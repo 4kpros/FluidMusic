@@ -11,7 +11,7 @@
   <a href="https://github.com/4kpros/FluidMusic/actions/workflows/android.yml" style="text-decoration:none" area-label="Build Status">
     <img src="https://github.com/RetroMusicPlayer/RetroMusicPlayer/actions/workflows/android.yml/badge.svg">
   </a>
-  <a href="https://github.com/4kpros/FluidMusic/master/LICENSE.md" style="text-decoration:none" area-label="License: GPL v3">
+  <a href="https://github.com/4kpros/FluidMusic/blob/dev/LICENCE.md" style="text-decoration:none" area-label="License: GPL v3">
     <img src="https://img.shields.io/badge/License-GPL%20v3-blue.svg">
   </a>
   <a href="https://twitter.com/fluidmusicapp" style="text-decoration:none" area-label="Twitter Follow">
