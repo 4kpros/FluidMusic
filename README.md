@@ -14,9 +14,6 @@
   <a href="https://github.com/4kpros/FluidMusic/blob/dev/LICENCE.md" style="text-decoration:none" area-label="License: GPL v3">
     <img src="https://img.shields.io/badge/License-GPL%20v3-blue.svg">
   </a>
-  <a href="https://twitter.com/fluidmusicapp" style="text-decoration:none" area-label="Twitter Follow">
-    <img src="https://img.shields.io/twitter/follow/fluidmusicapp?style=social">
-  </a>
 </p>
 
 **Fluid music** is an open source audio player. Currently available on Android devices.
