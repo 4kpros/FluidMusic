@@ -37,6 +37,7 @@
 
 ![FM](https://user-images.githubusercontent.com/52242361/198338087-c90fd62b-5985-4a9b-bbef-6e568b4386b0.png)
 
+Link totranslation : https://poeditor.com/join/project/ytUUxGZtzz
 
 Link to design files (Figma) : https://www.figma.com/file/XwEoyQ1CvGClTxtUzq3PmI/Fluid-music?node-id=907%3A2
 
