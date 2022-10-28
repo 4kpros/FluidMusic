@@ -40,4 +40,4 @@ Link to design files (Figma) : https://www.figma.com/file/XwEoyQ1CvGClTxtUzq3PmI
 
 Link to website project : https://github.com/4kpros/fluidmusic-website
 
-License: [GPLv3](LICENSE.md)
+License: [GPLv3](https://github.com/4kpros/FluidMusic/blob/dev/LICENCE.md)
