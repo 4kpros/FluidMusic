@@ -28,13 +28,12 @@
         <item name="colorSurfaceInverse">@color/md_theme_dark_inverseSurface</item>
         <item name="colorOnSurfaceInverse">@color/md_theme_dark_inverseOnSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_dark_inversePrimary</item>
-
-<!--        <item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
-<!--        <item name="android:windowTranslucentStatus">false</item>-->
-<!--        <item name="android:windowTranslucentNavigation">false</item>-->
-<!--        <item name="android:statusBarColor">@color/semiBlack</item>-->
-<!--        <item name="android:navigationBarColor">@color/semiBlack</item>-->
-<!--        &lt;!&ndash; Since the nav bar is white, we will use dark icons &ndash;&gt;-->
-<!--        <item name="android:windowLightNavigationBar">true</item>-->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:statusBarColor">@color/semiBlack</item>
+        <item name="android:navigationBarColor">@color/semiBlack</item>
+        <!-- Since the nav bar is white, we will use dark icons -->
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 </resources>

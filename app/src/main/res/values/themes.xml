@@ -27,23 +27,19 @@
         <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
         <item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:statusBarColor">@color/semiBlack</item>
+        <item name="android:navigationBarColor">@color/semiWhite</item>
+    </style>
 
-<!--        <item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
-<!--        <item name="android:windowTranslucentStatus">false</item>-->
-<!--        <item name="android:windowTranslucentNavigation">false</item>-->
-<!--        <item name="android:statusBarColor">@color/semiBlack</item>-->
-<!--        <item name="android:navigationBarColor">@color/semiWhite</item>-->
-    </style>
-    <!-- Nav view brand -->
-    <style name="NavViewHeaderIcon">
-        <item name="android:src">@drawable/ic_fluid_music_icon</item>
-    </style>
-    <!-- Covert art background -->
-    <style name="DefaultCoverArt">
-        <item name="android:src">@drawable/ic_fluid_music_icon_with_padding</item>
-    </style>
     <!-- Background -->
-    <style name="DefaultWithBackground">
+    <style name="DefaultBackground">
         <item name="android:background">@color/md_theme_light_background</item>
+    </style>
+    <style name="PlayerForeground">
+        <item name="android:background">@color/white</item>
+        <item name="android:alpha">0.4</item>
     </style>
 </resources>

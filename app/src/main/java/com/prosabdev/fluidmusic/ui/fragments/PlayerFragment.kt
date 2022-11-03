@@ -1,41 +1,57 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.content.Context
-import android.graphics.Insets.add
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.media.Image
+import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
-import androidx.core.view.ViewCompat
+import android.widget.ImageView
+import android.widget.Toast
+import androidx.annotation.Nullable
+import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
-import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.add
-import androidx.fragment.app.commit
+import androidx.core.widget.ImageViewCompat
+import androidx.fragment.app.*
+import androidx.viewpager2.widget.CompositePageTransformer
+import androidx.viewpager2.widget.MarginPageTransformer
+import androidx.viewpager2.widget.ViewPager2
+import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.google.android.material.button.MaterialButton
 import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.dialogs.PlayerMoreDialog
 import com.prosabdev.fluidmusic.dialogs.QueueMusicDialog
+import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
+import eightbitlab.com.blurview.BlurView
+import eightbitlab.com.blurview.RenderScriptBlur
+import jp.wasabeef.blurry.Blurry
+import org.jaudiotagger.tag.images.Artwork
+import kotlin.math.abs
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [PlayerFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class PlayerFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    private var mContext: Context? = null
+    private lateinit var mContext: Context
     private var mActivity: FragmentActivity? = null
+
+    private var mPlayerPagerAdapter: PlayerPageAdapter? = null
+    private var mSongList: MutableList<SongItem>? = null
+    private val mCurrentPosition = 0
+    private val mPlayerPageFragmentViewModel: MainExploreFragmentViewModel by viewModels()
 
     //Buttons var
     private var mButtonMore: MaterialButton? = null
@@ -46,14 +62,13 @@ class PlayerFragment : Fragment() {
     private var mPlayerMoreDialog: PlayerMoreDialog? = null
     private var mQueueMusicDialog: QueueMusicDialog? = null
 
-    private var mRelativeControls: RelativeLayout? = null
+    private var mPlayerContainer: LinearLayoutCompat? = null
+    private var mPlayerViewPager: ViewPager2? = null
+    private var mCovertArtBlurred: ImageView? = null
+    private var mBlurView: BlurView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
@@ -74,12 +89,98 @@ class PlayerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initViews(view)
+        blurViews(view)
+        setupViewPagerAdapter()
         checkInteractions(view)
-        listenViewModels(view)
+        observeLiveData(view)
     }
 
-    private fun listenViewModels(view: View) {
+    private fun blurViews(view: View) {
+//        val radius = 25f
+//
+//        val decorView : View = view.rootView
+//        // ViewGroup you want to start blur from. Choose root as close to BlurView in hierarchy as possible.
+//        val rootView : ViewGroup = decorView.findViewById(android.R.id.content)
+//
+//        // Optional:
+//        // Set drawable to draw in the beginning of each blurred frame.
+//        // Can be used in case your layout has a lot of transparent space and your content
+//        // gets a too low alpha value after blur is applied.
+//        val windowBackground : Drawable = decorView.background
+//        mBlurView?.setupWith(rootView, RenderScriptBlur(mContext)) // or RenderEffectBlur
+//            ?.setFrameClearDrawable(windowBackground) // Optional
+//            ?.setBlurRadius(radius)
 
+    }
+
+    private fun setupViewPagerAdapter() {
+        mSongList = mutableListOf<SongItem>()
+        mSongList?.add(SongItem("Drole de parcours", "La fouine"))
+        mSongList?.add(SongItem("Drole de parcours", "La fouine"))
+        mSongList?.add(SongItem("Drole de parcours", "La fouine"))
+        mSongList?.add(SongItem("Drole de parcours", "La fouine"))
+        mSongList?.add(SongItem("Drole de parcours", "La fouine"))
+        mSongList?.add(SongItem("Drole de parcours", "La fouine"))
+        mPlayerPagerAdapter =
+            PlayerPageAdapter(mSongList, mContext, object : PlayerPageAdapter.OnItemClickListener {
+                override fun onViewPagerClicked(position: Int) {
+                    Toast.makeText(context, "onViewPagerClicked", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onButtonLyricsClicked(position: Int) {
+                    Toast.makeText(context, "onButtonLyricsClicked", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onButtonFullscreenClicked(position: Int) {
+                    Toast.makeText(context, "onButtonFullscreenClicked", Toast.LENGTH_SHORT).show()
+                }
+
+            })
+        mPlayerViewPager?.adapter = mPlayerPagerAdapter
+        mPlayerViewPager?.setCurrentItem(0, true)
+        mPlayerViewPager?.clipToPadding = false
+        mPlayerViewPager?.clipChildren = false
+        //        mPlayerViewPager?.setOffscreenPageLimit(3);
+        mPlayerViewPager?.getChildAt(0)?.overScrollMode = View.OVER_SCROLL_NEVER
+        mPlayerViewPager?.registerOnPageChangeCallback(object : OnPageChangeCallback() {
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+            }
+
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                //
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                super.onPageScrollStateChanged(state)
+            }
+        })
+        transformPageScale(mPlayerViewPager)
+    }
+
+    private fun transformPageScale(viewPager: ViewPager2?) {
+        if(viewPager == null)
+            return
+        val compositePageTransformer = CompositePageTransformer()
+        compositePageTransformer.addTransformer(MarginPageTransformer(5))
+        compositePageTransformer.addTransformer { page, position ->
+            val normalizedPosition = abs(abs(position) - 1)
+            page.alpha = normalizedPosition
+            page.scaleX = normalizedPosition / 2 + 0.5f
+            page.scaleY = normalizedPosition / 2 + 0.5f
+            page.translationX = position * -100
+        }
+        viewPager.setPadding(0, 0, 0, 0)
+        viewPager.setPageTransformer(compositePageTransformer)
+    }
+
+    private fun observeLiveData(view: View) {
+        //
     }
 
     private fun checkInteractions(view: View) {
@@ -101,7 +202,86 @@ class PlayerFragment : Fragment() {
         mButtonArrowDown?.setOnClickListener(View.OnClickListener {
             //
         })
+
+        val drawable = ContextCompat.getDrawable(mContext.applicationContext, R.drawable.ic_fluid_music_icon_with_padding)
+        if (drawable != null) {
+            setBlurredFromImage(drawable)
+        }
     }
+
+    private fun setCovertArtFromPosition(position: Int) {
+        //Set covert art from song position
+        if((mSongList != null && mSongList!!.isNotEmpty())){
+            val tempArtwork: Artwork? = mSongList!![position].covertArt
+            var tempBinaryData: ByteArray? = null
+            if (tempArtwork != null) tempBinaryData = tempArtwork.binaryData
+
+            if(tempBinaryData != null && tempBinaryData.isNotEmpty()){
+                setBlurredFromImage(tempBinaryData)
+                return
+            }
+        }
+        //Set covert art from drawable
+        val drawable = ContextCompat.getDrawable(mContext.applicationContext, R.drawable.fashion)
+        if (drawable != null) {
+            setBlurredFromImage(drawable)
+        }
+    }
+
+    private fun setBlurredFromImage(binaryData: ByteArray) {
+        val customTarget: CustomTarget<Bitmap?> = object : CustomTarget<Bitmap?>() {
+            override fun onResourceReady(
+                resource: Bitmap,
+                transition: Transition<in Bitmap?>?
+            ) {
+            }
+
+            override fun onLoadCleared(placeholder: Drawable?) {
+                //
+            }
+        }
+        if (binaryData.isNotEmpty()){
+            Glide.with(mContext)
+                .asBitmap()
+                .load(binaryData)
+                .useAnimationPool(true)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .dontAnimate()
+                .centerCrop()
+                .apply(RequestOptions().override(380, 200))
+                .into(customTarget)
+        }else{
+            val drawable = ContextCompat.getDrawable(mContext.applicationContext, R.drawable.fashion)
+            if (drawable != null) {
+                setBlurredFromImage(drawable)
+            }
+        }
+    }
+
+    private fun setBlurredFromImage(drawableValue: Drawable) {
+        val customTarget: CustomTarget<Bitmap?> = object : CustomTarget<Bitmap?>() {
+            override fun onResourceReady(
+                resource: Bitmap,
+                transition: Transition<in Bitmap?>?
+            ) {
+                Blurry.with(context).from(resource).into(mCovertArtBlurred)
+            }
+
+            override fun onLoadCleared(placeholder: Drawable?) {
+                //
+            }
+        }
+        Glide.with(mContext)
+            .load(ContextCompat.getDrawable(mContext.applicationContext, R.drawable.fashion))
+            .useAnimationPool(true)
+            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+            .dontAnimate()
+            .centerCrop()
+            .apply(RequestOptions().override(380, 200))
+            .into(mCovertArtBlurred!!)
+
+    }
+
 
     private fun initViews(view: View) {
         mButtonMore = view.findViewById(R.id.button_more)
@@ -109,7 +289,46 @@ class PlayerFragment : Fragment() {
         mButtonEqualizer = view.findViewById(R.id.button_equalizer)
         mButtonArrowDown = view.findViewById(R.id.button_arrow_down)
 
-        mRelativeControls = view.findViewById(R.id.relative_controls_container)
+        mPlayerViewPager = view.findViewById<ViewPager2>(R.id.view_pager_player)
+        mCovertArtBlurred = view.findViewById<ImageView>(R.id.blur_imageview)
+        mPlayerContainer = view.findViewById<LinearLayoutCompat>(R.id.player_container)
+
+        updateTopViewInsets(mPlayerViewPager)
+        updateBottomViewInsets(view.findViewById(R.id.relative_player))
+        updateBottomViewInsets(view.findViewById(R.id.linear_mini_player))
+    }
+
+    private fun updateTopViewInsets(view: View?) {
+        view?.setOnApplyWindowInsetsListener { view, insets ->
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+                val tempInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
+                view.updatePadding(
+                    tempInsets.top,
+                )
+            }else{
+                view.updatePadding(
+                    top = insets.systemWindowInsetTop,
+                )
+            }
+            WindowInsetsCompat.CONSUMED
+            insets
+        }
+    }
+    private fun updateBottomViewInsets(view: View?) {
+        view?.setOnApplyWindowInsetsListener { view, insets ->
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+                val tempInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
+                view.updatePadding(
+                    tempInsets.bottom,
+                )
+            }else{
+                view.updatePadding(
+                    bottom = insets.systemWindowInsetBottom,
+                )
+            }
+            WindowInsetsCompat.CONSUMED
+            insets
+        }
     }
 
     companion object {
@@ -126,8 +345,6 @@ class PlayerFragment : Fragment() {
         fun newInstance(param1: String, param2: String) =
             PlayerFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
                 }
             }
     }

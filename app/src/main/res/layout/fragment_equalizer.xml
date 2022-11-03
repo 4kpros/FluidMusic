@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.fragments.EqualizerFragment"
-    style="@style/DefaultWithBackground"
+    style="@style/DefaultBackground"
+    android:clickable="true"
+    android:focusable="false"
     >
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/equalizer_app_bar"
@@ -14,6 +16,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:fitsSystemWindows="true"
         >
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/top_app_bar"

@@ -41,10 +41,10 @@ class MainFragment : Fragment() {
     private var mContext: Context? = null
     private var mActivity: FragmentActivity? = null
 
+    private var mSlidingUpPanel: SlidingUpPanelLayout? = null
+
     private var mMainFragmentContainer: FrameLayout? = null
     private var mPlayerFragmentContainer: FrameLayout? = null
-
-    private var mSlidingUpPanel: SlidingUpPanelLayout? = null
     private var mMiniPlayerContainer: LinearLayoutCompat? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,10 +78,24 @@ class MainFragment : Fragment() {
     }
 
     private fun checkInteractions(view: View) {
+
+        mMiniPlayerContainer?.alpha = 1.0f
+        mPlayerFragmentContainer?.alpha = 0.0f
         mSlidingUpPanel?.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
             override fun onPanelSlide(panel: View?, slideOffset: Float) {
                 Log.i(ConstantValues.TAG, "onPanelSlide, offset $slideOffset")
                 mMiniPlayerContainer?.alpha = if (1.0f - (slideOffset * 5.0f) >= 0.0f) (1.0f - (slideOffset * 5.0f)) else 0.0f
+                mPlayerFragmentContainer?.alpha = if (slideOffset <= 0.21f) 0.0f else slideOffset
+                if (slideOffset <= 0.15f){
+                    mPlayerFragmentContainer?.visibility = GONE
+                }else{
+                    mPlayerFragmentContainer?.visibility = VISIBLE
+                }
+                if(slideOffset < 1.0f){
+                    mMiniPlayerContainer?.visibility = VISIBLE
+                }else{
+                    mMiniPlayerContainer?.visibility = GONE
+                }
             }
 
             override fun onPanelStateChanged(
@@ -106,26 +120,36 @@ class MainFragment : Fragment() {
         mMainFragmentContainer = view.findViewById(R.id.main_fragment_container)
         mPlayerFragmentContainer = view.findViewById(R.id.player_fragment_container)
         mSlidingUpPanel = view.findViewById(R.id.sliding_up_panel)
-        mMiniPlayerContainer = view.findViewById(R.id.mini_player_container)
-
+        mMiniPlayerContainer = view.findViewById(R.id.linear_mini_player)
+        updateTopViewInsets(mMainFragmentContainer)
     }
 
-    private fun updateAllViewInsets(view: View?) {
+    private fun updateTopViewInsets(view: View?) {
         view?.setOnApplyWindowInsetsListener { view, insets ->
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
                 val tempInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
                 view.updatePadding(
                     tempInsets.top,
-                    tempInsets.left,
-                    tempInsets.right,
-                    tempInsets.bottom
                 )
             }else{
                 view.updatePadding(
                     top = insets.systemWindowInsetTop,
-                    left = insets.systemWindowInsetLeft,
-                    right = insets.systemWindowInsetRight,
-                    bottom = insets.systemWindowInsetBottom
+                )
+            }
+            WindowInsetsCompat.CONSUMED
+            insets
+        }
+    }
+    private fun updateBottomViewInsets(view: View?) {
+        view?.setOnApplyWindowInsetsListener { view, insets ->
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+                val tempInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
+                view.updatePadding(
+                    tempInsets.bottom,
+                )
+            }else{
+                view.updatePadding(
+                    bottom = insets.systemWindowInsetBottom,
                 )
             }
             WindowInsetsCompat.CONSUMED

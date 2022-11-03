@@ -5,7 +5,7 @@
     android:id="@+id/player_viewpager_container"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardElevation="2dp"
-    android:layout_margin="25dp"
+    android:layout_margin="20dp"
     style="@style/Widget.Material3.CardView.Elevated"
     >
     <RelativeLayout
@@ -22,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="?attr/materialIconButtonFilledTonalStyle"
-            app:icon="@drawable/play_circle"
+            app:icon="@drawable/lyrics"
             app:iconSize="24dp"
             android:scaleType="centerInside"
             android:layout_alignParentBottom="true"
@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="?attr/materialIconButtonFilledTonalStyle"
-            app:icon="@drawable/play_circle"
+            app:icon="@drawable/fullscreen"
             app:iconSize="24dp"
             android:scaleType="centerInside"
             android:layout_alignParentBottom="true"

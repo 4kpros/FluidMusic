@@ -15,11 +15,15 @@
             android:layout_height="wrap_content"
             style="@style/Widget.Material3.CardView.Elevated"
             android:layout_gravity="center_vertical"
+            android:layout_marginBottom="1dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginStart="1dp"
+            android:layout_marginEnd="1dp"
             >
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="60dp"
                 android:layout_height="55dp"
-                style="@style/DefaultCoverArt"
+                android:src="@drawable/ic_fluid_music_icon_with_padding"
                 android:layout_gravity="center"
                 />
         </com.google.android.material.card.MaterialCardView>
@@ -35,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="La fouine - Papa"
-                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textAppearance="?attr/textAppearanceBody1"
                 android:textColor="?attr/colorPrimary"
                 />
             <androidx.appcompat.widget.LinearLayoutCompat
@@ -90,7 +94,8 @@
                     style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/shuffle"
+                    app:icon="@drawable/info"
+                    app:iconPadding="2dp"
                     android:text="Info"
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -105,7 +110,8 @@
                     style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/shuffle"
+                    app:icon="@drawable/timer"
+                    app:iconPadding="2dp"
                     android:text="Timer"
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -127,7 +133,8 @@
                     style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/shuffle"
+                    app:icon="@drawable/photo_album"
+                    app:iconPadding="2dp"
                     android:text="Covert art"
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -142,7 +149,8 @@
                     style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/shuffle"
+                    app:icon="@drawable/link"
+                    app:iconPadding="2dp"
                     android:text="Go to"
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -164,7 +172,8 @@
                     style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/shuffle"
+                    app:icon="@drawable/lyrics"
+                    app:iconPadding="2dp"
                     android:text="Lyrics"
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -179,7 +188,8 @@
                     style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/shuffle"
+                    app:icon="@drawable/ring_volume"
+                    app:iconPadding="2dp"
                     android:text="Set as"
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -201,7 +211,8 @@
                     style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/shuffle"
+                    app:icon="@drawable/share"
+                    app:iconPadding="2dp"
                     android:text="Share"
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -216,7 +227,8 @@
                     style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/shuffle"
+                    app:icon="@drawable/delete"
+                    app:iconPadding="2dp"
                     android:text="Delete"
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>

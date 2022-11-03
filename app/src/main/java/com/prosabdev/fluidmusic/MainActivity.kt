@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
 
         //Setup UI
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
         setContentView(R.layout.activity_main)

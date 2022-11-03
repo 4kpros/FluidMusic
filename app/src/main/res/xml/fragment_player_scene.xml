@@ -4,10 +4,23 @@
     xmlns:motion="http://schemas.android.com/apk/res-auto">
 
     <Transition
-        motion:constraintSetEnd="@+id/end"
+        android:id="@+id/transition_mini_player"
         motion:constraintSetStart="@id/start"
-        motion:duration="1000">
+        motion:constraintSetEnd="@+id/end"
+        motion:duration="300">
+        <OnClick
+            motion:clickAction="transitionToEnd"
+            motion:targetId="@+id/player_container"
+            />
+        <OnSwipe
+            motion:touchRegionId="@+id/player_container"
+            motion:dragDirection="dragUp"
+            motion:touchAnchorSide="bottom"
+            motion:onTouchUp="autoComplete"
+            motion:springDamping="22"
+            />
        <KeyFrameSet>
+
        </KeyFrameSet>
     </Transition>
 
@@ -15,5 +28,82 @@
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
+        <Constraint
+            android:id="@+id/player_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:alpha="1" />
+        <Constraint
+            android:id="@+id/button_play_pause_2"
+            motion:layout_constraintEnd_toEndOf="@+id/progress_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:alpha="0"
+            motion:layout_constraintTop_toTopOf="@+id/linear_viewpager" />
+        <Constraint
+            android:id="@+id/progress_indicator"
+            motion:layout_constraintEnd_toEndOf="@+id/player_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:alpha="0"
+            motion:layout_constraintTop_toTopOf="@+id/player_container"
+            motion:layout_constraintStart_toStartOf="@+id/player_container" />
+        <Constraint
+            android:id="@+id/linear_viewpager"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintBottom_toTopOf="@+id/linear_song_title"
+            motion:layout_constraintTop_toTopOf="@+id/progress_indicator"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp" />
+        <Constraint
+            android:id="@+id/linear_more_buttons"
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            android:alpha="1"
+            motion:layout_constraintStart_toStartOf="parent" />
+        <Constraint
+            android:id="@+id/linear_buttons_container"
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            motion:layout_constraintBottom_toTopOf="@+id/linear_more_buttons"
+            android:alpha="1"
+            motion:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp" />
+        <Constraint
+            android:id="@+id/linear_progress_bar_container"
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            motion:layout_constraintBottom_toTopOf="@+id/linear_buttons_container"
+            android:alpha="1"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            motion:layout_constraintStart_toStartOf="parent" />
+        <Constraint
+            android:id="@+id/linear_song_title"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintBottom_toTopOf="@+id/linear_progress_bar_container"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:alpha="1" />
     </ConstraintSet>
 </MotionScene>
