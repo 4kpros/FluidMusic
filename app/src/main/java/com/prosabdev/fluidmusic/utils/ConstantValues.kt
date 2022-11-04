@@ -50,5 +50,13 @@ abstract class ConstantValues {
         //Shuffle modes
         const val SHUFFLE_NONE = 0
         const val SHUFFLE_DEFAULT = 1
+
+
+        const val ARGS_EXPLORE_CONTENT = "ARGS_EXPLORE_CONTENT"
+        const val EXPLORE_ALL_FOLDERS = "EXPLORE_ALL_FOLDERS"
+        const val EXPLORE_ALL_SONGS = "EXPLORE_ALL_SONGS"
+        const val EXPLORE_ALBUMS = "EXPLORE_ALBUMS"
+        const val EXPLORE_ALL_ARTISTS = "EXPLORE_ALL_ARTISTS"
+        const val EXPLORE_ALL_GENRES = "EXPLORE_ALL_GENRES"
     }
 }

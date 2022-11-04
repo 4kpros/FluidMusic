@@ -1,9 +1,10 @@
 package com.prosabdev.fluidmusic.models
 
+import android.graphics.Bitmap
 import org.jaudiotagger.tag.images.Artwork
 
-class SongItem(title: String, artist: String) {
-    var id = 0
+class SongItem() {
+    var id : Long = 0
     var fileName: String? = null
     var title: String? = null
     var artist: String? = null
@@ -30,4 +31,5 @@ class SongItem(title: String, artist: String) {
 
     //
     var covertArt: Artwork? = null
+    var covertArtBitmap: Bitmap? = null
 }

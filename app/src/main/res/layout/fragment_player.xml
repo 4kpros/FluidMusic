@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     android:clickable="false"
     android:focusable="false"
-    app:layoutDescription="@xml/fragment_player_scene"
     tools:context=".ui.fragments.PlayerFragment">
 
     <ImageView
@@ -15,6 +14,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:alpha="1"
+        style="@style/DefaultBackground"
+        />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/player_container"
@@ -112,39 +119,36 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/button_shuffle"
-                        style="?attr/materialIconButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        style="?attr/materialIconButtonStyle"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginEnd="5dp"
                         app:icon="@drawable/shuffle" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/button_skip_prev"
-                        style="?attr/materialIconButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        style="?attr/materialIconButtonFilledTonalStyle"
                         android:layout_gravity="center_vertical"
                         app:icon="@drawable/skip_previous"
                         app:iconSize="24dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/button_play_pause"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         style="?attr/materialIconButtonStyle"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="5dp"
                         app:icon="@drawable/play_circle"
-                        app:iconGravity="textStart"
-                        app:iconSize="60dp" />
+                        android:padding="0dp"
+                        app:iconSize="70dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/button_skip_next"
-                        style="?attr/materialIconButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        style="?attr/materialIconButtonFilledTonalStyle"
                         android:layout_gravity="center_vertical"
                         app:icon="@drawable/skip_next"
                         app:iconSize="24dp" />
@@ -155,7 +159,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginStart="5dp"
                         app:icon="@drawable/repeat" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
                 <androidx.appcompat.widget.LinearLayoutCompat

@@ -70,7 +70,7 @@ class PlayerPageAdapter(
                     .into(covertArtView)
             }else{
                 Glide.with(mContext)
-                    .load(ContextCompat.getDrawable(mContext.applicationContext, R.drawable.fashion))
+                    .load(ContextCompat.getDrawable(mContext, R.drawable.ic_fluid_music_icon_with_padding))
                     .useAnimationPool(true)
                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                     .dontAnimate()

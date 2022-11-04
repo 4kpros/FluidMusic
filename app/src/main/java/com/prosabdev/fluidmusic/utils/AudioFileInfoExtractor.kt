@@ -3,6 +3,7 @@ package com.prosabdev.fluidmusic.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.models.SongItem
 import org.jaudiotagger.audio.AudioFileIO
@@ -20,7 +21,8 @@ import java.io.IOException
 abstract class AudioFileInfoExtractor {
     companion object {
         //Return audio info
-        fun getAudioInfo(absolutePath: String?, songItem: SongItem) {
+        fun getAudioInfo(absolutePath: String?): SongItem {
+            val songItem : SongItem = SongItem()
             if (absolutePath != null && absolutePath.isNotEmpty()) {
                 val tempFile = File(absolutePath)
                 try {
@@ -33,10 +35,10 @@ abstract class AudioFileInfoExtractor {
                     val sampleRate = audioHeader.sampleRateAsNumber / 1000
 
                     // After get audio content tagger
-                    val tag: Tag = audioFile.tagOrCreateAndSetDefault!!
+                    val tag: Tag = audioFile.tagOrCreateAndSetDefault
 
                     //Retrieve covert art
-                    val artwork: Artwork = tag.firstArtwork
+                    val artwork: Artwork? = tag.firstArtwork
                     val title: String = tag.getFirst(FieldKey.TITLE)
                     val artist: String = tag.getFirst(FieldKey.ARTIST)
                     val album: String = tag.getFirst(FieldKey.ALBUM)
@@ -65,10 +67,11 @@ abstract class AudioFileInfoExtractor {
                     e.printStackTrace()
                 }
             }
+            return songItem
         }
 
         //Extract bitmap audio artwork from path
-        fun getBitmapAudioArtwork(context: Context, path: String?, width: Int, height: Int): Bitmap? {
+        fun getBitmapAudioArtwork(context: Context, path: String?, width: Int = 50, height: Int = 50): Bitmap? {
             var tempBitmapImage: Bitmap? = null
             if (path != null && path.isNotEmpty()) {
                 var binaryDataImage: ByteArray? = ByteArray(0)

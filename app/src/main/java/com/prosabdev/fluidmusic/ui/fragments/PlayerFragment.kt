@@ -115,12 +115,14 @@ class PlayerFragment : Fragment() {
 
     private fun setupViewPagerAdapter() {
         mSongList = mutableListOf<SongItem>()
-        mSongList?.add(SongItem("Drole de parcours", "La fouine"))
-        mSongList?.add(SongItem("Drole de parcours", "La fouine"))
-        mSongList?.add(SongItem("Drole de parcours", "La fouine"))
-        mSongList?.add(SongItem("Drole de parcours", "La fouine"))
-        mSongList?.add(SongItem("Drole de parcours", "La fouine"))
-        mSongList?.add(SongItem("Drole de parcours", "La fouine"))
+        mSongList?.add(SongItem())
+        mSongList?.add(SongItem())
+        mSongList?.add(SongItem())
+        mSongList?.add(SongItem())
+        mSongList?.add(SongItem())
+        mSongList?.add(SongItem())
+        mSongList?.add(SongItem())
+        mSongList?.add(SongItem())
         mPlayerPagerAdapter =
             PlayerPageAdapter(mSongList, mContext, object : PlayerPageAdapter.OnItemClickListener {
                 override fun onViewPagerClicked(position: Int) {
@@ -272,7 +274,7 @@ class PlayerFragment : Fragment() {
             }
         }
         Glide.with(mContext)
-            .load(ContextCompat.getDrawable(mContext.applicationContext, R.drawable.fashion))
+            .load(ContextCompat.getDrawable(mContext.applicationContext, R.drawable.ic_fluid_music_icon_with_padding))
             .useAnimationPool(true)
             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
             .dontAnimate()

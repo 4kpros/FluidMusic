@@ -20,22 +20,13 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
+import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.explore.AllSongsFragmentViewModel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [MainExploreFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class MainExploreFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    private var mExploreContentParam: Int = 0
 
     private lateinit var mAppBarLayout: AppBarLayout
     private lateinit var mTabLayout: TabLayout
@@ -47,8 +38,7 @@ class MainExploreFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            mExploreContentParam = it.getInt(ConstantValues.ARGS_EXPLORE_CONTENT)
         }
     }
 
@@ -64,12 +54,45 @@ class MainExploreFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initViews(view)
+        setupViewPagerAdapter(view)
         checkInteractions(view)
-        listenViewModels(view)
+        observeLiveData(view)
+    }
+
+    private fun setupViewPagerAdapter(view: View) {
+        //Setup adapter
+        mTabLayoutAdapter = TabLayoutAdapter(this)
+        mViewPager.adapter = mTabLayoutAdapter
+
+        //Setup tab layout mediator
+        TabLayoutMediator(mTabLayout, mViewPager){tab,position->
+            applyToolBarTitle(position, tab)
+        }.attach()
+        mViewPager.currentItem = mExploreContentParam
+        applyAppBarTitle(mExploreContentParam)
+    }
+    private fun applyToolBarTitle(position: Int, tab: TabLayout.Tab) {
+        when(position){
+            0->{
+                tab.text = getString(R.string.folders)
+            }
+            1->{
+                tab.text = getString(R.string.songs)
+            }
+            2->{
+                tab.text = getString(R.string.albums)
+            }
+            3->{
+                tab.text = getString(R.string.artists)
+            }
+            4->{
+                tab.text = getString(R.string.genre)
+            }
+        }
     }
 
     //Method to listen all view models
-    private fun listenViewModels(view: View) {
+    private fun observeLiveData(view: View) {
         //
     }
 
@@ -79,11 +102,11 @@ class MainExploreFragment : Fragment() {
             mMainExploreFragmentViewModel.setOnActionBarClickListened(true)
         }
 
-        applyAppBarTitle(mViewPager.currentItem)
         mViewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 applyAppBarTitle(position)
+                mMainExploreFragmentViewModel.setActivePage(position)
             }
         })
     }
@@ -114,34 +137,6 @@ class MainExploreFragment : Fragment() {
         mTopAppBar = view.findViewById(R.id.top_app_bar)
         mTabLayout = view.findViewById(R.id.tab_layout)
         mViewPager = view.findViewById(R.id.view_pager_main_explore)
-
-        //Setup adapter
-        mTabLayoutAdapter = TabLayoutAdapter(this)
-        mViewPager.adapter = mTabLayoutAdapter
-
-        //Setup tab layout mediator
-        TabLayoutMediator(mTabLayout, mViewPager){tab,position->
-            applyToolBarTitle(position, tab)
-        }.attach()
-    }
-    private fun applyToolBarTitle(position: Int, tab: TabLayout.Tab) {
-        when(position){
-            0->{
-                tab.text = getString(R.string.folders)
-            }
-            1->{
-                tab.text = getString(R.string.songs)
-            }
-            2->{
-                tab.text = getString(R.string.albums)
-            }
-            3->{
-                tab.text = getString(R.string.artists)
-            }
-            4->{
-                tab.text = getString(R.string.genre)
-            }
-        }
     }
 
     companion object {
@@ -155,11 +150,10 @@ class MainExploreFragment : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(exploreContent: Int = 0) =
             MainExploreFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putInt(ConstantValues.ARGS_EXPLORE_CONTENT, exploreContent)
                 }
             }
     }

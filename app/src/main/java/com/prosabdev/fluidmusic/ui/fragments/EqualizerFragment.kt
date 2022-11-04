@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.android.material.transition.MaterialContainerTransform
 import com.prosabdev.fluidmusic.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -28,6 +29,7 @@ class EqualizerFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+        sharedElementEnterTransition = MaterialContainerTransform()
     }
 
     override fun onCreateView(

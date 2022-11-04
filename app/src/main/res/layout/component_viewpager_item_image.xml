@@ -3,10 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/player_viewpager_container"
+    style="@style/Widget.Material3.CardView.Elevated"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardElevation="2dp"
     android:layout_margin="20dp"
-    style="@style/Widget.Material3.CardView.Elevated"
     >
     <RelativeLayout
         android:layout_width="match_parent"

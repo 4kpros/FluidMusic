@@ -38,6 +38,9 @@
     <style name="DefaultBackground">
         <item name="android:background">@color/md_theme_light_background</item>
     </style>
+    <style name="SongSelectedBackground">
+        <item name="android:background">@color/md_theme_light_secondaryContainer</item>
+    </style>
     <style name="PlayerForeground">
         <item name="android:background">@color/white</item>
         <item name="android:alpha">0.4</item>

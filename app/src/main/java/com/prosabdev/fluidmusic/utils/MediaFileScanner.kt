@@ -9,12 +9,12 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.prosabdev.fluidmusic.models.SongItem
 import java.io.File
-import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 
 abstract class MediaFileScanner {
@@ -43,8 +43,13 @@ abstract class MediaFileScanner {
             )
         }
 
-        fun scanAudioFilesWithMediaStore(activity: Activity): ArrayList<SongItem> {
-            val songArrayList: ArrayList<SongItem> = ArrayList()
+        fun scanAudioFilesWithMediaStore(
+            activity: Activity,
+            mMutableSongList: MutableLiveData<ArrayList<SongItem>>,
+            mMutableHaveData: MutableLiveData<Boolean>,
+            pagination: Int
+        ) {
+            val tempSongList: ArrayList<SongItem> = ArrayList()
             val collection: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
             } else {
@@ -79,7 +84,10 @@ abstract class MediaFileScanner {
                     cursor?.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION) ?: -1
                 val mimeTypeColumn: Int =
                     cursor?.getColumnIndexOrThrow(MediaStore.Audio.Media.MIME_TYPE) ?: -1
+
+                var itemsCount = 0
                 while (cursor?.moveToNext() == true) {
+                    itemsCount++
                     // Get values of columns for a given audio.
                     val absolutePath: String = cursor.getString(absolutePathColumn) ?: ""
                     val id: Int = cursor.getInt(idColumn) ?: -1
@@ -89,16 +97,21 @@ abstract class MediaFileScanner {
 
                     // Stores column values and the contentUri in a local object
                     // that represents the media file.
-                    val song = SongItem("", "")
-                    AudioFileInfoExtractor.getAudioInfo(absolutePath, song)
-                    song.absolutePath = absolutePath
-                    song.fileName = name
-                    song.duration = duration
-                    song.typeMime = mimeType
+                    val songItem : SongItem = AudioFileInfoExtractor.getAudioInfo(absolutePath)
+                    songItem.absolutePath = absolutePath
+                    songItem.fileName = name
+                    songItem.duration = duration
+                    songItem.typeMime = mimeType
+//                    songItem.covertArtBitmap = AudioFileInfoExtractor.getBitmapAudioArtwork(activity, absolutePath)
                     //Now save on database
-                    songArrayList.add(song)
+                    tempSongList.add(songItem)
+                    if(itemsCount > 0 && itemsCount % 10 == 0){
+                        mMutableSongList.value = tempSongList
+                        if(itemsCount == pagination)
+                            mMutableHaveData.value = true
+                    }
                 }
-                return songArrayList
+                mMutableHaveData.value = true
             }
         }
     }
