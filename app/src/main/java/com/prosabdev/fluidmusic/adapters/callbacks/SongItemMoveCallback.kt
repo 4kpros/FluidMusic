@@ -3,7 +3,7 @@ package com.prosabdev.fluidmusic.adapters.callbacks
 import android.util.Log
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.prosabdev.fluidmusic.adapters.SongItemAdapter
+import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.utils.ConstantValues
 
 class SongItemMoveCallback(adapter : SongItemAdapter) : ItemTouchHelper.Callback() {

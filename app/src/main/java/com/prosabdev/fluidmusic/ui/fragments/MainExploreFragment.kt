@@ -1,9 +1,8 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.os.Debug
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,13 +13,8 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
-import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
@@ -31,18 +25,15 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
+import com.prosabdev.fluidmusic.ui.fragments.explore.AllSongsFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
-import com.prosabdev.fluidmusic.utils.adapters.SelectableRecycleViewAdapter
 import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.explore.AllSongsFragmentViewModel
 
 class MainExploreFragment : Fragment() {
 
     private var mContext: Context? = null
     private var mActivity: FragmentActivity? = null
-
-    private var mExploreContentParam: Int = 0
 
     private lateinit var mAppBarLayout: AppBarLayout
     private lateinit var mTabLayout: TabLayout
@@ -64,7 +55,6 @@ class MainExploreFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            mExploreContentParam = it.getInt(ConstantValues.ARGS_EXPLORE_CONTENT)
         }
     }
 
@@ -98,16 +88,16 @@ class MainExploreFragment : Fragment() {
         TabLayoutMediator(mTabLayout, mViewPager){tab,position->
             applyToolBarTitle(position, tab)
         }.attach()
-        mViewPager.currentItem = mExploreContentParam
-        applyAppBarTitle(mExploreContentParam)
+        mViewPager.currentItem = mMainExploreFragmentViewModel.getActivePage().value ?: 0
+        applyAppBarTitle(mMainExploreFragmentViewModel.getActivePage().value ?: 0)
     }
     private fun applyToolBarTitle(position: Int, tab: TabLayout.Tab) {
         when(position){
             0->{
-                tab.text = getString(R.string.folders)
+                tab.text = getString(R.string.songs)
             }
             1->{
-                tab.text = getString(R.string.songs)
+                tab.text = getString(R.string.folders)
             }
             2->{
                 tab.text = getString(R.string.albums)
@@ -125,19 +115,42 @@ class MainExploreFragment : Fragment() {
     private fun observeLiveData(view: View) {
         mMainExploreFragmentViewModel.getSelectMode().observe(mActivity as LifecycleOwner, object : Observer<Boolean>{
             override fun onChanged(selectMode: Boolean?) {
-                Log.i(ConstantValues.TAG, "onSelectionModeChange, SELECT MODE = $selectMode, TOTAL = ${mMainExploreFragmentViewModel.getTotalSelected().value ?: 0}, TOTAL COUNT = ${mMainExploreFragmentViewModel.getTotalCount().value ?: 0}")
                 updateSelectedItems(selectMode ?: false, mMainExploreFragmentViewModel.getTotalSelected().value ?: 0, mMainExploreFragmentViewModel.getTotalCount().value ?: 0, true)
             }
-
         })
         mMainExploreFragmentViewModel.getTotalSelected().observe(mActivity as LifecycleOwner, object : Observer<Int>{
             override fun onChanged(totalSelected: Int?) {
                 if(mMainExploreFragmentViewModel.getSelectMode().value == true){
-                    Log.i(ConstantValues.TAG, "onSelectionModeChange, SELECT MODE = $mMainExploreFragmentViewModel.getSelectMode().value ?: false, TOTAL = ${mMainExploreFragmentViewModel.getTotalSelected().value ?: 0}, TOTAL COUNT = ${mMainExploreFragmentViewModel.getTotalCount().value ?: 0}")
                     updateSelectedItems(mMainExploreFragmentViewModel.getSelectMode().value ?: false, totalSelected ?: 0, mMainExploreFragmentViewModel.getTotalCount().value ?: 0)
                 }
             }
         })
+    }
+    private  fun updateSelectedItems(selectMode : Boolean, totalSelected: Int, totalCount : Int, animate : Boolean = false){
+        mTextSelectedCount.text = "$totalSelected/$totalCount"
+        if(totalSelected > 0 && totalSelected >= totalCount)
+            mButtonSelectAll.icon = ContextCompat.getDrawable(mContext!!, R.drawable.deselect)
+        else
+            mButtonSelectAll.icon = ContextCompat.getDrawable(mContext!!, R.drawable.select_all)
+
+        //Update UI
+        if (selectMode){
+            if(totalCount > 0 && totalSelected == totalCount)
+                mButtonSelectAll.icon = ContextCompat.getDrawable(mContext!!, R.drawable.deselect)
+            else
+                mButtonSelectAll.icon = ContextCompat.getDrawable(mContext!!, R.drawable.select_all)
+            //Show selection mode
+            if(animate)
+                CustomAnimators.crossFadeUp(mSelectionPanelEditor, true)
+        }else{
+            if(totalSelected > 0 && totalSelected >= totalCount)
+                mButtonSelectAll.icon = ContextCompat.getDrawable(mContext!!, R.drawable.deselect)
+            else
+                mButtonSelectAll.icon = ContextCompat.getDrawable(mContext!!, R.drawable.select_all)
+            //Hide selection mode
+            if(animate)
+                CustomAnimators.crossFadeDown(mSelectionPanelEditor, true)
+        }
     }
 
     //Method to check all interactions
@@ -157,13 +170,18 @@ class MainExploreFragment : Fragment() {
         })
         mButtonClose.setOnClickListener(object : OnClickListener{
             override fun onClick(p0: View?) {
-                Toast.makeText(context, "mButtonDelete", Toast.LENGTH_SHORT).show()
+                mMainExploreFragmentViewModel.setSelectMode(false)
+                mMainExploreFragmentViewModel.setTotalSelected(0)
             }
 
         })
         mButtonSelectAll.setOnClickListener(object : OnClickListener{
             override fun onClick(p0: View?) {
-                Toast.makeText(context, "mButtonSelectAll", Toast.LENGTH_SHORT).show()
+                if((mMainExploreFragmentViewModel.getTotalCount().value ?: 0) > 0 && (mMainExploreFragmentViewModel.getTotalSelected().value ?: 0) < (mMainExploreFragmentViewModel.getTotalCount().value ?: 0)){
+                    mMainExploreFragmentViewModel.setTotalSelected(mMainExploreFragmentViewModel.getTotalCount().value ?: 0)
+                }else{
+                    mMainExploreFragmentViewModel.setTotalSelected(0)
+                }
             }
 
         })
@@ -192,13 +210,14 @@ class MainExploreFragment : Fragment() {
 
         })
     }
+
     private fun applyAppBarTitle(position: Int) {
         when(position){
             0->{
-                mTopAppBar.title = getString(R.string.folders)
+                mTopAppBar.title = getString(R.string.songs)
             }
             1->{
-                mTopAppBar.title = getString(R.string.songs)
+                mTopAppBar.title = getString(R.string.folders)
             }
             2->{
                 mTopAppBar.title = getString(R.string.albums)
@@ -239,33 +258,5 @@ class MainExploreFragment : Fragment() {
                     putInt(ConstantValues.ARGS_EXPLORE_CONTENT, exploreContent)
                 }
             }
-    }
-
-    private  fun updateSelectedItems(selectMode : Boolean, totalSelected: Int, totalCount : Int, animate : Boolean = false){
-
-        mTextSelectedCount.text = "$totalSelected/$totalCount"
-        if(totalSelected > 0 && totalSelected >= totalCount)
-            mButtonSelectAll.icon = ContextCompat.getDrawable(mContext!!, R.drawable.deselect)
-        else
-            mButtonSelectAll.icon = ContextCompat.getDrawable(mContext!!, R.drawable.select_all)
-
-        //Update UI
-        if (selectMode){
-            if((mMainExploreFragmentViewModel.getTotalCount().value ?: 0) > 0 && (mMainExploreFragmentViewModel.getTotalSelected().value ?: 0) >= (mMainExploreFragmentViewModel.getTotalCount().value ?: 0))
-                mButtonSelectAll.icon = ContextCompat.getDrawable(mContext!!, R.drawable.deselect)
-            else
-                mButtonSelectAll.icon = ContextCompat.getDrawable(mContext!!, R.drawable.select_all)
-            //Show selection mode
-            if(animate)
-                CustomAnimators.crossFadeUp(mSelectionPanelEditor, true)
-        }else{
-            if((mMainExploreFragmentViewModel.getTotalSelected().value ?: 0) > 0 && (mMainExploreFragmentViewModel.getTotalSelected().value ?: 0) >= (mMainExploreFragmentViewModel.getTotalCount().value ?: 0))
-                mButtonSelectAll.icon = ContextCompat.getDrawable(mContext!!, R.drawable.deselect)
-            else
-                mButtonSelectAll.icon = ContextCompat.getDrawable(mContext!!, R.drawable.select_all)
-            //Hide selection mode
-            if(animate)
-                CustomAnimators.crossFadeDown(mSelectionPanelEditor, true)
-        }
     }
 }

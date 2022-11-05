@@ -10,38 +10,38 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.MediaFileScanner
 
 class AllSongsFragmentViewModel : ViewModel() {
-
-    private val mMutableFirstLoaded = MutableLiveData<Boolean>(false)
-    private val mMutableHaveData = MutableLiveData<Boolean>(false)
-    private val mMutableStartPosition = MutableLiveData<Int>(0)
+    private val mMutableIsLoading = MutableLiveData<Boolean>(true)
+    private val mMutableIsLoadingInBackground = MutableLiveData<Boolean>(true)
+    private val mMutableLastLoadedPosition = MutableLiveData<Int>(0)
     private val mMutableSongList = MutableLiveData<ArrayList<SongItem>>()
 
-    private val mFirstLoaded : LiveData<Boolean> get() = mMutableFirstLoaded
-    private val mHaveData : LiveData<Boolean> get() = mMutableHaveData
-    private val mStartPosition: LiveData<Int> get() = mMutableStartPosition
+    private val mIsLoading : LiveData<Boolean> get() = mMutableIsLoading
+    private val mIsLoadingInBackground : LiveData<Boolean> get() = mMutableIsLoadingInBackground
+    private val mLastLoadedPosition: LiveData<Int> get() = mMutableLastLoadedPosition
     private val mSongList: LiveData<ArrayList<SongItem>> get() = mMutableSongList
 
     fun requestLoadAsyncSongs(activity : Activity){
         //Load songs from database id exist
 
         //Else load songs from MediaFileScanner
-        MediaFileScanner.scanAudioFilesWithMediaStore(activity, mMutableSongList, mMutableHaveData, 30)
+        MediaFileScanner.scanAudioFilesWithMediaStore(activity, mMutableSongList, mMutableIsLoading, mMutableIsLoadingInBackground, 10)
     }
-    fun setFirstLoaded(value : Boolean) {
-        mMutableFirstLoaded.value = true
+    fun setIsLoading(value : Boolean) {
+        mMutableIsLoading.value = value
+        mMutableIsLoadingInBackground.value = value
     }
-    fun getFirstLoaded(): LiveData<Boolean> {
-        return mFirstLoaded
+    fun getIsLoading(): LiveData<Boolean> {
+        return mIsLoading
     }
-    fun onDataReady(): LiveData<Boolean> {
-        return mHaveData
+    fun getSongs(): LiveData<ArrayList<SongItem>>  {
+        return mSongList
     }
-    fun loadMoreSongs(pagination : Int = 30): LiveData<ArrayList<SongItem>>? {
+    fun loadMoreSongs(fromPosition : Int = 50): LiveData<ArrayList<SongItem>>? {
         var tempLiveDataSongList: MutableLiveData<ArrayList<SongItem>>? = null
         val tempSongList: ArrayList<SongItem> = ArrayList()
-        var tempStartPosition = mMutableStartPosition.value ?: 0
+        var tempStartPosition = mLastLoadedPosition.value ?: 0
         if(!(mSongList.value == null || mSongList.value?.size!! <= 0)){
-            for (i in 0 until pagination){
+            for (i in 0 until fromPosition){
                 if(tempStartPosition.plus(i) < mSongList.value?.size!!){
                     tempSongList.add(mSongList.value?.get(i)!!)
                     tempStartPosition++

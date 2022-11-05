@@ -1,4 +1,4 @@
-package com.prosabdev.fluidmusic.adapters
+package com.prosabdev.fluidmusic.adapters.explore
 
 import android.content.Context
 import android.view.LayoutInflater

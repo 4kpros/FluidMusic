@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.core.view.*
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
@@ -17,6 +18,7 @@ import com.google.android.material.color.DynamicColors
 import com.google.android.material.navigation.NavigationView
 import com.prosabdev.fluidmusic.ui.fragments.MainExploreFragment
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.AllSongsFragment
 import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
 
 class MainActivity : AppCompatActivity(){

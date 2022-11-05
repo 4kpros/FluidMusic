@@ -1,48 +1,91 @@
 package com.prosabdev.fluidmusic.ui.fragments.explore
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
+import com.prosabdev.fluidmusic.adapters.explore.GenreItemAdapter
+import com.prosabdev.fluidmusic.models.GenreItem
+import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.viewmodels.explore.GenresFragmentViewModel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [GenresFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class GenresFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var mPageIndex: Int? = -1
+
+    private var mContext: Context? = null
+    private var mActivity: FragmentActivity? = null
+
+    private val mGenresFragmentViewModel: GenresFragmentViewModel by activityViewModels()
+
+    private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
+    private var mGenreItemAdapter: GenreItemAdapter? = null
+    private var mRecyclerView: RecyclerView? = null
+    private var mLoadingContentProgress: LinearProgressIndicator? = null
+
+    private var mGenreList : ArrayList<GenreItem> = ArrayList<GenreItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            mPageIndex = it.getInt(ConstantValues.EXPLORE_ALL_GENRES)
         }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_genres, container, false)
+        val view : View = inflater.inflate(R.layout.fragment_genres, container, false)
+
+        mContext = requireContext()
+        mActivity = requireActivity()
+
+        runBlocking {
+            launch {
+                initViews(view)
+                setupRecyclerViewAdapter()
+                observeLiveData()
+                checkInteractions()
+            }
+        }
+
+        return view
+    }
+
+    private fun checkInteractions() {
+
+    }
+
+    private fun observeLiveData() {
+
+    }
+
+    private fun setupRecyclerViewAdapter() {
+
+    }
+
+    private fun initViews(view: View) {
+        mRecyclerView = view.findViewById<RecyclerView>(R.id.content_recycler_view)
+        mLoadingContentProgress = view.findViewById<LinearProgressIndicator>(R.id.loading_content_progress)
     }
 
     companion object {
         @JvmStatic
-        fun newInstance() =
+        fun newInstance(pageIndex: Int) =
             GenresFragment().apply {
                 arguments = Bundle().apply {
+                    putInt(ConstantValues.EXPLORE_ALL_GENRES, pageIndex)
                 }
             }
     }

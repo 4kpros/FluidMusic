@@ -32,7 +32,7 @@ class MainExploreFragmentViewModel : ViewModel() {
         return mTotalSelected
     }
     fun setTotalCount(value : Int) {
-        mMutableTotalCount.value = value
+        mMutableTotalCount.value = value + (mTotalCount.value ?: 0)
     }
     fun getTotalCount(): LiveData<Int> {
         return mTotalCount

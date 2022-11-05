@@ -1,22 +1,16 @@
 package com.prosabdev.fluidmusic.ui.fragments.explore
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ConcatAdapter
@@ -26,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
-import com.prosabdev.fluidmusic.adapters.SongItemAdapter
+import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.adapters.callbacks.SongItemMoveCallback
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
@@ -52,8 +46,6 @@ class AllSongsFragment : Fragment() {
 
     private var mSongList : ArrayList<SongItem> = ArrayList<SongItem>()
 
-    private var mShortAnimationDuration: Int = 0
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -73,13 +65,8 @@ class AllSongsFragment : Fragment() {
 
         runBlocking {
             launch {
-                initViews(view)
-                setupRecyclerViewAdapter()
-                observeLiveData()
-                checkInteractions()
             }
         }
-
         return view
     }
 
@@ -97,40 +84,33 @@ class AllSongsFragment : Fragment() {
                         clearSelectedItemsPage()
                     }
                 }
-                if(page == mPageIndex){
-                    if(mAllSongsFragmentViewModel.getFirstLoaded().value == false){
-                        mAllSongsFragmentViewModel.setFirstLoaded(true)
-                        //Set is loading views
-                        CustomAnimators.crossFadeDown(mRecyclerView as View)
-                        CustomAnimators.crossFadeUp(mLoadingContentProgress as View)
-                        MainScope().launch {
-                            var canLoadData = 0
-                            mAllSongsFragmentViewModel.onDataReady().observe(mActivity as LifecycleOwner, object  : Observer<Boolean>{
-                                override fun onChanged(t: Boolean?) {
-                                    canLoadData++
-                                    if(canLoadData == 1){
-                                        mAllSongsFragmentViewModel.loadMoreSongs()?.observe(mActivity as LifecycleOwner, object : Observer<ArrayList<SongItem>>{
-                                            override fun onChanged(songList: ArrayList<SongItem>?) {
-                                                launch {
-                                                    addSongsToAdapter(songList)
-                                                }
-                                            }
-
-                                        })
-                                    }else{
-                                        CustomAnimators.hideLoadingView(mRecyclerView as View, mLoadingContentProgress as View)
-                                    }
-                                }
-
-                            })
-                        }
-                    }else{
-                        CustomAnimators.hideLoadingView(mRecyclerView as View, mLoadingContentProgress as View)
-                    }
-                }
             }
 
         })
+        mAllSongsFragmentViewModel.getSongs().observe(mActivity as LifecycleOwner, object  : Observer<ArrayList<SongItem>>{
+            override fun onChanged(songList: ArrayList<SongItem>?) {
+                addSongsToAdapter(songList)
+            }
+        })
+        mAllSongsFragmentViewModel.getIsLoading().observe(mActivity as LifecycleOwner, object  : Observer<Boolean>{
+            override fun onChanged(isLoading: Boolean?) {
+                Log.i(ConstantValues.TAG, "Loading : $isLoading")
+                if(isLoading == false){
+                    CustomAnimators.hideLoadingView(mRecyclerView as View, mLoadingContentProgress as View, true)
+                }
+            }
+        })
+    }
+
+    private suspend fun updateSelectedItems(selectMode : Boolean, totalSelected: Int, totalCount : Int){
+        if (selectMode != mSongItemAdapter?.selectableGetSelectionMode()){
+            mSongItemAdapter?.selectableSetSelectionMode(selectMode)
+        }
+
+        if(totalCount > 0 && totalSelected == totalCount)
+            mSongItemAdapter?.selectableSelectAll()
+        else
+            mSongItemAdapter?.selectableClearSelection()
     }
 
     private suspend fun clearSelectedItemsPage() = coroutineScope{
@@ -141,17 +121,13 @@ class AllSongsFragment : Fragment() {
         mMainExploreFragmentViewModel.setTotalCount(0)
     }
 
-    private suspend fun addSongsToAdapter(songList: ArrayList<SongItem>?) = coroutineScope{
+    private fun addSongsToAdapter(songList: ArrayList<SongItem>?) {
         if (songList != null) {
             val startPosition = mSongList.size -1
             mSongList.addAll(songList)
             mSongItemAdapter?.notifyItemRangeInserted(startPosition, mSongList.size-1)
         }
         mMainExploreFragmentViewModel.setTotalCount(mSongList.size)
-        delay(250L)
-        MainScope().run {
-            CustomAnimators.hideLoadingView(mRecyclerView as View, mLoadingContentProgress as View, true)
-        }
     }
 
     private fun checkInteractions() {
@@ -219,15 +195,12 @@ class AllSongsFragment : Fragment() {
                 mMainExploreFragmentViewModel.setSelectMode(selectMode)
                 mMainExploreFragmentViewModel.setTotalSelected(totalSelected)
                 mMainExploreFragmentViewModel.setTotalCount(totalCount)
-                Log.i(ConstantValues.TAG, "onSelectionModeChange, SELECT MODE = $selectMode, TOTAL = $totalSelected, TOTAL COUNT = $totalCount")
             }
 
             override fun onTotalSelectedItemChange(totalSelected: Int, totalCount: Int) {
                 mMainExploreFragmentViewModel.setTotalSelected(totalSelected)
                 mMainExploreFragmentViewModel.setTotalCount(totalCount)
-                Log.i(ConstantValues.TAG, "onTotalSelectedItemChange, TOTAL = $totalSelected, TOTAL COUNT = $totalCount")
             }
-
         })
 
         //Setup adapter
@@ -250,17 +223,17 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun initViews(view: View) {
-        mRecyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_all_songs)
+        mRecyclerView = view.findViewById<RecyclerView>(R.id.content_recycler_view)
         mLoadingContentProgress = view.findViewById<LinearProgressIndicator>(R.id.loading_content_progress)
 
     }
 
     companion object {
         @JvmStatic
-        fun newInstance(page : Int) =
+        fun newInstance(pageIndex: Int) =
             AllSongsFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(ConstantValues.EXPLORE_ALL_SONGS, page)
+                    putInt(ConstantValues.EXPLORE_ALL_SONGS, pageIndex)
                 }
             }
     }

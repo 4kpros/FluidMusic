@@ -16,19 +16,19 @@ class TabLayoutAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
         var fragment = Fragment()
         when (position) {
             0 -> {
-                fragment = FoldersFragment.newInstance()
+                fragment = AllSongsFragment.newInstance(position)
             }
             1 -> {
-                fragment = AllSongsFragment.newInstance(1)
+                fragment = FoldersFragment.newInstance(position)
             }
             2 -> {
-                fragment = AlbumsFragment.newInstance()
+                fragment = AlbumsFragment.newInstance(position)
             }
             3 -> {
-                fragment = ArtistsFragment.newInstance()
+                fragment = ArtistsFragment.newInstance(position)
             }
             4 -> {
-                fragment = GenresFragment.newInstance()
+                fragment = GenresFragment.newInstance(position)
             }
         }
 

@@ -1,4 +1,4 @@
-package com.prosabdev.fluidmusic.adapters
+package com.prosabdev.fluidmusic.adapters.explore
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -9,7 +9,6 @@ import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.content.ContextCompat
-import androidx.core.util.contains
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
@@ -27,11 +26,11 @@ import java.util.*
 
 
 class SongItemAdapter(
-        private val mSongList: List<SongItem>,
-        private val mContext: Context,
-        private val mOnItemClickListener: OnItemClickListener,
-        private val mOnTouchListener: OnTouchListener,
-        private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener,
+    private val mSongList: List<SongItem>,
+    private val mContext: Context,
+    private val mOnItemClickListener: OnItemClickListener,
+    private val mOnTouchListener: OnTouchListener,
+    private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener,
     ) : SelectablePlayingItemAdapter<SongItemAdapter.SongItemHolder>(),
         SongItemMoveCallback.ItemTouchHelperContract
     {

@@ -1,49 +1,93 @@
 package com.prosabdev.fluidmusic.ui.fragments.explore
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
+import com.prosabdev.fluidmusic.adapters.explore.ArtistItemAdapter
+import com.prosabdev.fluidmusic.models.ArtistItem
+import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.viewmodels.explore.AllSongsFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.explore.ArtistsFragmentViewModel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ArtistsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ArtistsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var mPageIndex: Int? = -1
+
+    private var mContext: Context? = null
+    private var mActivity: FragmentActivity? = null
+
+    private val mArtistsFragmentViewModel: ArtistsFragmentViewModel by activityViewModels()
+
+    private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
+    private var mArtistItemAdapter: ArtistItemAdapter? = null
+    private var mRecyclerView: RecyclerView? = null
+    private var mLoadingContentProgress: LinearProgressIndicator? = null
+
+    private var mArtistList : ArrayList<ArtistItem> = ArrayList<ArtistItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            mPageIndex = it.getInt(ConstantValues.EXPLORE_ALL_ARTISTS)
         }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_artists, container, false)
+        val view : View = inflater.inflate(R.layout.fragment_artists, container, false)
+
+        mContext = requireContext()
+        mActivity = requireActivity()
+
+        runBlocking {
+            launch {
+                initViews(view)
+                setupRecyclerViewAdapter()
+                observeLiveData()
+                checkInteractions()
+            }
+        }
+
+        return view
+    }
+
+    private fun checkInteractions() {
+
+    }
+
+    private fun observeLiveData() {
+
+    }
+
+    private fun setupRecyclerViewAdapter() {
+
+    }
+
+    private fun initViews(view: View) {
+        mRecyclerView = view.findViewById<RecyclerView>(R.id.content_recycler_view)
+        mLoadingContentProgress = view.findViewById<LinearProgressIndicator>(R.id.loading_content_progress)
     }
 
     companion object {
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance() =
+        fun newInstance(pageIndex: Int) =
             ArtistsFragment().apply {
                 arguments = Bundle().apply {
+                    putInt(ConstantValues.EXPLORE_ALL_ARTISTS, pageIndex)
                 }
             }
     }

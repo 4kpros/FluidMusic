@@ -46,8 +46,9 @@ abstract class MediaFileScanner {
         fun scanAudioFilesWithMediaStore(
             activity: Activity,
             mMutableSongList: MutableLiveData<ArrayList<SongItem>>,
-            mMutableHaveData: MutableLiveData<Boolean>,
-            pagination: Int
+            mIsLoading: MutableLiveData<Boolean>,
+            mMutableIsLoadingInBackground: MutableLiveData<Boolean>,
+            minToShow: Int
         ) {
             val tempSongList: ArrayList<SongItem> = ArrayList()
             val collection: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -68,6 +69,7 @@ abstract class MediaFileScanner {
                 java.lang.String.valueOf(TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES))
             )
             val sortOrder: String = MediaStore.Audio.Media.DISPLAY_NAME + " ASC"
+
             activity.applicationContext.contentResolver.query(
                 collection,
                 projection,
@@ -105,13 +107,15 @@ abstract class MediaFileScanner {
 //                    songItem.covertArtBitmap = AudioFileInfoExtractor.getBitmapAudioArtwork(activity, absolutePath)
                     //Now save on database
                     tempSongList.add(songItem)
-                    if(itemsCount > 0 && itemsCount % 10 == 0){
+                    if(itemsCount > 0 && itemsCount == minToShow){
+                        itemsCount = 0
                         mMutableSongList.value = tempSongList
-                        if(itemsCount == pagination)
-                            mMutableHaveData.value = true
+                        mIsLoading.value = false
                     }
                 }
-                mMutableHaveData.value = true
+                mMutableSongList.value = tempSongList
+                mIsLoading.value = false
+                mMutableIsLoadingInBackground.value = false
             }
         }
     }
