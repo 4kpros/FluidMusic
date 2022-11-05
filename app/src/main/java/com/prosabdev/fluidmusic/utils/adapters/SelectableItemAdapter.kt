@@ -1,57 +1,88 @@
-package com.prosabdev.fluidmusic.utils
+package com.prosabdev.fluidmusic.utils.adapters
 
+import android.util.Log
 import android.util.SparseBooleanArray
 import androidx.core.util.contains
 import androidx.recyclerview.widget.RecyclerView
+import com.prosabdev.fluidmusic.utils.ConstantValues
 
 abstract class SelectableRecycleViewAdapter<VH : RecyclerView.ViewHolder>() : RecyclerView.Adapter<VH>() {
     private val TAG: String = SelectableRecycleViewAdapter::class.java.simpleName
-    private var selectedItems: SparseBooleanArray? = SparseBooleanArray()
+    private var mSelectedItems: SparseBooleanArray? = SparseBooleanArray()
+    private var mSelectionMode: Boolean = false
 
-    fun isSelected(position: Int): Boolean {
-        return selectedItems?.contains(position) ?: false
+    interface OnSelectSelectableItemListener{
+        fun onSelectionModeChange(selectMode : Boolean, totalSelected : Int, totalCount : Int)
+        fun onTotalSelectedItemChange(totalSelected : Int, totalCount : Int)
     }
 
-    fun toggleSelection(position: Int) {
-        if (selectedItems?.get(position, false) == true) {
-            selectedItems?.delete(position)
+    protected fun selectableItemGetSelectionMode(): Boolean {
+        return mSelectionMode
+    }
+
+    protected fun selectableItemSetSelectionMode(mOnSelectSelectableItemListener: OnSelectSelectableItemListener, value : Boolean, totalItemCount : Int) {
+        mSelectionMode = value
+        mOnSelectSelectableItemListener.onSelectionModeChange(mSelectionMode, selectableItemGetSelectedItemCount(), totalItemCount)
+    }
+
+    protected fun selectableItemIsSelected(position: Int): Boolean {
+        return mSelectedItems?.contains(position) ?: false
+    }
+
+    protected fun selectableItemToggleSelection(mOnSelectSelectableItemListener: OnSelectSelectableItemListener, position: Int, totalItemCount : Int) {
+        if (mSelectedItems?.get(position, false) == true) {
+            mSelectedItems?.delete(position)
         } else {
-            selectedItems?.put(position, true)
+            mSelectedItems?.put(position, true)
         }
+        mOnSelectSelectableItemListener.onTotalSelectedItemChange(selectableItemGetSelectedItemCount(), totalItemCount)
         notifyItemChanged(position)
     }
+    protected fun selectableItemUpdateSelection(position: Int, value : Boolean) {
+        if(mSelectedItems?.contains(position) == true){
+            if(!value){
+                mSelectedItems?.delete(position)
+            }
+        }else{
+            if(value){
+                mSelectedItems?.put(position, true)
+            }
+        }
+    }
 
-    fun selectAll() {
+    protected fun selectableItemGetSelectedItemCount(): Int {
+        return mSelectedItems?.size() ?: 0
+    }
+
+    protected fun selectableItemGetSelectedItems(): List<Int?> {
+        val items: ArrayList<Int> = ArrayList(selectableItemGetSelectedItemCount())
+        val maxLoop = mSelectedItems?.size() ?: 0
+        for (i in 0 until maxLoop) {
+            if(mSelectedItems?.keyAt(i) != null)
+                items.add(mSelectedItems?.keyAt(i)!!)
+        }
+        return items
+    }
+
+    protected fun selectableItemSelectAll(mOnSelectSelectableItemListener: OnSelectSelectableItemListener, totalItemCount : Int) {
         for (i in 0 until itemCount) {
-            if (!selectedItems?.get(i, false)!!) {
-                selectedItems?.put(i, true)
+            if (!mSelectedItems?.get(i, false)!!) {
+                mSelectedItems?.put(i, true)
             }
             notifyItemChanged(i)
         }
-        notifyDataSetChanged()
+//        notifyDataSetChanged()
+        mOnSelectSelectableItemListener.onTotalSelectedItemChange(selectableItemGetSelectedItemCount(), totalItemCount)
     }
 
-    fun clearSelection() {
-        val selection = getSelectedItems()
-        selectedItems?.clear()
+    protected fun selectableItemClearSelection(mOnSelectSelectableItemListener: OnSelectSelectableItemListener, totalItemCount : Int) {
+        val selection = selectableItemGetSelectedItems()
+        mSelectedItems?.clear()
         for (i in selection) {
             if (i != null) {
                 notifyItemChanged(i)
             }
         }
-    }
-
-    fun getSelectedItemCount(): Int {
-        return selectedItems?.size() ?: 0
-    }
-
-    private fun getSelectedItems(): List<Int?> {
-        val items: ArrayList<Int> = ArrayList(selectedItems?.size() ?: 0)
-        val maxLoop = selectedItems?.size() ?: 0
-        for (i in 0 until maxLoop) {
-            if(selectedItems?.keyAt(i) != null)
-                items.add(selectedItems?.keyAt(i)!!)
-        }
-        return items
+        mOnSelectSelectableItemListener.onTotalSelectedItemChange(0, totalItemCount)
     }
 }

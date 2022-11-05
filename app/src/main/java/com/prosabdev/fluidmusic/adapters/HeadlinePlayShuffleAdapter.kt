@@ -15,6 +15,7 @@ class HeadlinePlayShuffleAdapter(
     interface OnItemClickListener {
         fun onPlayButtonClicked()
         fun onShuffleButtonClicked()
+        fun onFilterButtonClicked()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeadlinePlayShuffleHolder {
@@ -38,6 +39,8 @@ class HeadlinePlayShuffleAdapter(
             itemView.findViewById<MaterialButton>(R.id.button_play)
         private var mShuffleButton: MaterialButton? =
             itemView.findViewById<MaterialButton>(R.id.button_shuffle)
+        private var mFilterButton: MaterialButton? =
+            itemView.findViewById<MaterialButton>(R.id.button_filter)
 
         //Method used to bind one listener with items events click
         fun bindListener(listener: OnItemClickListener) {
@@ -46,6 +49,9 @@ class HeadlinePlayShuffleAdapter(
             }
             mShuffleButton?.setOnClickListener {
                 listener.onShuffleButtonClicked()
+            }
+            mFilterButton?.setOnClickListener {
+                listener.onFilterButtonClicked()
             }
         }
     }

@@ -5,17 +5,20 @@
     android:id="@+id/linear_top_play_shuffle"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="10dp"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    >
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        >
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:icon="@drawable/play_arrow"
-            android:text="Play"/>
+            android:text="Play"
+            />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_shuffle"
             android:layout_width="wrap_content"
@@ -23,7 +26,22 @@
             app:icon="@drawable/shuffle"
             android:layout_marginStart="10dp"
             style="?attr/materialIconButtonFilledTonalStyle"
-            android:text="Shuffle"/>
+            android:text="Shuffle"
+            />
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="end">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/filter_list"
+                android:layout_marginStart="10dp"
+                style="?attr/materialIconButtonStyle"
+                />
+        </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

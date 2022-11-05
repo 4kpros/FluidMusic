@@ -40,7 +40,7 @@
                 android:orientation="vertical"
                 android:layout_alignParentBottom="true"
                 android:gravity="center_horizontal"
-                android:padding="10dp"
+                android:padding="@dimen/main_margin"
                 >
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/linear_song_title"
@@ -56,6 +56,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Over The Horizon 2015"
+                            android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="?attr/colorPrimary"
                             android:maxLines="1"
                             />
@@ -65,7 +66,7 @@
                             android:layout_height="wrap_content"
                             android:alpha="0.5"
                             android:text="Unknown artist"
-                            android:textAppearance="?attr/textAppearanceLabelSmall"
+                            android:textAppearance="?attr/textAppearanceTitleSmall"
                             android:textColor="?attr/colorPrimary"
                             android:maxLines="1" />
                     </androidx.appcompat.widget.LinearLayoutCompat>

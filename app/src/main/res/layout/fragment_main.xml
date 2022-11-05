@@ -9,14 +9,18 @@
     app:umanoPanelHeight="112dp"
     android:gravity="bottom"
     app:umanoShadowHeight="2dp">
-    <FrameLayout
-        android:id="@+id/main_fragment_container"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        />
+        android:layout_height="match_parent">
+        <FrameLayout
+            android:id="@+id/main_fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <!-- SLIDING LAYOUT -->
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         style="@style/DefaultBackground"
@@ -34,9 +38,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_alignParentTop="true"
+            app:layout_constraintTop_toTopOf="parent"
             >
             <include layout="@layout/component_mini_player"/>
         </androidx.appcompat.widget.LinearLayoutCompat>
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>

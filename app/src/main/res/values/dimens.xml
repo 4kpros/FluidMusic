@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="main_margin">15dp</dimen>
+    <dimen name="player_card_view">20dp</dimen>
+</resources>

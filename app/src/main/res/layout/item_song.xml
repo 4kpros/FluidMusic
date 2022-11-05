@@ -10,17 +10,19 @@
     >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        >
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/song_item_is_selected_checkbox"
+            android:id="@+id/song_item_is_selected"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintTop_toTopOf="@+id/linear_song_container"
-            app:layout_constraintBottom_toBottomOf="@+id/linear_song_container"
+            app:layout_constraintTop_toTopOf="@+id/constraint_song_container"
+            app:layout_constraintBottom_toBottomOf="@+id/constraint_song_container"
             style="@style/SongSelectedBackground"
+            android:visibility="gone"
             />
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/linear_song_container"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_song_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
@@ -31,11 +33,15 @@
             android:paddingEnd="10dp"
             >
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Widget.Material3.CardView.Elevated"
                 android:layout_gravity="center_vertical"
                 android:layout_margin="1dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 >
                 <ImageView
                     android:id="@+id/song_item_imageview"
@@ -46,10 +52,13 @@
                     />
             </com.google.android.material.card.MaterialCardView>
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginStart="5dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/card_image"
+                app:layout_constraintEnd_toStartOf="@+id/linear_drag_hand"
                 >
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/song_item_title"
@@ -103,6 +112,23 @@
                         />
                 </androidx.appcompat.widget.LinearLayoutCompat>
             </androidx.appcompat.widget.LinearLayoutCompat>
-        </androidx.appcompat.widget.LinearLayoutCompat>
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/linear_drag_hand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:visibility="gone"
+                >
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_drag_hand"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="?attr/materialIconButtonStyle"
+                    app:icon="@drawable/drag_handle"
+                    />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

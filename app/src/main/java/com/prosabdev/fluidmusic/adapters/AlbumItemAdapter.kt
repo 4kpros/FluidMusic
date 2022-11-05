@@ -17,13 +17,13 @@ import com.google.android.material.card.MaterialCardView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.models.AlbumItem
 import com.prosabdev.fluidmusic.utils.CustomFormatters
-import com.prosabdev.fluidmusic.utils.adapters.SongItemAdapter
+import com.prosabdev.fluidmusic.utils.adapters.SelectablePlayingItemAdapter
 
 class AlbumItemAdapter(
     private val mAlbumList: List<AlbumItem>?,
     private val mContext: Context,
     private val mListener: OnItemClickListener
-) : SongItemAdapter<AlbumItemAdapter.AlbumItemHolder>() {
+) : SelectablePlayingItemAdapter<AlbumItemAdapter.AlbumItemHolder>() {
 
     interface OnItemClickListener {
         fun onAlbumItemClicked(position: Int)
@@ -45,7 +45,7 @@ class AlbumItemAdapter(
         holder.bindListener(position, mListener)
 
         //Update UI
-        holder.updateUI(mContext, mAlbumList?.get(position)!!, isSelected(position))
+        holder.updateUI(mContext, mAlbumList?.get(position)!!, selectableItemIsSelected(position))
     }
 
     override fun getItemCount(): Int {
