@@ -6,7 +6,7 @@
     style="@style/Widget.Material3.CardView.Elevated"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardElevation="2dp"
-    android:layout_margin="@dimen/player_card_view"
+    android:layout_margin="@dimen/main_margin"
     >
     <RelativeLayout
         android:layout_width="match_parent"

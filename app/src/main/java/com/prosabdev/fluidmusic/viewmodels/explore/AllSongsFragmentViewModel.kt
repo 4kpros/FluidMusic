@@ -10,28 +10,44 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.MediaFileScanner
 
 class AllSongsFragmentViewModel : ViewModel() {
-    private val mMutableIsLoading = MutableLiveData<Boolean>(true)
-    private val mMutableIsLoadingInBackground = MutableLiveData<Boolean>(true)
+    private val mMutableIsLoading = MutableLiveData<Boolean>(false)
+    private val mMutableIsLoadingInBackground = MutableLiveData<Boolean>(false)
+    private val mMutableDataLoadedCounter = MutableLiveData<Int>(0)
     private val mMutableLastLoadedPosition = MutableLiveData<Int>(0)
-    private val mMutableSongList = MutableLiveData<ArrayList<SongItem>>()
+    private val mMutableSongList = MutableLiveData<ArrayList<SongItem>>(null)
 
     private val mIsLoading : LiveData<Boolean> get() = mMutableIsLoading
     private val mIsLoadingInBackground : LiveData<Boolean> get() = mMutableIsLoadingInBackground
+    private val mDataLoadedCounter : LiveData<Int> get() = mMutableDataLoadedCounter
     private val mLastLoadedPosition: LiveData<Int> get() = mMutableLastLoadedPosition
     private val mSongList: LiveData<ArrayList<SongItem>> get() = mMutableSongList
 
     fun requestLoadAsyncSongs(activity : Activity){
         //Load songs from database id exist
 
+        Log.i(ConstantValues.TAG, "ON REQUEST LOAD SONGS ASYNC")
         //Else load songs from MediaFileScanner
-        MediaFileScanner.scanAudioFilesWithMediaStore(activity, mMutableSongList, mMutableIsLoading, mMutableIsLoadingInBackground, 10)
-    }
-    fun setIsLoading(value : Boolean) {
-        mMutableIsLoading.value = value
-        mMutableIsLoadingInBackground.value = value
+        MediaFileScanner.scanAudioFilesWithMediaStore(
+            activity,
+            mMutableSongList,
+            mMutableIsLoading,
+            mMutableIsLoadingInBackground,
+            mMutableDataLoadedCounter,
+            10
+        )
     }
     fun getIsLoading(): LiveData<Boolean> {
         return mIsLoading
+    }
+    fun setIsLoading(value : Boolean) {
+        mMutableIsLoadingInBackground.value = true
+        mMutableIsLoading.value = true
+    }
+    fun getIsLoadingInBackground(): LiveData<Boolean> {
+        return mIsLoadingInBackground
+    }
+    fun getDataLoadedCounter(): LiveData<Int> {
+        return mDataLoadedCounter
     }
     fun getSongs(): LiveData<ArrayList<SongItem>>  {
         return mSongList

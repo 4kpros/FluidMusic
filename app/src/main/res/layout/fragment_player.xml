@@ -10,17 +10,19 @@
     tools:context=".ui.fragments.PlayerFragment">
 
     <ImageView
-        android:id="@+id/blur_imageview"
+        android:id="@+id/blurred_imageview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop" />
+        style="@style/DefaultBackground"
+        android:scaleType="centerCrop"
+        />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:alpha="1"
         style="@style/DefaultBackground"
+        android:alpha="0.5"
         />
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -40,7 +42,7 @@
                 android:orientation="vertical"
                 android:layout_alignParentBottom="true"
                 android:gravity="center_horizontal"
-                android:padding="@dimen/main_margin"
+                android:paddingHorizontal="@dimen/main_margin"
                 >
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/linear_song_title"
@@ -53,22 +55,26 @@
                         android:orientation="vertical">
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/text_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Over The Horizon 2015"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="?attr/colorPrimary"
                             android:maxLines="1"
+                            android:ellipsize="end"
                             />
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/text_artist"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:alpha="0.5"
                             android:text="Unknown artist"
                             android:textAppearance="?attr/textAppearanceTitleSmall"
                             android:textColor="?attr/colorPrimary"
-                            android:maxLines="1" />
+                            android:maxLines="1"
+                            android:ellipsize="end" />
                     </androidx.appcompat.widget.LinearLayoutCompat>
                 </androidx.appcompat.widget.LinearLayoutCompat>
                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -81,7 +87,7 @@
                         android:layout_height="wrap_content">
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/text_song_duration_current"
+                            android:id="@+id/text_duration_current"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentStart="true"
@@ -94,15 +100,15 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
-                            android:layout_toStartOf="@+id/text_song_duration"
-                            android:layout_toEndOf="@+id/text_song_duration_current"
+                            android:layout_toStartOf="@+id/text_duration"
+                            android:layout_toEndOf="@+id/text_duration_current"
                             android:value="50"
                             android:valueFrom="0"
                             android:valueTo="100"
                             app:trackHeight="2dp" />
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/text_song_duration"
+                            android:id="@+id/text_duration"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
@@ -115,8 +121,7 @@
                     android:id="@+id/linear_buttons_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp">
+                    >
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/button_shuffle"

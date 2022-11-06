@@ -21,6 +21,7 @@ import com.prosabdev.fluidmusic.adapters.callbacks.SongItemMoveCallback
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomFormatters
+import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import com.prosabdev.fluidmusic.utils.adapters.SelectablePlayingItemAdapter
 import java.util.*
 
@@ -142,41 +143,15 @@ class SongItemAdapter(
         //Update song item UI
         fun updateUI(context: Context, songItem: SongItem, isPlaying: Boolean, selected: Boolean){
             mTitle?.text = if(songItem.title != null && songItem.title!!.isNotEmpty()) songItem.title else songItem.fileName //Set song title
-            mArtist?.text = if(songItem.artist!!.isNotEmpty()) songItem.artist else "Unknown artist"
+            mArtist?.text = if(songItem.artist!!.isNotEmpty()) songItem.artist else context.getString(
+                            R.string.unknown_artist)
             mDuration?.text = CustomFormatters.formatSongDurationToString(songItem.duration) //Set song duration
             mTypeMime?.text = songItem.typeMime //Set song type mime
             //Set is is playing or is checked(for multiple item selection)
-            if(selected) CustomAnimators.crossFadeUp(mSelectedItemBackground as View, true) else CustomAnimators.crossFadeDown(mSelectedItemBackground as View)
+            if(selected) CustomAnimators.crossFadeUp(mSelectedItemBackground as View) else CustomAnimators.crossFadeDown(mSelectedItemBackground as View)
             //Set song covert art
-            if(songItem.covertArt != null && songItem.covertArt!!.binaryData != null && songItem.covertArt!!.binaryData.isNotEmpty()){
-                Glide.with(context)
-                    .load(songItem.covertArt?.binaryData)
-                    .useAnimationPool(false)
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .dontAnimate()
-                    .apply(
-                        RequestOptions()
-                            .fitCenter()
-                            .format(DecodeFormat.PREFER_RGB_565)
-                            .override(100)
-                    )
-                    .centerCrop()
-                    .into(mCovertArt!!)
-            }else{
-                Glide.with(context)
-                    .load(ContextCompat.getDrawable(context, R.drawable.ic_fluid_music_icon_with_padding))
-                    .useAnimationPool(true)
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .dontAnimate()
-                    .apply(
-                        RequestOptions()
-                            .fitCenter()
-                            .format(DecodeFormat.PREFER_RGB_565)
-                            .override(100)
-                    )
-                    .centerCrop()
-                    .into(mCovertArt!!)
-            }
+            val tempBinaryData : ByteArray? = songItem.covertArt?.binaryData
+            CustomUILoaders.loadCovertArtFromBinaryData(context, mCovertArt, tempBinaryData, 100)
         }
 
         fun updateItemTouchHelper(selected : Boolean){

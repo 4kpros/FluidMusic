@@ -9,38 +9,44 @@ abstract class CustomAnimators {
 
     companion object{
 
-        fun hideLoadingView(viewToHide : View, loadingView : View, animate : Boolean = false) {
-            if(animate){
-                crossFadeLoadingViewToContentView(viewToHide, loadingView)
-            }else{
-                viewToHide.visibility = View.VISIBLE
-                loadingView.visibility = View.GONE
-            }
+        fun hideLoadingView(contentView : View, loadingView : View, animate : Boolean = false) {
+            crossFadeUp(contentView, animate)
+            crossFadeDown(loadingView, animate)
         }
-        private fun crossFadeLoadingViewToContentView(contentView : View, loadingView : View) {
-            val mShortAnimationDuration = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)
-            //Animate content view to show
-            contentView.apply {
-                alpha = 0f
-                visibility = View.VISIBLE
-                animate()
-                    .alpha(1f)
-                    .setInterpolator(AccelerateDecelerateInterpolator())
-                    .setDuration(mShortAnimationDuration.toLong())
-                    .setListener(null)
-            }
-            //Animate loading view to hide
-            loadingView.animate()
-                .alpha(0f)
-                .setInterpolator(AccelerateDecelerateInterpolator())
-                .setDuration(mShortAnimationDuration.toLong())
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        loadingView.visibility = View.GONE
-                    }
-                })
+        fun showLoadingView(contentView : View, loadingView : View, animate : Boolean = false) {
+            crossFadeDown(contentView, animate)
+            crossFadeUp(loadingView, animate)
         }
 
+        fun crossFadeUpWithoutVisibilityAffect(contentView : View, animate : Boolean = false) {
+            if(animate){
+                val mShortAnimationDuration = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)
+                contentView.apply {
+                    alpha = 0f
+                    animate()
+                        .alpha(1f)
+                        .setInterpolator(AccelerateDecelerateInterpolator())
+                        .setDuration(mShortAnimationDuration.toLong())
+                        .setListener(null)
+                }
+            }else{
+                contentView.alpha = 1.0f
+            }
+        }
+        fun crossFadeDownWithoutVisibilityAffect(contentView : View, animate : Boolean = false) {
+            if(animate){
+                val mShortAnimationDuration = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)
+                contentView.apply {
+                    animate()
+                        .alpha(0f)
+                        .setInterpolator(AccelerateDecelerateInterpolator())
+                        .setDuration(mShortAnimationDuration.toLong())
+                        .setListener(null)
+                }
+            }else{
+                contentView.alpha = 0.0f
+            }
+        }
         fun crossFadeUp(contentView : View, animate : Boolean = false) {
             if(animate){
                 val mShortAnimationDuration = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)
@@ -55,6 +61,7 @@ abstract class CustomAnimators {
                 }
             }else{
                 contentView.visibility = View.VISIBLE
+                contentView.alpha = 1.0f
             }
         }
         fun crossFadeDown(contentView : View, animate : Boolean = false) {
@@ -73,6 +80,7 @@ abstract class CustomAnimators {
                 }
             }else{
                 contentView.visibility = View.GONE
+                contentView.alpha = 0.0f
             }
         }
         fun crossScaleIn(contentView : View, animate : Boolean = false) {

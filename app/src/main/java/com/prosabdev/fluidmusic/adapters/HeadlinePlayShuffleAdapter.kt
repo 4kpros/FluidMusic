@@ -3,12 +3,15 @@ package com.prosabdev.fluidmusic.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 
 class HeadlinePlayShuffleAdapter(
     private val mHeadLines: ArrayList<Long>,
+    private val mResourceId : Int,
     private val mListener: OnItemClickListener
     ) : RecyclerView.Adapter<HeadlinePlayShuffleAdapter.HeadlinePlayShuffleHolder>() {
 
@@ -20,7 +23,7 @@ class HeadlinePlayShuffleAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeadlinePlayShuffleHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_top_play_shuffle, parent, false)
+            .inflate(mResourceId, parent, false)
 
         return HeadlinePlayShuffleHolder(view)
     }
@@ -41,6 +44,8 @@ class HeadlinePlayShuffleAdapter(
             itemView.findViewById<MaterialButton>(R.id.button_shuffle)
         private var mFilterButton: MaterialButton? =
             itemView.findViewById<MaterialButton>(R.id.button_filter)
+        private var mCustomEmptyBottomSpace: LinearLayoutCompat? =
+            itemView.findViewById<LinearLayoutCompat>(R.id.custom_empty_bottom_space)
 
         //Method used to bind one listener with items events click
         fun bindListener(listener: OnItemClickListener) {
@@ -53,6 +58,7 @@ class HeadlinePlayShuffleAdapter(
             mFilterButton?.setOnClickListener {
                 listener.onFilterButtonClicked()
             }
+//            CustomViewModifiers.updateBottomViewInsets(mCustomEmptyBottomSpace)
         }
     }
 }

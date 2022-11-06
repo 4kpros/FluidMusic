@@ -10,6 +10,8 @@
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:liftOnScroll="false"
+        android:background="@color/transparent"
         >
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/top_app_bar"
@@ -18,14 +20,15 @@
             app:layout_scrollFlags="scroll|enterAlways"
             app:title="Folders"
             app:menu="@menu/main_top_app_bar"
-            app:navigationIcon="@drawable/menu" />
+            app:navigationIcon="@drawable/menu"
+            />
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:tabMode="scrollable"
             app:tabContentStart="60dp"
-            android:contentDescription="Tabs"
+            android:contentDescription="Explore"
             >
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"

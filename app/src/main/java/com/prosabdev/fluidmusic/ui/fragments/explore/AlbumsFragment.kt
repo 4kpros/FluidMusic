@@ -17,6 +17,7 @@ import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.models.AlbumItem
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 import com.prosabdev.fluidmusic.viewmodels.explore.AlbumsFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.explore.AllSongsFragmentViewModel
 import kotlinx.coroutines.launch
@@ -81,6 +82,7 @@ class AlbumsFragment : Fragment() {
     private fun initViews(view: View) {
         mRecyclerView = view.findViewById<RecyclerView>(R.id.content_recycler_view)
         mLoadingContentProgress = view.findViewById<LinearProgressIndicator>(R.id.loading_content_progress)
+
     }
 
     companion object {

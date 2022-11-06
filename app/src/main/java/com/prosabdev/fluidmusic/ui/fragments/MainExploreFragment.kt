@@ -28,6 +28,7 @@ import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
 import com.prosabdev.fluidmusic.ui.fragments.explore.AllSongsFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
+import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
 
 class MainExploreFragment : Fragment() {
@@ -67,16 +68,12 @@ class MainExploreFragment : Fragment() {
         mContext = requireContext()
         mActivity = requireActivity()
 
-        return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
         initViews(view)
         setupViewPagerAdapter(view)
         checkInteractions(view)
         observeLiveData(view)
+
+        return view
     }
 
     private fun setupViewPagerAdapter(view: View) {

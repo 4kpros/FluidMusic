@@ -9,7 +9,6 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.prosabdev.fluidmusic.models.SongItem
 import java.io.File
@@ -48,6 +47,7 @@ abstract class MediaFileScanner {
             mMutableSongList: MutableLiveData<ArrayList<SongItem>>,
             mIsLoading: MutableLiveData<Boolean>,
             mMutableIsLoadingInBackground: MutableLiveData<Boolean>,
+            mMutableDataLoadedCounter: MutableLiveData<Int>,
             minToShow: Int
         ) {
             val tempSongList: ArrayList<SongItem> = ArrayList()
@@ -116,6 +116,7 @@ abstract class MediaFileScanner {
                 mMutableSongList.value = tempSongList
                 mIsLoading.value = false
                 mMutableIsLoadingInBackground.value = false
+                mMutableDataLoadedCounter.value = (mMutableDataLoadedCounter.value ?: 0) + 1
             }
         }
     }

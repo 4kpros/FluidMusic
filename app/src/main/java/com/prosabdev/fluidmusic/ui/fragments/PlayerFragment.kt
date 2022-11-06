@@ -2,25 +2,21 @@ package com.prosabdev.fluidmusic.ui.fragments
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.media.Image
-import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.annotation.Nullable
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.*
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
@@ -36,10 +32,14 @@ import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.dialogs.PlayerMoreDialog
 import com.prosabdev.fluidmusic.dialogs.QueueMusicDialog
 import com.prosabdev.fluidmusic.models.SongItem
-import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
-import eightbitlab.com.blurview.BlurView
-import eightbitlab.com.blurview.RenderScriptBlur
+import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.utils.CustomFormatters
+import com.prosabdev.fluidmusic.utils.CustomUILoaders
+import com.prosabdev.fluidmusic.utils.CustomViewModifiers
+import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import jp.wasabeef.blurry.Blurry
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import org.jaudiotagger.tag.images.Artwork
 import kotlin.math.abs
 
@@ -49,10 +49,16 @@ class PlayerFragment : Fragment() {
     private var mActivity: FragmentActivity? = null
 
     private var mPlayerPagerAdapter: PlayerPageAdapter? = null
-    private var mSongList: MutableList<SongItem>? = null
-    private val mCurrentPosition = 0
-    private val mPlayerPageFragmentViewModel: MainExploreFragmentViewModel by viewModels()
+    private var mSongList: ArrayList<SongItem> = ArrayList<SongItem>()
+    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 
+    //Text view var
+    private var mTextTitle: AppCompatTextView? = null
+    private var mTextArtist: AppCompatTextView? = null
+    private var mTextDurationCurrent: AppCompatTextView? = null
+    private var mTextDuration: AppCompatTextView? = null
+    //Image view var
+    private var mCovertArtBlurred: ImageView? = null
     //Buttons var
     private var mButtonMore: MaterialButton? = null
     private var mButtonQueueMusic: MaterialButton? = null
@@ -62,10 +68,8 @@ class PlayerFragment : Fragment() {
     private var mPlayerMoreDialog: PlayerMoreDialog? = null
     private var mQueueMusicDialog: QueueMusicDialog? = null
 
-    private var mPlayerContainer: LinearLayoutCompat? = null
+    private var mLinearControls: LinearLayoutCompat? = null
     private var mPlayerViewPager: ViewPager2? = null
-    private var mCovertArtBlurred: ImageView? = null
-    private var mBlurView: BlurView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,11 +92,13 @@ class PlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initViews(view)
-        blurViews(view)
-        setupViewPagerAdapter()
-        checkInteractions(view)
-        observeLiveData(view)
+        MainScope().launch {
+            initViews(view)
+            setupViewPagerAdapter()
+            observeLiveData()
+            blurViews(view)
+            checkInteractions()
+        }
     }
 
     private fun blurViews(view: View) {
@@ -114,15 +120,6 @@ class PlayerFragment : Fragment() {
     }
 
     private fun setupViewPagerAdapter() {
-        mSongList = mutableListOf<SongItem>()
-        mSongList?.add(SongItem())
-        mSongList?.add(SongItem())
-        mSongList?.add(SongItem())
-        mSongList?.add(SongItem())
-        mSongList?.add(SongItem())
-        mSongList?.add(SongItem())
-        mSongList?.add(SongItem())
-        mSongList?.add(SongItem())
         mPlayerPagerAdapter =
             PlayerPageAdapter(mSongList, mContext, object : PlayerPageAdapter.OnItemClickListener {
                 override fun onViewPagerClicked(position: Int) {
@@ -181,11 +178,58 @@ class PlayerFragment : Fragment() {
         viewPager.setPageTransformer(compositePageTransformer)
     }
 
-    private fun observeLiveData(view: View) {
-        //
+    private fun observeLiveData() {
+        mPlayerFragmentViewModel.getQueueList().observe(mActivity as LifecycleOwner, object : Observer<ArrayList<SongItem>>{
+            override fun onChanged(songList: ArrayList<SongItem>?) {
+                Log.i(ConstantValues.TAG, "On queue list data changed ${songList?.size}")
+                MainScope().launch {
+                    updateQueueList(songList)
+                }
+            }
+        })
+        mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner, object : Observer<Int>{
+            override fun onChanged(currentSong: Int?) {
+                Log.i(ConstantValues.TAG, "On queue list current song changed $currentSong")
+                MainScope().launch {
+                    updateCurrentPlayingSong(currentSong)
+                }
+            }
+        })
     }
 
-    private fun checkInteractions(view: View) {
+    private fun updateCurrentPlayingSong(currentSong: Int?) {
+        mPlayerViewPager?.currentItem = currentSong ?: 0
+    }
+
+    private fun updateQueueList(songList: ArrayList<SongItem>?) {
+        mSongList.clear()
+        mSongList.addAll(songList!!)
+        mPlayerPagerAdapter?.notifyDataSetChanged()
+        if((mPlayerViewPager?.currentItem ?: 0) != mPlayerFragmentViewModel.getCurrentSong().value){
+            mPlayerViewPager?.currentItem = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
+        }
+    }
+
+    private fun checkInteractions() {
+        mPlayerViewPager?.registerOnPageChangeCallback(object : OnPageChangeCallback(){
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+                //
+            }
+
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                updatePlayerUI(position)
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                super.onPageScrollStateChanged(state)
+            }
+        })
         mButtonMore?.setOnClickListener(View.OnClickListener {
             mPlayerMoreDialog = PlayerMoreDialog()
             mPlayerMoreDialog?.show(childFragmentManager, PlayerMoreDialog.TAG)
@@ -204,147 +248,42 @@ class PlayerFragment : Fragment() {
         mButtonArrowDown?.setOnClickListener(View.OnClickListener {
             //
         })
-
-        val drawable = ContextCompat.getDrawable(mContext.applicationContext, R.drawable.ic_fluid_music_icon_with_padding)
-        if (drawable != null) {
-            setBlurredFromImage(drawable)
-        }
     }
 
-    private fun setCovertArtFromPosition(position: Int) {
-        //Set covert art from song position
-        if((mSongList != null && mSongList!!.isNotEmpty())){
-            val tempArtwork: Artwork? = mSongList!![position].covertArt
-            var tempBinaryData: ByteArray? = null
-            if (tempArtwork != null) tempBinaryData = tempArtwork.binaryData
+    private fun updatePlayerUI(position: Int) {
+        //Update current song info
 
-            if(tempBinaryData != null && tempBinaryData.isNotEmpty()){
-                setBlurredFromImage(tempBinaryData)
-                return
-            }
-        }
-        //Set covert art from drawable
-        val drawable = ContextCompat.getDrawable(mContext.applicationContext, R.drawable.fashion)
-        if (drawable != null) {
-            setBlurredFromImage(drawable)
-        }
+        mTextTitle?.text = if(mSongList[position].title != null && mSongList[position].title!!.isNotEmpty()) mSongList[position].title else mSongList[position].fileName //Set song title
+        mTextArtist?.text = if(mSongList[position].artist!!.isNotEmpty()) mSongList[position].artist else mContext.getString(R.string.unknown_artist)
+        mTextDurationCurrent?.text = CustomFormatters.formatSongDurationToString(mSongList[position].duration)
+        mTextDuration?.text = CustomFormatters.formatSongDurationToString(mSongList[position].duration)
+
+        //Update blurred background
+        val tempBinaryData : ByteArray? = mSongList[position].covertArt?.binaryData
+        CustomUILoaders.loadBlurredWithImageLoader(mContext, mCovertArtBlurred, tempBinaryData, 100)
     }
-
-    private fun setBlurredFromImage(binaryData: ByteArray) {
-        val customTarget: CustomTarget<Bitmap?> = object : CustomTarget<Bitmap?>() {
-            override fun onResourceReady(
-                resource: Bitmap,
-                transition: Transition<in Bitmap?>?
-            ) {
-            }
-
-            override fun onLoadCleared(placeholder: Drawable?) {
-                //
-            }
-        }
-        if (binaryData.isNotEmpty()){
-            Glide.with(mContext)
-                .asBitmap()
-                .load(binaryData)
-                .useAnimationPool(true)
-                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                .dontAnimate()
-                .centerCrop()
-                .apply(RequestOptions().override(380, 200))
-                .into(customTarget)
-        }else{
-            val drawable = ContextCompat.getDrawable(mContext.applicationContext, R.drawable.fashion)
-            if (drawable != null) {
-                setBlurredFromImage(drawable)
-            }
-        }
-    }
-
-    private fun setBlurredFromImage(drawableValue: Drawable) {
-        val customTarget: CustomTarget<Bitmap?> = object : CustomTarget<Bitmap?>() {
-            override fun onResourceReady(
-                resource: Bitmap,
-                transition: Transition<in Bitmap?>?
-            ) {
-                Blurry.with(context).from(resource).into(mCovertArtBlurred)
-            }
-
-            override fun onLoadCleared(placeholder: Drawable?) {
-                //
-            }
-        }
-        Glide.with(mContext)
-            .load(ContextCompat.getDrawable(mContext.applicationContext, R.drawable.ic_fluid_music_icon_with_padding))
-            .useAnimationPool(true)
-            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-            .dontAnimate()
-            .centerCrop()
-            .apply(RequestOptions().override(380, 200))
-            .into(mCovertArtBlurred!!)
-
-    }
-
 
     private fun initViews(view: View) {
-        mButtonMore = view.findViewById(R.id.button_more)
+        mTextTitle = view.findViewById(R.id.text_title)
+        mTextArtist = view.findViewById(R.id.text_artist)
+        mTextDurationCurrent = view.findViewById(R.id.text_duration_current)
+        mTextDuration = view.findViewById(R.id.text_duration)
+
+        mCovertArtBlurred = view.findViewById(R.id.blurred_imageview)
+
         mButtonQueueMusic = view.findViewById(R.id.button_queue_music)
         mButtonEqualizer = view.findViewById(R.id.button_equalizer)
         mButtonArrowDown = view.findViewById(R.id.button_arrow_down)
 
         mPlayerViewPager = view.findViewById<ViewPager2>(R.id.view_pager_player)
-        mCovertArtBlurred = view.findViewById<ImageView>(R.id.blur_imageview)
-        mPlayerContainer = view.findViewById<LinearLayoutCompat>(R.id.player_container)
+        mLinearControls = view.findViewById<LinearLayoutCompat>(R.id.linear_controls)
 
-        updateTopViewInsets(mPlayerViewPager)
-        updateBottomViewInsets(view.findViewById(R.id.relative_player))
-        updateBottomViewInsets(view.findViewById(R.id.linear_mini_player))
-    }
-
-    private fun updateTopViewInsets(view: View?) {
-        view?.setOnApplyWindowInsetsListener { view, insets ->
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-                val tempInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
-                view.updatePadding(
-                    tempInsets.top,
-                )
-            }else{
-                view.updatePadding(
-                    top = insets.systemWindowInsetTop,
-                )
-            }
-            WindowInsetsCompat.CONSUMED
-            insets
-        }
-    }
-    private fun updateBottomViewInsets(view: View?) {
-        view?.setOnApplyWindowInsetsListener { view, insets ->
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-                val tempInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
-                view.updatePadding(
-                    tempInsets.bottom,
-                )
-            }else{
-                view.updatePadding(
-                    bottom = insets.systemWindowInsetBottom,
-                )
-            }
-            WindowInsetsCompat.CONSUMED
-            insets
-        }
+        CustomViewModifiers.updateTopViewInsets(view.findViewById(R.id.linear_viewpager))
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment PlayerFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance() =
             PlayerFragment().apply {
                 arguments = Bundle().apply {
                 }

@@ -5,19 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DecodeFormat
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.models.SongItem
-import org.jaudiotagger.tag.images.Artwork
+import com.prosabdev.fluidmusic.utils.CustomUILoaders
 
 
 class PlayerPageAdapter(
@@ -34,7 +28,7 @@ class PlayerPageAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerPageHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.component_viewpager_item_image, parent, false)
+            .inflate(R.layout.component_player_carview, parent, false)
 
         return PlayerPageHolder(view)
     }
@@ -51,39 +45,8 @@ class PlayerPageAdapter(
     }
 
     private fun loadCovertArt(covertArtView: ImageView?, position: Int) {
-        val artwork: Artwork? = mSongList!![position].covertArt
-        val tempBinaryData: ByteArray? = artwork?.binaryData
-        if (covertArtView != null) {
-            if(tempBinaryData != null && tempBinaryData.isNotEmpty()){
-                Glide.with(mContext)
-                    .load(tempBinaryData)
-                    .useAnimationPool(true)
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .dontAnimate()
-                    .apply(
-                        RequestOptions()
-                            .fitCenter()
-                            .format(DecodeFormat.PREFER_ARGB_8888)
-                            .override(SIZE_ORIGINAL)
-                    )
-                    .centerCrop()
-                    .into(covertArtView)
-            }else{
-                Glide.with(mContext)
-                    .load(ContextCompat.getDrawable(mContext, R.drawable.ic_fluid_music_icon_with_padding))
-                    .useAnimationPool(true)
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .dontAnimate()
-                    .apply(
-                        RequestOptions()
-                            .fitCenter()
-                            .format(DecodeFormat.PREFER_ARGB_8888)
-                            .override(SIZE_ORIGINAL)
-                    )
-                    .centerCrop()
-                    .into(covertArtView)
-            }
-        }
+        val tempBinaryData: ByteArray? = mSongList!![position].covertArt?.binaryData
+        CustomUILoaders.loadCovertArtFromBinaryData(mContext, covertArtView, tempBinaryData, 450)
     }
 
     override fun getItemCount(): Int {

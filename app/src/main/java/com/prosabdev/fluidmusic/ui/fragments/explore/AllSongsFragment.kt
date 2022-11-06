@@ -27,6 +27,7 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.adapters.SelectableRecycleViewAdapter
 import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.explore.AllSongsFragmentViewModel
 import kotlinx.coroutines.*
 
@@ -37,6 +38,7 @@ class AllSongsFragment : Fragment() {
     private var mActivity: FragmentActivity? = null
 
     private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by activityViewModels()
+    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
     private val mMainExploreFragmentViewModel: MainExploreFragmentViewModel by activityViewModels()
 
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
@@ -62,41 +64,48 @@ class AllSongsFragment : Fragment() {
 
         mContext = requireContext()
         mActivity = requireActivity()
-
-        runBlocking {
-            launch {
-            }
-        }
         return view
     }
 
-    private suspend fun observeLiveData() {
-        //Hide all views
-        CustomAnimators.crossFadeDown(mRecyclerView as View)
-        CustomAnimators.crossFadeDown(mLoadingContentProgress as View)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        MainScope().launch {
+            initViews(view)
+            setupRecyclerViewAdapter()
+            observeLiveData()
+            checkInteractions()
+        }
+    }
+
+    private fun observeLiveData() {
         //Request load songs from database or media file scanner
-        mAllSongsFragmentViewModel.requestLoadAsyncSongs(mActivity as Activity)
+        if(mAllSongsFragmentViewModel.getIsLoadingInBackground().value == false && (mAllSongsFragmentViewModel.getDataLoadedCounter().value ?: 0) <= 0){
+            mAllSongsFragmentViewModel.setIsLoading(true)
+            mAllSongsFragmentViewModel.requestLoadAsyncSongs(mActivity as Activity)
+        }
         //Listen when current page = this page, then try to load view data
         mMainExploreFragmentViewModel.getActivePage().observe(mActivity as LifecycleOwner, object : Observer<Int>{
             override fun onChanged(page: Int?) {
                 MainScope().launch {
-                    launch {
-                        clearSelectedItemsPage()
-                    }
+                    clearSelectedItemsPage()
                 }
             }
 
         })
         mAllSongsFragmentViewModel.getSongs().observe(mActivity as LifecycleOwner, object  : Observer<ArrayList<SongItem>>{
             override fun onChanged(songList: ArrayList<SongItem>?) {
-                addSongsToAdapter(songList)
+                MainScope().launch {
+                    addSongsToAdapter(songList)
+                }
             }
         })
         mAllSongsFragmentViewModel.getIsLoading().observe(mActivity as LifecycleOwner, object  : Observer<Boolean>{
             override fun onChanged(isLoading: Boolean?) {
-                Log.i(ConstantValues.TAG, "Loading : $isLoading")
                 if(isLoading == false){
                     CustomAnimators.hideLoadingView(mRecyclerView as View, mLoadingContentProgress as View, true)
+                }else{
+                    CustomAnimators.showLoadingView(mRecyclerView as View, mLoadingContentProgress as View, true)
                 }
             }
         })
@@ -118,32 +127,33 @@ class AllSongsFragment : Fragment() {
         mSongItemAdapter?.selectableClearSelection()
         mMainExploreFragmentViewModel.setSelectMode(false)
         mMainExploreFragmentViewModel.setTotalSelected(0)
-        mMainExploreFragmentViewModel.setTotalCount(0)
+        mMainExploreFragmentViewModel.setTotalCount(mSongList.size)
     }
 
     private fun addSongsToAdapter(songList: ArrayList<SongItem>?) {
         if (songList != null) {
-            val startPosition = mSongList.size -1
+            val startPosition: Int = mSongList.size
+            val itemCount: Int = songList.size
             mSongList.addAll(songList)
-            mSongItemAdapter?.notifyItemRangeInserted(startPosition, mSongList.size-1)
+            mSongItemAdapter?.notifyItemRangeInserted(startPosition, itemCount)
         }
         mMainExploreFragmentViewModel.setTotalCount(mSongList.size)
     }
 
     private fun checkInteractions() {
-
     }
 
     private fun setupRecyclerViewAdapter() {
         val spanCount = 1
-
-        val listHeadlines : ArrayList<Long> = ArrayList<Long>()
-        listHeadlines.add(1)
         var touchHelper : ItemTouchHelper ? = null
+
         //Setup headline adapter
-        mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
+        val listHeadlines : ArrayList<Long> = ArrayList<Long>()
+        listHeadlines.add(0)
+        mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, R.layout.item_top_play_shuffle, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
             override fun onPlayButtonClicked() {
                 Toast.makeText(mContext, "onPlayButtonClicked", Toast.LENGTH_SHORT).show()
+                updateCurrentPlayingSong(0)
             }
             override fun onShuffleButtonClicked() {
                 Toast.makeText(mContext, "onShuffleButtonClicked", Toast.LENGTH_SHORT).show()
@@ -159,12 +169,12 @@ class AllSongsFragment : Fragment() {
                 if(mSongItemAdapter?.selectableGetSelectionMode() == true){
                     mSongItemAdapter?.selectableToggleSelection(position)
                 }else{
-                    Toast.makeText(mContext, "onSongItemClicked", Toast.LENGTH_SHORT).show()
+                    updateCurrentPlayingSong(position)
                 }
             }
 
             override fun onSongItemPlayClicked(position: Int) {
-                Toast.makeText(mContext, "onSongItemPlayClicked", Toast.LENGTH_SHORT).show()
+                updateCurrentPlayingSong(position)
             }
 
             override fun onSongItemLongClicked(position: Int) {
@@ -202,11 +212,28 @@ class AllSongsFragment : Fragment() {
                 mMainExploreFragmentViewModel.setTotalCount(totalCount)
             }
         })
-
-        //Setup adapter
+        //Setup concat adapter
         val concatAdapter = ConcatAdapter()
         concatAdapter.addAdapter(mHeadlineTopPlayShuffleAdapter!!)
         concatAdapter.addAdapter(mSongItemAdapter!!)
+        concatAdapter.addAdapter(
+            HeadlinePlayShuffleAdapter(
+                listHeadlines,
+                R.layout.item_custom_empty_bottom_space,
+                object : HeadlinePlayShuffleAdapter.OnItemClickListener{
+                    override fun onPlayButtonClicked() {
+                        Toast.makeText(mContext, "onPlayButtonClicked", Toast.LENGTH_SHORT).show()
+                    }
+                    override fun onShuffleButtonClicked() {
+                        Toast.makeText(mContext, "onShuffleButtonClicked", Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onFilterButtonClicked() {
+                        Toast.makeText(mContext, "onFilterButtonClicked", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            )
+        )
         mRecyclerView?.adapter = concatAdapter
 
         //Add Layout manager
@@ -218,6 +245,15 @@ class AllSongsFragment : Fragment() {
         touchHelper = ItemTouchHelper(callback)
         touchHelper.attachToRecyclerView(mRecyclerView)
     }
+
+    private fun updateCurrentPlayingSong(position: Int) {
+        if(mPlayerFragmentViewModel.getSourceOfQueueList().value != ConstantValues.EXPLORE_ALL_SONGS){
+            mPlayerFragmentViewModel.setQueueList(mSongList)
+            mPlayerFragmentViewModel.setSourceOfQueueList(ConstantValues.EXPLORE_ALL_SONGS)
+        }
+        mPlayerFragmentViewModel.setCurrentSong(position)
+    }
+
     fun scrollDrag(position: Int) {
         Log.i(ConstantValues.TAG, "scrollDrag To $position")
     }
@@ -225,7 +261,6 @@ class AllSongsFragment : Fragment() {
     private fun initViews(view: View) {
         mRecyclerView = view.findViewById<RecyclerView>(R.id.content_recycler_view)
         mLoadingContentProgress = view.findViewById<LinearProgressIndicator>(R.id.loading_content_progress)
-
     }
 
     companion object {

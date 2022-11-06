@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     >
     <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/progress_indicator"
+        android:id="@+id/progress_mini_player_indicator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:trackThickness="2dp"
@@ -17,8 +17,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Widget.Material3.CardView.Elevated"
-        app:layout_constraintTop_toTopOf="@+id/button_play_pause"
-        app:layout_constraintBottom_toBottomOf="@+id/button_play_pause"
+        app:layout_constraintTop_toTopOf="@+id/button_mini_player_play_pause"
+        app:layout_constraintBottom_toBottomOf="@+id/button_mini_player_play_pause"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="1dp"
@@ -26,6 +26,7 @@
         android:layout_marginTop="1dp"
         >
         <ImageView
+            android:id="@+id/imageview_mini_player"
             android:layout_width="55dp"
             android:layout_height="50dp"
             android:scaleType="centerCrop"
@@ -36,39 +37,43 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@+id/covert_art_card_container"
-        app:layout_constraintEnd_toStartOf="@id/button_play_pause"
-        app:layout_constraintTop_toTopOf="@id/button_play_pause"
-        app:layout_constraintBottom_toBottomOf="@id/button_play_pause"
+        app:layout_constraintEnd_toStartOf="@id/button_mini_player_play_pause"
+        app:layout_constraintTop_toTopOf="@id/button_mini_player_play_pause"
+        app:layout_constraintBottom_toBottomOf="@id/button_mini_player_play_pause"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
         android:orientation="vertical"
         android:gravity="center_horizontal|start"
         >
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/song_title"
+            android:id="@+id/text_mini_player_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Papa"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:textColor="?attr/colorPrimary"
             />
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/song_artist"
+            android:id="@+id/text_mini_player_artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="La fouine"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:textColor="?attr/colorPrimary"
             android:textAppearance="?attr/textAppearanceLabelSmall"
             />
     </androidx.appcompat.widget.LinearLayoutCompat>
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/button_play_pause"
+        android:id="@+id/button_mini_player_play_pause"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="?attr/materialIconButtonStyle"
         app:icon="@drawable/play_circle"
         app:iconSize="24dp"
         android:scaleType="centerInside"
-        app:layout_constraintTop_toBottomOf="@+id/progress_indicator"
+        app:layout_constraintTop_toBottomOf="@+id/progress_mini_player_indicator"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="1dp"
