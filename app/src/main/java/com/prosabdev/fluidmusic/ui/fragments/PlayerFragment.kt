@@ -1,8 +1,6 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,8 +10,6 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.core.content.ContextCompat
-import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.*
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
@@ -21,27 +17,18 @@ import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.google.android.material.button.MaterialButton
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.dialogs.PlayerMoreDialog
 import com.prosabdev.fluidmusic.dialogs.QueueMusicDialog
 import com.prosabdev.fluidmusic.models.SongItem
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomFormatters
-import com.prosabdev.fluidmusic.utils.CustomUILoaders
-import com.prosabdev.fluidmusic.utils.CustomViewModifiers
+import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import jp.wasabeef.blurry.Blurry
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.jaudiotagger.tag.images.Artwork
-import kotlin.math.abs
+import kotlin.math.*
 
 
 class PlayerFragment : Fragment() {
@@ -91,41 +78,20 @@ class PlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        MainScope().launch {
-            initViews(view)
-            setupViewPagerAdapter()
-            observeLiveData()
-            blurViews(view)
-            checkInteractions()
-        }
+        initViews(view)
+        setupViewPagerAdapter()
+        observeLiveData()
+        checkInteractions()
     }
 
-    private fun blurViews(view: View) {
-//        val radius = 25f
-//
-//        val decorView : View = view.rootView
-//        // ViewGroup you want to start blur from. Choose root as close to BlurView in hierarchy as possible.
-//        val rootView : ViewGroup = decorView.findViewById(android.R.id.content)
-//
-//        // Optional:
-//        // Set drawable to draw in the beginning of each blurred frame.
-//        // Can be used in case your layout has a lot of transparent space and your content
-//        // gets a too low alpha value after blur is applied.
-//        val windowBackground : Drawable = decorView.background
-//        mBlurView?.setupWith(rootView, RenderScriptBlur(mContext)) // or RenderEffectBlur
-//            ?.setFrameClearDrawable(windowBackground) // Optional
-//            ?.setBlurRadius(radius)
-
+    override fun onResume() {
+        updatePlayerUI(mPlayerFragmentViewModel.getCurrentSong().value ?: 0)
+        super.onResume()
     }
 
     private fun setupViewPagerAdapter() {
         mPlayerPagerAdapter =
             PlayerPageAdapter(mSongList, mContext, object : PlayerPageAdapter.OnItemClickListener {
-                override fun onViewPagerClicked(position: Int) {
-                    Toast.makeText(context, "onViewPagerClicked", Toast.LENGTH_SHORT).show()
-                }
-
                 override fun onButtonLyricsClicked(position: Int) {
                     Toast.makeText(context, "onButtonLyricsClicked", Toast.LENGTH_SHORT).show()
                 }
@@ -148,15 +114,7 @@ class PlayerFragment : Fragment() {
                 positionOffsetPixels: Int
             ) {
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-            }
-
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                //
-            }
-
-            override fun onPageScrollStateChanged(state: Int) {
-                super.onPageScrollStateChanged(state)
+                CustomMathComputations.fadeWithPageOffset(mCovertArtBlurred, positionOffset)
             }
         })
         transformPageScale(mPlayerViewPager)
@@ -181,18 +139,18 @@ class PlayerFragment : Fragment() {
     private fun observeLiveData() {
         mPlayerFragmentViewModel.getQueueList().observe(mActivity as LifecycleOwner, object : Observer<ArrayList<SongItem>>{
             override fun onChanged(songList: ArrayList<SongItem>?) {
-                Log.i(ConstantValues.TAG, "On queue list data changed ${songList?.size}")
-                MainScope().launch {
-                    updateQueueList(songList)
-                }
+                updateQueueList(songList)
             }
         })
         mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner, object : Observer<Int>{
             override fun onChanged(currentSong: Int?) {
-                Log.i(ConstantValues.TAG, "On queue list current song changed $currentSong")
-                MainScope().launch {
-                    updateCurrentPlayingSong(currentSong)
-                }
+                updateCurrentPlayingSong(currentSong)
+            }
+        })
+        mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner, object :
+            Observer<String> {
+            override fun onChanged(sourceOf: String?) {
+                updateDataFromSource(sourceOf)
             }
         })
     }
@@ -201,13 +159,17 @@ class PlayerFragment : Fragment() {
         mPlayerViewPager?.currentItem = currentSong ?: 0
     }
 
+    private fun updateDataFromSource(sourceOf: String?) {
+        if(sourceOf != mPlayerFragmentViewModel.getSourceOfQueueList().value){
+            updateQueueList(mPlayerFragmentViewModel.getQueueList().value)
+        }
+    }
+
     private fun updateQueueList(songList: ArrayList<SongItem>?) {
         mSongList.clear()
         mSongList.addAll(songList!!)
         mPlayerPagerAdapter?.notifyDataSetChanged()
-        if((mPlayerViewPager?.currentItem ?: 0) != mPlayerFragmentViewModel.getCurrentSong().value){
-            mPlayerViewPager?.currentItem = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
-        }
+        mPlayerViewPager?.currentItem = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
     }
 
     private fun checkInteractions() {
@@ -252,14 +214,23 @@ class PlayerFragment : Fragment() {
 
     private fun updatePlayerUI(position: Int) {
         //Update current song info
+        if(mSongList.size > 0){
+            if(mTextTitle != null)
+                mTextTitle?.text = if(mSongList[position].title != null && mSongList[position].title!!.isNotEmpty()) mSongList[position].title else mSongList[position].fileName //Set song title
 
-        mTextTitle?.text = if(mSongList[position].title != null && mSongList[position].title!!.isNotEmpty()) mSongList[position].title else mSongList[position].fileName //Set song title
-        mTextArtist?.text = if(mSongList[position].artist!!.isNotEmpty()) mSongList[position].artist else mContext.getString(R.string.unknown_artist)
-        mTextDurationCurrent?.text = CustomFormatters.formatSongDurationToString(mSongList[position].duration)
-        mTextDuration?.text = CustomFormatters.formatSongDurationToString(mSongList[position].duration)
+            if(mTextArtist != null)
+                mTextArtist?.text = if(mSongList[position].artist!!.isNotEmpty()) mSongList[position].artist else mContext.getString(R.string.unknown_artist)
 
+            if(mTextDurationCurrent != null)
+                mTextDurationCurrent?.text = CustomFormatters.formatSongDurationToString(mSongList[position].duration)
+
+            if(mTextDuration != null)
+                mTextDuration?.text = CustomFormatters.formatSongDurationToString(mSongList[position].duration)
+        }
         //Update blurred background
-        val tempBinaryData : ByteArray? = mSongList[position].covertArt?.binaryData
+        var tempBinaryData : ByteArray? = null
+        if(mSongList.size > 0)
+            tempBinaryData = mSongList[position].covertArt?.binaryData
         CustomUILoaders.loadBlurredWithImageLoader(mContext, mCovertArtBlurred, tempBinaryData, 100)
     }
 
@@ -279,6 +250,7 @@ class PlayerFragment : Fragment() {
         mLinearControls = view.findViewById<LinearLayoutCompat>(R.id.linear_controls)
 
         CustomViewModifiers.updateTopViewInsets(view.findViewById(R.id.linear_viewpager))
+        CustomViewModifiers.updateBottomViewInsets(mLinearControls!!)
     }
 
     companion object {

@@ -41,8 +41,8 @@ abstract class CustomUILoaders {
                     transition: Transition<in Bitmap?>?
                 ) {
                     Blurry.with(context)
-                        .radius(20)
-                        .sampling(3)
+                        .radius(30)
+                        .sampling(1)
                         .from(resource)
                         .into(imageView)
                 }

@@ -11,7 +11,12 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class PlayerPageAdapter(
@@ -21,7 +26,6 @@ class PlayerPageAdapter(
 ) : Adapter<PlayerPageAdapter.PlayerPageHolder>() {
 
     interface OnItemClickListener {
-        fun onViewPagerClicked(position: Int)
         fun onButtonLyricsClicked(position: Int)
         fun onButtonFullscreenClicked(position: Int)
     }
@@ -59,11 +63,15 @@ class PlayerPageAdapter(
         var mLyricsButton: MaterialButton? = itemView.findViewById(R.id.button_lyrics)
         var mFullscreenButton: MaterialButton? = itemView.findViewById(R.id.button_fullscreen)
 
+        var job : Job? = null
+
         fun bindListener(position: Int, listener: OnItemClickListener) {
             mContainer?.setOnClickListener(View.OnClickListener {
-                listener.onViewPagerClicked(
-                    position
-                )
+                if(job != null)
+                    job?.cancel()
+                job = MainScope().launch {
+                    animateButtons()
+                }
             })
             mLyricsButton?.setOnClickListener(View.OnClickListener {
                 listener.onButtonLyricsClicked(
@@ -75,6 +83,14 @@ class PlayerPageAdapter(
                     position
                 )
             })
+        }
+
+        private suspend fun animateButtons() {
+            CustomAnimators.crossFadeUp(this.mLyricsButton as View, true)
+            CustomAnimators.crossFadeUp(mFullscreenButton as View, true)
+            delay(2000)
+            CustomAnimators.crossFadeDown(this.mLyricsButton as View, true)
+            CustomAnimators.crossFadeDown(mFullscreenButton as View, true)
         }
     }
 }

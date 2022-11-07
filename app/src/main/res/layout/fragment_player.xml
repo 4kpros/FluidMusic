@@ -22,7 +22,7 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         style="@style/DefaultBackground"
-        android:alpha="0.5"
+        android:alpha="0.4"
         />
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -58,9 +58,8 @@
                             android:id="@+id/text_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Over The Horizon 2015"
+                            android:text="@string/unknown_title"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
-                            android:textColor="?attr/colorPrimary"
                             android:maxLines="1"
                             android:ellipsize="end"
                             />
@@ -70,9 +69,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:alpha="0.5"
-                            android:text="Unknown artist"
+                            android:text="@string/unknown_artist"
                             android:textAppearance="?attr/textAppearanceTitleSmall"
-                            android:textColor="?attr/colorPrimary"
                             android:maxLines="1"
                             android:ellipsize="end" />
                     </androidx.appcompat.widget.LinearLayoutCompat>
@@ -92,7 +90,7 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentStart="true"
                             android:layout_centerVertical="true"
-                            android:text="00:00"
+                            android:text="--:--"
                             android:textAppearance="?attr/textAppearanceLabelSmall" />
 
                         <com.google.android.material.slider.Slider
@@ -102,7 +100,7 @@
                             android:layout_centerVertical="true"
                             android:layout_toStartOf="@+id/text_duration"
                             android:layout_toEndOf="@+id/text_duration_current"
-                            android:value="50"
+                            android:value="100"
                             android:valueFrom="0"
                             android:valueTo="100"
                             app:trackHeight="2dp" />
@@ -113,7 +111,7 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:text="00:00"
+                            android:text="--:--"
                             android:textAppearance="?attr/textAppearanceLabelSmall" />
                     </RelativeLayout>
                 </androidx.appcompat.widget.LinearLayoutCompat>

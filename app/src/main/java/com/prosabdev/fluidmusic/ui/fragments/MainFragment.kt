@@ -76,47 +76,31 @@ class MainFragment : Fragment() {
             setReorderingAllowed(true)
             add<PlayerFragment>(R.id.player_fragment_container)
         }
+        initViews(view)
+        observeLiveData()
+        checkInteractions()
 
         // Inflate the layout for this fragment
         return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        MainScope().launch {
-            initViews(view)
-            observeLiveData()
-            checkInteractions()
-        }
     }
 
     private fun observeLiveData() {
         mPlayerFragmentViewModel.getQueueList().observe(mActivity as LifecycleOwner, object :
             Observer<ArrayList<SongItem>> {
             override fun onChanged(songList: ArrayList<SongItem>?) {
-                Log.i(ConstantValues.TAG, "MINI + getQueueList")
-                MainScope().launch {
-                    updateMiniPlayerUI(mPlayerFragmentViewModel.getCurrentSong().value ?: 0)
-                }
+                updateMiniPlayerUI(mPlayerFragmentViewModel.getCurrentSong().value ?: 0)
             }
         })
         mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner, object :
             Observer<Int> {
             override fun onChanged(currentSong: Int?) {
-                Log.i(ConstantValues.TAG, "MINI + getCurrentSong")
-                MainScope().launch {
-                    updateMiniPlayerUI(currentSong ?: 0)
-                }
+                updateMiniPlayerUI(currentSong ?: 0)
             }
         })
         mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner, object :
             Observer<String> {
             override fun onChanged(sourceOf: String?) {
-                Log.i(ConstantValues.TAG, "MINI + getSourceOfQueueList")
-                MainScope().launch {
-                    updateMiniPlayerUI(mPlayerFragmentViewModel.getCurrentSong().value ?: 0)
-                }
+                updateMiniPlayerUI(mPlayerFragmentViewModel.getCurrentSong().value ?: 0)
             }
         })
     }
@@ -135,9 +119,6 @@ class MainFragment : Fragment() {
     }
 
     private fun checkInteractions() {
-
-        mMiniPlayerContainer?.alpha = 1.0f
-        mPlayerFragmentContainer?.alpha = 0.0f
         mSlidingUpPanel?.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
             override fun onPanelSlide(panel: View?, slideOffset: Float) {
                 Log.i(ConstantValues.TAG, "Slide panel offset : $slideOffset")
@@ -190,7 +171,8 @@ class MainFragment : Fragment() {
         mButtonPlayPause = view.findViewById(R.id.button_mini_player_play_pause)
 
         CustomViewModifiers.updateTopViewInsets(mMainFragmentContainer!!)
-        CustomViewModifiers.updateBottomViewInsets(mSlidingUpPanel!!)
+        CustomViewModifiers.removeBottomViewInsets(mSlidingUpPanel!!)
+//        CustomViewModifiers.updateBottomViewInsets(mSlidingUpPanel!!)
     }
 
     companion object {

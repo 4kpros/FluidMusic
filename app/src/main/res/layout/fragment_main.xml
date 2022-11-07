@@ -10,7 +10,7 @@
     app:umanoScrollInterpolator="?attr/quantizeMotionInterpolator"
     app:umanoClipPanel="false"
     app:umanoOverlay="true"
-    app:umanoInitialState="collapsed"
+    app:umanoInitialState="anchored"
     android:gravity="bottom"
     app:umanoShadowHeight="2dp">
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,7 +35,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center|top"
-            android:visibility="gone"
+            android:visibility="visible"
+            android:alpha="1"
             />
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -45,6 +46,8 @@
             android:orientation="vertical"
             app:layout_constraintTop_toTopOf="parent"
             style="@style/DefaultBackground"
+            android:visibility="gone"
+            android:alpha="0"
             >
             <include layout="@layout/component_mini_player"/>
         </androidx.appcompat.widget.LinearLayoutCompat>

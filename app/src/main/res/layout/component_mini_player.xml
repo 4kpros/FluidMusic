@@ -52,7 +52,6 @@
             android:text="Papa"
             android:maxLines="1"
             android:ellipsize="end"
-            android:textColor="?attr/colorPrimary"
             />
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_mini_player_artist"
@@ -61,7 +60,6 @@
             android:text="La fouine"
             android:maxLines="1"
             android:ellipsize="end"
-            android:textColor="?attr/colorPrimary"
             android:textAppearance="?attr/textAppearanceLabelSmall"
             />
     </androidx.appcompat.widget.LinearLayoutCompat>

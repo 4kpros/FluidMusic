@@ -42,6 +42,20 @@ abstract class CustomViewModifiers {
                 insets
             }
         }
+        fun removeBottomViewInsets(view: View) {
+            view.setOnApplyWindowInsetsListener { view, insets ->
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+                    view.updatePadding(
+                        bottom = 0,
+                    )
+                }else{
+                    view.updatePadding(
+                        bottom = 0,
+                    )
+                }
+                insets
+            }
+        }
         fun updateBottomViewInsetsWithoutChild(view: View) {
             ViewCompat.setOnApplyWindowInsetsListener(
                 view

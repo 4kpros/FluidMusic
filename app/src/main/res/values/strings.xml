@@ -25,4 +25,5 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="unknown_artist">Unknown artist</string>
+    <string name="unknown_title">Unknown title</string>
 </resources>

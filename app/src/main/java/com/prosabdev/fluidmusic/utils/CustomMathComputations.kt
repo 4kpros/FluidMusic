@@ -4,13 +4,19 @@ import android.app.Activity
 import android.graphics.Insets
 import android.os.Build
 import android.util.DisplayMetrics
+import android.view.View
 import android.view.WindowInsets
 import android.view.WindowMetrics
 import kotlin.math.floor
+import kotlin.math.sin
 
 
 abstract class CustomMathComputations {
     companion object {
+
+        fun fadeWithPageOffset(vew : View?, positionOffset: Float){
+            vew?.alpha = ((sin(-positionOffset.toDouble() * 3) / 2) + 1).toFloat()
+        }
         //Return screen width in pixels
         fun getScreenWidth(activity: Activity): Int {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

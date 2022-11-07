@@ -33,7 +33,7 @@
         <item name="android:statusBarColor">@color/semiBlack</item>
         <item name="android:navigationBarColor">@color/semiBlack</item>
 
-        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowActionBarOverlay">false</item>
     </style>
 
     <!-- Background -->
