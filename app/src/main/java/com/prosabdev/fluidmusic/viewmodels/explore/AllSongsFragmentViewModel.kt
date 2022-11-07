@@ -29,10 +29,10 @@ class AllSongsFragmentViewModel : ViewModel() {
         //Else load songs from MediaFileScanner
         MediaFileScanner.scanAudioFilesWithMediaStore(
             activity,
-            mMutableSongList,
-            mMutableIsLoading,
-            mMutableIsLoadingInBackground,
-            mMutableDataLoadedCounter,
+            this.mMutableSongList,
+            this.mMutableIsLoading,
+            this.mMutableIsLoadingInBackground,
+            this.mMutableDataLoadedCounter,
             10
         )
     }
@@ -40,14 +40,17 @@ class AllSongsFragmentViewModel : ViewModel() {
         return mIsLoading
     }
     fun setIsLoading(value : Boolean) {
-        mMutableIsLoadingInBackground.value = true
-        mMutableIsLoading.value = true
+        this.mMutableIsLoadingInBackground.value = true
+        this.mMutableIsLoading.value = true
     }
     fun getIsLoadingInBackground(): LiveData<Boolean> {
         return mIsLoadingInBackground
     }
     fun getDataLoadedCounter(): LiveData<Int> {
         return mDataLoadedCounter
+    }
+    fun setSongs(songList: ArrayList<SongItem>)  {
+        mMutableSongList.value = songList
     }
     fun getSongs(): LiveData<ArrayList<SongItem>>  {
         return mSongList
