@@ -21,20 +21,20 @@ abstract class GenericDataListFetcherViewModel : ViewModel() {
     private val mDataList: LiveData<ArrayList<Any>> get() = mMutableDataList
 
     open fun requestLoadDataAsync(activity : Activity, minToUpdateDataList : Int = 10){
-        Log.i(ConstantValues.TAG, "BaseExploreViewModel request to load data")
-        Log.i(ConstantValues.TAG, "BaseExploreViewModel nothing to do")
+        Log.i(ConstantValues.TAG, "GenericDataListFetcherViewModel request to load data")
+        Log.i(ConstantValues.TAG, "GenericDataListFetcherViewModel nothing to do")
     }
     fun getIsLoading(): LiveData<Boolean> {
         return mIsLoading
     }
     fun setIsLoading(value : Boolean) {
-        this.mMutableIsLoading.value = true
+        this.mMutableIsLoading.value = value
     }
     fun getIsLoadingInBackground(): LiveData<Boolean> {
         return mIsLoadingInBackground
     }
     fun setIsLoadingInBackground(value : Boolean) {
-        this.mMutableIsLoadingInBackground.value = true
+        this.mMutableIsLoadingInBackground.value = value
     }
     fun getDataRequestCounter(): LiveData<Int> {
         return mDataLoadedCounter
@@ -48,7 +48,7 @@ abstract class GenericDataListFetcherViewModel : ViewModel() {
     fun setLastLoadedPosition(value : Int) {
         mMutableLastLoadedPosition.value = value
     }
-    fun getSongList(): LiveData<ArrayList<Any>> {
+    fun getDataList(): LiveData<ArrayList<Any>> {
         return mDataList
     }
     fun setDataList(dataList: ArrayList<Any>)  {

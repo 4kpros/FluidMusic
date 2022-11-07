@@ -91,7 +91,7 @@ abstract class MediaFileScanner {
                     val absolutePath: String = cursor.getString(absolutePathColumn) ?: ""
                     val id: Int = cursor.getInt(idColumn) ?: -1
                     val name: String = cursor.getString(nameColumn) ?: ""
-                    val duration: Long = cursor.getLong(durationColumn) ?: -1
+                    val duration: Long = cursor.getLong(durationColumn) ?: 0
                     val mimeType: String = cursor.getString(mimeTypeColumn) ?: ""
 
                     // Stores column values and the contentUri in a local object

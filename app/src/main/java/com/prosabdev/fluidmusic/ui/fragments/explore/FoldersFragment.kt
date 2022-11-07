@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
@@ -38,7 +39,7 @@ class FoldersFragment : Fragment() {
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
     private var molderItemAdapter: FolderItemAdapter? = null
     private var mRecyclerView: RecyclerView? = null
-    private var mLoadingContentProgress: LinearProgressIndicator? = null
+    private var mLoadingContentProgress: LinearLayoutCompat? = null
 
     private var mFolderList : ArrayList<FolderItem> = ArrayList<FolderItem>()
 
@@ -89,7 +90,7 @@ class FoldersFragment : Fragment() {
 
     private fun initViews(view: View) {
         mRecyclerView = view.findViewById<RecyclerView>(R.id.content_recycler_view)
-        mLoadingContentProgress = view.findViewById<LinearProgressIndicator>(R.id.loading_content_progress)
+        mLoadingContentProgress = view.findViewById<LinearLayoutCompat>(R.id.loading_content_progress)
     }
 
     companion object {

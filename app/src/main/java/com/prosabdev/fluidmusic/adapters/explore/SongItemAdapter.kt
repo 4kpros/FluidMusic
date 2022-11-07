@@ -148,7 +148,7 @@ class SongItemAdapter(
             mDuration?.text = CustomFormatters.formatSongDurationToString(songItem.duration) //Set song duration
             mTypeMime?.text = songItem.typeMime //Set song type mime
             //Set is is playing or is checked(for multiple item selection)
-            if(selected) CustomAnimators.crossFadeUp(mSelectedItemBackground as View) else CustomAnimators.crossFadeDown(mSelectedItemBackground as View)
+            if(selected) CustomAnimators.crossFadeUp(mSelectedItemBackground as View, false, 0) else CustomAnimators.crossFadeDown(mSelectedItemBackground as View, false, 0)
             //Set song covert art
             val tempBinaryData : ByteArray? = songItem.covertArt?.binaryData
             CustomUILoaders.loadCovertArtFromBinaryData(context, mCovertArt, tempBinaryData, 100)

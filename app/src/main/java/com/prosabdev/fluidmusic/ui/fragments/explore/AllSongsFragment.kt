@@ -7,7 +7,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
@@ -29,7 +31,6 @@ import com.prosabdev.fluidmusic.utils.adapters.SelectableRecycleViewAdapter
 import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.explore.AllSongsFragmentViewModel
-import kotlinx.coroutines.*
 
 class AllSongsFragment : Fragment() {
     private var mPageIndex: Int? = -1
@@ -45,7 +46,7 @@ class AllSongsFragment : Fragment() {
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
     private var mSongItemAdapter: SongItemAdapter? = null
     private var mRecyclerView: RecyclerView? = null
-    private var mLoadingContentProgress: LinearProgressIndicator? = null
+    private var mLoadingContentProgress: LinearLayoutCompat? = null
 
     private var mSongList : ArrayList<SongItem> = ArrayList<SongItem>()
 
@@ -72,40 +73,33 @@ class AllSongsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        MainScope().launch {
-            initViews(view)
-            setupRecyclerViewAdapter()
-            observeLiveData()
-            checkInteractions()
-        }
+        initViews(view)
+        setupRecyclerViewAdapter()
+        observeLiveData()
+        checkInteractions()
     }
 
     private fun observeLiveData() {
         //Request load songs from database or media file scanner
-        if(mAllSongsFragmentViewModel.getIsLoadingInBackground().value == false && (mAllSongsFragmentViewModel.getDataLoadedCounter().value ?: 0) <= 0){
-            mAllSongsFragmentViewModel.setIsLoading(true)
-            mAllSongsFragmentViewModel.requestLoadAsyncSongs(mActivity as Activity)
+        if(mAllSongsFragmentViewModel.getIsLoadingInBackground().value == false && (mAllSongsFragmentViewModel.getDataRequestCounter().value ?: 0) <= 0){
+            mAllSongsFragmentViewModel.requestLoadDataAsync(mActivity as Activity)
         }
         //Listen when current page = this page, then try to load view data
         mMainExploreFragmentViewModel.getActivePage().observe(mActivity as LifecycleOwner, object : Observer<Int>{
             override fun onChanged(page: Int?) {
-                MainScope().launch {
-                    clearSelectedItemsPage()
-                }
+                clearSelectedItemsPage()
             }
 
         })
-        mAllSongsFragmentViewModel.getSongs().observe(mActivity as LifecycleOwner, object  : Observer<ArrayList<SongItem>>{
-            override fun onChanged(songList: ArrayList<SongItem>?) {
-                MainScope().launch {
-                    addSongsToAdapter(songList)
-                }
+        mAllSongsFragmentViewModel.getDataList().observe(mActivity as LifecycleOwner, object  : Observer<ArrayList<Any>>{
+            override fun onChanged(songList: ArrayList<Any>?) {
+                addSongsToAdapter(songList as ArrayList<SongItem>)
             }
         })
         mAllSongsFragmentViewModel.getIsLoading().observe(mActivity as LifecycleOwner, object  : Observer<Boolean>{
             override fun onChanged(isLoading: Boolean?) {
                 if(isLoading == false){
-                    CustomAnimators.hideLoadingView(mRecyclerView as View, mLoadingContentProgress as View, true)
+                    CustomAnimators.hideLoadingView(mRecyclerView as View, mLoadingContentProgress as View,300, true)
                 }else{
                     CustomAnimators.showLoadingView(mRecyclerView as View, mLoadingContentProgress as View, true)
                 }
@@ -124,7 +118,7 @@ class AllSongsFragment : Fragment() {
             mSongItemAdapter?.selectableClearSelection()
     }
 
-    private suspend fun clearSelectedItemsPage() = coroutineScope{
+    private fun clearSelectedItemsPage() {
         mSongItemAdapter?.selectableSetSelectionMode(false)
         mSongItemAdapter?.selectableClearSelection()
         mMainExploreFragmentViewModel.setSelectMode(false)
@@ -262,7 +256,7 @@ class AllSongsFragment : Fragment() {
 
     private fun initViews(view: View) {
         mRecyclerView = view.findViewById<RecyclerView>(R.id.content_recycler_view)
-        mLoadingContentProgress = view.findViewById<LinearProgressIndicator>(R.id.loading_content_progress)
+        mLoadingContentProgress = view.findViewById<LinearLayoutCompat>(R.id.loading_content_progress)
     }
 
     companion object {
