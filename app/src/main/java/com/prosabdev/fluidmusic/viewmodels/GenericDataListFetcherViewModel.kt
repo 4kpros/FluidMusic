@@ -1,15 +1,13 @@
-package com.prosabdev.fluidmusic.viewmodels.explore
+package com.prosabdev.fluidmusic.viewmodels
 
 import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import java.util.Objects
 
-abstract class BaseExploreViewModel : ViewModel() {
+abstract class GenericDataListFetcherViewModel : ViewModel() {
     private val mMutableIsLoading = MutableLiveData<Boolean>(false)
     private val mMutableIsLoadingInBackground = MutableLiveData<Boolean>(false)
     private val mMutableDataRequestCounter = MutableLiveData<Int>(0)

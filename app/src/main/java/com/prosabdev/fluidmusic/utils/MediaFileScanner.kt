@@ -9,8 +9,8 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
 import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.viewmodels.GenericDataListFetcherViewModel
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -44,10 +44,7 @@ abstract class MediaFileScanner {
 
         fun scanAudioFilesWithMediaStore(
             activity: Activity,
-            mMutableSongList: MutableLiveData<ArrayList<SongItem>>,
-            mIsLoading: MutableLiveData<Boolean>,
-            mMutableIsLoadingInBackground: MutableLiveData<Boolean>,
-            mMutableDataLoadedCounter: MutableLiveData<Int>,
+            genericDataListFetcherViewModel : GenericDataListFetcherViewModel,
             minToShow: Int
         ) {
             val tempSongList: ArrayList<SongItem> = ArrayList()
@@ -104,19 +101,18 @@ abstract class MediaFileScanner {
                     songItem.fileName = name
                     songItem.duration = duration
                     songItem.typeMime = mimeType
-//                    songItem.covertArtBitmap = AudioFileInfoExtractor.getBitmapAudioArtwork(activity, absolutePath)
                     //Now save on database
                     tempSongList.add(songItem)
                     if(itemsCount > 0 && itemsCount == minToShow){
                         itemsCount = 0
-                        mMutableSongList.value = tempSongList
-                        mIsLoading.value = false
+                        genericDataListFetcherViewModel.setDataList(tempSongList as ArrayList<Any>)
+                        genericDataListFetcherViewModel.setIsLoading(false)
                     }
                 }
-                mMutableSongList.value = tempSongList
-                mIsLoading.value = false
-                mMutableIsLoadingInBackground.value = false
-                mMutableDataLoadedCounter.value = (mMutableDataLoadedCounter.value ?: 0) + 1
+                genericDataListFetcherViewModel.setDataList(tempSongList as ArrayList<Any>)
+                genericDataListFetcherViewModel.setIsLoading(false)
+                genericDataListFetcherViewModel.setIsLoadingInBackground(false)
+                genericDataListFetcherViewModel.setDataRequestCounter(1)
             }
         }
     }

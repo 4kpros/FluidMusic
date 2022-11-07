@@ -2,7 +2,6 @@ package com.prosabdev.fluidmusic.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,13 +21,10 @@ import com.google.android.material.slider.Slider
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.dialogs.PlayerMoreDialog
-import com.prosabdev.fluidmusic.dialogs.QueueMusicDialog
+import com.prosabdev.fluidmusic.dialogs.PlayerQueueMusicDialog
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
-import jp.wasabeef.blurry.Blurry
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import kotlin.math.*
 
 
@@ -56,7 +52,7 @@ class PlayerFragment : Fragment() {
     private var mButtonArrowDown: MaterialButton? = null
     //Dialog var
     private var mPlayerMoreDialog: PlayerMoreDialog? = null
-    private var mQueueMusicDialog: QueueMusicDialog? = null
+    private var mPlayerQueueMusicDialog: PlayerQueueMusicDialog? = null
 
     private var mLinearControls: LinearLayoutCompat? = null
     private var mPlayerViewPager: ViewPager2? = null
@@ -200,8 +196,8 @@ class PlayerFragment : Fragment() {
             mPlayerMoreDialog?.show(childFragmentManager, PlayerMoreDialog.TAG)
         })
         mButtonQueueMusic?.setOnClickListener(View.OnClickListener {
-            mQueueMusicDialog = QueueMusicDialog()
-            mQueueMusicDialog?.show(childFragmentManager, QueueMusicDialog.TAG)
+            mPlayerQueueMusicDialog = PlayerQueueMusicDialog()
+            mPlayerQueueMusicDialog?.show(childFragmentManager, PlayerQueueMusicDialog.TAG)
         })
         mButtonEqualizer?.setOnClickListener(View.OnClickListener {
             mActivity?.supportFragmentManager?.commit {

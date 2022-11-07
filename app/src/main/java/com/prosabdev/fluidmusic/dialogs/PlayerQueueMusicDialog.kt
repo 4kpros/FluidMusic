@@ -9,7 +9,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.prosabdev.fluidmusic.R
 
-class QueueMusicDialog : BottomSheetDialogFragment() {
+class PlayerQueueMusicDialog : BottomSheetDialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
