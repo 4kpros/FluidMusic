@@ -28,7 +28,16 @@ class HeadlinePlayShuffleAdapter(
         return HeadlinePlayShuffleHolder(view)
     }
 
+    override fun onViewAttachedToWindow(holder: HeadlinePlayShuffleHolder) {
+        super.onViewAttachedToWindow(holder)
+
+        if(holder.mCustomEmptyBottomSpace != null){
+            holder.mCustomEmptyBottomSpace!!.requestApplyInsets()
+            CustomViewModifiers.updateBottomViewInsets(holder.mCustomEmptyBottomSpace as View)
+        }
+    }
     override fun onBindViewHolder(holder: HeadlinePlayShuffleHolder, position: Int) {
+
         //Bind listener for to capture click events
         holder.bindListener(mListener)
     }
@@ -44,7 +53,7 @@ class HeadlinePlayShuffleAdapter(
             itemView.findViewById<MaterialButton>(R.id.button_shuffle)
         private var mFilterButton: MaterialButton? =
             itemView.findViewById<MaterialButton>(R.id.button_filter)
-        private var mCustomEmptyBottomSpace: LinearLayoutCompat? =
+        var mCustomEmptyBottomSpace: LinearLayoutCompat? =
             itemView.findViewById<LinearLayoutCompat>(R.id.custom_empty_bottom_space)
 
         //Method used to bind one listener with items events click

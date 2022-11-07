@@ -9,26 +9,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:trackThickness="2dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/covert_art_card_container"
         android:progress="50"
+        android:layout_marginTop="@dimen/main_small_margin"
         />
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/covert_art_card_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Widget.Material3.CardView.Elevated"
-        app:layout_constraintTop_toTopOf="@+id/button_mini_player_play_pause"
-        app:layout_constraintBottom_toBottomOf="@+id/button_mini_player_play_pause"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="@dimen/main_medium_margin"
         android:layout_marginEnd="1dp"
         android:layout_marginBottom="1dp"
-        android:layout_marginTop="1dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/main_small_margin"
         >
         <ImageView
             android:id="@+id/imageview_mini_player"
-            android:layout_width="55dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/song_card_image_small_w"
+            android:layout_height="@dimen/song_card_image_small_h"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_fluid_music_icon_with_padding"
             />
@@ -38,10 +38,9 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@+id/covert_art_card_container"
         app:layout_constraintEnd_toStartOf="@id/button_mini_player_play_pause"
-        app:layout_constraintTop_toTopOf="@id/button_mini_player_play_pause"
-        app:layout_constraintBottom_toBottomOf="@id/button_mini_player_play_pause"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
+        app:layout_constraintTop_toTopOf="@id/covert_art_card_container"
+        app:layout_constraintBottom_toBottomOf="@id/covert_art_card_container"
+        android:layout_marginStart="@dimen/main_small_margin"
         android:orientation="vertical"
         android:gravity="center_horizontal|start"
         >
@@ -52,6 +51,7 @@
             android:text="Papa"
             android:maxLines="1"
             android:ellipsize="end"
+            android:textAppearance="?attr/textAppearanceBody1"
             />
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_mini_player_artist"
@@ -60,7 +60,8 @@
             android:text="La fouine"
             android:maxLines="1"
             android:ellipsize="end"
-            android:textAppearance="?attr/textAppearanceLabelSmall"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:alpha="0.5"
             />
     </androidx.appcompat.widget.LinearLayoutCompat>
     <com.google.android.material.button.MaterialButton
@@ -68,12 +69,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="?attr/materialIconButtonStyle"
-        app:icon="@drawable/play_circle"
-        app:iconSize="24dp"
+        app:icon="@drawable/play_arrow"
         android:scaleType="centerInside"
-        app:layout_constraintTop_toBottomOf="@+id/progress_mini_player_indicator"
+        app:layout_constraintTop_toTopOf="@+id/covert_art_card_container"
+        app:layout_constraintBottom_toBottomOf="@+id/covert_art_card_container"
+        app:layout_constraintEnd_toStartOf="@+id/button_mini_player_next"
+        />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_mini_player_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="?attr/materialIconButtonStyle"
+        app:icon="@drawable/skip_next"
+        android:scaleType="centerInside"
+        app:layout_constraintTop_toTopOf="@+id/button_mini_player_play_pause"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="10dp"
-        android:layout_marginTop="1dp"
+        android:layout_marginEnd="@dimen/main_medium_margin"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

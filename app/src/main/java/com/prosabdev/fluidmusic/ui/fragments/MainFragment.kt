@@ -123,28 +123,30 @@ class MainFragment : Fragment() {
             override fun onPanelSlide(panel: View?, slideOffset: Float) {
                 Log.i(ConstantValues.TAG, "Slide panel offset : $slideOffset")
                 //Mini player visibility
-                if(1.0f - (slideOffset * 5.0f) >= 0.0f){
-                    mMiniPlayerContainer?.alpha = 1.0f - (slideOffset * 5.0f)
-                }else{
-                    mMiniPlayerContainer?.alpha = 0.0f
-                }
-                if(slideOffset < 1.0f){
-                    mMiniPlayerContainer?.visibility = VISIBLE
-                }else{
-                    mMiniPlayerContainer?.visibility = GONE
-                }
+//                if(1.0f - (slideOffset * 5.0f) >= 0.0f){
+//                    mMiniPlayerContainer?.alpha = 1.0f - (slideOffset * 5.0f)
+//                }else{
+//                    mMiniPlayerContainer?.alpha = 0.0f
+//                }
+//                if(slideOffset < 1.0f){
+//                    mMiniPlayerContainer?.visibility = VISIBLE
+//                }else{
+//                    mMiniPlayerContainer?.visibility = GONE
+//                }
 
                 //Player visibility
                 if(slideOffset <= 0.21f){
-                    mPlayerFragmentContainer?.alpha = 0.0f
+//                    mPlayerFragmentContainer?.alpha = 0.0f
+                    mSlidingUpPanel?.setDragView(mMiniPlayerContainer)
                 }else {
-                    mPlayerFragmentContainer?.alpha = (slideOffset * 1.21f) - 0.21f
+//                    mPlayerFragmentContainer?.alpha = (slideOffset * 1.21f) - 0.21f
+                    mSlidingUpPanel?.setDragView(mPlayerFragmentContainer)
                 }
-                if (slideOffset <= 0.15f){
-                    mPlayerFragmentContainer?.visibility = GONE
-                }else{
-                    mPlayerFragmentContainer?.visibility = VISIBLE
-                }
+//                if (slideOffset <= 0.15f){
+//                    mPlayerFragmentContainer?.visibility = GONE
+//                }else{
+//                    mPlayerFragmentContainer?.visibility = VISIBLE
+//                }
             }
 
             override fun onPanelStateChanged(
@@ -171,7 +173,9 @@ class MainFragment : Fragment() {
         mButtonPlayPause = view.findViewById(R.id.button_mini_player_play_pause)
 
         CustomViewModifiers.updateTopViewInsets(mMainFragmentContainer!!)
-        CustomViewModifiers.removeBottomViewInsets(mSlidingUpPanel!!)
+//        CustomViewModifiers.removeBottomViewInsets(mSlidingUpPanel!!)
+        CustomViewModifiers.updateBottomViewInsets(mMiniPlayerContainer as View)
+
 //        CustomViewModifiers.updateBottomViewInsets(mSlidingUpPanel!!)
     }
 

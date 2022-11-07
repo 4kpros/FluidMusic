@@ -41,6 +41,7 @@ class AllSongsFragment : Fragment() {
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
     private val mMainExploreFragmentViewModel: MainExploreFragmentViewModel by activityViewModels()
 
+    private var mEmptyBottomAdapter: HeadlinePlayShuffleAdapter? = null
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
     private var mSongItemAdapter: SongItemAdapter? = null
     private var mRecyclerView: RecyclerView? = null
@@ -212,28 +213,28 @@ class AllSongsFragment : Fragment() {
                 mMainExploreFragmentViewModel.setTotalCount(totalCount)
             }
         })
+        //Setup empty bottom adapter
+        mEmptyBottomAdapter = HeadlinePlayShuffleAdapter(
+            listHeadlines,
+            R.layout.item_custom_empty_bottom_space,
+            object : HeadlinePlayShuffleAdapter.OnItemClickListener{
+                override fun onPlayButtonClicked() {
+                    Toast.makeText(mContext, "onPlayButtonClicked", Toast.LENGTH_SHORT).show()
+                }
+                override fun onShuffleButtonClicked() {
+                    Toast.makeText(mContext, "onShuffleButtonClicked", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onFilterButtonClicked() {
+                    Toast.makeText(mContext, "onFilterButtonClicked", Toast.LENGTH_SHORT).show()
+                }
+            }
+        )
         //Setup concat adapter
         val concatAdapter = ConcatAdapter()
         concatAdapter.addAdapter(mHeadlineTopPlayShuffleAdapter!!)
         concatAdapter.addAdapter(mSongItemAdapter!!)
-        concatAdapter.addAdapter(
-            HeadlinePlayShuffleAdapter(
-                listHeadlines,
-                R.layout.item_custom_empty_bottom_space,
-                object : HeadlinePlayShuffleAdapter.OnItemClickListener{
-                    override fun onPlayButtonClicked() {
-                        Toast.makeText(mContext, "onPlayButtonClicked", Toast.LENGTH_SHORT).show()
-                    }
-                    override fun onShuffleButtonClicked() {
-                        Toast.makeText(mContext, "onShuffleButtonClicked", Toast.LENGTH_SHORT).show()
-                    }
-
-                    override fun onFilterButtonClicked() {
-                        Toast.makeText(mContext, "onFilterButtonClicked", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            )
-        )
+        concatAdapter.addAdapter(mEmptyBottomAdapter!!)
         mRecyclerView?.adapter = concatAdapter
 
         //Add Layout manager

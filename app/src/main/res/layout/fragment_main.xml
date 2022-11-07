@@ -6,11 +6,11 @@
     android:id="@+id/sliding_up_panel"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:umanoPanelHeight="?attr/actionBarSize"
+    app:umanoPanelHeight="0dp"
+    app:umanoDragView="@id/linear_mini_player"
     app:umanoScrollInterpolator="?attr/quantizeMotionInterpolator"
     app:umanoClipPanel="false"
     app:umanoOverlay="true"
-    app:umanoInitialState="anchored"
     android:gravity="bottom"
     app:umanoShadowHeight="2dp">
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,34 +22,24 @@
             android:layout_height="match_parent"
             android:gravity="center"
             />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- SLIDING LAYOUT -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/players_views_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        style="@style/DefaultBackground"
-        >
-        <FrameLayout
-            android:id="@+id/player_fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center|top"
-            android:visibility="visible"
-            android:alpha="1"
-            />
-
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/linear_mini_player"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             style="@style/DefaultBackground"
-            android:visibility="gone"
-            android:alpha="0"
             >
             <include layout="@layout/component_mini_player"/>
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- SLIDING LAYOUT -->
+    <FrameLayout
+        android:id="@+id/player_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center|top"
+        android:visibility="visible"
+        android:alpha="1"
+        />
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>

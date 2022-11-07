@@ -5,6 +5,7 @@
     android:id="@+id/player_motion_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    style="@style/DefaultBackground"
     android:clickable="false"
     android:focusable="false"
     tools:context=".ui.fragments.PlayerFragment">
@@ -59,7 +60,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/unknown_title"
-                            android:textAppearance="?attr/textAppearanceTitleMedium"
+                            android:textAppearance="?attr/textAppearanceTitleLarge"
+                            android:gravity="center"
                             android:maxLines="1"
                             android:ellipsize="end"
                             />
@@ -70,7 +72,8 @@
                             android:layout_height="wrap_content"
                             android:alpha="0.5"
                             android:text="@string/unknown_artist"
-                            android:textAppearance="?attr/textAppearanceTitleSmall"
+                            android:textAppearance="?attr/textAppearanceTitleMedium"
+                            android:gravity="center"
                             android:maxLines="1"
                             android:ellipsize="end" />
                     </androidx.appcompat.widget.LinearLayoutCompat>
@@ -94,7 +97,7 @@
                             android:textAppearance="?attr/textAppearanceLabelSmall" />
 
                         <com.google.android.material.slider.Slider
-                            android:id="@+id/seekbar"
+                            android:id="@+id/slider"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
@@ -133,10 +136,10 @@
                         android:id="@+id/button_skip_prev"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        style="?attr/materialIconButtonFilledTonalStyle"
+                        style="?attr/materialIconButtonStyle"
                         android:layout_gravity="center_vertical"
                         app:icon="@drawable/skip_previous"
-                        app:iconSize="24dp" />
+                        app:iconSize="30dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/button_play_pause"
@@ -152,10 +155,10 @@
                         android:id="@+id/button_skip_next"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        style="?attr/materialIconButtonFilledTonalStyle"
+                        style="?attr/materialIconButtonStyle"
                         android:layout_gravity="center_vertical"
                         app:icon="@drawable/skip_next"
-                        app:iconSize="24dp" />
+                        app:iconSize="30dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/button_repeat"

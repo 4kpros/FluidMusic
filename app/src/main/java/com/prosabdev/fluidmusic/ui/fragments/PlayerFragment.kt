@@ -18,6 +18,7 @@ import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.slider.Slider
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.dialogs.PlayerMoreDialog
@@ -44,6 +45,8 @@ class PlayerFragment : Fragment() {
     private var mTextArtist: AppCompatTextView? = null
     private var mTextDurationCurrent: AppCompatTextView? = null
     private var mTextDuration: AppCompatTextView? = null
+    //Slider view var
+    private var mSlider: Slider? = null
     //Image view var
     private var mCovertArtBlurred: ImageView? = null
     //Buttons var
@@ -168,7 +171,7 @@ class PlayerFragment : Fragment() {
     private fun updateQueueList(songList: ArrayList<SongItem>?) {
         mSongList.clear()
         mSongList.addAll(songList!!)
-        mPlayerPagerAdapter?.notifyDataSetChanged()
+        mPlayerPagerAdapter?.notifyItemRangeChanged(0, mSongList.size)
         mPlayerViewPager?.currentItem = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
     }
 
@@ -222,10 +225,13 @@ class PlayerFragment : Fragment() {
                 mTextArtist?.text = if(mSongList[position].artist!!.isNotEmpty()) mSongList[position].artist else mContext.getString(R.string.unknown_artist)
 
             if(mTextDurationCurrent != null)
-                mTextDurationCurrent?.text = CustomFormatters.formatSongDurationToString(mSongList[position].duration)
+                mTextDurationCurrent?.text = CustomFormatters.formatSongDurationToString(0)
 
             if(mTextDuration != null)
                 mTextDuration?.text = CustomFormatters.formatSongDurationToString(mSongList[position].duration)
+
+            if(mSlider != null)
+                mSlider?.value = 0.0f
         }
         //Update blurred background
         var tempBinaryData : ByteArray? = null
@@ -239,6 +245,7 @@ class PlayerFragment : Fragment() {
         mTextArtist = view.findViewById(R.id.text_artist)
         mTextDurationCurrent = view.findViewById(R.id.text_duration_current)
         mTextDuration = view.findViewById(R.id.text_duration)
+        mSlider = view.findViewById(R.id.slider)
 
         mCovertArtBlurred = view.findViewById(R.id.blurred_imageview)
 

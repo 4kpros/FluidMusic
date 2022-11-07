@@ -22,6 +22,7 @@ import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomFormatters
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
+import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 import com.prosabdev.fluidmusic.utils.adapters.SelectablePlayingItemAdapter
 import java.util.*
 
@@ -94,7 +95,6 @@ class SongItemAdapter(
         return SongItemHolder(view)
     }
     override fun onBindViewHolder(holder: SongItemHolder, position: Int) {
-        //Bind listener for to capture click events
         holder.bindListener(holder, position, mOnItemClickListener, mOnTouchListener)
 
         //Update UI

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="main_small_margin">5dp</dimen>
+    <dimen name="main_medium_margin">10dp</dimen>
     <dimen name="main_margin">15dp</dimen>
     <dimen name="player_card_view">20dp</dimen>
+    <dimen name="song_card_image_small_h">55dp</dimen>
+    <dimen name="song_card_image_small_w">60dp</dimen>
 </resources>
