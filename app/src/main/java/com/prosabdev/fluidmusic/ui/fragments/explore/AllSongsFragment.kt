@@ -65,6 +65,7 @@ class AllSongsFragment : Fragment() {
 
         mContext = requireContext()
         mActivity = requireActivity()
+
         return view
     }
 

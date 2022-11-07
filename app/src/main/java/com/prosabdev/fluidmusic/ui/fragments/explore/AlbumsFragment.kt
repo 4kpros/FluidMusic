@@ -18,8 +18,11 @@ import com.prosabdev.fluidmusic.models.AlbumItem
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
+import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.explore.AlbumsFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.explore.AllSongsFragmentViewModel
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -30,7 +33,10 @@ class AlbumsFragment : Fragment() {
     private var mActivity: FragmentActivity? = null
 
     private val mAlbumsFragmentViewModel: AlbumsFragmentViewModel by activityViewModels()
+    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
+    private val mMainExploreFragmentViewModel: MainExploreFragmentViewModel by activityViewModels()
 
+    private var mEmptyBottomAdapter: HeadlinePlayShuffleAdapter? = null
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
     private var mSongItemAdapter: AlbumItemAdapter? = null
     private var mRecyclerView: RecyclerView? = null
@@ -55,16 +61,18 @@ class AlbumsFragment : Fragment() {
         mContext = requireContext()
         mActivity = requireActivity()
 
-        runBlocking {
-            launch {
-                initViews(view)
-                setupRecyclerViewAdapter()
-                observeLiveData()
-                checkInteractions()
-            }
-        }
-
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        MainScope().launch {
+            initViews(view)
+            setupRecyclerViewAdapter()
+            observeLiveData()
+            checkInteractions()
+        }
     }
 
     private fun checkInteractions() {

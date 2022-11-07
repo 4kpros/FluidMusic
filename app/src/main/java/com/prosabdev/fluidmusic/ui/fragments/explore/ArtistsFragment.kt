@@ -16,6 +16,8 @@ import com.prosabdev.fluidmusic.adapters.explore.ArtistItemAdapter
 import com.prosabdev.fluidmusic.models.ArtistItem
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.explore.AllSongsFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.explore.ArtistsFragmentViewModel
 import kotlinx.coroutines.launch
@@ -28,7 +30,10 @@ class ArtistsFragment : Fragment() {
     private var mActivity: FragmentActivity? = null
 
     private val mArtistsFragmentViewModel: ArtistsFragmentViewModel by activityViewModels()
+    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
+    private val mMainExploreFragmentViewModel: MainExploreFragmentViewModel by activityViewModels()
 
+    private var mEmptyBottomAdapter: HeadlinePlayShuffleAdapter? = null
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
     private var mArtistItemAdapter: ArtistItemAdapter? = null
     private var mRecyclerView: RecyclerView? = null
@@ -53,6 +58,12 @@ class ArtistsFragment : Fragment() {
         mContext = requireContext()
         mActivity = requireActivity()
 
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         runBlocking {
             launch {
                 initViews(view)
@@ -61,8 +72,6 @@ class ArtistsFragment : Fragment() {
                 checkInteractions()
             }
         }
-
-        return view
     }
 
     private fun checkInteractions() {

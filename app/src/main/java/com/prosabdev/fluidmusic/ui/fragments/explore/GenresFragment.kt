@@ -15,6 +15,8 @@ import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.GenreItemAdapter
 import com.prosabdev.fluidmusic.models.GenreItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.explore.GenresFragmentViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -26,7 +28,10 @@ class GenresFragment : Fragment() {
     private var mActivity: FragmentActivity? = null
 
     private val mGenresFragmentViewModel: GenresFragmentViewModel by activityViewModels()
+    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
+    private val mMainExploreFragmentViewModel: MainExploreFragmentViewModel by activityViewModels()
 
+    private var mEmptyBottomAdapter: HeadlinePlayShuffleAdapter? = null
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
     private var mGenreItemAdapter: GenreItemAdapter? = null
     private var mRecyclerView: RecyclerView? = null
@@ -51,6 +56,12 @@ class GenresFragment : Fragment() {
         mContext = requireContext()
         mActivity = requireActivity()
 
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         runBlocking {
             launch {
                 initViews(view)
@@ -59,8 +70,6 @@ class GenresFragment : Fragment() {
                 checkInteractions()
             }
         }
-
-        return view
     }
 
     private fun checkInteractions() {

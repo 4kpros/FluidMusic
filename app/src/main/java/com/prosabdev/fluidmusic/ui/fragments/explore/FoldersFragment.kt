@@ -17,6 +17,8 @@ import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.models.FolderItem
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.explore.AllSongsFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.explore.FoldersFragmentViewModel
 import kotlinx.coroutines.launch
@@ -29,7 +31,10 @@ class FoldersFragment : Fragment() {
     private var mActivity: FragmentActivity? = null
 
     private val mFoldersFragmentViewModel: FoldersFragmentViewModel by activityViewModels()
+    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
+    private val mMainExploreFragmentViewModel: MainExploreFragmentViewModel by activityViewModels()
 
+    private var mEmptyBottomAdapter: HeadlinePlayShuffleAdapter? = null
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
     private var molderItemAdapter: FolderItemAdapter? = null
     private var mRecyclerView: RecyclerView? = null
@@ -54,6 +59,12 @@ class FoldersFragment : Fragment() {
         mContext = requireContext()
         mActivity = requireActivity()
 
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         runBlocking {
             launch {
                 initViews(view)
@@ -62,8 +73,6 @@ class FoldersFragment : Fragment() {
                 checkInteractions()
             }
         }
-
-        return view
     }
 
     private fun checkInteractions() {
