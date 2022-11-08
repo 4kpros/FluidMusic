@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -154,9 +155,6 @@ class PlayerFragment : Fragment() {
                 updateDataFromSource(sourceOf)
             }
         })
-        //Listen for source of queue list updated
-        //Listen for source of queue list updated
-        //Listen for source of queue list updated
     }
 
     private fun updateCurrentPlayingSong(currentSong: Int?) {
@@ -235,10 +233,10 @@ class PlayerFragment : Fragment() {
                 mSlider?.value = 0.0f
         }
         //Update blurred background
-        var tempBinaryData : ByteArray? = null
+        var tempBitmap : Bitmap? = null
         if(mSongList.size > 0)
-            tempBinaryData = mSongList[position].covertArt?.binaryData
-        CustomUILoaders.loadBlurredWithImageLoader(mContext, mCovertArtBlurred, tempBinaryData, 100)
+            tempBitmap = mSongList[position].covertArt
+        CustomUILoaders.loadBlurredWithImageLoader(mContext, mCovertArtBlurred, tempBitmap, 100)
     }
 
     private fun initViews(view: View) {

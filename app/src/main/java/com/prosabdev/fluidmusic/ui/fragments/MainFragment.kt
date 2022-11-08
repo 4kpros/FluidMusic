@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.opengl.Visibility
 import android.os.Build
 import android.os.Bundle
@@ -113,8 +114,8 @@ class MainFragment : Fragment() {
                     R.string.unknown_artist
                 )
             //Update mini player covert art
-            val tempBinaryData : ByteArray? = mPlayerFragmentViewModel.getQueueList().value!![position].covertArt?.binaryData
-            CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtMiniPlayer, tempBinaryData, 100)
+            val bitmap : Bitmap? = mPlayerFragmentViewModel.getQueueList().value!![position].covertArt
+            CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtMiniPlayer, bitmap, 100)
         }
     }
 

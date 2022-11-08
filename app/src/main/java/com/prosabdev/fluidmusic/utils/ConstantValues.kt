@@ -3,6 +3,14 @@ package com.prosabdev.fluidmusic.utils
 abstract class ConstantValues {
 
     companion object {
+        const val BUNDLE_CURRENT_SONG_META_DATA = "BUNDLE_CURRENT_SONG_META_DATA"
+        const val BUNDLE_QUEUE_LIST = "BUNDLE_QUEUE_LIST"
+        const val BUNDLE_SOURCE_FROM = "BUNDLE_SOURCE_FROM"
+        const val BUNDLE_SOURCE_FROM_VALUE = "BUNDLE_SOURCE_FROM_VALUE"
+        const val BUNDLE_SHUFFLE_VALUE = "BUNDLE_SHUFFLE_VALUE"
+        const val BUNDLE_REPEAT_VALUE = "BUNDLE_REPEAT_VALUE"
+        const val BUNDLE_CURRENT_SONG_ID = "BUNDLE_CURRENT_SONG_ID"
+
         const val TAG = "FluidMusic"
 
         const val SHARED_PREFERENCES_BROADCAST = "SHARED_PREFERENCES_BROADCAST"
@@ -47,16 +55,6 @@ abstract class ConstantValues {
         const val NOTIFICATION_MODE_NON = 0
         const val NOTIFICATION_MODE_FOREGROUND = 1
         const val NOTIFICATION_MODE_BACKGROUND = 2
-
-        //Repeat modes
-        const val REPEAT_NONE = 0
-        const val REPEAT_ALL = 1
-        const val REPEAT_ONE = 2
-        const val REPEAT_ONE_TIME = 1
-        //Shuffle modes
-        const val SHUFFLE_NONE = 0
-        const val SHUFFLE_ALL = 1
-
 
         const val ARGS_EXPLORE_CONTENT = "ARGS_EXPLORE_CONTENT"
         const val ARGS_EXPLORE_QUEUE_LIST = "ARGS_EXPLORE_QUEUE_LIST"

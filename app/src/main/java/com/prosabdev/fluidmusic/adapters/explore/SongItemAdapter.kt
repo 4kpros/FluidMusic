@@ -150,8 +150,7 @@ class SongItemAdapter(
             //Set is is playing or is checked(for multiple item selection)
             if(selected) CustomAnimators.crossFadeUp(mSelectedItemBackground as View, false, 0) else CustomAnimators.crossFadeDown(mSelectedItemBackground as View, false, 0)
             //Set song covert art
-            val tempBinaryData : ByteArray? = songItem.covertArt?.binaryData
-            CustomUILoaders.loadCovertArtFromBinaryData(context, mCovertArt, tempBinaryData, 100)
+            CustomUILoaders.loadCovertArtFromBinaryData(context, mCovertArt, songItem.covertArt, 100)
         }
 
         fun updateItemTouchHelper(selected : Boolean){

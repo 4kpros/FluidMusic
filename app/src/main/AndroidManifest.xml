@@ -25,14 +25,21 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="31">
+
         <service android:name=".services.MediaPlaybackService"
             android:enabled="true"
             android:exported="true"
+            android:stopWithTask="false"
+            android:foregroundServiceType="mediaPlayback"
+            android:description="@string/app_name"
+            android:icon="@drawable/ic_fluid_music_icon"
+            android:logo="@drawable/ic_fluid_music_icon"
             >
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
+
         <activity
             android:name=".SettingsActivity"
             android:exported="false"
@@ -43,7 +50,9 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|uiMode|smallestScreenSize"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

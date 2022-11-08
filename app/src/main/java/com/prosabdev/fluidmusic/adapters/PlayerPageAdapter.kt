@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.adapters
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,8 +50,8 @@ class PlayerPageAdapter(
     }
 
     private fun loadCovertArt(covertArtView: ImageView?, position: Int) {
-        val tempBinaryData: ByteArray? = mSongList!![position].covertArt?.binaryData
-        CustomUILoaders.loadCovertArtFromBinaryData(mContext, covertArtView, tempBinaryData, 450)
+        val tempBitmap: Bitmap? = mSongList!![position].covertArt
+        CustomUILoaders.loadCovertArtFromBinaryData(mContext, covertArtView, tempBitmap, 450)
     }
 
     override fun getItemCount(): Int {

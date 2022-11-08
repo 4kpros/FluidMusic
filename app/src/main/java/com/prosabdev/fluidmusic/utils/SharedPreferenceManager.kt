@@ -2,6 +2,7 @@ package com.prosabdev.fluidmusic.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.support.v4.media.session.PlaybackStateCompat
 import com.prosabdev.fluidmusic.R
 
 abstract class SharedPreferenceManager {
@@ -51,7 +52,9 @@ abstract class SharedPreferenceManager {
             val sharedPref: SharedPreferences = context.getSharedPreferences(
                 context.getString(R.string.preference_file_key), Context.MODE_PRIVATE
             )
-            return sharedPref.getInt(ConstantValues.SHARED_PREFERENCES_REPEAT, ConstantValues.REPEAT_NONE)
+            return sharedPref.getInt(ConstantValues.SHARED_PREFERENCES_REPEAT,
+                PlaybackStateCompat.REPEAT_MODE_ONE
+            )
         }
 
         fun setRepeat(context: Context, repeat: Int) {

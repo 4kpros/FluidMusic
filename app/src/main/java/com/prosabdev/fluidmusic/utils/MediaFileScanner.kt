@@ -89,14 +89,15 @@ abstract class MediaFileScanner {
                     itemsCount++
                     // Get values of columns for a given audio.
                     val absolutePath: String = cursor.getString(absolutePathColumn) ?: ""
-                    val id: Int = cursor.getInt(idColumn) ?: -1
+                    val id: Long = (cursor.getInt(idColumn) ?: -1).toLong()
                     val name: String = cursor.getString(nameColumn) ?: ""
                     val duration: Long = cursor.getLong(durationColumn) ?: 0
                     val mimeType: String = cursor.getString(mimeTypeColumn) ?: ""
 
                     // Stores column values and the contentUri in a local object
                     // that represents the media file.
-                    val songItem : SongItem = AudioFileInfoExtractor.getAudioInfo(absolutePath)
+                    val songItem : SongItem = AudioFileInfoExtractor.getAudioInfo(activity, absolutePath)
+                    songItem.id = id
                     songItem.absolutePath = absolutePath
                     songItem.fileName = name
                     songItem.duration = duration

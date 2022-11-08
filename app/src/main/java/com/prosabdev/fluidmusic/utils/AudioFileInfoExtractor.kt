@@ -21,7 +21,7 @@ import java.io.IOException
 abstract class AudioFileInfoExtractor {
     companion object {
         //Return audio info
-        fun getAudioInfo(absolutePath: String?): SongItem {
+        fun getAudioInfo(context : Context, absolutePath: String?): SongItem {
             val songItem : SongItem = SongItem()
             if (absolutePath != null && absolutePath.isNotEmpty()) {
                 val tempFile = File(absolutePath)
@@ -46,7 +46,8 @@ abstract class AudioFileInfoExtractor {
                     val year: String = tag.getFirst(FieldKey.YEAR)
                     val comment: String = tag.getFirst(FieldKey.COMMENT)
                     val lyrics: String = tag.getFirst(FieldKey.LYRICS)
-                    songItem.covertArt = artwork
+                    songItem.covertArt = getBitmapAudioArtwork(context, artwork?.binaryData, 500, 500)
+                    songItem.covertArtUrl = artwork?.imageUrl
                     songItem.title = title
                     songItem.artist = artist
                     songItem.album = album
@@ -71,47 +72,35 @@ abstract class AudioFileInfoExtractor {
         }
 
         //Extract bitmap audio artwork from path
-        fun getBitmapAudioArtwork(context: Context, path: String?, width: Int = 50, height: Int = 50): Bitmap? {
-            var tempBitmapImage: Bitmap? = null
-            if (path != null && path.isNotEmpty()) {
-                var binaryDataImage: ByteArray? = ByteArray(0)
+        fun getBitmapAudioArtwork(context: Context, binaryDataImage: ByteArray?, width: Int = 100, height: Int = 100): Bitmap? {
+            var bitmap: Bitmap? = null
+            if (binaryDataImage != null && binaryDataImage.isNotEmpty()) {
+                val options: BitmapFactory.Options = BitmapFactory.Options()
+                options.inJustDecodeBounds = true
+                BitmapFactory.decodeByteArray(binaryDataImage, 0, binaryDataImage.size, options)
+
+                // Calculate inSampleSize
+                options.inSampleSize = calculateInSampleSize(options, width, height)
+
+                // Decode bitmap with inSampleSize set
+                options.inJustDecodeBounds = false
                 try {
-                    binaryDataImage = getAudioBinaryDataArtwork(path)
+                    bitmap = BitmapFactory.decodeByteArray(
+                        binaryDataImage,
+                        0,
+                        binaryDataImage.size,
+                        options
+                    )
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-                try {
-                    if (binaryDataImage != null && binaryDataImage.isNotEmpty()) {
-                        val options: BitmapFactory.Options = BitmapFactory.Options()
-                        options.inJustDecodeBounds = true
-                        BitmapFactory.decodeByteArray(binaryDataImage, 0, binaryDataImage.size, options)
-
-                        // Calculate inSampleSize
-                        options.inSampleSize = calculateInSampleSize(options, width, height)
-
-                        // Decode bitmap with inSampleSize set
-                        options.inJustDecodeBounds = false
-                        try {
-                            tempBitmapImage = BitmapFactory.decodeByteArray(
-                                binaryDataImage,
-                                0,
-                                binaryDataImage.size,
-                                options
-                            )
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    } else {
-                        tempBitmapImage = BitmapFactory.decodeResource(
-                            context.resources,
-                            R.drawable.ic_fluid_music_icon
-                        )
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+            } else {
+                bitmap = BitmapFactory.decodeResource(
+                    context.resources,
+                    R.drawable.ic_fluid_music_icon
+                )
             }
-            return tempBitmapImage
+            return bitmap
         }
 
         private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {

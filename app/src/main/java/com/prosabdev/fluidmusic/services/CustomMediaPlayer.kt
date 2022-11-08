@@ -28,21 +28,23 @@ class CustomMediaPlayer() : MediaPlayer.OnCompletionListener, MediaPlayer.OnErro
     fun setHandler(handler: Handler?) {
         mHandler = handler
     }
-
-    fun prepareMediaPlayerWithPath(path: String?) {
-        mIsMediaPlayerPrepared = prepareMediaPlayer(mMediaPlayer, path)
+    fun onPrepareMediaPlayer(path: String = "") {
+        mIsMediaPlayerPrepared = prepareMediaPlayer(mMediaPlayer)
     }
 
-    private fun prepareMediaPlayer(mediaPlayer: MediaPlayer?, path: String?): Boolean {
-        if (mediaPlayer != null && path != null) {
+    private fun prepareMediaPlayer(mediaPlayer: MediaPlayer?, path: String = ""): Boolean {
+        if (mediaPlayer != null && path.isNotEmpty()) {
             mediaPlayer.reset()
             if (path.isNotEmpty()) {
                 mediaPlayer.setDataSource(path)
             }
             setupAudioAttributes(mediaPlayer)
-            mediaPlayer.prepare()
-            mediaPlayer.setOnErrorListener(this)
-            mediaPlayer.setOnCompletionListener(this)
+            try {
+                mediaPlayer.prepare()
+            } finally {
+                mediaPlayer.setOnErrorListener(this)
+                mediaPlayer.setOnCompletionListener(this)
+            }
             return true
         }
         return false
