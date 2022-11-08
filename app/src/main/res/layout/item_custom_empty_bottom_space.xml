@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:id="@+id/custom_empty_bottom_space"
     android:orientation="vertical"
+    android:paddingBottom="@dimen/main_small_margin"
     >
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"

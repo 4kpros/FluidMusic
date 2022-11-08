@@ -38,6 +38,22 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="31">
+        <service android:name=".MusicAidlInterface"
+            android:enabled="true"
+            android:exported="true"
+            android:stopWithTask="false"
+            android:icon="@drawable/ic_fluid_music_icon"
+            android:roundIcon="@drawable/ic_fluid_music_icon"
+            android:logo="@drawable/ic_fluid_music_icon"
+            android:foregroundServiceType="mediaPlayback"
+            android:description="Fluid Music"
+            android:externalService="true"
+            android:label="Fluid Music"
+            >
+            <intent-filter >
+                <action android:name="MusicServiceAidl"/>
+            </intent-filter>
+        </service>
         <activity
             android:name=".SettingsActivity"
             android:exported="false"

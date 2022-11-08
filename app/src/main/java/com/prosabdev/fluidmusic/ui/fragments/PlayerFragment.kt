@@ -136,22 +136,27 @@ class PlayerFragment : Fragment() {
     }
 
     private fun observeLiveData() {
+        //Listen for queue list updated
         mPlayerFragmentViewModel.getQueueList().observe(mActivity as LifecycleOwner, object : Observer<ArrayList<SongItem>>{
             override fun onChanged(songList: ArrayList<SongItem>?) {
                 updateQueueList(songList)
             }
         })
+        //Listen for current song updated
         mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner, object : Observer<Int>{
             override fun onChanged(currentSong: Int?) {
                 updateCurrentPlayingSong(currentSong)
             }
         })
-        mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner, object :
-            Observer<String> {
+        //Listen for source of queue list updated
+        mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner, object : Observer<String> {
             override fun onChanged(sourceOf: String?) {
                 updateDataFromSource(sourceOf)
             }
         })
+        //Listen for source of queue list updated
+        //Listen for source of queue list updated
+        //Listen for source of queue list updated
     }
 
     private fun updateCurrentPlayingSong(currentSong: Int?) {

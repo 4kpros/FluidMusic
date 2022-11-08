@@ -47,9 +47,10 @@ abstract class ConstantValues {
         const val REPEAT_NONE = 0
         const val REPEAT_ALL = 1
         const val REPEAT_ONE = 2
+        const val REPEAT_ONE_TIME = 1
         //Shuffle modes
         const val SHUFFLE_NONE = 0
-        const val SHUFFLE_DEFAULT = 1
+        const val SHUFFLE_ALL = 1
 
 
         const val ARGS_EXPLORE_CONTENT = "ARGS_EXPLORE_CONTENT"

@@ -1,24 +1,16 @@
 package com.prosabdev.fluidmusic
 
-import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.AttributeSet
-import android.view.View
-import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.*
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.navigation.NavigationView
-import com.prosabdev.fluidmusic.ui.fragments.MainExploreFragment
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
-import com.prosabdev.fluidmusic.ui.fragments.explore.AllSongsFragment
 import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
 
 class MainActivity : AppCompatActivity(){
@@ -27,9 +19,10 @@ class MainActivity : AppCompatActivity(){
     private var mDrawerLayout : DrawerLayout? = null
     private val mMainExploreFragmentViewModel: MainExploreFragmentViewModel by viewModels()
 
+//    private val token: PlayingService.ServiceToken? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+//        token = PlayingService.bindToService(this, this)
         //Setup UI
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
