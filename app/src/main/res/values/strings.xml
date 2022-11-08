@@ -26,4 +26,9 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="unknown_artist">Unknown artist</string>
     <string name="unknown_title">Unknown title</string>
+    <string name="pause">Pause</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="fluidmusic">Fluid Music</string>
+    <string name="musicplayer">Music player</string>
 </resources>

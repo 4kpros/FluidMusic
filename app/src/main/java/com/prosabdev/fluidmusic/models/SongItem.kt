@@ -31,5 +31,4 @@ class SongItem() {
 
     //
     var covertArt: Artwork? = null
-    var covertArtBitmap: Bitmap? = null
 }

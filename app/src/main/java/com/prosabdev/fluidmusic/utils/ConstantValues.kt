@@ -28,7 +28,7 @@ abstract class ConstantValues {
         const val GO_TO_NEXT_TRACK = 22
 
         // Actions for notifications
-        const val TOGGLE_PAUSE_ACTION = "TOGGLE_PAUSE_ACTION"
+        const val TOGGLE_PLAY_PAUSE_ACTION = "TOGGLE_PLAY_PAUSE_ACTION"
         const val PLAY_ACTION = "ACTION_PLAY"
         const val PAUSE_ACTION = "ACTION_PAUSE"
         const val STOP_ACTION = "ACTION_STOP"
@@ -37,8 +37,13 @@ abstract class ConstantValues {
         const val FAVORITE_ACTION = "FAVORITE_ACTION"
         const val REPEAT_ACTION = "REPEAT_ACTION"
         const val CLOSE_ACTION = "CLOSE_ACTION"
+        const val SEEK_TO_ACTION = "SEEK_TO_ACTION"
 
         //Notification mode
+        const val MEDIA_SESSION_TAG = "MEDIA_SESSION_TAG"
+        const val CHANNEL_ID = "CHANNEL_ID"
+        const val NOTIFICATION_ID = "21323123"
+        const val NOTIFICATION_REQUEST_CODE : Int = 21301
         const val NOTIFICATION_MODE_NON = 0
         const val NOTIFICATION_MODE_FOREGROUND = 1
         const val NOTIFICATION_MODE_BACKGROUND = 2
@@ -54,6 +59,7 @@ abstract class ConstantValues {
 
 
         const val ARGS_EXPLORE_CONTENT = "ARGS_EXPLORE_CONTENT"
+        const val ARGS_EXPLORE_QUEUE_LIST = "ARGS_EXPLORE_QUEUE_LIST"
         const val EXPLORE_ALL_FOLDERS = "EXPLORE_ALL_FOLDERS"
         const val EXPLORE_ALL_SONGS = "EXPLORE_ALL_SONGS"
         const val EXPLORE_ALBUMS = "EXPLORE_ALBUMS"
