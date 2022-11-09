@@ -3,6 +3,7 @@ package com.prosabdev.fluidmusic.ui.fragments.explore
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +29,7 @@ import com.prosabdev.fluidmusic.adapters.callbacks.SongItemMoveCallback
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
+import com.prosabdev.fluidmusic.utils.CustomMathComputations
 import com.prosabdev.fluidmusic.utils.adapters.SelectableRecycleViewAdapter
 import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
@@ -154,11 +156,14 @@ class AllSongsFragment : Fragment() {
         listHeadlines.add(0)
         mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, R.layout.item_top_play_shuffle, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
             override fun onPlayButtonClicked() {
-                Toast.makeText(mContext, "onPlayButtonClicked", Toast.LENGTH_SHORT).show()
+                mPlayerFragmentViewModel.setShuffle( PlaybackStateCompat.SHUFFLE_MODE_NONE)
+                mPlayerFragmentViewModel.setRepeat( PlaybackStateCompat.REPEAT_MODE_NONE)
                 updateCurrentPlayingSong(0)
             }
             override fun onShuffleButtonClicked() {
-                Toast.makeText(mContext, "onShuffleButtonClicked", Toast.LENGTH_SHORT).show()
+                mPlayerFragmentViewModel.setShuffle( PlaybackStateCompat.SHUFFLE_MODE_ALL)
+                mPlayerFragmentViewModel.setRepeat( PlaybackStateCompat.REPEAT_MODE_NONE)
+                updateCurrentPlayingSong(CustomMathComputations.randomExcluded(0, mSongList.size))
             }
 
             override fun onFilterButtonClicked() {
@@ -254,6 +259,7 @@ class AllSongsFragment : Fragment() {
             mPlayerFragmentViewModel.setSourceOfQueueList(ConstantValues.EXPLORE_ALL_SONGS)
         }
         mPlayerFragmentViewModel.setCurrentSong(position)
+        mPlayerFragmentViewModel.setIsPlaying(true)
     }
 
     fun scrollDrag(position: Int) {

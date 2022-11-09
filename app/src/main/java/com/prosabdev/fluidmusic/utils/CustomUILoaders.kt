@@ -25,7 +25,7 @@ abstract class CustomUILoaders {
                 widthHeight
             )
         }
-        fun loadBlurredWithImageLoader(context : Context, imageView : ImageView?, binaryData: ByteArray?, widthHeight: Int = 10) {
+        fun loadBlurredWithImageLoader(context : Context, imageView : ImageView?, binaryData: ByteArray?, widthHeight: Int = 1) {
             if(binaryData == null || binaryData.isEmpty()){
                 loadWithBinaryData(context, imageView, null, widthHeight, true)
                 return

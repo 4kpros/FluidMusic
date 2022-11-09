@@ -1,19 +1,21 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.content.Context
-import android.graphics.Bitmap
-import android.opengl.Visibility
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AnticipateOvershootInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.*
 import androidx.fragment.app.*
 import androidx.lifecycle.LifecycleOwner
@@ -28,6 +30,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainFragment : Fragment() {
@@ -43,6 +46,7 @@ class MainFragment : Fragment() {
     private var mCovertArtMiniPlayer: ImageView? = null
     private var mBlurredCovertArtMiniPlayer: ImageView? = null
     private var mButtonPlayPause: MaterialButton? = null
+    private var mButtonSkipNext: MaterialButton? = null
 
     private var mSlidingUpPanel: SlidingUpPanelLayout? = null
 
@@ -54,6 +58,14 @@ class MainFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
+        }
+        requireActivity().supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            add<MainExploreFragment>(R.id.main_fragment_container)
+        }
+        requireActivity().supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            add<PlayerFragment>(R.id.player_fragment_container)
         }
     }
 
@@ -68,14 +80,6 @@ class MainFragment : Fragment() {
         mContext = requireContext()
         mActivity = requireActivity()
 
-        mActivity?.supportFragmentManager?.commit {
-            setReorderingAllowed(true)
-            add<MainExploreFragment>(R.id.main_fragment_container)
-        }
-        mActivity?.supportFragmentManager?.commit {
-            setReorderingAllowed(true)
-            add<PlayerFragment>(R.id.player_fragment_container)
-        }
         initViews(view)
         observeLiveData()
         checkInteractions()
@@ -85,7 +89,7 @@ class MainFragment : Fragment() {
     }
 
     override fun onResume() {
-        updateMiniPlayerUI()
+        updateMiniPlayerUI(false)
         super.onResume()
     }
 
@@ -108,8 +112,28 @@ class MainFragment : Fragment() {
                 updateMiniPlayerUI()
             }
         })
+        mPlayerFragmentViewModel.getIsPlaying().observe(mActivity as LifecycleOwner, object : Observer<Boolean> {
+            override fun onChanged(isPlaying: Boolean?) {
+                updatePlayerButtonsUI()
+            }
+        })
+        mPlayerFragmentViewModel.getPlayingProgressValue().observe(mActivity as LifecycleOwner, object : Observer<Long> {
+            override fun onChanged(progressValue: Long?) {
+                updatePlayerButtonsUI()
+            }
+        })
     }
-    private fun updateMiniPlayerUI() {
+
+    private fun updatePlayerButtonsUI() {
+        if(mPlayerFragmentViewModel.getIsPlaying().value == true){
+            mButtonPlayPause?.icon = ContextCompat.getDrawable(mContext, R.drawable.pause)
+        }else{
+            mButtonPlayPause?.icon = ContextCompat.getDrawable(mContext, R.drawable.play_arrow)
+        }
+    }
+
+    var mUpdateMiniPlayerUIJob : Job? = null
+    private fun updateMiniPlayerUI(animate : Boolean = true) {
         //Update current song info
         val tempQL : ArrayList<SongItem>? = mPlayerFragmentViewModel.getSongList().value
         val tempPositionInQL : Int = mPlayerFragmentViewModel.getCurrentSong().value ?: -1
@@ -121,12 +145,54 @@ class MainFragment : Fragment() {
                 mTextArtistMiniPlayer?.text = if(tempQL[tempPositionInQL].artist != null && tempQL[tempPositionInQL].artist!!.isNotEmpty()) tempQL[tempPositionInQL].artist else mContext.getString(R.string.unknown_artist)
 
             val tempBinary : ByteArray? = if(tempQL.size > 0) tempQL[tempPositionInQL].covertArt?.binaryData else null
-            CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtMiniPlayer, tempBinary, 100)
-            CustomUILoaders.loadBlurredWithImageLoader(mContext, mBlurredCovertArtMiniPlayer, tempBinary)
+
+            if(animate){
+                if(mUpdateMiniPlayerUIJob != null)
+                    mUpdateMiniPlayerUIJob?.cancel()
+                mUpdateMiniPlayerUIJob = MainScope().launch {
+                    animateCrossFadeImage(mCovertArtMiniPlayer, tempBinary, false, 100, 150)
+                    animateCrossFadeImage(mBlurredCovertArtMiniPlayer, tempBinary, true, 10, 150)
+                }
+            }else{
+                CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtMiniPlayer, tempBinary, 100)
+                CustomUILoaders.loadBlurredWithImageLoader(mContext, mBlurredCovertArtMiniPlayer, tempBinary)
+            }
+        }
+    }
+
+    private suspend fun animateCrossFadeImage(
+        imageView: ImageView?,
+        tempBinary: ByteArray?,
+        blurred : Boolean = false,
+        width : Int = 100,
+        durationInterval : Int = 150
+    ) {
+        imageView?.apply {
+            View.VISIBLE
+            animate()
+                .alpha(0f)
+                .setInterpolator(DecelerateInterpolator())
+                .setDuration(durationInterval.toLong())
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        if(!blurred){
+                            CustomUILoaders.loadCovertArtFromBinaryData(mContext, imageView, tempBinary, width)
+                        }else{
+                            CustomUILoaders.loadBlurredWithImageLoader(mContext, imageView, tempBinary, width)
+                        }
+                        CustomAnimators.crossFadeUp(imageView, true, durationInterval)
+                    }
+                })
         }
     }
 
     private fun checkInteractions() {
+        mButtonSkipNext?.setOnClickListener(View.OnClickListener {
+            onNextPage()
+        })
+        mButtonPlayPause?.setOnClickListener(View.OnClickListener {
+            onPlayPause()
+        })
         mSlidingUpPanel?.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
             override fun onPanelSlide(panel: View?, slideOffset: Float) {
                 Log.i(ConstantValues.TAG, "Slide panel offset : $slideOffset")
@@ -167,6 +233,17 @@ class MainFragment : Fragment() {
         })
     }
 
+    fun onPlayPause(){
+        val tempPP : Boolean = !(mPlayerFragmentViewModel.getIsPlaying().value ?: false)
+        mPlayerFragmentViewModel.setIsPlaying(tempPP)
+    }
+    fun onNextPage(){
+        val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
+        val tempSongListSize :Int = mPlayerFragmentViewModel.getSongList().value?.size ?: 0
+        if(tempSongListSize > 0 && tempCS < tempSongListSize - 1)
+            mPlayerFragmentViewModel.setCurrentSong(tempCS + 1)
+    }
+
     private fun initViews(view: View) {
 
         mSlidingUpPanel = view.findViewById(R.id.sliding_up_panel)
@@ -179,7 +256,9 @@ class MainFragment : Fragment() {
         mProgressIndicatorMiniPlayer = view.findViewById(R.id.progress_mini_player_indicator)
         mCovertArtMiniPlayer = view.findViewById(R.id.imageview_mini_player)
         mBlurredCovertArtMiniPlayer = view.findViewById(R.id.imageview_blurred_mini_player)
-        mButtonPlayPause = view.findViewById(R.id.button_mini_player_play_pause)
+
+        mButtonPlayPause = view.findViewById(R.id.button_play_pause)
+        mButtonSkipNext = view.findViewById(R.id.button_skip_next)
 
         CustomViewModifiers.updateTopViewInsets(mMainFragmentContainer!!)
 //        CustomViewModifiers.removeBottomViewInsets(mSlidingUpPanel!!)

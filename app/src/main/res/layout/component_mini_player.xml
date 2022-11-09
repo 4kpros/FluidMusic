@@ -14,6 +14,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:alpha="0"
         />
     <View
         android:layout_width="0dp"
@@ -57,6 +58,7 @@
                 android:layout_width="@dimen/song_card_image_small_w"
                 android:layout_height="@dimen/song_card_image_small_h"
                 android:scaleType="centerCrop"
+                android:alpha="0"
                 android:src="@drawable/ic_fluid_music_icon_with_padding"
                 />
         </com.google.android.material.card.MaterialCardView>
@@ -64,7 +66,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toEndOf="@+id/covert_art_card_container"
-            app:layout_constraintEnd_toStartOf="@id/button_mini_player_play_pause"
+            app:layout_constraintEnd_toStartOf="@id/button_play_pause"
             app:layout_constraintTop_toTopOf="@id/covert_art_card_container"
             app:layout_constraintBottom_toBottomOf="@id/covert_art_card_container"
             android:layout_marginStart="@dimen/main_small_margin"
@@ -96,7 +98,7 @@
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_mini_player_play_pause"
+            android:id="@+id/button_play_pause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="?attr/materialIconButtonStyle"
@@ -104,16 +106,16 @@
             android:scaleType="centerInside"
             app:layout_constraintTop_toTopOf="@+id/covert_art_card_container"
             app:layout_constraintBottom_toBottomOf="@+id/covert_art_card_container"
-            app:layout_constraintEnd_toStartOf="@+id/button_mini_player_next"
+            app:layout_constraintEnd_toStartOf="@+id/button_skip_next"
             />
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_mini_player_next"
+            android:id="@+id/button_skip_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="?attr/materialIconButtonStyle"
             app:icon="@drawable/skip_next"
             android:scaleType="centerInside"
-            app:layout_constraintTop_toTopOf="@+id/button_mini_player_play_pause"
+            app:layout_constraintTop_toTopOf="@+id/button_play_pause"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="@dimen/main_medium_margin"
             />
