@@ -6,9 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.prosabdev.fluidmusic.R
@@ -84,7 +87,50 @@ class ArtistsFragment : Fragment() {
     }
 
     private fun setupRecyclerViewAdapter() {
+        val spanCount = 1
 
+        //Setup headline adapter
+        val listHeadlines : ArrayList<Long> = ArrayList<Long>()
+        listHeadlines.add(0)
+        mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, R.layout.item_top_play_shuffle, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
+            override fun onPlayButtonClicked() {
+                Toast.makeText(mContext, "onPlayButtonClicked", Toast.LENGTH_SHORT).show()
+            }
+            override fun onShuffleButtonClicked() {
+                Toast.makeText(mContext, "onShuffleButtonClicked", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onFilterButtonClicked() {
+                Toast.makeText(mContext, "onFilterButtonClicked", Toast.LENGTH_SHORT).show()
+            }
+        })
+        //Setup empty bottom adapter
+        mEmptyBottomAdapter = HeadlinePlayShuffleAdapter(
+            listHeadlines,
+            R.layout.item_custom_empty_bottom_space,
+            object : HeadlinePlayShuffleAdapter.OnItemClickListener{
+                override fun onPlayButtonClicked() {
+                    Toast.makeText(mContext, "onPlayButtonClicked", Toast.LENGTH_SHORT).show()
+                }
+                override fun onShuffleButtonClicked() {
+                    Toast.makeText(mContext, "onShuffleButtonClicked", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onFilterButtonClicked() {
+                    Toast.makeText(mContext, "onFilterButtonClicked", Toast.LENGTH_SHORT).show()
+                }
+            }
+        )
+        //Setup concat adapter
+        val concatAdapter = ConcatAdapter()
+//        concatAdapter.addAdapter(mHeadlineTopPlayShuffleAdapter!!)
+//        concatAdapter.addAdapter(mArtistItemAdapter!!)
+        concatAdapter.addAdapter(mEmptyBottomAdapter!!)
+        mRecyclerView?.adapter = concatAdapter
+
+        //Add Layout manager
+        val layoutManager = GridLayoutManager(mContext, spanCount, GridLayoutManager.VERTICAL, false)
+        mRecyclerView?.layoutManager = layoutManager
     }
 
     private fun initViews(view: View) {

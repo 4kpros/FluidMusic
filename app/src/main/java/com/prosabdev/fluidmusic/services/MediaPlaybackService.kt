@@ -14,6 +14,8 @@ import android.media.AudioManager.STREAM_MUSIC
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.HandlerThread
+import android.provider.CallLog.Calls.PRIORITY_NORMAL
 import android.service.media.MediaBrowserService
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
@@ -26,6 +28,7 @@ import androidx.media.app.NotificationCompat
 import androidx.media.session.MediaButtonReceiver
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import java.lang.ref.WeakReference
 
 private const val MY_MEDIA_ROOT_ID = "media_root_id"
 private const val MY_EMPTY_MEDIA_ROOT_ID = "empty_root_id"
@@ -36,7 +39,9 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
     private lateinit var mNotificationManager: NotificationManager
     private var mMediaSession: MediaSessionCompat? = null
     private lateinit var mStateBuilder: PlaybackStateCompat.Builder
-    private var mMediaPlayer: CustomMediaPlayer = CustomMediaPlayer()
+    private var mHandlerThread : HandlerThread? = null
+    private var mCustomPlayerHandler : CustomPlayerHandler? = null
+    private lateinit var mMediaPlayer: CustomMediaPlayer
 
     private lateinit var mAudioFocusRequest: AudioFocusRequest
 
@@ -55,39 +60,34 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
 
         override fun onPrepare() {
             super.onPrepare()
-            mMediaPlayer.onPrepareMediaPlayer()
         }
 
         override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
             super.onPlayFromMediaId(mediaId, extras)
-            Log.i(ConstantValues.TAG, "onPlayFromMediaId")
-            opPlayFrom(extras, mediaId)
+            onPlayFrom(extras)
         }
 
         override fun onPlayFromUri(uri: Uri?, extras: Bundle?) {
             super.onPlayFromUri(uri, extras)
-            Log.i(ConstantValues.TAG, "onPlayFromUri")
-            opPlayFrom(extras)
+            onPlayFrom(extras)
         }
 
-        private fun opPlayFrom(extras: Bundle?, mediaId: String? = "") {
+        private fun onPlayFrom(extras: Bundle?) {
             if (extras != null) {
                 setupMediaSessionWithBundleData(extras)
             }
             if(requestAudioFocus()){
                 startService(Intent(applicationContext, MediaBrowserService::class.java))
 
-                setupMediaPlayer()
-                registerReceivers()
                 createNotification()
+                registerReceivers()
+                setupMediaPlayer(extras!!)
             }
         }
         fun createNotification(){
-            Log.i(ConstantValues.TAG, "createNotification")
             val controller = mMediaSession?.controller
             val mediaMetadata = controller?.metadata
             val description = mediaMetadata?.description
-            Log.i(ConstantValues.TAG, "mediaMetadata : ${mediaMetadata?.description}")
 
             val builder = androidx.core.app.NotificationCompat.Builder(applicationContext, ConstantValues.CHANNEL_ID).apply {
                 setStyle(
@@ -123,23 +123,14 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
                 setVisibility(androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC)
 
                 setSmallIcon(R.drawable.ic_fluid_music_icon)
+
                 addAction(
                     androidx.core.app.NotificationCompat.Action(
-                        R.drawable.close,
-                        getString(R.string.close),
+                        R.drawable.skip_previous,
+                        getString(R.string.previous),
                         MediaButtonReceiver.buildMediaButtonPendingIntent(
                             applicationContext,
-                            PlaybackStateCompat.ACTION_STOP
-                        )
-                    )
-                )
-                addAction(
-                    androidx.core.app.NotificationCompat.Action(
-                        R.drawable.skip_next,
-                        getString(R.string.next),
-                        MediaButtonReceiver.buildMediaButtonPendingIntent(
-                            applicationContext,
-                            PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                            PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
                         )
                     )
                 )
@@ -155,42 +146,46 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
                 )
                 addAction(
                     androidx.core.app.NotificationCompat.Action(
-                        R.drawable.skip_previous,
-                        getString(R.string.previous),
+                        R.drawable.skip_next,
+                        getString(R.string.next),
                         MediaButtonReceiver.buildMediaButtonPendingIntent(
                             applicationContext,
-                            PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                            PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                        )
+                    )
+                )
+                addAction(
+                    androidx.core.app.NotificationCompat.Action(
+                        R.drawable.close,
+                        getString(R.string.close),
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(
+                            applicationContext,
+                            PlaybackStateCompat.ACTION_STOP
                         )
                     )
                 )
             }
             startForeground(ConstantValues.NOTIFICATION_REQUEST_CODE, builder.build())
         }
-        fun setupMediaPlayer(){
-            mMediaPlayer.startMediaPlayer()
+
+        fun setupMediaPlayer(extras : Bundle){
+            val currentSongPath : String? = mMediaPlayer.setupQueueListExtras(extras)
+
+            if(currentSongPath != null && currentSongPath.isNotEmpty())
+                if(mMediaPlayer.prepareMediaPlayerWithPath(currentSongPath))
+                    mMediaPlayer.playMediaPlayer()
         }
         fun registerReceivers() {
             registerReceiver(mBecomingNoisyReceiver, mIntentFilterAudioBecomingNoisy)
         }
         fun setupMediaSessionWithBundleData(extras: Bundle) {
-//            val tempQueueList : ArrayList<MediaSessionCompat.QueueItem> =
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//                    extras.getParcelableArrayList(ConstantValues.BUNDLE_QUEUE_LIST, QueueItem::class.java) as ArrayList<QueueItem>
-//                } else {
-//                    extras.getParcelableArrayList<QueueItem>(ConstantValues.BUNDLE_QUEUE_LIST) as ArrayList<QueueItem>
-//                }
-            var tempSourceFrom : String = extras.getString(ConstantValues.BUNDLE_SOURCE_FROM, "")
-            var tempSourceFromValue : String = extras.getString(ConstantValues.BUNDLE_SOURCE_FROM_VALUE, "")
             val tempShuffle : Int = extras.getInt(ConstantValues.BUNDLE_SHUFFLE_VALUE, 0)
             val tempRepeat : Int = extras.getInt(ConstantValues.BUNDLE_REPEAT_VALUE, 0)
-            var tempCurrentSongIndex : Int = extras.getInt(ConstantValues.BUNDLE_CURRENT_SONG_ID, 0)
             val tempCurrentSongMetaData : MediaMetadataCompat? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 extras.getParcelable(ConstantValues.BUNDLE_CURRENT_SONG_META_DATA, MediaMetadataCompat::class.java)
             } else {
                 extras.getParcelable(ConstantValues.BUNDLE_CURRENT_SONG_META_DATA)
             }
-//            mMediaSession?.setQueue(tempQueueList)
-            Log.i(ConstantValues.TAG, "tempCurrentSongMetaData $tempCurrentSongMetaData")
             mMediaSession?.setRepeatMode(tempRepeat)
             mMediaSession?.setShuffleMode(tempShuffle)
             mMediaSession?.setMetadata(tempCurrentSongMetaData)
@@ -266,8 +261,17 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
 
     override fun onCreate() {
         super.onCreate()
-        setupNotificationChannel()
         setupMediaSession()
+        setupPlayerHandler()
+        setupNotificationChannel()
+    }
+
+    private fun setupPlayerHandler() {
+        mHandlerThread = HandlerThread(ConstantValues.HANDLER_THREAD, Thread.NORM_PRIORITY)
+        mHandlerThread?.start()
+        mCustomPlayerHandler = CustomPlayerHandler(mHandlerThread?.looper!!, WeakReference(this))
+        mMediaPlayer = CustomMediaPlayer(WeakReference(this))
+        mMediaPlayer.setHandler(mCustomPlayerHandler!!)
     }
 
     private fun setupMediaSession() {

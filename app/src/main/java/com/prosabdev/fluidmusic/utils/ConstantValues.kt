@@ -47,8 +47,10 @@ abstract class ConstantValues {
         const val CLOSE_ACTION = "CLOSE_ACTION"
         const val SEEK_TO_ACTION = "SEEK_TO_ACTION"
 
-        //Notification mode
         const val MEDIA_SESSION_TAG = "MEDIA_SESSION_TAG"
+
+        //Notification mode
+        const val HANDLER_THREAD = "HANDLER_THREAD"
         const val CHANNEL_ID = "CHANNEL_ID"
         const val NOTIFICATION_ID = "21323123"
         const val NOTIFICATION_REQUEST_CODE : Int = 21301

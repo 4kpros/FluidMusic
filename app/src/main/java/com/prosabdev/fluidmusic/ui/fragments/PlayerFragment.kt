@@ -233,10 +233,8 @@ class PlayerFragment : Fragment() {
                 mSlider?.value = 0.0f
         }
         //Update blurred background
-        var tempBitmap : Bitmap? = null
-        if(mSongList.size > 0)
-            tempBitmap = mSongList[position].covertArt
-        CustomUILoaders.loadBlurredWithImageLoader(mContext, mCovertArtBlurred, tempBitmap, 100)
+        val tempBinary : ByteArray? = if(mSongList.size > 0) mSongList[position].covertArt?.binaryData else null
+        CustomUILoaders.loadBlurredWithImageLoader(mContext, mCovertArtBlurred, tempBinary, 100)
     }
 
     private fun initViews(view: View) {

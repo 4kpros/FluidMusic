@@ -50,8 +50,8 @@ class PlayerPageAdapter(
     }
 
     private fun loadCovertArt(covertArtView: ImageView?, position: Int) {
-        val tempBitmap: Bitmap? = mSongList!![position].covertArt
-        CustomUILoaders.loadCovertArtFromBinaryData(mContext, covertArtView, tempBitmap, 450)
+        val tempBinary: ByteArray? = mSongList!![position].covertArt?.binaryData
+        CustomUILoaders.loadCovertArtFromBinaryData(mContext, covertArtView, tempBinary, 450)
     }
 
     override fun getItemCount(): Int {

@@ -17,20 +17,20 @@ import jp.wasabeef.blurry.Blurry
 
 abstract class CustomUILoaders {
     companion object{
-        fun loadCovertArtFromBinaryData(context : Context, imageView : ImageView?, bitmap: Bitmap?, widthHeight: Int) {
+        fun loadCovertArtFromBinaryData(context : Context, imageView : ImageView?, binaryData: ByteArray?, widthHeight: Int) {
             loadWithImageLoader(
                 context,
                 imageView,
-                bitmap,
+                binaryData,
                 widthHeight
             )
         }
-        fun loadBlurredWithImageLoader(context : Context, imageView : ImageView?, bitmap: Bitmap?, widthHeight: Int) {
-            if(bitmap == null || bitmap == null){
+        fun loadBlurredWithImageLoader(context : Context, imageView : ImageView?, binaryData: ByteArray?, widthHeight: Int) {
+            if(imageView == null || binaryData == null){
                 loadWithImageLoader(
                     context,
                     imageView,
-                    bitmap,
+                    binaryData,
                     widthHeight,
                     true
                 )
@@ -52,7 +52,7 @@ abstract class CustomUILoaders {
             }
             Glide.with(context)
                 .asBitmap()
-                .load(bitmap)
+                .load(binaryData)
                 .useAnimationPool(true)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .useAnimationPool(true)
@@ -60,10 +60,10 @@ abstract class CustomUILoaders {
                 .apply(RequestOptions().override(widthHeight, widthHeight))
                 .into(customTarget)
         }
-        private fun loadWithImageLoader(context : Context, imageView : ImageView?, bitmap: Bitmap?, widthHeight: Int, transparent : Boolean = false){
+        private fun loadWithImageLoader(context : Context, imageView : ImageView?, binaryData: ByteArray?, widthHeight: Int, transparent : Boolean = false){
             if(imageView == null)
                 return
-            if(bitmap == null || bitmap == null){
+            if(binaryData == null || binaryData.isEmpty()){
                 if(transparent){
                     loadWithImageLoader(
                         context,
@@ -82,7 +82,7 @@ abstract class CustomUILoaders {
                 return
             }
             Glide.with(context)
-                .load(bitmap)
+                .load(binaryData)
                 .useAnimationPool(true)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .useAnimationPool(true)

@@ -31,6 +31,6 @@ open class SongItem() {
     var storageName: String? = null
 
     //
-    var covertArt: Bitmap? = null
+    var covertArt: Artwork? = null
     var covertArtUrl: String? = null
 }

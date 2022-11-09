@@ -46,7 +46,7 @@ abstract class AudioFileInfoExtractor {
                     val year: String = tag.getFirst(FieldKey.YEAR)
                     val comment: String = tag.getFirst(FieldKey.COMMENT)
                     val lyrics: String = tag.getFirst(FieldKey.LYRICS)
-                    songItem.covertArt = getBitmapAudioArtwork(context, artwork?.binaryData, 500, 500)
+                    songItem.covertArt = artwork
                     songItem.covertArtUrl = artwork?.imageUrl
                     songItem.title = title
                     songItem.artist = artist
@@ -72,9 +72,9 @@ abstract class AudioFileInfoExtractor {
         }
 
         //Extract bitmap audio artwork from path
-        fun getBitmapAudioArtwork(context: Context, binaryDataImage: ByteArray?, width: Int = 100, height: Int = 100): Bitmap? {
-            var bitmap: Bitmap? = null
+        fun getBitmapAudioArtwork(context: Context, binaryDataImage: ByteArray?, width: Int = 100, height: Int = 100): Bitmap {
             if (binaryDataImage != null && binaryDataImage.isNotEmpty()) {
+                var bitmap: Bitmap? = null
                 val options: BitmapFactory.Options = BitmapFactory.Options()
                 options.inJustDecodeBounds = true
                 BitmapFactory.decodeByteArray(binaryDataImage, 0, binaryDataImage.size, options)
@@ -94,13 +94,13 @@ abstract class AudioFileInfoExtractor {
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-            } else {
-                bitmap = BitmapFactory.decodeResource(
-                    context.resources,
-                    R.drawable.ic_fluid_music_icon
-                )
+                if (bitmap != null)
+                    return bitmap
             }
-            return bitmap
+            return BitmapFactory.decodeResource(
+                context.resources,
+                R.drawable.fluid_music_image
+            )
         }
 
         private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {

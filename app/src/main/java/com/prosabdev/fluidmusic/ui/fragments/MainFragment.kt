@@ -114,8 +114,8 @@ class MainFragment : Fragment() {
                     R.string.unknown_artist
                 )
             //Update mini player covert art
-            val bitmap : Bitmap? = mPlayerFragmentViewModel.getQueueList().value!![position].covertArt
-            CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtMiniPlayer, bitmap, 100)
+            val tempBinary : ByteArray? = mPlayerFragmentViewModel.getQueueList().value!![position].covertArt?.binaryData
+            CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtMiniPlayer, tempBinary, 100)
         }
     }
 

@@ -12,5 +12,5 @@ class AlbumItem {
     var totalDuration: Long = 0
     //
     var covertArt: Artwork? = null
-    var covertArtBitmap: Bitmap? = null
+    var covertArtUrl: String? = null
 }

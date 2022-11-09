@@ -17,12 +17,14 @@ import com.google.android.material.card.MaterialCardView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.models.AlbumItem
 import com.prosabdev.fluidmusic.utils.CustomFormatters
+import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import com.prosabdev.fluidmusic.utils.adapters.SelectablePlayingItemAdapter
 
 class AlbumItemAdapter(
     private val mAlbumList: List<AlbumItem>?,
     private val mContext: Context,
-    private val mListener: OnItemClickListener
+    private val mListener: OnItemClickListener,
+    private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener,
 ) : SelectablePlayingItemAdapter<AlbumItemAdapter.AlbumItemHolder>() {
 
     interface OnItemClickListener {
@@ -76,35 +78,8 @@ class AlbumItemAdapter(
             //Set is is playing or is checked(for multiple item selection)
             mIsSelectedCheckbox?.visibility = if(selected) View.VISIBLE else View.GONE
             //Set song covert art
-            if(albumItem.covertArt != null && albumItem.covertArt!!.binaryData != null && albumItem.covertArt!!.binaryData.isNotEmpty()){
-                Glide.with(context)
-                    .load(albumItem.covertArt?.binaryData)
-                    .useAnimationPool(false)
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .dontAnimate()
-                    .apply(
-                        RequestOptions()
-                            .fitCenter()
-                            .format(DecodeFormat.PREFER_RGB_565)
-                            .override(100)
-                    )
-                    .centerCrop()
-                    .into(mCovertArt!!)
-            }else{
-                Glide.with(context)
-                    .load(ContextCompat.getDrawable(context, R.drawable.ic_fluid_music_icon_with_padding))
-                    .useAnimationPool(true)
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .dontAnimate()
-                    .apply(
-                        RequestOptions()
-                            .fitCenter()
-                            .format(DecodeFormat.PREFER_RGB_565)
-                            .override(100)
-                    )
-                    .centerCrop()
-                    .into(mCovertArt!!)
-            }
+            val tempBinary: ByteArray? = albumItem.covertArt?.binaryData
+            CustomUILoaders.loadCovertArtFromBinaryData(context, mCovertArt, tempBinary, 100)
         }
 
         //Method used to bind one listener with items events click

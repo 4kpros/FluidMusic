@@ -31,6 +31,9 @@ import com.prosabdev.fluidmusic.utils.adapters.SelectableRecycleViewAdapter
 import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.explore.AllSongsFragmentViewModel
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class AllSongsFragment : Fragment() {
     private var mPageIndex: Int? = -1
@@ -93,15 +96,17 @@ class AllSongsFragment : Fragment() {
         })
         mAllSongsFragmentViewModel.getDataList().observe(mActivity as LifecycleOwner, object  : Observer<ArrayList<Any>>{
             override fun onChanged(songList: ArrayList<Any>?) {
-                addSongsToAdapter(songList as ArrayList<SongItem>)
+                MainScope().launch {
+                    addSongsToAdapter(songList as ArrayList<SongItem>)
+                }
             }
         })
         mAllSongsFragmentViewModel.getIsLoading().observe(mActivity as LifecycleOwner, object  : Observer<Boolean>{
             override fun onChanged(isLoading: Boolean?) {
                 if(isLoading == false){
-                    CustomAnimators.hideLoadingView(mRecyclerView as View, mLoadingContentProgress as View,300, true)
+                    CustomAnimators.crossFadeDown(mLoadingContentProgress as View, true, 50)
                 }else{
-                    CustomAnimators.showLoadingView(mRecyclerView as View, mLoadingContentProgress as View, true)
+                    CustomAnimators.crossFadeUp(mLoadingContentProgress as View, true, 100)
                 }
             }
         })
@@ -126,7 +131,7 @@ class AllSongsFragment : Fragment() {
         mMainExploreFragmentViewModel.setTotalCount(mSongList.size)
     }
 
-    private fun addSongsToAdapter(songList: ArrayList<SongItem>?) {
+    private suspend fun addSongsToAdapter(songList: ArrayList<SongItem>?) = coroutineScope{
         if (songList != null) {
             val startPosition: Int = mSongList.size
             val itemCount: Int = songList.size
