@@ -104,16 +104,18 @@ abstract class MediaFileScanner {
                     songItem.typeMime = mimeType
                     //Now save on database
                     tempSongList.add(songItem)
-                    if(itemsCount > 0 && itemsCount == 5){
+                    if(itemsCount > 0 && itemsCount == minToShow){
 //                        itemsCount = 0
                         viewModel.setSongList(tempSongList)
                         viewModel.setIsLoading(false)
+                        viewModel.setIsLoadingInBackground(false)
+                        viewModel.setDataRequestCounter(1)
                     }
                 }
-//                genericDataListFetcherViewModel.setDataList(tempSongList as ArrayList<Any>)
-//                genericDataListFetcherViewModel.setDataRequestCounter(1)
-//                genericDataListFetcherViewModel.setIsLoading(false)
-//                genericDataListFetcherViewModel.setIsLoadingInBackground(false)
+//                viewModel.setDataList(tempSongList as ArrayList<Any>)
+//                viewModel.setDataRequestCounter(1)
+//                viewModel.setIsLoading(false)
+//                viewModel.setIsLoadingInBackground(false)
             }
         }
     }

@@ -58,6 +58,8 @@ class MainExploreFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
         }
+        mContext = requireContext()
+        mActivity = requireActivity()
     }
 
     override fun onCreateView(
@@ -66,15 +68,17 @@ class MainExploreFragment : Fragment() {
     ): View {
         val view: View = inflater.inflate(R.layout.fragment_main_explore, container, false)
 
-        mContext = requireContext()
-        mActivity = requireActivity()
-
         initViews(view)
         setupViewPagerAdapter(view)
         checkInteractions(view)
-        observeLiveData(view)
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        observeLiveData(view)
     }
 
     private fun setupViewPagerAdapter(view: View) {

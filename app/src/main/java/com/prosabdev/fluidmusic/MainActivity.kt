@@ -34,6 +34,7 @@ import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity(){
 
@@ -94,15 +95,25 @@ class MainActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        createMediaBrowserService()
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
+        if (savedInstanceState == null) {
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                add<MainFragment>(R.id.main_activity_fragment_container)
+            }
+        }
+
         setContentView(R.layout.activity_main)
 
-        initViews(savedInstanceState)
-        observeLiveData()
-        checkInteractions()
+
+        runBlocking {
+            initViews(savedInstanceState)
+            createMediaBrowserService()
+            checkInteractions()
+            observeLiveData()
+        }
     }
 
     private fun createMediaBrowserService() {
@@ -227,13 +238,6 @@ class MainActivity : AppCompatActivity(){
 
     //Initialize views
     private fun initViews(savedInstanceState : Bundle?) {
-        if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                add<MainFragment>(R.id.main_activity_fragment_container)
-            }
-        }
-
         mDrawerLayout = findViewById(R.id.drawer_layout)
         mNavigationView = findViewById(R.id.navigation_view)
 

@@ -67,6 +67,9 @@ class MainFragment : Fragment() {
             setReorderingAllowed(true)
             add<PlayerFragment>(R.id.player_fragment_container)
         }
+
+        mContext = requireContext()
+        mActivity = requireActivity()
     }
 
     override fun onCreateView(
@@ -77,15 +80,17 @@ class MainFragment : Fragment() {
         // Inflate the layout for this fragment
         val view: View = inflater.inflate(R.layout.fragment_main, container, false)
 
-        mContext = requireContext()
-        mActivity = requireActivity()
-
         initViews(view)
-        observeLiveData()
         checkInteractions()
 
         // Inflate the layout for this fragment
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        observeLiveData()
     }
 
     override fun onResume() {
@@ -259,6 +264,9 @@ class MainFragment : Fragment() {
 
         mButtonPlayPause = view.findViewById(R.id.button_play_pause)
         mButtonSkipNext = view.findViewById(R.id.button_skip_next)
+
+        mTextTitleMiniPlayer?.isSelected = true
+        mTextArtistMiniPlayer?.isSelected = true
 
         CustomViewModifiers.updateTopViewInsets(mMainFragmentContainer!!)
 //        CustomViewModifiers.removeBottomViewInsets(mSlidingUpPanel!!)

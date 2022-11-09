@@ -2,8 +2,8 @@ package com.prosabdev.fluidmusic.ui.fragments
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.Bitmap
 import android.os.Bundle
+import android.support.v4.media.session.PlaybackStateCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -69,6 +69,9 @@ class PlayerFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        mContext = requireContext()
+        mActivity = requireActivity()
     }
 
     override fun onCreateView(
@@ -78,19 +81,17 @@ class PlayerFragment : Fragment() {
         // Inflate the layout for this fragment
         val view: View = inflater.inflate(R.layout.fragment_player, container, false)
 
-        mContext = requireContext()
-        mActivity = requireActivity()
+        initViews(view)
+        setupViewPagerAdapter()
+        checkInteractions()
 
-        // Inflate the layout for this fragment
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initViews(view)
-        setupViewPagerAdapter()
+
         observeLiveData()
-        checkInteractions()
     }
 
     override fun onResume() {
@@ -173,19 +174,52 @@ class PlayerFragment : Fragment() {
         })
         mPlayerFragmentViewModel.getShuffle().observe(mActivity as LifecycleOwner, object : Observer<Int> {
             override fun onChanged(shuffle: Int?) {
-                updatePlayerButtonsUI()
+                updateShuffleUI(shuffle)
             }
         })
         mPlayerFragmentViewModel.getRepeat().observe(mActivity as LifecycleOwner, object : Observer<Int> {
             override fun onChanged(repeat: Int?) {
-                updatePlayerButtonsUI()
+                updateRepeatUI(repeat)
             }
         })
         mPlayerFragmentViewModel.getPlayingProgressValue().observe(mActivity as LifecycleOwner, object : Observer<Long> {
             override fun onChanged(progressValue: Long?) {
-                updatePlayerButtonsUI()
+                updateProgress(progressValue)
             }
         })
+    }
+
+    private fun updateProgress(progressValue: Long?) {
+    }
+
+    private fun updateRepeatUI(repeat: Int?) {
+        when (repeat) {
+            PlaybackStateCompat.REPEAT_MODE_ALL -> {
+                mButtonRepeat?.alpha = 1.0f
+                mButtonRepeat?.icon = ContextCompat.getDrawable(mContext, R.drawable.repeat)
+            }
+            PlaybackStateCompat.REPEAT_MODE_ONE -> {
+                mButtonRepeat?.alpha = 1.0f
+                mButtonRepeat?.icon = ContextCompat.getDrawable(mContext, R.drawable.repeat_one)
+            }
+            else -> {
+                mButtonRepeat?.alpha = 0.5f
+                mButtonRepeat?.icon = ContextCompat.getDrawable(mContext, R.drawable.repeat)
+            }
+        }
+    }
+
+    private fun updateShuffleUI(shuffle: Int?) {
+        when (shuffle) {
+            PlaybackStateCompat.SHUFFLE_MODE_ALL -> {
+                mButtonShuffle?.alpha = 1.0f
+                mButtonShuffle?.icon = ContextCompat.getDrawable(mContext, R.drawable.shuffle)
+            }
+            else -> {
+                mButtonShuffle?.alpha = 0.5f
+                mButtonShuffle?.icon = ContextCompat.getDrawable(mContext, R.drawable.shuffle)
+            }
+        }
     }
 
     private fun updatePlayerButtonsUI() {
@@ -211,7 +245,8 @@ class PlayerFragment : Fragment() {
         mSongList.addAll(songList!!)
         mPlayerPagerAdapter?.notifyItemRangeInserted(0, mSongList.size)
         mPlayerViewPager?.currentItem = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
-    } private fun changeCurrentSong(position: Int) {
+    }
+    private fun changeCurrentSong(position: Int) {
         mPlayerFragmentViewModel.setCurrentSong(position)
     }
 
@@ -341,6 +376,9 @@ class PlayerFragment : Fragment() {
 
         mPlayerViewPager = view.findViewById<ViewPager2>(R.id.view_pager_player)
         mLinearControls = view.findViewById<LinearLayoutCompat>(R.id.linear_controls)
+
+        mTextTitle?.isSelected = true
+        mTextArtist?.isSelected = true
 
         CustomViewModifiers.updateTopViewInsets(view.findViewById(R.id.linear_viewpager))
         CustomViewModifiers.updateBottomViewInsets(mLinearControls!!)

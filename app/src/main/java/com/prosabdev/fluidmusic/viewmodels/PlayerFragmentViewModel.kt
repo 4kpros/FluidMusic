@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.viewmodels
 
 import android.app.Activity
+import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,8 +17,8 @@ class PlayerFragmentViewModel : GenericSongItemDataListViewModel()  {
     private val mMutablePlayingProgressValue = MutableLiveData<Long>(0)
     private val mMutableSourceOfQueueList = MutableLiveData<String>("")
     private val mMutableSourceOfQueueListValue = MutableLiveData<String>("")
-    private val mMutableShuffle = MutableLiveData<Int>(0)
-    private val mMutableRepeat = MutableLiveData<Int>(0)
+    private val mMutableShuffle = MutableLiveData<Int>(PlaybackStateCompat.SHUFFLE_MODE_NONE)
+    private val mMutableRepeat = MutableLiveData<Int>(PlaybackStateCompat.REPEAT_MODE_NONE)
     private val mMutableCurrentSong = MutableLiveData<Int>(0)
 
     private val mIsPlaying: LiveData<Boolean> get() = mMutableIsPlaying

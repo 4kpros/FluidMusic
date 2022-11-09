@@ -61,6 +61,8 @@ class AllSongsFragment : Fragment() {
         arguments?.let {
             mPageIndex = it.getInt(ConstantValues.EXPLORE_ALL_SONGS)
         }
+        mContext = requireContext()
+        mActivity = requireActivity()
     }
 
     override fun onCreateView(
@@ -70,8 +72,9 @@ class AllSongsFragment : Fragment() {
         // Inflate the layout for this fragment
         val view : View = inflater.inflate(R.layout.fragment_all_songs, container, false)
 
-        mContext = requireContext()
-        mActivity = requireActivity()
+        initViews(view)
+        setupRecyclerViewAdapter()
+        checkInteractions()
 
         return view
     }
@@ -79,10 +82,7 @@ class AllSongsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initViews(view)
-        setupRecyclerViewAdapter()
         observeLiveData()
-        checkInteractions()
     }
 
     private fun observeLiveData() {
@@ -156,14 +156,12 @@ class AllSongsFragment : Fragment() {
         listHeadlines.add(0)
         mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, R.layout.item_top_play_shuffle, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
             override fun onPlayButtonClicked() {
-                mPlayerFragmentViewModel.setShuffle( PlaybackStateCompat.SHUFFLE_MODE_NONE)
-                mPlayerFragmentViewModel.setRepeat( PlaybackStateCompat.REPEAT_MODE_NONE)
+                updatePlayClickListener()
                 updateCurrentPlayingSong(0)
             }
             override fun onShuffleButtonClicked() {
-                mPlayerFragmentViewModel.setShuffle( PlaybackStateCompat.SHUFFLE_MODE_ALL)
-                mPlayerFragmentViewModel.setRepeat( PlaybackStateCompat.REPEAT_MODE_NONE)
-                updateCurrentPlayingSong(CustomMathComputations.randomExcluded(0, mSongList.size))
+                updateShuffleClickListener()
+                updateCurrentPlayingSong(CustomMathComputations.randomExcluded(mPlayerFragmentViewModel.getCurrentSong().value ?: 0, mSongList.size-1))
             }
 
             override fun onFilterButtonClicked() {
@@ -251,6 +249,26 @@ class AllSongsFragment : Fragment() {
         val callback : ItemTouchHelper.Callback = SongItemMoveCallback(mSongItemAdapter!!)
         touchHelper = ItemTouchHelper(callback)
         touchHelper.attachToRecyclerView(mRecyclerView)
+    }
+
+    private fun updatePlayClickListener() {
+        mPlayerFragmentViewModel.setShuffle( PlaybackStateCompat.SHUFFLE_MODE_NONE)
+        mPlayerFragmentViewModel.setRepeat( PlaybackStateCompat.REPEAT_MODE_NONE)
+    }
+
+    private fun updateShuffleClickListener() {
+        mPlayerFragmentViewModel.setRepeat( PlaybackStateCompat.REPEAT_MODE_NONE)
+        when (mPlayerFragmentViewModel.getShuffle().value) {
+            PlaybackStateCompat.SHUFFLE_MODE_NONE -> {
+                mPlayerFragmentViewModel.setShuffle(PlaybackStateCompat.SHUFFLE_MODE_ALL)
+            }
+            PlaybackStateCompat.SHUFFLE_MODE_ALL -> {
+                mPlayerFragmentViewModel.setShuffle(PlaybackStateCompat.SHUFFLE_MODE_NONE)
+            }
+            else -> {
+                mPlayerFragmentViewModel.setShuffle(PlaybackStateCompat.SHUFFLE_MODE_NONE)
+            }
+        }
     }
 
     private fun updateCurrentPlayingSong(position: Int) {
