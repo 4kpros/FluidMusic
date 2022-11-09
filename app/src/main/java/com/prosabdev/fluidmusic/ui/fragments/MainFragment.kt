@@ -154,12 +154,12 @@ class MainFragment : Fragment() {
             val tempBinary : ByteArray? = if(tempQL.size > 0) tempQL[tempPositionInQL].covertArt?.binaryData else null
 
             if(animate){
-                CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtMiniPlayer, tempBinary, 100)
                 if(mUpdateMiniPlayerUIJob != null)
                     mUpdateMiniPlayerUIJob?.cancel()
                 mUpdateMiniPlayerUIJob = MainScope().launch {
                     animateCrossFadeOutInTextView(mTextTitleMiniPlayer, tempTitle, 100)
                     animateCrossFadeOutInTextView(mTextArtistMiniPlayer, tempArtist, 100)
+                    animateCrossFadeOutInImage(mCovertArtMiniPlayer, tempBinary, false, 100, 100)
                     animateCrossFadeOutInImage(mBlurredCovertArtMiniPlayer, tempBinary, true, 10, 100)
                 }
             }else{

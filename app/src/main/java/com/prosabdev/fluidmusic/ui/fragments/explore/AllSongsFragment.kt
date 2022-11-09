@@ -113,6 +113,13 @@ class AllSongsFragment : Fragment() {
                 }
             }
         })
+        mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner, object : Observer<Int>{
+            override fun onChanged(currentSong: Int?) {
+                if(mPlayerFragmentViewModel.getSourceOfQueueList().value == ConstantValues.EXPLORE_ALL_SONGS)
+                    mSongItemAdapter?.setCurrentPlayingSong(currentSong ?: -1)
+            }
+
+        })
     }
 
     private suspend fun updateSelectedItems(selectMode : Boolean, totalSelected: Int, totalCount : Int){

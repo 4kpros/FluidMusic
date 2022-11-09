@@ -1,28 +1,25 @@
 package com.prosabdev.fluidmusic.adapters.explore
 
 import android.content.Context
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DecodeFormat
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.color.MaterialColors
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.callbacks.SongItemMoveCallback
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomFormatters
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
-import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 import com.prosabdev.fluidmusic.utils.adapters.SelectablePlayingItemAdapter
 import java.util.*
 
@@ -48,14 +45,14 @@ class SongItemAdapter(
     }
 
     //Methods for selectable playing
-    fun isPlaying(position: Int): Boolean {
+    private fun isPlaying(position: Int): Boolean {
         return selectablePlayingIsPlaying(position)
     }
     fun getCurrentPlayingSong(): Int {
         return selectablePlayingGetCurrentPlayingSong()
     }
     fun setCurrentPlayingSong(position: Int) {
-        selectablePlayingIsPlaying(position)
+        selectablePlayingSetCurrentPlayingSong(position)
     }
 
     //Methods for selectable items
@@ -141,20 +138,42 @@ class SongItemAdapter(
         private var mArtist: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.song_item_artist)
         private var mDuration: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.song_item_duration)
         private var mTypeMime: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.song_item_type_mime)
+        private var mVerticalSeparator: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.vertical_separator)
+        private var mCurrentlyPlaying: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.song_currently_playing)
         private var mSelectedItemBackground: View? = itemView.findViewById<View>(R.id.song_item_is_selected)
         private var mDragHand: MaterialButton? = itemView.findViewById<MaterialButton>(R.id.button_drag_hand)
-//        private var mIsPlayingBackground: LinearLayoutCompat? = itemView.findViewById<LinearLayoutCompat>(R.id.song_item_is_playing_background)
 
         //Update song item UI
-        fun updateUI(context: Context, songItem: SongItem, iqsPlaying: Boolean, selected: Boolean){
+        fun updateUI(context: Context, songItem: SongItem, isPlaying: Boolean, selected: Boolean){
             mCovertArt?.layout(0,0,0,0)
             mTitle?.text = if(songItem.title != null && songItem.title!!.isNotEmpty()) songItem.title else songItem.fileName //Set song title
             mArtist?.text = if(songItem.artist!!.isNotEmpty()) songItem.artist else context.getString(
                             R.string.unknown_artist)
             mDuration?.text = CustomFormatters.formatSongDurationToString(songItem.duration) //Set song duration
             mTypeMime?.text = songItem.typeMime //Set song type mime
-            //Set is is playing or is checked(for multiple item selection)
+            
             if(selected) CustomAnimators.crossFadeUp(mSelectedItemBackground as View, false, 0) else CustomAnimators.crossFadeDown(mSelectedItemBackground as View, false, 0)
+            if(isPlaying){
+                val value = MaterialColors.getColor(mTitle as View, com.google.android.material.R.attr.colorPrimary)
+                mTitle?.setTextColor(value)
+                mArtist?.setTextColor(value)
+                mDuration?.setTextColor(value)
+                mTypeMime?.setTextColor(value)
+                mVerticalSeparator?.setTextColor(value)
+
+                mCurrentlyPlaying?.setTextColor(value)
+                mCurrentlyPlaying?.visibility = VISIBLE
+            }else{
+                val value = MaterialColors.getColor(mTitle as View, com.google.android.material.R.attr.colorOnBackground)
+                mTitle?.setTextColor(value)
+                mArtist?.setTextColor(value)
+                mDuration?.setTextColor(value)
+                mTypeMime?.setTextColor(value)
+                mVerticalSeparator?.setTextColor(value)
+
+                mCurrentlyPlaying?.setTextColor(value)
+                mCurrentlyPlaying?.visibility = GONE
+            }
             //Set song covert art
             val tempBinary: ByteArray? = songItem.covertArt?.binaryData
             CustomUILoaders.loadCovertArtFromBinaryData(context, mCovertArt, tempBinary, 100)

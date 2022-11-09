@@ -80,45 +80,66 @@
                     android:textAppearance="?attr/textAppearanceBody2"
                     app:layout_constraintTop_toBottomOf="@+id/song_item_title"
                     />
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     app:layout_constraintTop_toBottomOf="@+id/song_item_artist"
                     >
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/song_currently_playing"
+                        app:layout_constraintTop_toTopOf="parent"
+                        >
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/song_item_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.5"
+                            android:text="--:--"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:textAppearance="?attr/textAppearanceLabelSmall"
+                            />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/vertical_separator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.5"
+                            android:text=" | "
+                            android:maxLines="1"
+                            android:textAppearance="?attr/textAppearanceLabelSmall"
+                            />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/song_item_type_mime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.5"
+                            android:text=""
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:textAppearance="?attr/textAppearanceLabelSmall"
+                            />
+                    </androidx.appcompat.widget.LinearLayoutCompat>
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/song_item_duration"
+                        android:id="@+id/song_currently_playing"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:alpha="0.5"
-                        android:text="--:--"
+                        android:text="@string/now_playing"
                         android:maxLines="1"
                         android:ellipsize="end"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
                         android:textAppearance="?attr/textAppearanceLabelSmall"
                         />
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:alpha="0.5"
-                        android:text=" | "
-                        android:maxLines="1"
-                        android:textAppearance="?attr/textAppearanceLabelSmall"
-                        />
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/song_item_type_mime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:alpha="0.5"
-                        android:text=""
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:textAppearance="?attr/textAppearanceLabelSmall"
-                        />
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_drag_hand"
-                android:layout_width="wrap_content"
+                android:layout_width="0.1dp"
                 android:layout_height="wrap_content"
                 style="?attr/materialIconButtonStyle"
                 app:icon="@drawable/drag_handle"

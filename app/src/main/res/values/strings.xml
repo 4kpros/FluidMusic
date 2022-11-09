@@ -32,4 +32,5 @@
     <string name="fluidmusic">Fluid Music</string>
     <string name="musicplayer">Music player</string>
     <string name="close">Close</string>
+    <string name="now_playing">Now playing</string>
 </resources>
