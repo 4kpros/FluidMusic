@@ -58,7 +58,6 @@
                 android:layout_width="@dimen/song_card_image_small_w"
                 android:layout_height="@dimen/song_card_image_small_h"
                 android:scaleType="centerCrop"
-                android:alpha="0"
                 android:src="@drawable/ic_fluid_music_icon_with_padding"
                 />
         </com.google.android.material.card.MaterialCardView>
@@ -78,7 +77,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceBody1"
-                android:text="@string/unknown_title"
                 android:singleLine="true"
                 android:ellipsize="marquee"
                 android:marqueeRepeatLimit ="marquee_forever"
@@ -93,7 +91,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceBody2"
-                android:text="@string/unknown_artist"
                 android:singleLine="true"
                 android:ellipsize="marquee"
                 android:marqueeRepeatLimit ="marquee_forever"

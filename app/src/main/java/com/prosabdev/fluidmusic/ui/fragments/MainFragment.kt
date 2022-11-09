@@ -143,20 +143,24 @@ class MainFragment : Fragment() {
         val tempQL : ArrayList<SongItem>? = mPlayerFragmentViewModel.getSongList().value
         val tempPositionInQL : Int = mPlayerFragmentViewModel.getCurrentSong().value ?: -1
         if(tempQL!= null && tempQL.size > 0 && tempPositionInQL >= 0){
+            var tempTitle : String = ""
+            var tempArtist : String = ""
             if(mTextTitleMiniPlayer != null)
-                mTextTitleMiniPlayer?.text = if(tempQL[tempPositionInQL].title != null && tempQL[tempPositionInQL].title!!.isNotEmpty()) tempQL[tempPositionInQL].title else tempQL[tempPositionInQL].fileName //Set song title
+                tempTitle = if(tempQL[tempPositionInQL].title != null && tempQL[tempPositionInQL].title!!.isNotEmpty()) tempQL[tempPositionInQL].title.toString() else tempQL[tempPositionInQL].fileName.toString() //Set song title
 
             if(mTextArtistMiniPlayer != null)
-                mTextArtistMiniPlayer?.text = if(tempQL[tempPositionInQL].artist != null && tempQL[tempPositionInQL].artist!!.isNotEmpty()) tempQL[tempPositionInQL].artist else mContext.getString(R.string.unknown_artist)
+                tempArtist = if(tempQL[tempPositionInQL].artist != null && tempQL[tempPositionInQL].artist!!.isNotEmpty()) tempQL[tempPositionInQL].artist.toString() else mContext.getString(R.string.unknown_artist)
 
             val tempBinary : ByteArray? = if(tempQL.size > 0) tempQL[tempPositionInQL].covertArt?.binaryData else null
 
             if(animate){
+                CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtMiniPlayer, tempBinary, 100)
                 if(mUpdateMiniPlayerUIJob != null)
                     mUpdateMiniPlayerUIJob?.cancel()
                 mUpdateMiniPlayerUIJob = MainScope().launch {
-                    animateCrossFadeImage(mCovertArtMiniPlayer, tempBinary, false, 100, 150)
-                    animateCrossFadeImage(mBlurredCovertArtMiniPlayer, tempBinary, true, 10, 150)
+                    animateCrossFadeOutInTextView(mTextTitleMiniPlayer, tempTitle, 100)
+                    animateCrossFadeOutInTextView(mTextArtistMiniPlayer, tempArtist, 100)
+                    animateCrossFadeOutInImage(mBlurredCovertArtMiniPlayer, tempBinary, true, 10, 100)
                 }
             }else{
                 CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtMiniPlayer, tempBinary, 100)
@@ -164,8 +168,27 @@ class MainFragment : Fragment() {
             }
         }
     }
+    private suspend fun animateCrossFadeOutInTextView(
+        textView: AppCompatTextView?,
+        textValue : String,
+        durationInterval : Int = 150
+    ) {
+        textView?.apply {
+            View.VISIBLE
+            animate()
+                .alpha(0f)
+                .setInterpolator(DecelerateInterpolator())
+                .setDuration(durationInterval.toLong())
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        textView.text = textValue
+                        CustomAnimators.crossFadeUp(textView as View, true, durationInterval)
+                    }
+                })
+        }
+    }
 
-    private suspend fun animateCrossFadeImage(
+    private suspend fun animateCrossFadeOutInImage(
         imageView: ImageView?,
         tempBinary: ByteArray?,
         blurred : Boolean = false,
