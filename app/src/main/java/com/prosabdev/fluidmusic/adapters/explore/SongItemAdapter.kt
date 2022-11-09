@@ -136,7 +136,7 @@ class SongItemAdapter(
         private var mArtist: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.song_item_artist)
         private var mDuration: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.song_item_duration)
         private var mTypeMime: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.song_item_type_mime)
-        private var mSelectedItemBackground: LinearLayoutCompat? = itemView.findViewById<LinearLayoutCompat>(R.id.song_item_is_selected)
+        private var mSelectedItemBackground: View? = itemView.findViewById<View>(R.id.song_item_is_selected)
         private var mDragHand: MaterialButton? = itemView.findViewById<MaterialButton>(R.id.button_drag_hand)
 //        private var mIsPlayingBackground: LinearLayoutCompat? = itemView.findViewById<LinearLayoutCompat>(R.id.song_item_is_playing_background)
 

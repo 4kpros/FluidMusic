@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ConcatAdapter
@@ -46,7 +47,7 @@ class AlbumsFragment : Fragment() {
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
     private var mAlbumItemAdapter: AlbumItemAdapter? = null
     private var mRecyclerView: RecyclerView? = null
-    private var mLoadingContentProgress: LinearLayoutCompat? = null
+    private var mLoadingContentProgress: ConstraintLayout? = null
 
     private var mAlbumList : ArrayList<AlbumItem> = ArrayList<AlbumItem>()
 
@@ -160,7 +161,7 @@ class AlbumsFragment : Fragment() {
 
     private fun initViews(view: View) {
         mRecyclerView = view.findViewById<RecyclerView>(R.id.content_recycler_view)
-        mLoadingContentProgress = view.findViewById<LinearLayoutCompat>(R.id.loading_content_progress)
+        mLoadingContentProgress = view.findViewById<ConstraintLayout>(R.id.loading_content_progress)
 
     }
 

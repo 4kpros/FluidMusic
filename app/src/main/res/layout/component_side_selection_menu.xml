@@ -3,7 +3,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     style="?attr/materialCardViewStyle"
     >
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,7 +24,7 @@
             android:clickable="true"
             android:focusable="true"
             >
-            <androidx.appcompat.widget.LinearLayoutCompat
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -33,13 +32,16 @@
                 android:paddingBottom="10dp"
                 >
                 <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/image_view_close"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/close"
                     app:tint="?attr/colorOnPrimary"
                     android:tint="?attr/colorOnPrimary"
                     android:layout_margin="5dp"
-                    android:layout_gravity="center"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     />
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/text_selected_count"
@@ -50,11 +52,13 @@
                     android:text="13/100"
                     android:textColor="?attr/colorOnPrimary"
                     android:textAppearance="?attr/textAppearanceLabelSmall"
-                    android:layout_gravity="center"
+                    app:layout_constraintTop_toBottomOf="@+id/image_view_close"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     />
-            </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -73,6 +77,9 @@
                 app:icon="@drawable/select_all"
                 style="?attr/materialIconButtonStyle"
                 android:layout_gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_play_after"
@@ -81,6 +88,9 @@
                 app:icon="@drawable/play_arrow"
                 style="?attr/materialIconButtonStyle"
                 android:layout_gravity="center"
+                app:layout_constraintTop_toBottomOf="@+id/button_select_all"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_queue_music_add"
@@ -89,6 +99,9 @@
                 app:icon="@drawable/fast_forward"
                 style="?attr/materialIconButtonStyle"
                 android:layout_gravity="center"
+                app:layout_constraintTop_toBottomOf="@+id/button_play_after"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_playlist_add"
@@ -97,6 +110,9 @@
                 app:icon="@drawable/playlist_add"
                 style="?attr/materialIconButtonStyle"
                 android:layout_gravity="center"
+                app:layout_constraintTop_toBottomOf="@+id/button_queue_music_add"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_delete"
@@ -105,7 +121,10 @@
                 app:icon="@drawable/delete"
                 style="?attr/materialIconButtonStyle"
                 android:layout_gravity="center"
+                app:layout_constraintTop_toBottomOf="@+id/button_playlist_add"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

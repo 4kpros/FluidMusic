@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.prosabdev.fluidmusic.R
@@ -53,8 +54,8 @@ class HeadlinePlayShuffleAdapter(
             itemView.findViewById<MaterialButton>(R.id.button_shuffle)
         private var mFilterButton: MaterialButton? =
             itemView.findViewById<MaterialButton>(R.id.button_filter)
-        var mCustomEmptyBottomSpace: LinearLayoutCompat? =
-            itemView.findViewById<LinearLayoutCompat>(R.id.custom_empty_bottom_space)
+        var mCustomEmptyBottomSpace: ConstraintLayout? =
+            itemView.findViewById<ConstraintLayout>(R.id.custom_empty_bottom_space)
 
         //Method used to bind one listener with items events click
         fun bindListener(listener: OnItemClickListener) {
