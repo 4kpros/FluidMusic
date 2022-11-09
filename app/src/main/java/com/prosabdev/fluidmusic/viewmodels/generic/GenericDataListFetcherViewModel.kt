@@ -1,4 +1,4 @@
-package com.prosabdev.fluidmusic.viewmodels
+package com.prosabdev.fluidmusic.viewmodels.generic
 
 import android.app.Activity
 import android.util.Log
@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.prosabdev.fluidmusic.utils.ConstantValues
 
-abstract class GenericDataListFetcherViewModel : ViewModel() {
+open class GenericDataListFetcherViewModel : ViewModel() {
     private val mMutableIsLoading = MutableLiveData<Boolean>(false)
     private val mMutableIsLoadingInBackground = MutableLiveData<Boolean>(false)
     private val mMutableDataRequestCounter = MutableLiveData<Int>(0)
@@ -24,6 +24,14 @@ abstract class GenericDataListFetcherViewModel : ViewModel() {
         Log.i(ConstantValues.TAG, "GenericDataListFetcherViewModel request to load data")
         Log.i(ConstantValues.TAG, "GenericDataListFetcherViewModel nothing to do")
     }
+
+    protected fun getDataList(): LiveData<ArrayList<Any>> {
+        return mDataList
+    }
+    protected fun setDataList(dataList: ArrayList<Any>)  {
+        mMutableDataList.value = dataList
+    }
+
     fun getIsLoading(): LiveData<Boolean> {
         return mIsLoading
     }
@@ -47,11 +55,5 @@ abstract class GenericDataListFetcherViewModel : ViewModel() {
     }
     fun setLastLoadedPosition(value : Int) {
         mMutableLastLoadedPosition.value = value
-    }
-    fun getDataList(): LiveData<ArrayList<Any>> {
-        return mDataList
-    }
-    fun setDataList(dataList: ArrayList<Any>)  {
-        mMutableDataList.value = dataList
     }
 }

@@ -22,13 +22,11 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.models.SongItem
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomFormatters
-import com.prosabdev.fluidmusic.utils.CustomUILoaders
-import com.prosabdev.fluidmusic.utils.CustomViewModifiers
+import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -43,13 +41,14 @@ class MainFragment : Fragment() {
     private var mTextArtistMiniPlayer: AppCompatTextView? = null
     private var mProgressIndicatorMiniPlayer: LinearProgressIndicator? = null
     private var mCovertArtMiniPlayer: ImageView? = null
+    private var mBlurredCovertArtMiniPlayer: ImageView? = null
     private var mButtonPlayPause: MaterialButton? = null
 
     private var mSlidingUpPanel: SlidingUpPanelLayout? = null
 
     private var mMainFragmentContainer: FrameLayout? = null
     private var mPlayerFragmentContainer: FrameLayout? = null
-    private var mMiniPlayerContainer: LinearLayoutCompat? = null
+    private var mMiniPlayerContainer: ConstraintLayout? = null
     private var mPlayerViewsContainer: ConstraintLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,37 +84,45 @@ class MainFragment : Fragment() {
         return view
     }
 
+    override fun onResume() {
+        updateMiniPlayerUI()
+        super.onResume()
+    }
+
     private fun observeLiveData() {
-        mPlayerFragmentViewModel.getQueueList().observe(mActivity as LifecycleOwner, object :
+        mPlayerFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner, object :
             Observer<ArrayList<SongItem>> {
             override fun onChanged(songList: ArrayList<SongItem>?) {
-                updateMiniPlayerUI(mPlayerFragmentViewModel.getCurrentSong().value ?: 0)
+                updateMiniPlayerUI()
             }
         })
         mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner, object :
             Observer<Int> {
             override fun onChanged(currentSong: Int?) {
-                updateMiniPlayerUI(currentSong ?: 0)
+                updateMiniPlayerUI()
             }
         })
         mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner, object :
             Observer<String> {
             override fun onChanged(sourceOf: String?) {
-                updateMiniPlayerUI(mPlayerFragmentViewModel.getCurrentSong().value ?: 0)
+                updateMiniPlayerUI()
             }
         })
     }
-    private fun updateMiniPlayerUI(position: Int) {
-        if(mPlayerFragmentViewModel.getQueueList().value != null && mPlayerFragmentViewModel.getQueueList().value!!.size > 0) {
-            mTextTitleMiniPlayer?.text =
-                if (mPlayerFragmentViewModel.getQueueList().value!![position].title != null && mPlayerFragmentViewModel.getQueueList().value!![position].title!!.isNotEmpty()) mPlayerFragmentViewModel.getQueueList().value!![position].title else mPlayerFragmentViewModel.getQueueList().value!![position].fileName //Set song title
-            mTextArtistMiniPlayer?.text =
-                if (mPlayerFragmentViewModel.getQueueList().value!![position].artist!!.isNotEmpty()) mPlayerFragmentViewModel.getQueueList().value!![position].artist else mContext.getString(
-                    R.string.unknown_artist
-                )
-            //Update mini player covert art
-            val tempBinary : ByteArray? = mPlayerFragmentViewModel.getQueueList().value!![position].covertArt?.binaryData
+    private fun updateMiniPlayerUI() {
+        //Update current song info
+        val tempQL : ArrayList<SongItem>? = mPlayerFragmentViewModel.getSongList().value
+        val tempPositionInQL : Int = mPlayerFragmentViewModel.getCurrentSong().value ?: -1
+        if(tempQL!= null && tempQL.size > 0 && tempPositionInQL >= 0){
+            if(mTextTitleMiniPlayer != null)
+                mTextTitleMiniPlayer?.text = if(tempQL[tempPositionInQL].title != null && tempQL[tempPositionInQL].title!!.isNotEmpty()) tempQL[tempPositionInQL].title else tempQL[tempPositionInQL].fileName //Set song title
+
+            if(mTextArtistMiniPlayer != null)
+                mTextArtistMiniPlayer?.text = if(tempQL[tempPositionInQL].artist != null && tempQL[tempPositionInQL].artist!!.isNotEmpty()) tempQL[tempPositionInQL].artist else mContext.getString(R.string.unknown_artist)
+
+            val tempBinary : ByteArray? = if(tempQL.size > 0) tempQL[tempPositionInQL].covertArt?.binaryData else null
             CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtMiniPlayer, tempBinary, 100)
+            CustomUILoaders.loadBlurredWithImageLoader(mContext, mBlurredCovertArtMiniPlayer, tempBinary)
         }
     }
 
@@ -165,12 +172,13 @@ class MainFragment : Fragment() {
         mSlidingUpPanel = view.findViewById(R.id.sliding_up_panel)
         mMainFragmentContainer = view.findViewById(R.id.main_fragment_container)
         mPlayerFragmentContainer = view.findViewById(R.id.player_fragment_container)
-        mMiniPlayerContainer = view.findViewById(R.id.linear_mini_player)
+        mMiniPlayerContainer = view.findViewById(R.id.constraint_mini_player)
 
         mTextTitleMiniPlayer = view.findViewById(R.id.text_mini_player_title)
         mTextArtistMiniPlayer = view.findViewById(R.id.text_mini_player_artist)
         mProgressIndicatorMiniPlayer = view.findViewById(R.id.progress_mini_player_indicator)
         mCovertArtMiniPlayer = view.findViewById(R.id.imageview_mini_player)
+        mBlurredCovertArtMiniPlayer = view.findViewById(R.id.imageview_blurred_mini_player)
         mButtonPlayPause = view.findViewById(R.id.button_mini_player_play_pause)
 
         CustomViewModifiers.updateTopViewInsets(mMainFragmentContainer!!)

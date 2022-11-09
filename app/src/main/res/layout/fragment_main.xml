@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     app:umanoPanelHeight="0dp"
     app:umanoDragView="@id/linear_mini_player"
-    app:umanoScrollInterpolator="?attr/quantizeMotionInterpolator"
+    app:umanoScrollInterpolator="?attr/motionEasingEmphasizedDecelerateInterpolator"
     app:umanoClipPanel="false"
     app:umanoOverlay="true"
     android:gravity="bottom"
@@ -22,16 +22,15 @@
             android:layout_height="match_parent"
             android:gravity="center"
             />
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linear_mini_player"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             style="@style/DefaultBackground"
             >
             <include layout="@layout/component_mini_player"/>
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
     <!-- SLIDING LAYOUT -->
     <FrameLayout

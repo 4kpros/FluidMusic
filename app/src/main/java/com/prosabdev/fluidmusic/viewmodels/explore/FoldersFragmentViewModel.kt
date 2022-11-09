@@ -4,9 +4,10 @@ import android.app.Activity
 import android.util.Log
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.MediaFileScanner
-import com.prosabdev.fluidmusic.viewmodels.GenericDataListFetcherViewModel
+import com.prosabdev.fluidmusic.viewmodels.generic.GenericDataListFetcherViewModel
+import com.prosabdev.fluidmusic.viewmodels.generic.GenericSongItemDataListViewModel
 
-class FoldersFragmentViewModel : GenericDataListFetcherViewModel() {
+class FoldersFragmentViewModel : GenericSongItemDataListViewModel() {
 
     override fun requestLoadDataAsync(
         activity: Activity,
@@ -23,7 +24,7 @@ class FoldersFragmentViewModel : GenericDataListFetcherViewModel() {
         //Else load songs from MediaFileScanner
         MediaFileScanner.scanAudioFilesWithMediaStore(
             activity,
-            this as GenericDataListFetcherViewModel,
+            this,
             10
         )
     }

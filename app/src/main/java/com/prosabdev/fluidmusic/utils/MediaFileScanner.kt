@@ -10,7 +10,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import com.prosabdev.fluidmusic.models.SongItem
-import com.prosabdev.fluidmusic.viewmodels.GenericDataListFetcherViewModel
+import com.prosabdev.fluidmusic.viewmodels.generic.GenericSongItemDataListViewModel
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -44,7 +44,7 @@ abstract class MediaFileScanner {
 
         fun scanAudioFilesWithMediaStore(
             activity: Activity,
-            genericDataListFetcherViewModel : GenericDataListFetcherViewModel,
+            viewModel : GenericSongItemDataListViewModel,
             minToShow: Int
         ) {
             val tempSongList: ArrayList<SongItem> = ArrayList()
@@ -104,16 +104,16 @@ abstract class MediaFileScanner {
                     songItem.typeMime = mimeType
                     //Now save on database
                     tempSongList.add(songItem)
-                    if(itemsCount > 0 && itemsCount == minToShow){
-                        itemsCount = 0
-                        genericDataListFetcherViewModel.setDataList(tempSongList as ArrayList<Any>)
-                        genericDataListFetcherViewModel.setIsLoading(false)
+                    if(itemsCount > 0 && itemsCount == 5){
+//                        itemsCount = 0
+                        viewModel.setSongList(tempSongList)
+                        viewModel.setIsLoading(false)
                     }
                 }
-                genericDataListFetcherViewModel.setDataList(tempSongList as ArrayList<Any>)
-                genericDataListFetcherViewModel.setIsLoading(false)
-                genericDataListFetcherViewModel.setIsLoadingInBackground(false)
-                genericDataListFetcherViewModel.setDataRequestCounter(1)
+//                genericDataListFetcherViewModel.setDataList(tempSongList as ArrayList<Any>)
+//                genericDataListFetcherViewModel.setDataRequestCounter(1)
+//                genericDataListFetcherViewModel.setIsLoading(false)
+//                genericDataListFetcherViewModel.setIsLoadingInBackground(false)
             }
         }
     }

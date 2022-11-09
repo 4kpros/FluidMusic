@@ -72,7 +72,7 @@ abstract class AudioFileInfoExtractor {
         }
 
         //Extract bitmap audio artwork from path
-        fun getBitmapAudioArtwork(context: Context, binaryDataImage: ByteArray?, width: Int = 100, height: Int = 100): Bitmap {
+        fun getBitmapAudioArtwork(context: Context, binaryDataImage: ByteArray?, width: Int = 100, height: Int = 100): Bitmap? {
             if (binaryDataImage != null && binaryDataImage.isNotEmpty()) {
                 var bitmap: Bitmap? = null
                 val options: BitmapFactory.Options = BitmapFactory.Options()
@@ -94,13 +94,15 @@ abstract class AudioFileInfoExtractor {
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
+
                 if (bitmap != null)
                     return bitmap
             }
-            return BitmapFactory.decodeResource(
-                context.resources,
-                R.drawable.fluid_music_image
-            )
+//            BitmapFactory.decodeResource(
+//                context.resources,
+//                R.drawable.fluid_music_image
+//            )
+            return null
         }
 
         private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {

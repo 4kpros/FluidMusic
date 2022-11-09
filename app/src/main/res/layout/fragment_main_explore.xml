@@ -80,19 +80,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="@dimen/main_margin"
             android:layout_marginBottom="@dimen/main_margin"
             android:orientation="vertical"
+            android:layout_marginTop="70dp"
             android:visibility="gone"
-            android:alpha="0"
             >
             <include layout="@layout/component_side_selection_menu"/>
-            <View
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

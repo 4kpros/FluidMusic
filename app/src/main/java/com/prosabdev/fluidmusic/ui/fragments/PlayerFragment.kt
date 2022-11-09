@@ -1,5 +1,6 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.*
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
@@ -47,10 +49,17 @@ class PlayerFragment : Fragment() {
     //Image view var
     private var mCovertArtBlurred: ImageView? = null
     //Buttons var
+    private var mButtonPlayPause: MaterialButton? = null
+    private var mButtonSkipNext: MaterialButton? = null
+    private var mButtonSkipPrev: MaterialButton? = null
+    private var mButtonShuffle: MaterialButton? = null
+    private var mButtonRepeat: MaterialButton? = null
+    //
     private var mButtonMore: MaterialButton? = null
     private var mButtonQueueMusic: MaterialButton? = null
     private var mButtonEqualizer: MaterialButton? = null
     private var mButtonArrowDown: MaterialButton? = null
+
     //Dialog var
     private var mPlayerMoreDialog: PlayerMoreDialog? = null
     private var mPlayerQueueMusicDialog: PlayerQueueMusicDialog? = null
@@ -137,24 +146,54 @@ class PlayerFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-        //Listen for queue list updated
-        mPlayerFragmentViewModel.getQueueList().observe(mActivity as LifecycleOwner, object : Observer<ArrayList<SongItem>>{
+
+        //Request load songs from database or media file scanner
+        if(mPlayerFragmentViewModel.getIsLoadingInBackground().value == false && (mPlayerFragmentViewModel.getDataRequestCounter().value ?: 0) <= 0){
+            mPlayerFragmentViewModel.requestLoadDataAsync(mActivity as Activity)
+        }
+        mPlayerFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner, object : Observer<ArrayList<SongItem>>{
             override fun onChanged(songList: ArrayList<SongItem>?) {
                 updateQueueList(songList)
             }
         })
-        //Listen for current song updated
         mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner, object : Observer<Int>{
             override fun onChanged(currentSong: Int?) {
                 updateCurrentPlayingSong(currentSong)
             }
         })
-        //Listen for source of queue list updated
         mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner, object : Observer<String> {
             override fun onChanged(sourceOf: String?) {
                 updateDataFromSource(sourceOf)
             }
         })
+        mPlayerFragmentViewModel.getIsPlaying().observe(mActivity as LifecycleOwner, object : Observer<Boolean> {
+            override fun onChanged(isPlaying: Boolean?) {
+                updatePlayerButtonsUI()
+            }
+        })
+        mPlayerFragmentViewModel.getShuffle().observe(mActivity as LifecycleOwner, object : Observer<Int> {
+            override fun onChanged(shuffle: Int?) {
+                updatePlayerButtonsUI()
+            }
+        })
+        mPlayerFragmentViewModel.getRepeat().observe(mActivity as LifecycleOwner, object : Observer<Int> {
+            override fun onChanged(repeat: Int?) {
+                updatePlayerButtonsUI()
+            }
+        })
+        mPlayerFragmentViewModel.getPlayingProgressValue().observe(mActivity as LifecycleOwner, object : Observer<Long> {
+            override fun onChanged(progressValue: Long?) {
+                updatePlayerButtonsUI()
+            }
+        })
+    }
+
+    private fun updatePlayerButtonsUI() {
+        if(mPlayerFragmentViewModel.getIsPlaying().value == true){
+            mButtonPlayPause?.icon = ContextCompat.getDrawable(mContext, R.drawable.pause_circle)
+        }else{
+            mButtonPlayPause?.icon = ContextCompat.getDrawable(mContext, R.drawable.play_circle)
+        }
     }
 
     private fun updateCurrentPlayingSong(currentSong: Int?) {
@@ -163,60 +202,22 @@ class PlayerFragment : Fragment() {
 
     private fun updateDataFromSource(sourceOf: String?) {
         if(sourceOf != mPlayerFragmentViewModel.getSourceOfQueueList().value){
-            updateQueueList(mPlayerFragmentViewModel.getQueueList().value)
+            updateQueueList(mPlayerFragmentViewModel.getSongList().value)
         }
     }
 
     private fun updateQueueList(songList: ArrayList<SongItem>?) {
         mSongList.clear()
         mSongList.addAll(songList!!)
-        mPlayerPagerAdapter?.notifyItemRangeChanged(0, mSongList.size)
+        mPlayerPagerAdapter?.notifyItemRangeInserted(0, mSongList.size)
         mPlayerViewPager?.currentItem = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
-    }
-
-    private fun checkInteractions() {
-        mPlayerViewPager?.registerOnPageChangeCallback(object : OnPageChangeCallback(){
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                //
-            }
-
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                updatePlayerUI(position)
-            }
-
-            override fun onPageScrollStateChanged(state: Int) {
-                super.onPageScrollStateChanged(state)
-            }
-        })
-        mButtonMore?.setOnClickListener(View.OnClickListener {
-            mPlayerMoreDialog = PlayerMoreDialog()
-            mPlayerMoreDialog?.show(childFragmentManager, PlayerMoreDialog.TAG)
-        })
-        mButtonQueueMusic?.setOnClickListener(View.OnClickListener {
-            mPlayerQueueMusicDialog = PlayerQueueMusicDialog()
-            mPlayerQueueMusicDialog?.show(childFragmentManager, PlayerQueueMusicDialog.TAG)
-        })
-        mButtonEqualizer?.setOnClickListener(View.OnClickListener {
-            mActivity?.supportFragmentManager?.commit {
-                setReorderingAllowed(true)
-                add<EqualizerFragment>(R.id.main_activity_fragment_container)
-                addToBackStack(null)
-            }
-        })
-        mButtonArrowDown?.setOnClickListener(View.OnClickListener {
-            //
-        })
+    } private fun changeCurrentSong(position: Int) {
+        mPlayerFragmentViewModel.setCurrentSong(position)
     }
 
     private fun updatePlayerUI(position: Int) {
         //Update current song info
-        if(mSongList.size > 0){
+        if(mSongList.size > 0 && position >= 0){
             if(mTextTitle != null)
                 mTextTitle?.text = if(mSongList[position].title != null && mSongList[position].title!!.isNotEmpty()) mSongList[position].title else mSongList[position].fileName //Set song title
 
@@ -237,6 +238,88 @@ class PlayerFragment : Fragment() {
         CustomUILoaders.loadBlurredWithImageLoader(mContext, mCovertArtBlurred, tempBinary, 100)
     }
 
+    private fun checkInteractions() {
+        mPlayerViewPager?.registerOnPageChangeCallback(object : OnPageChangeCallback(){
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+                //
+            }
+
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                changeCurrentSong(position)
+                updatePlayerUI(position)
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                super.onPageScrollStateChanged(state)
+            }
+        })
+        mButtonPlayPause?.setOnClickListener(View.OnClickListener {
+            onPlayPause()
+        })
+        mButtonSkipNext?.setOnClickListener(View.OnClickListener {
+            onNextPage()
+        })
+        mButtonSkipPrev?.setOnClickListener(View.OnClickListener {
+            onPrevPage()
+        })
+        mButtonShuffle?.setOnClickListener(View.OnClickListener {
+            onShuffle()
+        })
+        mButtonRepeat?.setOnClickListener(View.OnClickListener {
+            onRepeat()
+        })
+        //
+        mButtonMore?.setOnClickListener(View.OnClickListener {
+            mPlayerMoreDialog = PlayerMoreDialog()
+            mPlayerMoreDialog?.show(childFragmentManager, PlayerMoreDialog.TAG)
+        })
+        mButtonQueueMusic?.setOnClickListener(View.OnClickListener {
+            mPlayerQueueMusicDialog = PlayerQueueMusicDialog()
+            mPlayerQueueMusicDialog?.show(childFragmentManager, PlayerQueueMusicDialog.TAG)
+        })
+        mButtonEqualizer?.setOnClickListener(View.OnClickListener {
+            mActivity?.supportFragmentManager?.commit {
+                setReorderingAllowed(true)
+                add<EqualizerFragment>(R.id.main_activity_fragment_container)
+                addToBackStack(null)
+            }
+        })
+        mButtonArrowDown?.setOnClickListener(View.OnClickListener {
+            //
+        })
+    }
+
+    fun onPlayPause(){
+        val tempPP : Boolean = !(mPlayerFragmentViewModel.getIsPlaying().value ?: false)
+        mPlayerFragmentViewModel.setIsPlaying(tempPP)
+    }
+    fun onNextPage(){
+        val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
+        if(mSongList.size > 0 && tempCS < mSongList.size-1)
+            mPlayerFragmentViewModel.setCurrentSong(tempCS + 1)
+    }
+    fun onPrevPage(){
+        val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
+        if(tempCS > 0)
+            mPlayerFragmentViewModel.setCurrentSong(tempCS - 1)
+    }
+    fun onShuffle(){
+        val tempS :Int = mPlayerFragmentViewModel.getShuffle().value ?: 0
+//        if(tempS > 0)
+//            mPlayerFragmentViewModel.setShuffle(tempS)
+    }
+    fun onRepeat(){
+        val tempR :Int = mPlayerFragmentViewModel.getRepeat().value ?: 0
+//        if(tempR > 0)
+//            mPlayerFragmentViewModel.setRepeat(tempR)
+    }
+
     private fun initViews(view: View) {
         mTextTitle = view.findViewById(R.id.text_title)
         mTextArtist = view.findViewById(R.id.text_artist)
@@ -246,6 +329,12 @@ class PlayerFragment : Fragment() {
 
         mCovertArtBlurred = view.findViewById(R.id.blurred_imageview)
 
+        mButtonPlayPause = view.findViewById(R.id.button_play_pause)
+        mButtonSkipNext = view.findViewById(R.id.button_skip_next)
+        mButtonSkipPrev = view.findViewById(R.id.button_skip_prev)
+        mButtonShuffle = view.findViewById(R.id.button_shuffle)
+        mButtonRepeat = view.findViewById(R.id.button_repeat)
+        //
         mButtonQueueMusic = view.findViewById(R.id.button_queue_music)
         mButtonEqualizer = view.findViewById(R.id.button_equalizer)
         mButtonArrowDown = view.findViewById(R.id.button_arrow_down)

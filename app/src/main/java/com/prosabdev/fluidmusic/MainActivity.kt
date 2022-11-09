@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity(){
 
     private fun observeLiveData() {
         //Listen for queue list updated
-        mPlayerFragmentViewModel.getQueueList().observe(this as LifecycleOwner, object : Observer<ArrayList<SongItem>>{
+        mPlayerFragmentViewModel.getSongList().observe(this as LifecycleOwner, object : Observer<ArrayList<SongItem>>{
             override fun onChanged(songList: ArrayList<SongItem>?) {
                 updateQueueList(songList)
             }
@@ -143,11 +143,11 @@ class MainActivity : AppCompatActivity(){
     }
 
     private suspend fun updateCurrentPlayingSong(currentSong: Int?)  = coroutineScope{
-        if ((mPlayerFragmentViewModel.getQueueList().value?.size ?: 0) > 0) {
+        if ((mPlayerFragmentViewModel.getSongList().value?.size ?: 0) > 0) {
             val bundle = createQueueListBundle(currentSong ?: 0)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 mediaController?.transportControls?.playFromUri(
-                    Uri.parse(mPlayerFragmentViewModel.getQueueList().value?.get(currentSong ?: 0)?.absolutePath),
+                    Uri.parse(mPlayerFragmentViewModel.getSongList().value?.get(currentSong ?: 0)?.absolutePath),
                     bundle
                 )
             }
@@ -159,30 +159,30 @@ class MainActivity : AppCompatActivity(){
         val bundle = Bundle()
         //Get queue list
         val queueList : ArrayList<String> = ArrayList()
-        for (i in 0 until (mPlayerFragmentViewModel.getQueueList().value?.size ?: 0)){
-            val tempSong : String? = mPlayerFragmentViewModel.getQueueList().value?.get(i)?.absolutePath
+        for (i in 0 until (mPlayerFragmentViewModel.getSongList().value?.size ?: 0)){
+            val tempSong : String? = mPlayerFragmentViewModel.getSongList().value?.get(i)?.absolutePath
             if(tempSong != null && tempSong.isNotEmpty())
                 queueList.add(tempSong)
         }
         //Setup song title
-        val tempTitle = if(mPlayerFragmentViewModel.getQueueList().value?.get(currentSong)?.title.isNullOrBlank())
-            mPlayerFragmentViewModel.getQueueList().value?.get(currentSong)?.fileName
+        val tempTitle = if(mPlayerFragmentViewModel.getSongList().value?.get(currentSong)?.title.isNullOrBlank())
+            mPlayerFragmentViewModel.getSongList().value?.get(currentSong)?.fileName
         else
-            mPlayerFragmentViewModel.getQueueList().value?.get(currentSong)?.title
+            mPlayerFragmentViewModel.getSongList().value?.get(currentSong)?.title
         //Get bitmap image from binary data
-        val temBitmap : Bitmap = AudioFileInfoExtractor.getBitmapAudioArtwork(
+        val temBitmap : Bitmap? = AudioFileInfoExtractor.getBitmapAudioArtwork(
             this,
-            mPlayerFragmentViewModel.getQueueList().value?.get(currentSong)?.covertArt?.binaryData,
+            mPlayerFragmentViewModel.getSongList().value?.get(currentSong)?.covertArt?.binaryData,
             100,
             100
             )
         //Create new media meta data for current playing song
         val tempMediaMetadataCompat = MediaMetadataCompat.Builder()
             .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, temBitmap)
-            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, mPlayerFragmentViewModel.getQueueList().value?.get(currentSong)!!.artist)
-            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, mPlayerFragmentViewModel.getQueueList().value?.get(currentSong)!!.album)
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, mPlayerFragmentViewModel.getSongList().value?.get(currentSong)!!.artist)
+            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, mPlayerFragmentViewModel.getSongList().value?.get(currentSong)!!.album)
             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, tempTitle)
-            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayerFragmentViewModel.getQueueList().value?.get(currentSong)!!.duration)
+            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayerFragmentViewModel.getSongList().value?.get(currentSong)!!.duration)
             .build()
 
         //Setup bundle

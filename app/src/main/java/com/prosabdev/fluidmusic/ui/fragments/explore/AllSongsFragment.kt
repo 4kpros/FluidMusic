@@ -95,10 +95,10 @@ class AllSongsFragment : Fragment() {
             }
 
         })
-        mAllSongsFragmentViewModel.getDataList().observe(mActivity as LifecycleOwner, object  : Observer<ArrayList<Any>>{
-            override fun onChanged(songList: ArrayList<Any>?) {
+        mAllSongsFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner, object  : Observer<ArrayList<SongItem>>{
+            override fun onChanged(songList: ArrayList<SongItem>?) {
                 MainScope().launch {
-                    addSongsToAdapter(songList as ArrayList<SongItem>)
+                    addSongsToAdapter(songList)
                 }
             }
         })
@@ -250,7 +250,7 @@ class AllSongsFragment : Fragment() {
 
     private fun updateCurrentPlayingSong(position: Int) {
         if(mPlayerFragmentViewModel.getSourceOfQueueList().value != ConstantValues.EXPLORE_ALL_SONGS){
-            mPlayerFragmentViewModel.setQueueList(mSongList)
+            mPlayerFragmentViewModel.setSongList(mSongList)
             mPlayerFragmentViewModel.setSourceOfQueueList(ConstantValues.EXPLORE_ALL_SONGS)
         }
         mPlayerFragmentViewModel.setCurrentSong(position)

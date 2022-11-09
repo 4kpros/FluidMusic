@@ -2,11 +2,21 @@ package com.prosabdev.fluidmusic.viewmodels.explore
 
 import android.app.Activity
 import android.util.Log
+import androidx.lifecycle.LiveData
+import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.MediaFileScanner
-import com.prosabdev.fluidmusic.viewmodels.GenericDataListFetcherViewModel
+import com.prosabdev.fluidmusic.viewmodels.generic.GenericDataListFetcherViewModel
+import com.prosabdev.fluidmusic.viewmodels.generic.GenericSongItemDataListViewModel
 
-class AllSongsFragmentViewModel : GenericDataListFetcherViewModel() {
+class AllSongsFragmentViewModel : GenericSongItemDataListViewModel() {
+    fun getDataListSongs(): LiveData<ArrayList<SongItem>> {
+        return super.getDataList() as LiveData<ArrayList<SongItem>>
+    }
+    fun setDataListSongs(songList : ArrayList<SongItem>) {
+        super.setDataList(songList as ArrayList<Any>)
+    }
+
     override fun requestLoadDataAsync(
         activity: Activity,
         minToUpdateDataList: Int
@@ -22,7 +32,7 @@ class AllSongsFragmentViewModel : GenericDataListFetcherViewModel() {
         //Else load songs from MediaFileScanner
         MediaFileScanner.scanAudioFilesWithMediaStore(
             activity,
-            this as GenericDataListFetcherViewModel,
+            this,
             10
         )
     }
