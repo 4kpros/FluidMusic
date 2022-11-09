@@ -49,7 +49,13 @@ class PlayerPageAdapter(
         loadCovertArt(holder.mCovertArt, position);
     }
 
+    override fun onViewRecycled(holder: PlayerPageHolder) {
+        super.onViewRecycled(holder)
+        holder.recycleItem()
+    }
+
     private fun loadCovertArt(covertArtView: ImageView?, position: Int) {
+        covertArtView?.layout(0,0,0,0)
         val tempBinary: ByteArray? = mSongList!![position].covertArt?.binaryData
         CustomUILoaders.loadCovertArtFromBinaryData(mContext, covertArtView, tempBinary, 450)
     }
@@ -64,8 +70,12 @@ class PlayerPageAdapter(
         var mLyricsButton: MaterialButton? = itemView.findViewById(R.id.button_lyrics)
         var mFullscreenButton: MaterialButton? = itemView.findViewById(R.id.button_fullscreen)
 
-        var job : Job? = null
+        fun recycleItem(){
+            mCovertArt?.layout(0,0,0,0)
+            mCovertArt?.setImageDrawable(null)
+        }
 
+        var job : Job? = null
         fun bindListener(position: Int, listener: OnItemClickListener) {
             mContainer?.setOnClickListener(View.OnClickListener {
                 if(job != null)

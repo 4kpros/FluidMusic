@@ -115,7 +115,7 @@ class PlayerFragment : Fragment() {
         mPlayerViewPager?.setCurrentItem(0, true)
         mPlayerViewPager?.clipToPadding = false
         mPlayerViewPager?.clipChildren = false
-        //        mPlayerViewPager?.setOffscreenPageLimit(3);
+        mPlayerViewPager?.offscreenPageLimit = 5
         mPlayerViewPager?.getChildAt(0)?.overScrollMode = View.OVER_SCROLL_NEVER
         mPlayerViewPager?.registerOnPageChangeCallback(object : OnPageChangeCallback() {
             override fun onPageScrolled(
@@ -231,7 +231,7 @@ class PlayerFragment : Fragment() {
     }
 
     private fun updateCurrentPlayingSong(currentSong: Int?) {
-        mPlayerViewPager?.currentItem = currentSong ?: 0
+        mPlayerViewPager?.setCurrentItem(currentSong ?: 0, true)
     }
 
     private fun updateDataFromSource(sourceOf: String?) {
@@ -242,7 +242,8 @@ class PlayerFragment : Fragment() {
 
     private fun updateQueueList(songList: ArrayList<SongItem>?) {
         mSongList.clear()
-        mSongList.addAll(songList!!)
+        if(songList != null)
+            mSongList.addAll(songList)
         mPlayerPagerAdapter?.notifyItemRangeInserted(0, mSongList.size)
         mPlayerViewPager?.currentItem = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
     }
@@ -377,6 +378,7 @@ class PlayerFragment : Fragment() {
         mPlayerViewPager = view.findViewById<ViewPager2>(R.id.view_pager_player)
         mLinearControls = view.findViewById<LinearLayoutCompat>(R.id.linear_controls)
 
+        mCovertArtBlurred?.layout(0,0,0,0)
         mTextTitle?.isSelected = true
         mTextArtist?.isSelected = true
 

@@ -102,6 +102,11 @@ class SongItemAdapter(
             holder.updateUI(mContext, mSongList[position], isPlaying(position), selectableIsSelected(position))
         }
     }
+
+    override fun onViewRecycled(holder: SongItemHolder) {
+        super.onViewRecycled(holder)
+        holder.recycleItem()
+    }
     override fun getItemCount(): Int {
         return mSongList.size
     }
@@ -141,7 +146,8 @@ class SongItemAdapter(
 //        private var mIsPlayingBackground: LinearLayoutCompat? = itemView.findViewById<LinearLayoutCompat>(R.id.song_item_is_playing_background)
 
         //Update song item UI
-        fun updateUI(context: Context, songItem: SongItem, isPlaying: Boolean, selected: Boolean){
+        fun updateUI(context: Context, songItem: SongItem, iqsPlaying: Boolean, selected: Boolean){
+            mCovertArt?.layout(0,0,0,0)
             mTitle?.text = if(songItem.title != null && songItem.title!!.isNotEmpty()) songItem.title else songItem.fileName //Set song title
             mArtist?.text = if(songItem.artist!!.isNotEmpty()) songItem.artist else context.getString(
                             R.string.unknown_artist)
@@ -152,6 +158,10 @@ class SongItemAdapter(
             //Set song covert art
             val tempBinary: ByteArray? = songItem.covertArt?.binaryData
             CustomUILoaders.loadCovertArtFromBinaryData(context, mCovertArt, tempBinary, 100)
+        }
+
+        fun recycleItem(){
+            mCovertArt?.setImageDrawable(null)
         }
 
         fun updateItemTouchHelper(selected : Boolean){

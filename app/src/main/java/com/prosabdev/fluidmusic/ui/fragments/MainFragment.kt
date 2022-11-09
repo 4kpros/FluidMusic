@@ -265,6 +265,8 @@ class MainFragment : Fragment() {
         mButtonPlayPause = view.findViewById(R.id.button_play_pause)
         mButtonSkipNext = view.findViewById(R.id.button_skip_next)
 
+        mCovertArtMiniPlayer?.layout(0,0,0,0)
+        mBlurredCovertArtMiniPlayer?.layout(0,0,0,0)
         mTextTitleMiniPlayer?.isSelected = true
         mTextArtistMiniPlayer?.isSelected = true
 

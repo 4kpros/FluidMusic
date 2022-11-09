@@ -49,8 +49,7 @@ abstract class CustomUILoaders {
             Glide.with(context)
                 .asBitmap()
                 .load(binaryData)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .dontAnimate()
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .centerCrop()
                 .apply(RequestOptions().override(widthHeight, widthHeight))
                 .into(customTarget)
@@ -58,30 +57,14 @@ abstract class CustomUILoaders {
         private fun loadWithBinaryData(context : Context, imageView : ImageView?, binaryData: ByteArray?, widthHeight: Int, transparent : Boolean = false){
             if(imageView == null)
                 return
-            if(binaryData == null || binaryData.isEmpty()){
-                if(transparent){
-                    loadWithResourceID(
-                        context,
-                        imageView,
-                        android.R.color.transparent,
-                        widthHeight
-                    )
-                }else{
-                    loadWithResourceID(
-                        context,
-                        imageView,
-                        R.drawable.ic_fluid_music_icon_with_padding,
-                        widthHeight
-                    )
-                }
-                return
-            }
+            var placeHolderImage : Int = R.drawable.ic_fluid_music_icon_with_padding
+            if(transparent)
+                placeHolderImage = android.R.color.transparent
             Glide.with(context)
                 .load(binaryData)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .dontAnimate()
-                .dontAnimate()
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .centerCrop()
+                .placeholder(placeHolderImage)
                 .apply(RequestOptions().override(widthHeight, widthHeight))
                 .into(imageView)
         }
@@ -89,9 +72,10 @@ abstract class CustomUILoaders {
             if(imageView == null)
                 return
             Glide.with(context)
-                .load(resourceId)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .load(0)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .dontAnimate()
+                .placeholder(R.drawable.ic_fluid_music_icon_with_padding)
                 .centerCrop()
                 .apply(RequestOptions().override(widthHeight, widthHeight))
                 .into(imageView)

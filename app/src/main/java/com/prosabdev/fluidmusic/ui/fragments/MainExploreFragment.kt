@@ -85,7 +85,7 @@ class MainExploreFragment : Fragment() {
         //Setup adapter
         mTabLayoutAdapter = TabLayoutAdapter(this)
         mViewPager.adapter = mTabLayoutAdapter
-
+        mViewPager.offscreenPageLimit = 5
         //Setup tab layout mediator
         TabLayoutMediator(mTabLayout, mViewPager){tab,position->
             applyToolBarTitle(position, tab)
