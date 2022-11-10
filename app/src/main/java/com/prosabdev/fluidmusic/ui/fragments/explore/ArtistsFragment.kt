@@ -7,23 +7,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.ArtistItemAdapter
 import com.prosabdev.fluidmusic.models.ArtistItem
-import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.explore.AllSongsFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.explore.ArtistsFragmentViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -36,7 +32,7 @@ class ArtistsFragment : Fragment() {
 
     private val mArtistsFragmentViewModel: ArtistsFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
-    private val mMainExploreFragmentViewModel: MainExploreFragmentViewModel by activityViewModels()
+    private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
 
     private var mEmptyBottomAdapter: HeadlinePlayShuffleAdapter? = null
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null

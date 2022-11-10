@@ -3,34 +3,33 @@ package com.prosabdev.fluidmusic.ui.fragments
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.AnticipateOvershootInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.*
 import androidx.fragment.app.*
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.google.android.material.textview.MaterialTextView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.*
+import com.prosabdev.fluidmusic.viewmodels.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainFragment : Fragment() {
@@ -39,6 +38,7 @@ class MainFragment : Fragment() {
     private var mActivity: FragmentActivity? = null
 
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
+    private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
 
     private var mTextTitleMiniPlayer: AppCompatTextView? = null
     private var mTextArtistMiniPlayer: AppCompatTextView? = null
@@ -53,7 +53,15 @@ class MainFragment : Fragment() {
     private var mMainFragmentContainer: FrameLayout? = null
     private var mPlayerFragmentContainer: FrameLayout? = null
     private var mMiniPlayerContainer: ConstraintLayout? = null
-    private var mPlayerViewsContainer: ConstraintLayout? = null
+    private var mConstraintBottomSelectionContainer: ConstraintLayout? = null
+    private var mConstraintTopSelectionContainer: ConstraintLayout? = null
+    private var mConstraintBottomSelectionMenu: ConstraintLayout? = null
+    private var mConstraintTopSelectionMenu: ConstraintLayout? = null
+
+    private var mButtonSelectAll: MaterialButton? = null
+    private var mButtonSelectRange: MaterialButton? = null
+    private var mButtonCLoseSelectionMenu: MaterialButton? = null
+    private var mTextSelectedCount: MaterialTextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,34 +107,75 @@ class MainFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-        mPlayerFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner, object :
-            Observer<ArrayList<SongItem>> {
-            override fun onChanged(songList: ArrayList<SongItem>?) {
-                updateMiniPlayerUI()
-            }
-        })
-        mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner, object :
-            Observer<Int> {
-            override fun onChanged(currentSong: Int?) {
-                updateMiniPlayerUI()
-            }
-        })
-        mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner, object :
-            Observer<String> {
-            override fun onChanged(sourceOf: String?) {
-                updateMiniPlayerUI()
-            }
-        })
-        mPlayerFragmentViewModel.getIsPlaying().observe(mActivity as LifecycleOwner, object : Observer<Boolean> {
-            override fun onChanged(isPlaying: Boolean?) {
-                updatePlayerButtonsUI()
-            }
-        })
-        mPlayerFragmentViewModel.getPlayingProgressValue().observe(mActivity as LifecycleOwner, object : Observer<Long> {
-            override fun onChanged(progressValue: Long?) {
-                updatePlayerButtonsUI()
-            }
-        })
+        mPlayerFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner
+        ) { updateMiniPlayerUI() }
+        mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner
+        ) { updateMiniPlayerUI() }
+        mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner
+        ) { updateMiniPlayerUI() }
+        mPlayerFragmentViewModel.getIsPlaying().observe(mActivity as LifecycleOwner
+        ) { updatePlayerButtonsUI() }
+        mPlayerFragmentViewModel.getPlayingProgressValue().observe(mActivity as LifecycleOwner
+        ) { updatePlayerButtonsUI() }
+        mMainFragmentViewModel.getSelectMode().observe(mActivity as LifecycleOwner
+        ) { selectMode -> updateSelectModeUI(selectMode ?: false) }
+        mMainFragmentViewModel.getTotalSelected().observe(mActivity as LifecycleOwner){
+            updateTotalSelectedUI(it)
+        }
+        mMainFragmentViewModel.getIsAllSelected().observe(mActivity as LifecycleOwner){
+            updateTotalSelectedUI(mMainFragmentViewModel.getTotalSelected().value ?: 0)
+        }
+        mMainFragmentViewModel.getIsRangeSelected().observe(mActivity as LifecycleOwner
+        ) {
+            updateSelectedRangeUI(it)
+        }
+    }
+
+    private fun updateTotalSelectedUI(totalSelected: Int?) {
+        if((totalSelected ?: 0) < 2){
+            mButtonSelectRange?.alpha = 0.4f
+            mButtonSelectRange?.isClickable = false
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                mButtonSelectRange?.focusable = View.NOT_FOCUSABLE
+        }else{
+            mButtonSelectRange?.alpha = 1.0f
+            mButtonSelectRange?.isClickable = true
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                mButtonSelectRange?.focusable = View.FOCUSABLE_AUTO
+        }
+
+        if((totalSelected ?: 0) >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
+            mButtonSelectAll?.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box)
+            mTextSelectedCount?.text = "$totalSelected"
+            mButtonSelectRange?.alpha = 0.4f
+            mButtonSelectRange?.isClickable = false
+
+        }else{
+            mButtonSelectAll?.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box_outline_blank)
+            mTextSelectedCount?.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
+        }
+    }
+
+    private fun updateSelectedRangeUI(b: Boolean) {
+        if(b){
+            mButtonSelectRange?.icon = ContextCompat.getDrawable(mContext, R.drawable.compress)
+        }else{
+            mButtonSelectRange?.icon = ContextCompat.getDrawable(mContext, R.drawable.expand)
+        }
+    }
+
+    private  fun updateSelectModeUI(selectMode : Boolean, animate : Boolean = true){
+        if (selectMode) {
+            if(mConstraintBottomSelectionContainer?.visibility != VISIBLE)
+                CustomAnimators.crossTranslateInFromVertical(mConstraintBottomSelectionContainer as View, 1, animate)
+            if(mConstraintTopSelectionContainer?.visibility != VISIBLE)
+                CustomAnimators.crossTranslateInFromVertical(mConstraintTopSelectionContainer as View, -1, animate)
+        }else {
+            if(mConstraintBottomSelectionContainer?.visibility != GONE)
+                CustomAnimators.crossTranslateOutFromVertical(mConstraintBottomSelectionContainer as View, 1, animate)
+            if(mConstraintTopSelectionContainer?.visibility != GONE)
+                CustomAnimators.crossTranslateOutFromVertical(mConstraintTopSelectionContainer as View, -1, animate)
+        }
     }
 
     private fun updatePlayerButtonsUI() {
@@ -142,6 +191,7 @@ class MainFragment : Fragment() {
         //Update current song info
         val tempQL : ArrayList<SongItem>? = mPlayerFragmentViewModel.getSongList().value
         val tempPositionInQL : Int = mPlayerFragmentViewModel.getCurrentSong().value ?: -1
+        Log.i(ConstantValues.TAG, "Index value $tempPositionInQL")
         if(tempQL!= null && tempQL.size > 0 && tempPositionInQL >= 0){
             var tempTitle : String = ""
             var tempArtist : String = ""
@@ -215,12 +265,21 @@ class MainFragment : Fragment() {
     }
 
     private fun checkInteractions() {
-        mButtonSkipNext?.setOnClickListener(View.OnClickListener {
+        mButtonSkipNext?.setOnClickListener{
             onNextPage()
-        })
-        mButtonPlayPause?.setOnClickListener(View.OnClickListener {
+        }
+        mButtonPlayPause?.setOnClickListener{
             onPlayPause()
-        })
+        }
+        mButtonSelectAll?.setOnClickListener{
+            toggleOnSelectionAll()
+        }
+        mButtonSelectRange?.setOnClickListener {
+            onToggleSelectRange()
+        }
+        mButtonCLoseSelectionMenu?.setOnClickListener {
+            onCloseSelectionMenu()
+        }
         mSlidingUpPanel?.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
             override fun onPanelSlide(panel: View?, slideOffset: Float) {
                 Log.i(ConstantValues.TAG, "Slide panel offset : $slideOffset")
@@ -261,6 +320,33 @@ class MainFragment : Fragment() {
         })
     }
 
+    private fun onToggleSelectRange() {
+        val minSelect: Int = mMainFragmentViewModel.getMinimumSelectedIndex().value ?: -1
+        val maxSelect: Int  = mMainFragmentViewModel.getMaximumSelectedIndex().value ?: -1
+        if(minSelect in 0 until maxSelect){
+            if(mMainFragmentViewModel.getIsRangeSelected().value == true){
+                mMainFragmentViewModel.setIsRangeSelected(false)
+            }else{
+                mMainFragmentViewModel.setIsRangeSelected(true)
+            }
+        }
+    }
+
+    private fun toggleOnSelectionAll() {
+        if(((mMainFragmentViewModel.getTotalSelected().value ?: 0) >= (mMainFragmentViewModel.getTotalCount().value ?: 0)) || mMainFragmentViewModel.getIsAllSelected().value == true) {
+            mMainFragmentViewModel.setTotalSelected(0)
+            mMainFragmentViewModel.setIsAllSelected(false)
+        }else {
+            mMainFragmentViewModel.setTotalSelected(mMainFragmentViewModel.getTotalCount().value ?: 0)
+            mMainFragmentViewModel.setIsAllSelected(true)
+        }
+        mMainFragmentViewModel.setIsRangeSelected(false)
+    }
+    private fun onCloseSelectionMenu() {
+        mMainFragmentViewModel.setTotalSelected(0)
+        mMainFragmentViewModel.setSelectMode(false)
+    }
+
     fun onPlayPause(){
         val tempPP : Boolean = !(mPlayerFragmentViewModel.getIsPlaying().value ?: false)
         mPlayerFragmentViewModel.setIsPlaying(tempPP)
@@ -278,6 +364,16 @@ class MainFragment : Fragment() {
         mMainFragmentContainer = view.findViewById(R.id.main_fragment_container)
         mPlayerFragmentContainer = view.findViewById(R.id.player_fragment_container)
         mMiniPlayerContainer = view.findViewById(R.id.constraint_mini_player)
+        mConstraintBottomSelectionContainer = view.findViewById<ConstraintLayout>(R.id.constraint_bottom_selection_container)
+        mConstraintTopSelectionContainer = view.findViewById<ConstraintLayout>(R.id.constraint_top_selection_container)
+        mConstraintBottomSelectionMenu = view.findViewById<ConstraintLayout>(R.id.constraint_bottom_selection_menu)
+        mConstraintTopSelectionMenu = view.findViewById<ConstraintLayout>(R.id.constraint_top_selection_menu)
+
+        mButtonSelectAll = view.findViewById<MaterialButton>(R.id.button_select_all)
+        mButtonSelectRange = view.findViewById<MaterialButton>(R.id.button_select_range)
+        mButtonCLoseSelectionMenu = view.findViewById<MaterialButton>(R.id.button_close)
+
+        mTextSelectedCount = view.findViewById<MaterialTextView>(R.id.text_selected_count)
 
         mTextTitleMiniPlayer = view.findViewById(R.id.text_mini_player_title)
         mTextArtistMiniPlayer = view.findViewById(R.id.text_mini_player_artist)
@@ -293,11 +389,10 @@ class MainFragment : Fragment() {
         mTextTitleMiniPlayer?.isSelected = true
         mTextArtistMiniPlayer?.isSelected = true
 
-        CustomViewModifiers.updateTopViewInsets(mMainFragmentContainer!!)
-//        CustomViewModifiers.removeBottomViewInsets(mSlidingUpPanel!!)
+        CustomViewModifiers.updateTopViewInsets(mMainFragmentContainer as View)
         CustomViewModifiers.updateBottomViewInsets(mMiniPlayerContainer as View)
-
-//        CustomViewModifiers.updateBottomViewInsets(mSlidingUpPanel!!)
+        CustomViewModifiers.updateBottomViewInsets(mConstraintBottomSelectionMenu as View)
+        CustomViewModifiers.updateTopViewInsets(mConstraintTopSelectionMenu as View)
     }
 
     companion object {

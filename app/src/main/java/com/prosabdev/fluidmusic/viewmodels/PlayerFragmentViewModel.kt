@@ -10,6 +10,9 @@ import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.MediaFileScanner
 import com.prosabdev.fluidmusic.viewmodels.generic.GenericSongItemDataListViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 class PlayerFragmentViewModel : GenericSongItemDataListViewModel()  {
 
@@ -29,8 +32,8 @@ class PlayerFragmentViewModel : GenericSongItemDataListViewModel()  {
     private val mShuffle: LiveData<Int> get() = mMutableShuffle
     private val mRepeat: LiveData<Int> get() = mMutableRepeat
 
-    override fun requestLoadDataAsync(activity: Activity, minToUpdateDataList: Int) {
-        super.requestLoadDataAsync(activity, minToUpdateDataList)
+    override fun requestLoadDataAsync(activity: Activity, startCursor: Int, maxDataCount: Int) {
+        super.requestLoadDataAsync(activity, startCursor, maxDataCount)
 
         Log.i(ConstantValues.TAG, "ON REQUEST LOAD DATA FROM PLAYER FRAGMENT")
 
@@ -39,10 +42,11 @@ class PlayerFragmentViewModel : GenericSongItemDataListViewModel()  {
         setIsLoadingInBackground(true)
 
         //Else load songs from MediaFileScanner
-        MediaFileScanner.scanAudioFilesWithMediaStore(
+        MediaFileScanner.scanAudioFilesOnDevice(
             activity,
-            this as GenericSongItemDataListViewModel,
-            10
+            this@PlayerFragmentViewModel as GenericSongItemDataListViewModel,
+            startCursor,
+            maxDataCount
         )
     }
 

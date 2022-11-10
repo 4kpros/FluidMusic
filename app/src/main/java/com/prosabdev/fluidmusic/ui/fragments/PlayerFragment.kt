@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -147,10 +148,9 @@ class PlayerFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-
         //Request load songs from database or media file scanner
         if(mPlayerFragmentViewModel.getIsLoadingInBackground().value == false && (mPlayerFragmentViewModel.getDataRequestCounter().value ?: 0) <= 0){
-            mPlayerFragmentViewModel.requestLoadDataAsync(mActivity as Activity)
+            mPlayerFragmentViewModel.requestLoadDataAsync(mActivity as Activity, 50)
         }
         mPlayerFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner, object : Observer<ArrayList<SongItem>>{
             override fun onChanged(songList: ArrayList<SongItem>?) {
@@ -235,16 +235,19 @@ class PlayerFragment : Fragment() {
     }
 
     private fun updateDataFromSource(sourceOf: String?) {
-        if(sourceOf != mPlayerFragmentViewModel.getSourceOfQueueList().value){
-            updateQueueList(mPlayerFragmentViewModel.getSongList().value)
-        }
+        //
     }
 
     private fun updateQueueList(songList: ArrayList<SongItem>?) {
-        mSongList.clear()
-        if(songList != null)
-            mSongList.addAll(songList)
-        mPlayerPagerAdapter?.notifyItemRangeInserted(0, mSongList.size)
+//        Log.i(ConstantValues.TAG, "SIZE : $mSongList.size")
+        if (songList != null) {
+            mSongList.clear()
+            val startPosition: Int = mSongList.size
+            val itemCount: Int = songList.size
+            mSongList.addAll(startPosition, songList)
+            Log.i(ConstantValues.TAG, "SIZE : ${mSongList.size}")
+            mPlayerPagerAdapter?.notifyItemRangeInserted(startPosition, itemCount)
+        }
         mPlayerViewPager?.currentItem = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
     }
     private fun changeCurrentSong(position: Int) {

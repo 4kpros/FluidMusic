@@ -86,6 +86,8 @@
             android:orientation="vertical"
             android:layout_marginTop="70dp"
             android:visibility="gone"
+            android:alpha="0"
+            android:translationX="500dp"
             >
             <include layout="@layout/component_side_selection_menu"/>
         </androidx.appcompat.widget.LinearLayoutCompat>

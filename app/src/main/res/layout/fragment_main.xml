@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:umanoPanelHeight="0dp"
-    app:umanoDragView="@id/linear_mini_player"
+    app:umanoDragView="@id/constraint_mini_player"
     app:umanoScrollInterpolator="?attr/motionEasingEmphasizedDecelerateInterpolator"
     app:umanoClipPanel="false"
     app:umanoOverlay="true"
@@ -23,13 +23,39 @@
             android:gravity="center"
             />
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/linear_mini_player"
+            android:id="@+id/constraint_mini_player"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             style="@style/DefaultBackground"
             >
             <include layout="@layout/component_mini_player"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_bottom_selection_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            style="@style/DefaultBackground"
+            android:visibility="gone"
+            android:alpha="0"
+            android:translationY="0dp"
+            >
+            <include layout="@layout/component_bottom_selection_menu"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_top_selection_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            style="@style/DefaultBackground"
+            android:visibility="gone"
+            android:alpha="0"
+            android:translationY="0dp"
+            >
+            <include layout="@layout/component_top_selection_menu"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
     <!-- SLIDING LAYOUT -->

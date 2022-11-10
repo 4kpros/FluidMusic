@@ -33,4 +33,8 @@
     <string name="musicplayer">Music player</string>
     <string name="close">Close</string>
     <string name="now_playing">Now playing</string>
+    <string name="playing">Playing</string>
+    <string name="all">All</string>
+    <string name="range">Range</string>
+    <string name="selection">Selection</string>
 </resources>

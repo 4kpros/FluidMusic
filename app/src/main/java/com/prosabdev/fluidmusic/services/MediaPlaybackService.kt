@@ -80,7 +80,7 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
                 startService(Intent(applicationContext, MediaBrowserService::class.java))
 
                 createNotification()
-                registerReceivers()
+//                registerReceivers()
                 setupMediaPlayer(extras!!)
             }
         }

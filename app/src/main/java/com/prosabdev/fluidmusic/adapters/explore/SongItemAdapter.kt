@@ -1,12 +1,11 @@
 package com.prosabdev.fluidmusic.adapters.explore
 
 import android.content.Context
-import android.util.TypedValue
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -21,6 +20,7 @@ import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomFormatters
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import com.prosabdev.fluidmusic.utils.adapters.SelectablePlayingItemAdapter
+import com.prosabdev.fluidmusic.utils.adapters.SelectableRecycleViewAdapter
 import java.util.*
 
 
@@ -28,8 +28,8 @@ class SongItemAdapter(
     private val mSongList: List<SongItem>,
     private val mContext: Context,
     private val mOnItemClickListener: OnItemClickListener,
+    private val mOnSelectSelectableItemListener: SelectableRecycleViewAdapter.OnSelectSelectableItemListener,
     private val mOnTouchListener: OnTouchListener,
-    private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener,
     ) : SelectablePlayingItemAdapter<SongItemAdapter.SongItemHolder>(),
         SongItemMoveCallback.ItemTouchHelperContract
     {
@@ -59,17 +59,23 @@ class SongItemAdapter(
     fun selectableGetSelectionMode(): Boolean {
         return selectableItemGetSelectionMode()
     }
-    fun selectableSetSelectionMode(value : Boolean) {
-        return selectableItemSetSelectionMode(mOnSelectSelectableItemListener, value, itemCount)
+    fun selectableSetSelectionMode(value : Boolean, notifyListener: Boolean = true) {
+        return selectableItemSetSelectionMode(mOnSelectSelectableItemListener, value, notifyListener)
     }
     fun selectableIsSelected(position: Int): Boolean {
         return selectableItemIsSelected(position)
     }
     fun selectableToggleSelection(position: Int) {
-        selectableItemToggleSelection(mOnSelectSelectableItemListener, position, itemCount)
+        selectableItemToggleSelection(mOnSelectSelectableItemListener, position)
     }
     fun selectableUpdateSelection(position: Int, value : Boolean) {
-        selectableItemUpdateSelection(position, value)
+        selectableItemUpdateSelection(position, value, mOnSelectSelectableItemListener)
+    }
+    fun selectableSelectRange(startRange: Int, endRange: Int) {
+        selectableItemSelectRange(startRange, endRange, mOnSelectSelectableItemListener)
+    }
+    fun selectableClearRange(startRange: Int, endRange: Int) {
+        selectableItemClearRange(startRange, endRange, mOnSelectSelectableItemListener)
     }
     fun selectableGetSelectedItemCount(): Int {
         return selectableItemGetSelectedItemCount()
@@ -78,13 +84,12 @@ class SongItemAdapter(
         return selectableItemGetSelectedItems()
     }
     fun selectableSelectAll() {
-        selectableItemSelectAll(mOnSelectSelectableItemListener, itemCount)
+        selectableItemSelectAll(mOnSelectSelectableItemListener)
     }
-    fun selectableClearSelection() {
-        selectableItemClearSelection(mOnSelectSelectableItemListener, itemCount)
+    fun selectableClearSelection(notifyListener: Boolean = true) {
+        selectableItemClearAllSelection(mOnSelectSelectableItemListener, notifyListener)
     }
 
-    //Override methods
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongItemHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_song, parent, false)
@@ -93,11 +98,7 @@ class SongItemAdapter(
     }
     override fun onBindViewHolder(holder: SongItemHolder, position: Int) {
         holder.bindListener(holder, position, mOnItemClickListener, mOnTouchListener)
-
-        //Update UI
-        if(position < mSongList.size){
-            holder.updateUI(mContext, mSongList[position], isPlaying(position), selectableIsSelected(position))
-        }
+        holder.updateUI(mContext, mSongList[position], isPlaying(position), selectableIsSelected(position))
     }
 
     override fun onViewRecycled(holder: SongItemHolder) {
@@ -111,14 +112,14 @@ class SongItemAdapter(
         mOnItemClickListener.onItemMovedTo(mToPosition)
         if (mFromPosition < mToPosition) {
             for (i in mFromPosition until mToPosition) {
-                selectableItemUpdateSelection(i, selectableIsSelected(i + 1))
-                selectableItemUpdateSelection(i + 1, selectableIsSelected(i))
+                selectableItemUpdateSelection(i, selectableIsSelected(i + 1), mOnSelectSelectableItemListener)
+                selectableItemUpdateSelection(i + 1, selectableIsSelected(i), mOnSelectSelectableItemListener)
                 Collections.swap(mSongList, i, i + 1)
             }
         } else {
             for (i in mFromPosition downTo mToPosition + 1) {
-                selectableItemUpdateSelection(i, selectableIsSelected(i - 1))
-                selectableItemUpdateSelection(i - 1, selectableIsSelected(i))
+                selectableItemUpdateSelection(i, selectableIsSelected(i - 1), mOnSelectSelectableItemListener)
+                selectableItemUpdateSelection(i - 1, selectableIsSelected(i), mOnSelectSelectableItemListener)
                 Collections.swap(mSongList, i, i - 1)
             }
         }
@@ -140,41 +141,57 @@ class SongItemAdapter(
         private var mTypeMime: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.song_item_type_mime)
         private var mVerticalSeparator: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.vertical_separator)
         private var mCurrentlyPlaying: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.song_currently_playing)
+
         private var mSelectedItemBackground: View? = itemView.findViewById<View>(R.id.song_item_is_selected)
+
         private var mDragHand: MaterialButton? = itemView.findViewById<MaterialButton>(R.id.button_drag_hand)
 
-        //Update song item UI
         fun updateUI(context: Context, songItem: SongItem, isPlaying: Boolean, selected: Boolean){
             mCovertArt?.layout(0,0,0,0)
-            mTitle?.text = if(songItem.title != null && songItem.title!!.isNotEmpty()) songItem.title else songItem.fileName //Set song title
+            mTitle?.text = if(songItem.title != null && songItem.title!!.isNotEmpty()) songItem.title else songItem.fileName
             mArtist?.text = if(songItem.artist!!.isNotEmpty()) songItem.artist else context.getString(
                             R.string.unknown_artist)
-            mDuration?.text = CustomFormatters.formatSongDurationToString(songItem.duration) //Set song duration
-            mTypeMime?.text = songItem.typeMime //Set song type mime
-            
-            if(selected) CustomAnimators.crossFadeUp(mSelectedItemBackground as View, false, 0) else CustomAnimators.crossFadeDown(mSelectedItemBackground as View, false, 0)
+            mDuration?.text = CustomFormatters.formatSongDurationToString(songItem.duration)
+            mTypeMime?.text = songItem.typeMime
+
+            if(selected)
+                mSelectedItemBackground?.visibility = VISIBLE
+            else
+                mSelectedItemBackground?.visibility = INVISIBLE
             if(isPlaying){
+                mTitle?.setTypeface(null, Typeface.BOLD)
+                mArtist?.setTypeface(null, Typeface.BOLD)
+                mDuration?.setTypeface(null, Typeface.BOLD)
+                mTypeMime?.setTypeface(null, Typeface.BOLD)
+                mVerticalSeparator?.setTypeface(null, Typeface.BOLD)
+                mCurrentlyPlaying?.setTypeface(null, Typeface.BOLD)
+
                 val value = MaterialColors.getColor(mTitle as View, com.google.android.material.R.attr.colorPrimary)
                 mTitle?.setTextColor(value)
                 mArtist?.setTextColor(value)
                 mDuration?.setTextColor(value)
                 mTypeMime?.setTextColor(value)
                 mVerticalSeparator?.setTextColor(value)
-
                 mCurrentlyPlaying?.setTextColor(value)
                 mCurrentlyPlaying?.visibility = VISIBLE
             }else{
+                mTitle?.setTypeface(null, Typeface.NORMAL)
+                mArtist?.setTypeface(null, Typeface.NORMAL)
+                mDuration?.setTypeface(null, Typeface.NORMAL)
+                mTypeMime?.setTypeface(null, Typeface.NORMAL)
+                mVerticalSeparator?.setTypeface(null, Typeface.NORMAL)
+                mCurrentlyPlaying?.setTypeface(null, Typeface.NORMAL)
+
                 val value = MaterialColors.getColor(mTitle as View, com.google.android.material.R.attr.colorOnBackground)
                 mTitle?.setTextColor(value)
                 mArtist?.setTextColor(value)
                 mDuration?.setTextColor(value)
                 mTypeMime?.setTextColor(value)
                 mVerticalSeparator?.setTextColor(value)
-
                 mCurrentlyPlaying?.setTextColor(value)
-                mCurrentlyPlaying?.visibility = GONE
+                mCurrentlyPlaying?.visibility = INVISIBLE
             }
-            //Set song covert art
+
             val tempBinary: ByteArray? = songItem.covertArt?.binaryData
             CustomUILoaders.loadCovertArtFromBinaryData(context, mCovertArt, tempBinary, 100)
         }
@@ -184,10 +201,9 @@ class SongItemAdapter(
         }
 
         fun updateItemTouchHelper(selected : Boolean){
-            if(selected) CustomAnimators.crossScaleIn(mContainer as View, true) else CustomAnimators.crossScaleOut(mContainer as View, true)
+//            if(selected) CustomAnimators.crossScaleIn(mContainer as View, true) else CustomAnimators.crossScaleOut(mContainer as View, true)
         }
 
-        //Method used to bind one listener with items events click
         fun bindListener(
             holder: SongItemHolder,
             position: Int,

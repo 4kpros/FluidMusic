@@ -8,20 +8,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
@@ -31,7 +27,7 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomMathComputations
 import com.prosabdev.fluidmusic.utils.adapters.SelectableRecycleViewAdapter
-import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.explore.AllSongsFragmentViewModel
 import kotlinx.coroutines.MainScope
@@ -46,7 +42,7 @@ class AllSongsFragment : Fragment() {
 
     private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
-    private val mMainExploreFragmentViewModel: MainExploreFragmentViewModel by activityViewModels()
+    private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
 
     private var mEmptyBottomAdapter: HeadlinePlayShuffleAdapter? = null
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
@@ -88,67 +84,79 @@ class AllSongsFragment : Fragment() {
     private fun observeLiveData() {
         //Request load songs from database or media file scanner
         if(mAllSongsFragmentViewModel.getIsLoadingInBackground().value == false && (mAllSongsFragmentViewModel.getDataRequestCounter().value ?: 0) <= 0){
-            mAllSongsFragmentViewModel.requestLoadDataAsync(mActivity as Activity)
+            mAllSongsFragmentViewModel.requestLoadDataAsync(mActivity as Activity, 0, 1000)
         }
-        //Listen when current page = this page, then try to load view data
-        mMainExploreFragmentViewModel.getActivePage().observe(mActivity as LifecycleOwner, object : Observer<Int>{
-            override fun onChanged(page: Int?) {
-                clearSelectedItemsPage()
+        mAllSongsFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner
+        ) {
+            MainScope().launch {
+                addSongsToAdapter(it)
             }
-
-        })
-        mAllSongsFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner, object  : Observer<ArrayList<SongItem>>{
-            override fun onChanged(songList: ArrayList<SongItem>?) {
-                MainScope().launch {
-                    addSongsToAdapter(songList)
-                }
+        }
+        mAllSongsFragmentViewModel.getIsLoading().observe(mActivity as LifecycleOwner
+        ) {
+            if (it == false) {
+                CustomAnimators.crossFadeDown(mLoadingContentProgress as View, true, 50)
+            } else {
+                CustomAnimators.crossFadeUp(mLoadingContentProgress as View, true, 100)
             }
-        })
-        mAllSongsFragmentViewModel.getIsLoading().observe(mActivity as LifecycleOwner, object  : Observer<Boolean>{
-            override fun onChanged(isLoading: Boolean?) {
-                if(isLoading == false){
-                    CustomAnimators.crossFadeDown(mLoadingContentProgress as View, true, 50)
-                }else{
-                    CustomAnimators.crossFadeUp(mLoadingContentProgress as View, true, 100)
-                }
-            }
-        })
-        mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner, object : Observer<Int>{
-            override fun onChanged(currentSong: Int?) {
-                if(mPlayerFragmentViewModel.getSourceOfQueueList().value == ConstantValues.EXPLORE_ALL_SONGS)
-                    mSongItemAdapter?.setCurrentPlayingSong(currentSong ?: -1)
-            }
-
-        })
+        }
+        mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner
+        ) {
+            if (mPlayerFragmentViewModel.getSourceOfQueueList().value == ConstantValues.EXPLORE_ALL_SONGS)
+                mSongItemAdapter?.setCurrentPlayingSong(it ?: -1)
+        }
+        mMainFragmentViewModel.getSelectMode().observe(mActivity as LifecycleOwner
+        ) { selectMode -> toggleSelectModeChangeWithoutNotifying(selectMode) }
+        mMainFragmentViewModel.getTotalSelected().observe(mActivity as LifecycleOwner){
+            updateTotalSelectedItems(it)
+        }
+        mMainFragmentViewModel.getIsAllSelected().observe(mActivity as LifecycleOwner){
+            updateAllSelectionState(it)
+        }
+        mMainFragmentViewModel.getIsRangeSelected().observe(mActivity as LifecycleOwner){
+            updateRangeSelected(it)
+        }
     }
 
-    private suspend fun updateSelectedItems(selectMode : Boolean, totalSelected: Int, totalCount : Int){
-        if (selectMode != mSongItemAdapter?.selectableGetSelectionMode()){
-            mSongItemAdapter?.selectableSetSelectionMode(selectMode)
-        }
-
-        if(totalCount > 0 && totalSelected == totalCount)
+    private fun updateAllSelectionState(it: Boolean?) {
+        if(it == true)
             mSongItemAdapter?.selectableSelectAll()
         else
             mSongItemAdapter?.selectableClearSelection()
     }
 
-    private fun clearSelectedItemsPage() {
-        mSongItemAdapter?.selectableSetSelectionMode(false)
-        mSongItemAdapter?.selectableClearSelection()
-        mMainExploreFragmentViewModel.setSelectMode(false)
-        mMainExploreFragmentViewModel.setTotalSelected(0)
-        mMainExploreFragmentViewModel.setTotalCount(mSongList.size)
+    private fun updateTotalSelectedItems(i: Int) {
+        if(i > 0 && i >= (mMainFragmentViewModel.getTotalCount().value ?: 0))
+            mSongItemAdapter?.selectableSelectAll()
+    }
+
+    private fun updateRangeSelected(it: Boolean?) {
+        val tempStartRange : Int = mMainFragmentViewModel.getMinimumSelectedIndex().value ?: -1
+        val tempEndRange : Int = mMainFragmentViewModel.getMaximumSelectedIndex().value ?: -1
+        if(it == true){
+            mSongItemAdapter?.selectableSelectRange(tempStartRange, tempEndRange)
+        }else{
+            mSongItemAdapter?.selectableClearRange(tempStartRange, tempEndRange)
+        }
+    }
+
+    private fun toggleSelectModeChangeWithoutNotifying(selectMode: Boolean?) {
+        if(selectMode == true){
+            mSongItemAdapter?.selectableSetSelectionMode(true, notifyListener = false)
+        }else{
+            mSongItemAdapter?.selectableSetSelectionMode(false, notifyListener = false)
+            mSongItemAdapter?.selectableClearSelection(false)
+        }
     }
 
     private suspend fun addSongsToAdapter(songList: ArrayList<SongItem>?) = coroutineScope{
         if (songList != null) {
             val startPosition: Int = mSongList.size
             val itemCount: Int = songList.size
-            mSongList.addAll(songList)
+            mSongList.addAll(startPosition, songList)
             mSongItemAdapter?.notifyItemRangeInserted(startPosition, itemCount)
         }
-        mMainExploreFragmentViewModel.setTotalCount(mSongList.size)
+        mMainFragmentViewModel.setTotalCount(mSongList.size)
     }
 
     private fun checkInteractions() {
@@ -176,54 +184,75 @@ class AllSongsFragment : Fragment() {
             }
         })
         //Setup song adapter
-        mSongItemAdapter = SongItemAdapter(mSongList, mContext!!, object : SongItemAdapter.OnItemClickListener{
-            override fun onSongItemClicked(position: Int) {
-                if(mSongItemAdapter?.selectableGetSelectionMode() == true){
-                    mSongItemAdapter?.selectableToggleSelection(position)
-                }else{
+        mSongItemAdapter = SongItemAdapter(
+            mSongList,
+            mContext!!,
+            object : SongItemAdapter.OnItemClickListener{
+                override fun onSongItemClicked(position: Int) {
+                    if(mSongItemAdapter?.selectableGetSelectionMode() == true){
+                        mSongItemAdapter?.selectableToggleSelection(position)
+                        mMainFragmentViewModel.setTotalSelected(mSongItemAdapter?.selectableGetSelectedItemCount() ?: 0)
+                    }else{
+                        updateCurrentPlayingSong(position)
+                    }
+                }
+
+                override fun onSongItemPlayClicked(position: Int) {
                     updateCurrentPlayingSong(position)
                 }
-            }
 
-            override fun onSongItemPlayClicked(position: Int) {
-                updateCurrentPlayingSong(position)
-            }
-
-            override fun onSongItemLongClicked(position: Int) {
-                if(mSongItemAdapter?.selectableGetSelectionMode() == false){
-                    mSongItemAdapter?.selectableSetSelectionMode(true)
-                    mSongItemAdapter?.selectableToggleSelection(position)
+                override fun onSongItemLongClicked(position: Int) {
+                    if(mSongItemAdapter?.selectableGetSelectionMode() == false){
+                        mSongItemAdapter?.selectableSetSelectionMode(true)
+                        mSongItemAdapter?.selectableToggleSelection(position)
+                    }
                 }
-            }
 
-            override fun onItemMovedTo(position: Int) {
-                scrollDrag(position)
-            }
-
-        }, object : SongItemAdapter.OnTouchListener{
-            override fun requestDrag(viewHolder: RecyclerView.ViewHolder?) {
-                if (viewHolder != null) {
-                    touchHelper?.startDrag(viewHolder)
+                override fun onItemMovedTo(position: Int) {
+                    scrollDrag(position)
                 }
-            }
 
-        },
-        object : SelectableRecycleViewAdapter.OnSelectSelectableItemListener {
-            override fun onSelectionModeChange(
-                selectMode: Boolean,
-                totalSelected: Int,
-                totalCount: Int
-            ) {
-                mMainExploreFragmentViewModel.setSelectMode(selectMode)
-                mMainExploreFragmentViewModel.setTotalSelected(totalSelected)
-                mMainExploreFragmentViewModel.setTotalCount(totalCount)
-            }
+            },
+            object : SelectableRecycleViewAdapter.OnSelectSelectableItemListener {
+                override fun onSelectionModeChange(
+                    selectMode: Boolean,
+                    totalSelected: Int
+                ) {
+                    mMainFragmentViewModel.setSelectMode(selectMode)
+                    mMainFragmentViewModel.setTotalSelected(totalSelected)
+                }
 
-            override fun onTotalSelectedItemChange(totalSelected: Int, totalCount: Int) {
-                mMainExploreFragmentViewModel.setTotalSelected(totalSelected)
-                mMainExploreFragmentViewModel.setTotalCount(totalCount)
+                override fun onTotalSelectedItemChange(totalSelected: Int) {
+//                    mMainFragmentViewModel.setTotalSelected(totalSelected)
+                }
+
+                override fun onTotalSelectedItemChangeFromRange(totalSelected: Int) {
+                    mMainFragmentViewModel.setTotalSelected(totalSelected)
+                }
+
+                override fun onTotalSelectedItemChangeFromToggle(totalSelected: Int) {
+                    mMainFragmentViewModel.setTotalSelected(totalSelected)
+                }
+
+                override fun onMinSelectedItemChange(minSelected: Int) {
+                    Log.i(ConstantValues.TAG, "MINIMUM CHANGED TO : $minSelected")
+                    mMainFragmentViewModel.setMinimumSelectedIndex(minSelected)
+                }
+
+                override fun onMaxSelectedItemChange(maxSelected: Int) {
+                    Log.i(ConstantValues.TAG, "MAXIMUM CHANGED TO : $maxSelected")
+                    mMainFragmentViewModel.setMaximumSelectedIndex(maxSelected)
+                }
+            },
+            object : SongItemAdapter.OnTouchListener{
+                override fun requestDrag(viewHolder: RecyclerView.ViewHolder?) {
+                    if (viewHolder != null) {
+                        touchHelper?.startDrag(viewHolder)
+                    }
+                }
+
             }
-        })
+        )
         //Setup empty bottom adapter
         mEmptyBottomAdapter = HeadlinePlayShuffleAdapter(
             listHeadlines,

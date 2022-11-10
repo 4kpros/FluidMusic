@@ -49,7 +49,7 @@ abstract class CustomUILoaders {
             Glide.with(context)
                 .asBitmap()
                 .load(binaryData)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .centerCrop()
                 .apply(RequestOptions().override(widthHeight, widthHeight))
                 .into(customTarget)
@@ -62,7 +62,7 @@ abstract class CustomUILoaders {
                 placeHolderImage = android.R.color.transparent
             Glide.with(context)
                 .load(binaryData)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
 //                .transition(DrawableTransitionOptions.withCrossFade())
                 .centerCrop()
                 .placeholder(placeHolderImage)

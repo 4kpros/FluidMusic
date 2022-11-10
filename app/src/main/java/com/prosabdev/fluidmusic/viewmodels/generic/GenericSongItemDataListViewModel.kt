@@ -7,8 +7,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import kotlinx.coroutines.Job
 
 open class GenericSongItemDataListViewModel : GenericDataListFetcherViewModel() {
+
+    protected var tempJob: Job? = null
 
     fun getSongList(): LiveData<ArrayList<SongItem>> {
         return super.getDataList() as LiveData<ArrayList<SongItem>>

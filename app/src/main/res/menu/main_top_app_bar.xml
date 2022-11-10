@@ -2,13 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/menu"
-        android:title="Menu"
-        android:contentDescription="Menu"
-        app:showAsAction="ifRoom"
-        android:icon="@drawable/menu"
-        android:visible="false"
-        />
     <item android:id="@+id/search"
         android:title="Search"
         android:contentDescription="Tap here to search"

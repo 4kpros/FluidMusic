@@ -20,7 +20,11 @@ open class GenericDataListFetcherViewModel : ViewModel() {
     private val mLastLoadedPosition: LiveData<Int> get() = mMutableLastLoadedPosition
     private val mDataList: LiveData<ArrayList<Any>> get() = mMutableDataList
 
-    open fun requestLoadDataAsync(activity : Activity, minToUpdateDataList : Int = 10){
+    open fun requestLoadDataAsync(
+        activity : Activity,
+        startCursor: Int = 0,
+        maxDataCount: Int = 50
+    ){
         Log.i(ConstantValues.TAG, "GenericDataListFetcherViewModel request to load data")
         Log.i(ConstantValues.TAG, "GenericDataListFetcherViewModel nothing to do")
     }

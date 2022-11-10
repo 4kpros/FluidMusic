@@ -8,10 +8,8 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserCompat.ConnectionCallback
-import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.activity.viewModels
@@ -29,7 +27,7 @@ import com.prosabdev.fluidmusic.services.MediaPlaybackService
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
 import com.prosabdev.fluidmusic.utils.AudioFileInfoExtractor
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.coroutineScope
@@ -40,7 +38,7 @@ class MainActivity : AppCompatActivity(){
 
     private var mNavigationView : NavigationView? = null
     private var mDrawerLayout : DrawerLayout? = null
-    private val mMainExploreFragmentViewModel: MainExploreFragmentViewModel by viewModels()
+    private val mMainFragmentViewModel: MainFragmentViewModel by viewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by viewModels()
 
     private var mMediaBrowser: MediaBrowserCompat? = null
@@ -182,7 +180,6 @@ class MainActivity : AppCompatActivity(){
             mPlayerFragmentViewModel.getSongList().value?.get(currentSong)?.title
         //Get bitmap image from binary data
         val temBitmap : Bitmap? = AudioFileInfoExtractor.getBitmapAudioArtwork(
-            this,
             mPlayerFragmentViewModel.getSongList().value?.get(currentSong)?.covertArt?.binaryData,
             100,
             100
@@ -229,7 +226,7 @@ class MainActivity : AppCompatActivity(){
     }
 
     private fun checkInteractions() {
-        mMainExploreFragmentViewModel.mActionBarState.observe(this, Observer { item ->
+        mMainFragmentViewModel.mActionBarState.observe(this, Observer { item ->
             if(item){
                 mDrawerLayout?.open()
             }

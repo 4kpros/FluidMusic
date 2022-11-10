@@ -21,7 +21,7 @@ import java.io.IOException
 abstract class AudioFileInfoExtractor {
     companion object {
         //Return audio info
-        fun getAudioInfo(context : Context, absolutePath: String?): SongItem {
+        fun getAudioInfo(absolutePath: String?): SongItem {
             val songItem : SongItem = SongItem()
             if (absolutePath != null && absolutePath.isNotEmpty()) {
                 val tempFile = File(absolutePath)
@@ -72,7 +72,7 @@ abstract class AudioFileInfoExtractor {
         }
 
         //Extract bitmap audio artwork from path
-        fun getBitmapAudioArtwork(context: Context, binaryDataImage: ByteArray?, width: Int = 100, height: Int = 100): Bitmap? {
+        fun getBitmapAudioArtwork(binaryDataImage: ByteArray?, width: Int = 100, height: Int = 100): Bitmap? {
             if (binaryDataImage != null && binaryDataImage.isNotEmpty()) {
                 var bitmap: Bitmap? = null
                 val options: BitmapFactory.Options = BitmapFactory.Options()
