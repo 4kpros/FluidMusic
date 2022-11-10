@@ -216,7 +216,7 @@ class MainExploreFragment : Fragment() {
         mTabLayout = view.findViewById(R.id.tab_layout)
         mViewPager = view.findViewById(R.id.view_pager_main_explore)
         mSelectionRightSelectionMenu = view.findViewById<LinearLayoutCompat>(R.id.selection_panel_editor_container)
-        mConstraintSelectCounter = view.findViewById<ConstraintLayout>(R.id.constraint_select_counter)
+        mConstraintSelectCounter = view.findViewById<ConstraintLayout>(R.id.constraint_side_menu_hover)
 
         mButtonPlayAfter = view.findViewById<MaterialButton>(R.id.button_play_after)
         mButtonQueueMusicAdd = view.findViewById<MaterialButton>(R.id.button_queue_music_add)

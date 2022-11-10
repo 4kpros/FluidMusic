@@ -8,6 +8,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -68,7 +69,6 @@ abstract class CustomAnimators {
             }
         }
 
-
         fun crossTranslateInFromVertical(contentView : View, direction : Int, animate : Boolean = false, duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)) {
             val tempDirection = if(direction > 0) 1 else -1
             if(animate){
@@ -79,7 +79,7 @@ abstract class CustomAnimators {
                     animate()
                         .translationY(0.0f)
                         .alpha(1.0f)
-                        .setInterpolator(AccelerateDecelerateInterpolator())
+                        .setInterpolator(DecelerateInterpolator())
                         .setDuration(duration.toLong())
                         .setListener(null)
                 }
@@ -99,7 +99,7 @@ abstract class CustomAnimators {
                     animate()
                         .translationX(0.0f)
                         .alpha(1.0f)
-                        .setInterpolator(AccelerateDecelerateInterpolator())
+                        .setInterpolator(DecelerateInterpolator())
                         .setDuration(duration.toLong())
                         .setListener(null)
                 }
@@ -116,7 +116,7 @@ abstract class CustomAnimators {
                     animate()
                         .translationY(tempDirection * defaultTranslationPosition)
                         .alpha(0.0f)
-                        .setInterpolator(AccelerateDecelerateInterpolator())
+                        .setInterpolator(AccelerateInterpolator())
                         .setDuration(duration.toLong())
                         .setListener(object : AnimatorListenerAdapter() {
                             override fun onAnimationEnd(animation: Animator) {
@@ -137,7 +137,7 @@ abstract class CustomAnimators {
                     animate()
                         .translationX(tempDirection * defaultTranslationPosition)
                         .alpha(0.0f)
-                        .setInterpolator(AccelerateDecelerateInterpolator())
+                        .setInterpolator(AccelerateInterpolator())
                         .setDuration(duration.toLong())
                         .setListener(object : AnimatorListenerAdapter() {
                             override fun onAnimationEnd(animation: Animator) {

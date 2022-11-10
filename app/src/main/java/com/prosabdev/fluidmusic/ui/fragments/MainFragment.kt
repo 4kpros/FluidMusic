@@ -60,6 +60,7 @@ class MainFragment : Fragment() {
 
     private var mButtonSelectAll: MaterialButton? = null
     private var mButtonSelectRange: MaterialButton? = null
+    private var mHoverMenuRange: View? = null
     private var mButtonCLoseSelectionMenu: MaterialButton? = null
     private var mTextSelectedCount: MaterialTextView? = null
 
@@ -131,24 +132,17 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun updateTotalSelectedUI(totalSelected: Int?) {
-        if((totalSelected ?: 0) < 2){
-            mButtonSelectRange?.alpha = 0.4f
-            mButtonSelectRange?.isClickable = false
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                mButtonSelectRange?.focusable = View.NOT_FOCUSABLE
-        }else{
-            mButtonSelectRange?.alpha = 1.0f
-            mButtonSelectRange?.isClickable = true
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                mButtonSelectRange?.focusable = View.FOCUSABLE_AUTO
-        }
+    private fun updateTotalSelectedUI(totalSelected: Int?, animate : Boolean = true) {
+        if ((totalSelected ?: 0) >= 2 && mHoverMenuRange?.visibility != GONE)
+            CustomAnimators.crossFadeDown(mHoverMenuRange!!, animate, 200)
+        else if((totalSelected ?: 0) < 2 && mHoverMenuRange?.visibility != VISIBLE)
+            CustomAnimators.crossFadeUp(mHoverMenuRange!!, animate, 200, 0.8f)
 
         if((totalSelected ?: 0) >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
             mButtonSelectAll?.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box)
             mTextSelectedCount?.text = "$totalSelected"
-            mButtonSelectRange?.alpha = 0.4f
-            mButtonSelectRange?.isClickable = false
+            if ((totalSelected ?: 0) >= 2 && mHoverMenuRange?.visibility != GONE)
+                CustomAnimators.crossFadeDown(mHoverMenuRange!!, animate, 200)
 
         }else{
             mButtonSelectAll?.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box_outline_blank)
@@ -164,17 +158,17 @@ class MainFragment : Fragment() {
         }
     }
 
-    private  fun updateSelectModeUI(selectMode : Boolean, animate : Boolean = true){
+    private fun updateSelectModeUI(selectMode : Boolean, animate : Boolean = true){
         if (selectMode) {
             if(mConstraintBottomSelectionContainer?.visibility != VISIBLE)
-                CustomAnimators.crossTranslateInFromVertical(mConstraintBottomSelectionContainer as View, 1, animate)
+                CustomAnimators.crossTranslateInFromVertical(mConstraintBottomSelectionContainer as View, 1, animate, 300)
             if(mConstraintTopSelectionContainer?.visibility != VISIBLE)
-                CustomAnimators.crossTranslateInFromVertical(mConstraintTopSelectionContainer as View, -1, animate)
+                CustomAnimators.crossTranslateInFromVertical(mConstraintTopSelectionContainer as View, -1, animate, 300)
         }else {
             if(mConstraintBottomSelectionContainer?.visibility != GONE)
-                CustomAnimators.crossTranslateOutFromVertical(mConstraintBottomSelectionContainer as View, 1, animate)
+                CustomAnimators.crossTranslateOutFromVertical(mConstraintBottomSelectionContainer as View, 1, animate, 300)
             if(mConstraintTopSelectionContainer?.visibility != GONE)
-                CustomAnimators.crossTranslateOutFromVertical(mConstraintTopSelectionContainer as View, -1, animate)
+                CustomAnimators.crossTranslateOutFromVertical(mConstraintTopSelectionContainer as View, -1, animate, 300)
         }
     }
 
@@ -371,6 +365,7 @@ class MainFragment : Fragment() {
 
         mButtonSelectAll = view.findViewById<MaterialButton>(R.id.button_select_all)
         mButtonSelectRange = view.findViewById<MaterialButton>(R.id.button_select_range)
+        mHoverMenuRange = view.findViewById<View>(R.id.constraint_range_menu_hover)
         mButtonCLoseSelectionMenu = view.findViewById<MaterialButton>(R.id.button_close)
 
         mTextSelectedCount = view.findViewById<MaterialTextView>(R.id.text_selected_count)
