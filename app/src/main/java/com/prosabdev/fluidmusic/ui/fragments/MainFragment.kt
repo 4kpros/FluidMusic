@@ -64,6 +64,8 @@ class MainFragment : Fragment() {
     private var mButtonCLoseSelectionMenu: MaterialButton? = null
     private var mTextSelectedCount: MaterialTextView? = null
 
+    var mUpdateMiniPlayerUIJob : Job? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -85,14 +87,11 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        // Inflate the layout for this fragment
         val view: View = inflater.inflate(R.layout.fragment_main, container, false)
 
         initViews(view)
         checkInteractions()
 
-        // Inflate the layout for this fragment
         return view
     }
 
@@ -120,44 +119,25 @@ class MainFragment : Fragment() {
         ) { updatePlayerButtonsUI() }
         mMainFragmentViewModel.getSelectMode().observe(mActivity as LifecycleOwner
         ) { selectMode -> updateSelectModeUI(selectMode ?: false) }
-        mMainFragmentViewModel.getTotalSelected().observe(mActivity as LifecycleOwner){
-            updateTotalSelectedUI(it)
-        }
-        mMainFragmentViewModel.getIsAllSelected().observe(mActivity as LifecycleOwner){
-            updateTotalSelectedUI(mMainFragmentViewModel.getTotalSelected().value ?: 0)
-        }
-        mMainFragmentViewModel.getIsRangeSelected().observe(mActivity as LifecycleOwner
-        ) {
-            updateSelectedRangeUI(it)
-        }
+        mMainFragmentViewModel.getTotalSelected().observe(mActivity as LifecycleOwner
+        ){ updateTotalSelectedUI(it ?: 0) }
     }
-
-    private fun updateTotalSelectedUI(totalSelected: Int?, animate : Boolean = true) {
-        if ((totalSelected ?: 0) >= 2 && mHoverMenuRange?.visibility != GONE)
+    private fun updateTotalSelectedUI(totalSelected: Int, animate : Boolean = true) {
+        if (totalSelected >= 2 && mHoverMenuRange?.visibility != GONE)
             CustomAnimators.crossFadeDown(mHoverMenuRange!!, animate, 200)
-        else if((totalSelected ?: 0) < 2 && mHoverMenuRange?.visibility != VISIBLE)
+        else if(totalSelected < 2 && mHoverMenuRange?.visibility != VISIBLE)
             CustomAnimators.crossFadeUp(mHoverMenuRange!!, animate, 200, 0.8f)
 
-        if((totalSelected ?: 0) >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
+        if(totalSelected >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
             mButtonSelectAll?.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box)
-            mTextSelectedCount?.text = "$totalSelected"
-            if ((totalSelected ?: 0) >= 2 && mHoverMenuRange?.visibility != GONE)
-                CustomAnimators.crossFadeDown(mHoverMenuRange!!, animate, 200)
 
+            if (totalSelected >= 2 && mHoverMenuRange?.visibility != GONE)
+                CustomAnimators.crossFadeDown(mHoverMenuRange!!, animate, 200)
         }else{
             mButtonSelectAll?.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box_outline_blank)
-            mTextSelectedCount?.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
         }
+        mTextSelectedCount?.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
     }
-
-    private fun updateSelectedRangeUI(b: Boolean) {
-        if(b){
-            mButtonSelectRange?.icon = ContextCompat.getDrawable(mContext, R.drawable.compress)
-        }else{
-            mButtonSelectRange?.icon = ContextCompat.getDrawable(mContext, R.drawable.expand)
-        }
-    }
-
     private fun updateSelectModeUI(selectMode : Boolean, animate : Boolean = true){
         if (selectMode) {
             if(mConstraintBottomSelectionContainer?.visibility != VISIBLE)
@@ -171,7 +151,6 @@ class MainFragment : Fragment() {
                 CustomAnimators.crossTranslateOutFromVertical(mConstraintTopSelectionContainer as View, -1, animate, 300)
         }
     }
-
     private fun updatePlayerButtonsUI() {
         if(mPlayerFragmentViewModel.getIsPlaying().value == true){
             mButtonPlayPause?.icon = ContextCompat.getDrawable(mContext, R.drawable.pause)
@@ -179,13 +158,9 @@ class MainFragment : Fragment() {
             mButtonPlayPause?.icon = ContextCompat.getDrawable(mContext, R.drawable.play_arrow)
         }
     }
-
-    var mUpdateMiniPlayerUIJob : Job? = null
     private fun updateMiniPlayerUI(animate : Boolean = true) {
-        //Update current song info
         val tempQL : ArrayList<SongItem>? = mPlayerFragmentViewModel.getSongList().value
         val tempPositionInQL : Int = mPlayerFragmentViewModel.getCurrentSong().value ?: -1
-        Log.i(ConstantValues.TAG, "Index value $tempPositionInQL")
         if(tempQL!= null && tempQL.size > 0 && tempPositionInQL >= 0){
             var tempTitle : String = ""
             var tempArtist : String = ""
@@ -201,60 +176,15 @@ class MainFragment : Fragment() {
                 if(mUpdateMiniPlayerUIJob != null)
                     mUpdateMiniPlayerUIJob?.cancel()
                 mUpdateMiniPlayerUIJob = MainScope().launch {
-                    animateCrossFadeOutInTextView(mTextTitleMiniPlayer, tempTitle, 100)
-                    animateCrossFadeOutInTextView(mTextArtistMiniPlayer, tempArtist, 100)
-                    animateCrossFadeOutInImage(mCovertArtMiniPlayer, tempBinary, false, 100, 100)
-                    animateCrossFadeOutInImage(mBlurredCovertArtMiniPlayer, tempBinary, true, 10, 100)
+                    CustomAnimators.animateCrossFadeOutInTextView(mTextTitleMiniPlayer, tempTitle, 100)
+                    CustomAnimators.animateCrossFadeOutInTextView(mTextArtistMiniPlayer, tempArtist, 100)
+                    CustomAnimators.animateCrossFadeOutInImage(mContext, mCovertArtMiniPlayer, tempBinary, false, 100, 100)
+                    CustomAnimators.animateCrossFadeOutInImage(mContext, mBlurredCovertArtMiniPlayer, tempBinary, true, 10, 100)
                 }
             }else{
                 CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtMiniPlayer, tempBinary, 100)
                 CustomUILoaders.loadBlurredWithImageLoader(mContext, mBlurredCovertArtMiniPlayer, tempBinary)
             }
-        }
-    }
-    private suspend fun animateCrossFadeOutInTextView(
-        textView: AppCompatTextView?,
-        textValue : String,
-        durationInterval : Int = 150
-    ) {
-        textView?.apply {
-            View.VISIBLE
-            animate()
-                .alpha(0f)
-                .setInterpolator(DecelerateInterpolator())
-                .setDuration(durationInterval.toLong())
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        textView.text = textValue
-                        CustomAnimators.crossFadeUp(textView as View, true, durationInterval)
-                    }
-                })
-        }
-    }
-
-    private suspend fun animateCrossFadeOutInImage(
-        imageView: ImageView?,
-        tempBinary: ByteArray?,
-        blurred : Boolean = false,
-        width : Int = 100,
-        durationInterval : Int = 150
-    ) {
-        imageView?.apply {
-            View.VISIBLE
-            animate()
-                .alpha(0f)
-                .setInterpolator(DecelerateInterpolator())
-                .setDuration(durationInterval.toLong())
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        if(!blurred){
-                            CustomUILoaders.loadCovertArtFromBinaryData(mContext, imageView, tempBinary, width)
-                        }else{
-                            CustomUILoaders.loadBlurredWithImageLoader(mContext, imageView, tempBinary, width)
-                        }
-                        CustomAnimators.crossFadeUp(imageView, true, durationInterval)
-                    }
-                })
         }
     }
 
@@ -266,7 +196,7 @@ class MainFragment : Fragment() {
             onPlayPause()
         }
         mButtonSelectAll?.setOnClickListener{
-            toggleOnSelectionAll()
+            onToggleSelectAll()
         }
         mButtonSelectRange?.setOnClickListener {
             onToggleSelectRange()
@@ -313,34 +243,19 @@ class MainFragment : Fragment() {
             }
         })
     }
-
-    private fun onToggleSelectRange() {
-        val minSelect: Int = mMainFragmentViewModel.getMinimumSelectedIndex().value ?: -1
-        val maxSelect: Int  = mMainFragmentViewModel.getMaximumSelectedIndex().value ?: -1
-        if(minSelect in 0 until maxSelect){
-            if(mMainFragmentViewModel.getIsRangeSelected().value == true){
-                mMainFragmentViewModel.setIsRangeSelected(false)
-            }else{
-                mMainFragmentViewModel.setIsRangeSelected(true)
-            }
-        }
-    }
-
-    private fun toggleOnSelectionAll() {
-        if(((mMainFragmentViewModel.getTotalSelected().value ?: 0) >= (mMainFragmentViewModel.getTotalCount().value ?: 0)) || mMainFragmentViewModel.getIsAllSelected().value == true) {
-            mMainFragmentViewModel.setTotalSelected(0)
-            mMainFragmentViewModel.setIsAllSelected(false)
-        }else {
-            mMainFragmentViewModel.setTotalSelected(mMainFragmentViewModel.getTotalCount().value ?: 0)
-            mMainFragmentViewModel.setIsAllSelected(true)
-        }
-        mMainFragmentViewModel.setIsRangeSelected(false)
-    }
     private fun onCloseSelectionMenu() {
-        mMainFragmentViewModel.setTotalSelected(0)
         mMainFragmentViewModel.setSelectMode(false)
     }
-
+    private fun onToggleSelectRange() {
+        mMainFragmentViewModel.setToggleRange()
+    }
+    private fun onToggleSelectAll() {
+        if(((mMainFragmentViewModel.getTotalSelected().value ?: 0) >= (mMainFragmentViewModel.getTotalCount().value ?: 0))) {
+            mMainFragmentViewModel.setTotalSelected(0)
+        }else {
+            mMainFragmentViewModel.setTotalSelected(mMainFragmentViewModel.getTotalCount().value ?: 0)
+        }
+    }
     fun onPlayPause(){
         val tempPP : Boolean = !(mPlayerFragmentViewModel.getIsPlaying().value ?: false)
         mPlayerFragmentViewModel.setIsPlaying(tempPP)

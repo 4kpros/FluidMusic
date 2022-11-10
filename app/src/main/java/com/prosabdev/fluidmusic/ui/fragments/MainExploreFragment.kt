@@ -37,7 +37,7 @@ class MainExploreFragment : Fragment() {
     private lateinit var mTabLayoutAdapter: TabLayoutAdapter
     private lateinit var mViewPager: ViewPager2
     private lateinit var mSelectionRightSelectionMenu: LinearLayoutCompat
-    private lateinit var mConstraintSelectCounter: ConstraintLayout
+    private lateinit var mConstraintSelectMenuHover: ConstraintLayout
 
     private lateinit var mButtonPlayAfter: MaterialButton
     private lateinit var mButtonQueueMusicAdd: MaterialButton
@@ -62,7 +62,7 @@ class MainExploreFragment : Fragment() {
         val view: View = inflater.inflate(R.layout.fragment_main_explore, container, false)
 
         initViews(view)
-        setupViewPagerAdapter(view)
+        setupTabLayoutViewPagerAdapter(view)
         checkInteractions(view)
 
         return view
@@ -74,19 +74,10 @@ class MainExploreFragment : Fragment() {
         observeLiveData(view)
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        updateTotalSelectedItemsUI(mMainFragmentViewModel.getTotalSelected().value ?: 0, false)
-        updateSelectModeUI(mMainFragmentViewModel.getSelectMode().value ?: false, animate = false)
-    }
-
-    private fun setupViewPagerAdapter(view: View) {
-        //Setup adapter
+    private fun setupTabLayoutViewPagerAdapter(view: View) {
         mTabLayoutAdapter = TabLayoutAdapter(this)
         mViewPager.adapter = mTabLayoutAdapter
         mViewPager.offscreenPageLimit = 5
-        //Setup tab layout mediator
         TabLayoutMediator(mTabLayout, mViewPager){tab,position->
             applyToolBarTitle(position, tab)
         }.attach()
@@ -113,41 +104,32 @@ class MainExploreFragment : Fragment() {
         }
     }
 
-    //Method to listen all view models
     private fun observeLiveData(view: View) {
-        mMainFragmentViewModel.getSelectMode().observe(mActivity as LifecycleOwner, object : Observer<Boolean>{
-            override fun onChanged(selectMode: Boolean?) {
-                updateSelectModeUI(selectMode ?: false)
-            }
-        })
-        mMainFragmentViewModel.getTotalSelected().observe(mActivity as LifecycleOwner, object : Observer<Int>{
-            override fun onChanged(totalSelected: Int?) {
-                updateTotalSelectedItemsUI(totalSelected ?: 0)
-            }
-        })
+        mMainFragmentViewModel.getSelectMode().observe(mActivity as LifecycleOwner
+        ) { selectMode -> updateSelectModeUI(selectMode ?: false) }
+        mMainFragmentViewModel.getTotalSelected().observe(mActivity as LifecycleOwner
+        ) { totalSelected -> updateTotalSelectedItemsUI(totalSelected ?: 0) }
     }
     private  fun updateTotalSelectedItemsUI(totalSelected : Int, animate : Boolean = true){
-        if (totalSelected > 0 && mConstraintSelectCounter.visibility != GONE)
-            CustomAnimators.crossFadeDown(mConstraintSelectCounter, animate, 200)
-        else if(totalSelected <= 0 && mConstraintSelectCounter.visibility != VISIBLE)
-            CustomAnimators.crossFadeUp(mConstraintSelectCounter, animate, 200, 0.8f)
+        if (totalSelected > 0 && mConstraintSelectMenuHover.visibility != GONE)
+            CustomAnimators.crossFadeDown(mConstraintSelectMenuHover, animate, 200)
+        else if(totalSelected <= 0 && mConstraintSelectMenuHover.visibility != VISIBLE)
+            CustomAnimators.crossFadeUp(mConstraintSelectMenuHover, animate, 200, 0.8f)
     }
     private  fun updateSelectModeUI(selectMode : Boolean, animate : Boolean = true){
         if (selectMode) {
-            CustomAnimators.crossFadeUp(mSelectionRightSelectionMenu, animate)
-            mViewPager.isUserInputEnabled = false
+            if(mSelectionRightSelectionMenu.visibility != VISIBLE)
+                CustomAnimators.crossTranslateInFromHorizontal(mSelectionRightSelectionMenu as View, 1, animate, 300)
         }else {
-            CustomAnimators.crossFadeDown(mSelectionRightSelectionMenu, animate)
-            mViewPager.isUserInputEnabled = true
+            if(mSelectionRightSelectionMenu.visibility != GONE)
+                CustomAnimators.crossTranslateOutFromHorizontal(mSelectionRightSelectionMenu as View, 1, animate, 300)
         }
     }
 
-    //Method to check all interactions
     private fun checkInteractions(view: View) {
         mTopAppBar.setNavigationOnClickListener {
             mMainFragmentViewModel.setOnActionBarClickListened(true)
         }
-
         mViewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
@@ -156,36 +138,16 @@ class MainExploreFragment : Fragment() {
                 updateSelectModeUI(false)
             }
         })
-        mButtonPlayAfter.setOnClickListener(object : OnClickListener{
-            override fun onClick(p0: View?) {
-                Toast.makeText(context, "mButtonPlayAfter", Toast.LENGTH_SHORT).show()
-            }
-
-        })
-        mButtonQueueMusicAdd.setOnClickListener(object : OnClickListener{
-            override fun onClick(p0: View?) {
-                Toast.makeText(context, "mButtonQueueMusicAdd", Toast.LENGTH_SHORT).show()
-            }
-
-        })
-        mButtonPlaylistAdd.setOnClickListener(object : OnClickListener{
-            override fun onClick(p0: View?) {
-                Toast.makeText(context, "mButtonPlaylistAdd", Toast.LENGTH_SHORT).show()
-            }
-
-        })
-        mButtonShare.setOnClickListener(object : OnClickListener{
-            override fun onClick(p0: View?) {
-                Toast.makeText(context, "mButtonShare", Toast.LENGTH_SHORT).show()
-            }
-
-        })
-        mButtonDelete.setOnClickListener(object : OnClickListener{
-            override fun onClick(p0: View?) {
-                Toast.makeText(context, "mButtonDelete", Toast.LENGTH_SHORT).show()
-            }
-
-        })
+        mButtonPlayAfter.setOnClickListener {
+        }
+        mButtonQueueMusicAdd.setOnClickListener {
+        }
+        mButtonPlaylistAdd.setOnClickListener {
+        }
+        mButtonShare.setOnClickListener {
+        }
+        mButtonDelete.setOnClickListener {
+        }
     }
 
     private fun applyAppBarTitle(position: Int) {
@@ -208,23 +170,19 @@ class MainExploreFragment : Fragment() {
         }
     }
 
-    //Init all views
     private fun initViews(view: View) {
-        //Find views by IDs
         mAppBarLayout = view.findViewById(R.id.app_bar_layout)
         mTopAppBar = view.findViewById(R.id.top_app_bar)
         mTabLayout = view.findViewById(R.id.tab_layout)
         mViewPager = view.findViewById(R.id.view_pager_main_explore)
         mSelectionRightSelectionMenu = view.findViewById<LinearLayoutCompat>(R.id.selection_panel_editor_container)
-        mConstraintSelectCounter = view.findViewById<ConstraintLayout>(R.id.constraint_side_menu_hover)
+        mConstraintSelectMenuHover = view.findViewById<ConstraintLayout>(R.id.constraint_side_menu_hover)
 
         mButtonPlayAfter = view.findViewById<MaterialButton>(R.id.button_play_after)
         mButtonQueueMusicAdd = view.findViewById<MaterialButton>(R.id.button_queue_music_add)
         mButtonPlaylistAdd = view.findViewById<MaterialButton>(R.id.button_playlist_add)
         mButtonShare = view.findViewById<MaterialButton>(R.id.button_share)
         mButtonDelete = view.findViewById<MaterialButton>(R.id.button_delete)
-
-        updateSelectModeUI(selectMode = false, animate = false)
     }
 
     companion object {

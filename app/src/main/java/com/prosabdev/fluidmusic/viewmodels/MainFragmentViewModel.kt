@@ -6,8 +6,7 @@ import androidx.lifecycle.ViewModel
 
 class MainFragmentViewModel : ViewModel() {
     private val mMutableSelectMode = MutableLiveData<Boolean>(false)
-    private val mMutableIsAllSelected = MutableLiveData<Boolean>(false)
-    private val mMutableIsRangeSelected = MutableLiveData<Boolean>(false)
+    private val mMutableToggleOnRange = MutableLiveData<Int>(0)
     private val mMutableTotalSelected = MutableLiveData<Int>(0)
     private val mMutableTotalCount = MutableLiveData<Int>(0)
     private val mMutableMinimumSelectedIndex = MutableLiveData<Int>(-1)
@@ -16,8 +15,7 @@ class MainFragmentViewModel : ViewModel() {
     private val mMutableActionBarState = MutableLiveData<Boolean>()
 
     private val mSelectMode: LiveData<Boolean> get() = mMutableSelectMode
-    private val mutableIsAllSelected: LiveData<Boolean> get() = mMutableIsAllSelected
-    private val mutableIsRangeSelected: LiveData<Boolean> get() = mMutableIsRangeSelected
+    private val mToggleOnRange: LiveData<Int> get() = mMutableToggleOnRange
     private val mTotalSelected: LiveData<Int> get() = mMutableTotalSelected
     private val mTotalCount: LiveData<Int> get() = mMutableTotalCount
     private val mMinimumSelectedIndex: LiveData<Int> get() = mMutableMinimumSelectedIndex
@@ -31,29 +29,15 @@ class MainFragmentViewModel : ViewModel() {
     fun getSelectMode(): LiveData<Boolean> {
         return mSelectMode
     }
-    fun setIsAllSelected(value : Boolean) {
-        mMutableIsAllSelected.value = value
+    fun setToggleRange() {
+        var tempToggleRange: Int = mToggleOnRange.value ?: 0
+        if(tempToggleRange >= 100)
+            tempToggleRange = 0
+        tempToggleRange++
+        mMutableToggleOnRange.value = tempToggleRange
     }
-    fun getIsAllSelected(): LiveData<Boolean> {
-        return mutableIsAllSelected
-    }
-    fun setIsRangeSelected(value : Boolean) {
-        mMutableIsRangeSelected.value = value
-    }
-    fun getIsRangeSelected(): LiveData<Boolean> {
-        return mutableIsRangeSelected
-    }
-    fun setMinimumSelectedIndex(value : Int) {
-        mMutableMinimumSelectedIndex.value = value
-    }
-    fun getMinimumSelectedIndex(): LiveData<Int> {
-        return mMinimumSelectedIndex
-    }
-    fun setMaximumSelectedIndex(value : Int) {
-        mMutableMaximumSelectedIndex.value = value
-    }
-    fun getMaximumSelectedIndex(): LiveData<Int> {
-        return mMaximumSelectedIndex
+    fun getToggleRange(): LiveData<Int> {
+        return mToggleOnRange
     }
     fun setTotalSelected(value : Int) {
         mMutableTotalSelected.value = value

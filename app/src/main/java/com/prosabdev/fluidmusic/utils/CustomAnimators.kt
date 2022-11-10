@@ -4,12 +4,15 @@ import android.R
 import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.AnimatorListenerAdapter
+import android.content.Context
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatTextView
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -149,6 +152,52 @@ abstract class CustomAnimators {
                 contentView.translationX = tempDirection * defaultTranslationPosition
                 contentView.alpha = 0.0f
                 contentView.visibility = GONE
+            }
+        }
+
+        suspend fun animateCrossFadeOutInTextView(
+            textView: AppCompatTextView?,
+            textValue : String,
+            durationInterval : Int = 150
+        ) {
+            textView?.apply {
+                View.VISIBLE
+                animate()
+                    .alpha(0f)
+                    .setInterpolator(DecelerateInterpolator())
+                    .setDuration(durationInterval.toLong())
+                    .setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            textView.text = textValue
+                            CustomAnimators.crossFadeUp(textView as View, true, durationInterval)
+                        }
+                    })
+            }
+        }
+        suspend fun animateCrossFadeOutInImage(
+            context : Context,
+            imageView: ImageView?,
+            tempBinary: ByteArray?,
+            blurred : Boolean = false,
+            width : Int = 100,
+            durationInterval : Int = 150
+        ) {
+            imageView?.apply {
+                View.VISIBLE
+                animate()
+                    .alpha(0f)
+                    .setInterpolator(DecelerateInterpolator())
+                    .setDuration(durationInterval.toLong())
+                    .setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            if(!blurred){
+                                CustomUILoaders.loadCovertArtFromBinaryData(context, imageView, tempBinary, width)
+                            }else{
+                                CustomUILoaders.loadBlurredWithImageLoader(context, imageView, tempBinary, width)
+                            }
+                            CustomAnimators.crossFadeUp(imageView, true, durationInterval)
+                        }
+                    })
             }
         }
     }
