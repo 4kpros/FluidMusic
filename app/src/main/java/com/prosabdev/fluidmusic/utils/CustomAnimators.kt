@@ -164,28 +164,27 @@ abstract class CustomAnimators {
                 View.VISIBLE
                 animate()
                     .alpha(0f)
-                    .setInterpolator(DecelerateInterpolator())
+                    .setInterpolator(AccelerateDecelerateInterpolator())
                     .setDuration(durationInterval.toLong())
                     .setListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
                             textView.text = textValue
-                            CustomAnimators.crossFadeUp(textView as View, true, durationInterval)
+                            crossFadeUp(textView as View, true, durationInterval)
                         }
                     })
             }
         }
-        suspend fun animateCrossFadeOutInImage(
+        fun animateCrossFadeOutInImage(
             context : Context,
             imageView: ImageView?,
             tempBinary: ByteArray?,
             blurred : Boolean = false,
             width : Int = 100,
-            durationInterval : Int = 150
+            durationInterval : Int = 100
         ) {
             imageView?.apply {
-                View.VISIBLE
                 animate()
-                    .alpha(0f)
+                    .alpha(1.0f)
                     .setInterpolator(DecelerateInterpolator())
                     .setDuration(durationInterval.toLong())
                     .setListener(object : AnimatorListenerAdapter() {
@@ -193,9 +192,8 @@ abstract class CustomAnimators {
                             if(!blurred){
                                 CustomUILoaders.loadCovertArtFromBinaryData(context, imageView, tempBinary, width)
                             }else{
-                                CustomUILoaders.loadBlurredWithImageLoader(context, imageView, tempBinary, width)
+                                CustomUILoaders.loadWithBinaryDataWithCrossFade(context, imageView, tempBinary, width)
                             }
-                            CustomAnimators.crossFadeUp(imageView, true, durationInterval)
                         }
                     })
             }

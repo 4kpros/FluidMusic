@@ -64,8 +64,6 @@ class MainFragment : Fragment() {
     private var mButtonCLoseSelectionMenu: MaterialButton? = null
     private var mTextSelectedCount: MaterialTextView? = null
 
-    var mUpdateMiniPlayerUIJob : Job? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -172,19 +170,10 @@ class MainFragment : Fragment() {
 
             val tempBinary : ByteArray? = if(tempQL.size > 0) tempQL[tempPositionInQL].covertArt?.binaryData else null
 
-            if(animate){
-                if(mUpdateMiniPlayerUIJob != null)
-                    mUpdateMiniPlayerUIJob?.cancel()
-                mUpdateMiniPlayerUIJob = MainScope().launch {
-                    CustomAnimators.animateCrossFadeOutInTextView(mTextTitleMiniPlayer, tempTitle, 100)
-                    CustomAnimators.animateCrossFadeOutInTextView(mTextArtistMiniPlayer, tempArtist, 100)
-                    CustomAnimators.animateCrossFadeOutInImage(mContext, mCovertArtMiniPlayer, tempBinary, false, 100, 100)
-                    CustomAnimators.animateCrossFadeOutInImage(mContext, mBlurredCovertArtMiniPlayer, tempBinary, true, 10, 100)
-                }
-            }else{
-                CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtMiniPlayer, tempBinary, 100)
-                CustomUILoaders.loadBlurredWithImageLoader(mContext, mBlurredCovertArtMiniPlayer, tempBinary)
-            }
+            mTextTitleMiniPlayer?.text = tempTitle
+            mTextArtistMiniPlayer?.text = tempArtist
+            CustomUILoaders.loadWithBinaryDataWithCrossFade(mContext, mCovertArtMiniPlayer, tempBinary, 60)
+            CustomUILoaders.loadBlurredWithImageLoader(mContext, mBlurredCovertArtMiniPlayer, tempBinary, 10)
         }
     }
 

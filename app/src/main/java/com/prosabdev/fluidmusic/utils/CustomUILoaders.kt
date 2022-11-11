@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.TransitionOptions
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -27,7 +26,7 @@ abstract class CustomUILoaders {
                 widthHeight
             )
         }
-        fun loadBlurredWithImageLoader(context : Context, imageView : ImageView?, binaryData: ByteArray?, widthHeight: Int = 1) {
+        fun loadBlurredWithImageLoader(context : Context, imageView : ImageView?, binaryData: ByteArray?, widthHeight: Int = 10) {
             if(binaryData == null || binaryData.isEmpty()){
                 loadWithBinaryData(context, imageView, null, widthHeight, true)
                 return
@@ -46,13 +45,27 @@ abstract class CustomUILoaders {
                 override fun onLoadCleared(placeholder: Drawable?) {
                 }
             }
+            val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
             Glide.with(context)
                 .asBitmap()
                 .load(binaryData)
-                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .transition(withCrossFade(factory))
                 .centerCrop()
                 .apply(RequestOptions().override(widthHeight, widthHeight))
                 .into(customTarget)
+        }
+        fun loadWithBinaryDataWithCrossFade(context : Context, imageView : ImageView?, binaryData: ByteArray?, widthHeight: Int, transparent : Boolean = false){
+            if(imageView == null)
+                return
+            Glide.with(context)
+                .load(binaryData)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .transition(DrawableTransitionOptions.withCrossFade(200))
+                .placeholder(R.drawable.ic_fluid_music_icon_with_padding)
+                .centerCrop()
+                .apply(RequestOptions().override(widthHeight, widthHeight))
+                .into(imageView)
         }
         private fun loadWithBinaryData(context : Context, imageView : ImageView?, binaryData: ByteArray?, widthHeight: Int, transparent : Boolean = false){
             if(imageView == null)
@@ -62,8 +75,7 @@ abstract class CustomUILoaders {
                 placeHolderImage = android.R.color.transparent
             Glide.with(context)
                 .load(binaryData)
-                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-//                .transition(DrawableTransitionOptions.withCrossFade())
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .centerCrop()
                 .placeholder(placeHolderImage)
                 .apply(RequestOptions().override(widthHeight, widthHeight))
@@ -75,7 +87,6 @@ abstract class CustomUILoaders {
             Glide.with(context)
                 .load(0)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-//                .transition(DrawableTransitionOptions.withCrossFade())
                 .centerCrop()
                 .placeholder(R.drawable.ic_fluid_music_icon_with_padding)
                 .apply(RequestOptions().override(widthHeight, widthHeight))

@@ -32,8 +32,8 @@ abstract class SelectableRecycleViewAdapter<VH : RecyclerView.ViewHolder>() : Re
     }
     private fun isItemPositionVisible(position : Int, layoutManager : GridLayoutManager?): Boolean {
         var tempResult : Boolean? = false
-        val tempFirstVisiblePosition = layoutManager?.findFirstVisibleItemPosition() ?: -1
-        val tempLastVisiblePosition = layoutManager?.findLastVisibleItemPosition() ?: -1
+        val tempFirstVisiblePosition = (layoutManager?.findFirstVisibleItemPosition() ?: 0) - 2
+        val tempLastVisiblePosition = (layoutManager?.findLastVisibleItemPosition() ?: 0) + 2
         if(position in tempFirstVisiblePosition ..  tempLastVisiblePosition)
             tempResult = true
         Log.i(ConstantValues.TAG, "View visibility at $position : $tempResult")
