@@ -1,15 +1,11 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -18,7 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.*
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textview.MaterialTextView
 import com.prosabdev.fluidmusic.R
@@ -28,9 +23,7 @@ import com.prosabdev.fluidmusic.viewmodels.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class MainFragment : Fragment() {
 
@@ -52,7 +45,8 @@ class MainFragment : Fragment() {
 
     private var mMainFragmentContainer: FrameLayout? = null
     private var mPlayerFragmentContainer: FrameLayout? = null
-    private var mMiniPlayerContainer: ConstraintLayout? = null
+    private var mConstraintMiniPlayerContainer: ConstraintLayout? = null
+    private var mConstraintMiniPlayer: ConstraintLayout? = null
     private var mConstraintBottomSelectionContainer: ConstraintLayout? = null
     private var mConstraintTopSelectionContainer: ConstraintLayout? = null
     private var mConstraintBottomSelectionMenu: ConstraintLayout? = null
@@ -119,9 +113,38 @@ class MainFragment : Fragment() {
         ) { selectMode -> updateSelectModeUI(selectMode ?: false) }
         mMainFragmentViewModel.getTotalSelected().observe(mActivity as LifecycleOwner
         ){ updateTotalSelectedUI(it ?: 0) }
+        mMainFragmentViewModel.getScrollingState().observe(mActivity as LifecycleOwner
+        ){ animateScrollStateUI(it ?: 0) }
+    }
+    private var mIsAnimatingScroll1: Boolean = false
+    private var mIsAnimatingScroll2: Boolean = false
+    private fun animateScrollStateUI(i: Int, animate : Boolean = true) {
+        Log.i(ConstantValues.TAG, "IIII = $i")
+        if(i == 1){
+            if(mIsAnimatingScroll2){
+                mConstraintMiniPlayerContainer?.apply {
+                    clearAnimation()
+                    mIsAnimatingScroll2 = false
+                }
+            }
+            if(mIsAnimatingScroll1)
+                return
+            mIsAnimatingScroll1 = true
+            CustomAnimators.crossTranslateOutFromVertical(mConstraintMiniPlayerContainer!!,  1, animate, 150,300.0f)
+        }else{
+            if(mIsAnimatingScroll1){
+                mConstraintMiniPlayerContainer?.apply {
+                    clearAnimation()
+                    mIsAnimatingScroll1 = false
+                }
+            }
+            if(mIsAnimatingScroll2)
+                return
+            mIsAnimatingScroll2 = true
+            CustomAnimators.crossTranslateInFromVertical(mConstraintMiniPlayerContainer!!,  1, animate, 150,300.0f)
+        }
     }
     private fun updateTotalSelectedUI(totalSelected: Int, animate : Boolean = true) {
-
         if(totalSelected > 0 && totalSelected >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
             mButtonSelectAll?.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box)
 
@@ -195,32 +218,12 @@ class MainFragment : Fragment() {
         }
         mSlidingUpPanel?.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
             override fun onPanelSlide(panel: View?, slideOffset: Float) {
-                Log.i(ConstantValues.TAG, "Slide panel offset : $slideOffset")
-                //Mini player visibility
-//                if(1.0f - (slideOffset * 5.0f) >= 0.0f){
-//                    mMiniPlayerContainer?.alpha = 1.0f - (slideOffset * 5.0f)
-//                }else{
-//                    mMiniPlayerContainer?.alpha = 0.0f
-//                }
-//                if(slideOffset < 1.0f){
-//                    mMiniPlayerContainer?.visibility = VISIBLE
-//                }else{
-//                    mMiniPlayerContainer?.visibility = GONE
-//                }
-
-                //Player visibility
+                Log.i(ConstantValues.TAG, "On panel slide offset : $slideOffset")
                 if(slideOffset <= 0.21f){
-//                    mPlayerFragmentContainer?.alpha = 0.0f
-                    mSlidingUpPanel?.setDragView(mMiniPlayerContainer)
+                    mSlidingUpPanel?.setDragView(mConstraintMiniPlayerContainer)
                 }else {
-//                    mPlayerFragmentContainer?.alpha = (slideOffset * 1.21f) - 0.21f
                     mSlidingUpPanel?.setDragView(mPlayerFragmentContainer)
                 }
-//                if (slideOffset <= 0.15f){
-//                    mPlayerFragmentContainer?.visibility = GONE
-//                }else{
-//                    mPlayerFragmentContainer?.visibility = VISIBLE
-//                }
             }
 
             override fun onPanelStateChanged(
@@ -246,10 +249,12 @@ class MainFragment : Fragment() {
         }
     }
     fun onPlayPause(){
+        mMainFragmentViewModel.setScrollingState(-1)
         val tempPP : Boolean = !(mPlayerFragmentViewModel.getIsPlaying().value ?: false)
         mPlayerFragmentViewModel.setIsPlaying(tempPP)
     }
     fun onNextPage(){
+        mMainFragmentViewModel.setScrollingState(-1)
         val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
         val tempSongListSize :Int = mPlayerFragmentViewModel.getSongList().value?.size ?: 0
         if(tempSongListSize > 0 && tempCS < tempSongListSize - 1)
@@ -261,7 +266,8 @@ class MainFragment : Fragment() {
         mSlidingUpPanel = view.findViewById(R.id.sliding_up_panel)
         mMainFragmentContainer = view.findViewById(R.id.main_fragment_container)
         mPlayerFragmentContainer = view.findViewById(R.id.player_fragment_container)
-        mMiniPlayerContainer = view.findViewById(R.id.constraint_mini_player)
+        mConstraintMiniPlayerContainer = view.findViewById(R.id.constraint_mini_player_container)
+        mConstraintMiniPlayer = view.findViewById(R.id.constraint_mini_player)
         mConstraintBottomSelectionContainer = view.findViewById<ConstraintLayout>(R.id.constraint_bottom_selection_container)
         mConstraintTopSelectionContainer = view.findViewById<ConstraintLayout>(R.id.constraint_top_selection_container)
         mConstraintBottomSelectionMenu = view.findViewById<ConstraintLayout>(R.id.constraint_bottom_selection_menu)
@@ -289,7 +295,7 @@ class MainFragment : Fragment() {
         mTextArtistMiniPlayer?.isSelected = true
 
         CustomViewModifiers.updateTopViewInsets(mMainFragmentContainer as View)
-        CustomViewModifiers.updateBottomViewInsets(mMiniPlayerContainer as View)
+        CustomViewModifiers.updateBottomViewInsets(mConstraintMiniPlayer as View)
         CustomViewModifiers.updateBottomViewInsets(mConstraintBottomSelectionMenu as View)
         CustomViewModifiers.updateTopViewInsets(mConstraintTopSelectionMenu as View)
     }

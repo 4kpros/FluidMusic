@@ -36,8 +36,6 @@ class AlbumsFragment : Fragment() {
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
 
-    private var mEmptyBottomAdapter: HeadlinePlayShuffleAdapter? = null
-    private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
     private var mAlbumItemAdapter: AlbumItemAdapter? = null
     private var mRecyclerView: RecyclerView? = null
     private var mLoadingContentProgress: ConstraintLayout? = null
@@ -85,24 +83,6 @@ class AlbumsFragment : Fragment() {
 
     private fun setupRecyclerViewAdapter() {
         val spanCount = 1
-        var touchHelper : ItemTouchHelper? = null
-
-        //Setup headline adapter
-        val listHeadlines : ArrayList<Long> = ArrayList<Long>()
-        listHeadlines.add(0)
-        mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, R.layout.item_top_play_shuffle, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
-            override fun onPlayButtonClicked() {
-                Toast.makeText(mContext, "onPlayButtonClicked", Toast.LENGTH_SHORT).show()
-            }
-            override fun onShuffleButtonClicked() {
-                Toast.makeText(mContext, "onShuffleButtonClicked", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onFilterButtonClicked() {
-                Toast.makeText(mContext, "onFilterButtonClicked", Toast.LENGTH_SHORT).show()
-            }
-        })
-        //Setup song adapter
         mAlbumItemAdapter = AlbumItemAdapter(mAlbumList, mContext!!, object : AlbumItemAdapter.OnItemClickListener{
             override fun onAlbumItemClicked(position: Int) {
             }
@@ -114,29 +94,7 @@ class AlbumsFragment : Fragment() {
                 }
 
             })
-        //Setup empty bottom adapter
-        mEmptyBottomAdapter = HeadlinePlayShuffleAdapter(
-            listHeadlines,
-            R.layout.item_custom_empty_bottom_space,
-            object : HeadlinePlayShuffleAdapter.OnItemClickListener{
-                override fun onPlayButtonClicked() {
-                    Toast.makeText(mContext, "onPlayButtonClicked", Toast.LENGTH_SHORT).show()
-                }
-                override fun onShuffleButtonClicked() {
-                    Toast.makeText(mContext, "onShuffleButtonClicked", Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onFilterButtonClicked() {
-                    Toast.makeText(mContext, "onFilterButtonClicked", Toast.LENGTH_SHORT).show()
-                }
-            }
-        )
-        //Setup concat adapter
-        val concatAdapter = ConcatAdapter()
-//        concatAdapter.addAdapter(mHeadlineTopPlayShuffleAdapter!!)
-        concatAdapter.addAdapter(mAlbumItemAdapter!!)
-        concatAdapter.addAdapter(mEmptyBottomAdapter!!)
-        mRecyclerView?.adapter = concatAdapter
+        mRecyclerView?.adapter = mAlbumItemAdapter
 
         //Add Layout manager
         val layoutManager = GridLayoutManager(mContext, spanCount, GridLayoutManager.VERTICAL, false)

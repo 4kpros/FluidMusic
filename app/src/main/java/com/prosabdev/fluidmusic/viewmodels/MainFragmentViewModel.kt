@@ -11,6 +11,7 @@ class MainFragmentViewModel : ViewModel() {
     private val mMutableTotalCount = MutableLiveData<Int>(0)
     private val mMutableActivePage = MutableLiveData<Int>(0)
     private val mMutableActionBarState = MutableLiveData<Boolean>()
+    private val mMutableScrollingState = MutableLiveData<Int>(-2)
 
     private val mSelectMode: LiveData<Boolean> get() = mMutableSelectMode
     private val mToggleOnRange: LiveData<Int> get() = mMutableToggleOnRange
@@ -18,7 +19,14 @@ class MainFragmentViewModel : ViewModel() {
     private val mTotalCount: LiveData<Int> get() = mMutableTotalCount
     private val mActivePage: LiveData<Int> get() = mMutableActivePage
     private val mActionBarState: LiveData<Boolean> get() = mMutableActionBarState
+    private val mScrollingState: LiveData<Int> get() = mMutableScrollingState
 
+    fun setScrollingState(value : Int) {
+        mMutableScrollingState.value = value
+    }
+    fun getScrollingState(): LiveData<Int> {
+        return mScrollingState
+    }
     fun setSelectMode(value : Boolean) {
         mMutableSelectMode.value = value
     }
