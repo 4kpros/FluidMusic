@@ -37,15 +37,14 @@ class HeadlinePlayShuffleAdapter(
 
     override fun onViewAttachedToWindow(holder: HeadlinePlayShuffleHolder) {
         super.onViewAttachedToWindow(holder)
-
         holder.updateBottomSpaceUI(mScrollState)
     }
     override fun onBindViewHolder(holder: HeadlinePlayShuffleHolder, position: Int) {
 
         //Bind listener for to capture click events
+        holder.updateBottomSpaceUI(mScrollState)
         holder.bindListener(mListener)
         holder.updateOnSelectModeEnabledUI(mIsSelectMode)
-        holder.updateBottomSpaceUI(mScrollState)
     }
 
     override fun getItemCount(): Int {
@@ -77,6 +76,7 @@ class HeadlinePlayShuffleAdapter(
         private var mCustomEmptyBottomSpace: ConstraintLayout? =
             itemView.findViewById<ConstraintLayout>(R.id.custom_empty_bottom_space)
 
+        private var mRequestApplyInsetsCounter :Int  = 0;
         fun bindListener(listener: OnItemClickListener) {
             mPlayButton?.setOnClickListener {
                 listener.onPlayButtonClicked()
@@ -95,9 +95,12 @@ class HeadlinePlayShuffleAdapter(
             if (scrollState == 1) {
                 mCustomEmptyBottomSpace?.visibility = GONE
             }else {
+                if(mRequestApplyInsetsCounter == 0){
+                    mRequestApplyInsetsCounter++
+//                    CustomViewModifiers.updateBottomViewInsets(mCustomEmptyBottomSpace!!)
+                }
+//                mCustomEmptyBottomSpace?.requestApplyInsets()
                 mCustomEmptyBottomSpace?.visibility = VISIBLE
-                CustomViewModifiers.updateBottomViewInsets(mCustomEmptyBottomSpace!!)
-                mCustomEmptyBottomSpace?.requestApplyInsets()
             }
             if(scrollState == 2) {
                 if (mTextEnd != null)
