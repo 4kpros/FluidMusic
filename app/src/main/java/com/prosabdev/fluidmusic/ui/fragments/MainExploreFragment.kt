@@ -11,6 +11,8 @@ import android.widget.Toast
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
@@ -18,6 +20,7 @@ import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.prosabdev.fluidmusic.R
@@ -25,6 +28,7 @@ import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.viewmodels.MainFragmentViewModel
+import kotlinx.coroutines.NonCancellable.cancel
 
 class MainExploreFragment : Fragment() {
 
@@ -141,15 +145,61 @@ class MainExploreFragment : Fragment() {
             }
         })
         mButtonPlayAfter.setOnClickListener {
+            onAddToPlayAfter()
         }
         mButtonQueueMusicAdd.setOnClickListener {
+            onAddSelectionToQueueMusicDialog()
         }
         mButtonPlaylistAdd.setOnClickListener {
+            onShowAddSelectionToPlaylistDialog()
         }
         mButtonShare.setOnClickListener {
+            onShareSelectionDialog()
         }
         mButtonDelete.setOnClickListener {
+            onShowDeleteSelectionDialog()
         }
+    }
+
+    private fun onShareSelectionDialog() {
+        Toast.makeText(mContext, "On share selection", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun onShowAddSelectionToPlaylistDialog() {
+        Toast.makeText(mContext, "On add selection to playlist", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun onAddSelectionToQueueMusicDialog() {
+        Toast.makeText(mContext, "On add selection to queue music", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun onShowDeleteSelectionDialog() {
+        if(mContext == null)
+            return
+        MaterialAlertDialogBuilder(mContext!!)
+            .setTitle(resources.getString(R.string.dialog_delete_selection_title))
+            .setMessage(resources.getString(R.string.dialog_delete_selection_description))
+            .setNeutralButton(resources.getString(R.string.delete_files)) { dialog, which ->
+                onDeleteForeverFilesSelection()
+            }
+            .setNegativeButton(resources.getString(R.string.decline)) { dialog, which ->
+                dialog.dismiss()
+            }
+            .setPositiveButton(resources.getString(R.string.delete)) { dialog, which ->
+                onDeleteSelection()
+            }
+            .show()
+    }
+    private fun onAddToPlayAfter() {
+        Toast.makeText(mContext, "On add to play after selection", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun onDeleteForeverFilesSelection() {
+        Toast.makeText(mContext, "On delete forever files selection", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun onDeleteSelection() {
+        Toast.makeText(mContext, "On delete selection", Toast.LENGTH_SHORT).show()
     }
 
     private fun applyAppBarTitle(position: Int) {

@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.callbacks.SongItemMoveCallback
@@ -186,7 +187,7 @@ class AllSongsFragment : Fragment() {
                 onShuffleButton()
             }
             override fun onFilterButtonClicked() {
-                Toast.makeText(mContext, "onFilterButtonClicked", Toast.LENGTH_SHORT).show()
+                onShowFilterDialog()
             }
         })
         //Setup song adapter
@@ -251,6 +252,25 @@ class AllSongsFragment : Fragment() {
         touchHelper = ItemTouchHelper(callback)
         touchHelper.attachToRecyclerView(mRecyclerView)
     }
+
+    private fun onShowFilterDialog() {
+        if(mContext == null)
+            return
+//        MaterialAlertDialogBuilder(mContext!!)
+//            .setTitle(resources.getString(R.string.dialog_delete_selection_title))
+//            .setMessage(resources.getString(R.string.supporting_text))
+//            .setNeutralButton(resources.getString(R.string.cancel)) { dialog, which ->
+//                // Respond to neutral button press
+//            }
+//            .setNegativeButton(resources.getString(R.string.decline)) { dialog, which ->
+//                // Respond to negative button press
+//            }
+//            .setPositiveButton(resources.getString(R.string.accept)) { dialog, which ->
+//                // Respond to positive button press
+//            }
+//            .show()
+    }
+
     private fun onLongPressedToItemSong(position: Int) {
         if(mSongItemAdapter?.selectableGetSelectionMode() == true){
             mSongItemAdapter?.selectableToggleSelection(position, mLayoutManager)

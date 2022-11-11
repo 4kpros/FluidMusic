@@ -291,7 +291,7 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
     private fun setupNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.app_name)
-            val descriptionText = getString(R.string.musicplayer)
+            val descriptionText = getString(R.string.music_player)
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val mChannel = NotificationChannel(ConstantValues.CHANNEL_ID, name, importance)
             mChannel.description = descriptionText
