@@ -37,4 +37,5 @@
     <string name="all">All</string>
     <string name="range">Range</string>
     <string name="selection">Selection</string>
+    <string name="end_of_list">End of list</string>
 </resources>

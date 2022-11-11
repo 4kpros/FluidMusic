@@ -5,6 +5,7 @@ import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -73,6 +74,7 @@ abstract class CustomAnimators {
         }
         fun crossTranslateInFromVertical(contentView : View, direction : Int, animate : Boolean = false, duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime), translationDistance: Float = defaultTranslationPosition) {
             val tempDirection = if(direction > 0) 1 else -1
+            Log.i(ConstantValues.TAG, "Show")
             if(animate){
                 contentView.apply {
                     translationY = tempDirection * translationDistance
@@ -95,6 +97,9 @@ abstract class CustomAnimators {
             val tempDirection = if(direction > 0) 1 else -1
             if(animate){
                 contentView.apply {
+                    translationY = 0.0f
+                    alpha = 1.0f
+                    visibility = VISIBLE
                     animate()
                         .translationY(tempDirection * translationDistance)
                         .alpha(0.0f)

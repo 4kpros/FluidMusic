@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.textview.MaterialTextView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
@@ -37,7 +38,7 @@ class HeadlinePlayShuffleAdapter(
     override fun onViewAttachedToWindow(holder: HeadlinePlayShuffleHolder) {
         super.onViewAttachedToWindow(holder)
 
-//        holder.updateBottomSpaceUI(mScrollState)
+        holder.updateBottomSpaceUI(mScrollState)
     }
     override fun onBindViewHolder(holder: HeadlinePlayShuffleHolder, position: Int) {
 
@@ -45,7 +46,6 @@ class HeadlinePlayShuffleAdapter(
         holder.bindListener(mListener)
         holder.updateOnSelectModeEnabledUI(mIsSelectMode)
         holder.updateBottomSpaceUI(mScrollState)
-        mScrollState--
     }
 
     override fun getItemCount(): Int {
@@ -72,7 +72,9 @@ class HeadlinePlayShuffleAdapter(
         private var mHoverView: View? =
             itemView.findViewById<View>(R.id.hover_view)
 //
-        var mCustomEmptyBottomSpace: ConstraintLayout? =
+        private var mTextEnd: MaterialTextView? =
+            itemView.findViewById<MaterialTextView>(R.id.text_end)
+        private var mCustomEmptyBottomSpace: ConstraintLayout? =
             itemView.findViewById<ConstraintLayout>(R.id.custom_empty_bottom_space)
 
         fun bindListener(listener: OnItemClickListener) {
@@ -89,10 +91,18 @@ class HeadlinePlayShuffleAdapter(
         fun updateBottomSpaceUI(scrollState : Int) {
             if(mCustomEmptyBottomSpace == null)
                 return
+
             if (scrollState == 1) {
+                mCustomEmptyBottomSpace?.visibility = GONE
+            }else {
+                mCustomEmptyBottomSpace?.visibility = VISIBLE
                 CustomViewModifiers.updateBottomViewInsets(mCustomEmptyBottomSpace!!)
+                mCustomEmptyBottomSpace?.requestApplyInsets()
             }
-            mCustomEmptyBottomSpace?.requestApplyInsets()
+            if(scrollState == 2) {
+                if (mTextEnd != null)
+                    CustomAnimators.crossFadeUp(mTextEnd!!, true, 500)
+            }
         }
         fun updateOnSelectModeEnabledUI(isSelectMode: Boolean) {
             if(mHoverView == null)

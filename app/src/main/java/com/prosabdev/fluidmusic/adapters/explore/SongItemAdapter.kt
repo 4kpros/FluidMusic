@@ -19,6 +19,7 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.callbacks.SongItemMoveCallback
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomFormatters
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import com.prosabdev.fluidmusic.utils.adapters.SelectablePlayingItemAdapter
@@ -170,7 +171,7 @@ class SongItemAdapter(
         private var mDragHand: MaterialButton? = itemView.findViewById<MaterialButton>(R.id.button_drag_hand)
 
         fun updateAllUI(context: Context, songItem: SongItem, isPlaying: Boolean, selected: Boolean){
-            updateSelectedStateUI(selected)
+            updateSelectedStateUI(selected, false)
             updateIsPlayingStateUI(isPlaying)
             updateCovertArtAndTitleUI(context, songItem)
         }
@@ -226,11 +227,13 @@ class SongItemAdapter(
                 mCurrentlyPlaying?.visibility = INVISIBLE
             }
         }
-        fun updateSelectedStateUI(selectableIsSelected: Boolean) {
-            if(selectableIsSelected)
-                mSelectedItemBackground?.visibility = VISIBLE
-            else
-                mSelectedItemBackground?.visibility = INVISIBLE
+        fun updateSelectedStateUI(selectableIsSelected: Boolean, animated: Boolean = true) {
+            if(mSelectedItemBackground == null)
+                return
+            if(selectableIsSelected && mSelectedItemBackground?.visibility != VISIBLE)
+                CustomAnimators.crossFadeUp(mSelectedItemBackground!!, animated)
+            else if(!selectableIsSelected && (mSelectedItemBackground?.alpha ?: 0.0f) == 1.0f)
+                CustomAnimators.crossFadeDown(mSelectedItemBackground!!, animated)
         }
         fun bindListener(
             holder: SongItemHolder,

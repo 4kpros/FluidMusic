@@ -107,15 +107,8 @@ class AllSongsFragment : Fragment() {
     }
     private fun updateOnScrollingStateUI(i: Int) {
         if(mMainFragmentViewModel.getActivePage().value == mPageIndex){
-//            if(mEmptyBottomLineContainer != null){
-//                if(i == 1){
-//                    if((mEmptyBottomLineContainer?.scaleY ?: 0.0f) == 1.0f)
-//                        CustomAnimators.crossScaleYDown(mEmptyBottomLineContainer!!, true, 150)
-//                }else{
-//                    if((mEmptyBottomLineContainer?.scaleY ?: 0.0f) == 0.0f)
-//                        CustomAnimators.crossScaleYUp(mEmptyBottomLineContainer!!, true, 150)
-//                }
-//            }
+            if(i == 2)
+                mEmptyBottomSpaceAdapter?.onSetScrollState(2)
         }
     }
     private fun onToggleRangeChanged() {

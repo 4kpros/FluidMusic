@@ -120,11 +120,11 @@ class MainFragment : Fragment() {
     private var mIsAnimatingScroll2: Boolean = false
     private fun animateScrollStateUI(i: Int, animate : Boolean = true) {
         Log.i(ConstantValues.TAG, "IIII = $i")
-        if(i == 1){
+        if(i >= 1){
             if(mIsAnimatingScroll2){
                 mConstraintMiniPlayerContainer?.apply {
-                    clearAnimation()
                     mIsAnimatingScroll2 = false
+                    clearAnimation()
                 }
             }
             if(mIsAnimatingScroll1)
@@ -134,8 +134,8 @@ class MainFragment : Fragment() {
         }else{
             if(mIsAnimatingScroll1){
                 mConstraintMiniPlayerContainer?.apply {
-                    clearAnimation()
                     mIsAnimatingScroll1 = false
+                    clearAnimation()
                 }
             }
             if(mIsAnimatingScroll2)
