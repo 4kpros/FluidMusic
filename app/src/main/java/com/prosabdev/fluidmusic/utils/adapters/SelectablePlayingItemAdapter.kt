@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 abstract class SelectablePlayingItemAdapter<VH : RecyclerView.ViewHolder>() : SelectableRecycleViewAdapter<VH>() {
     private val TAG: String = SelectablePlayingItemAdapter::class.java.simpleName
+    public val PAYLOAD_IS_PLAYING = "PAYLOAD_IS_PLAYING"
     private var mPlayingItem: Int = -1
 
     protected fun selectablePlayingIsPlaying(position: Int): Boolean {
@@ -16,8 +17,8 @@ abstract class SelectablePlayingItemAdapter<VH : RecyclerView.ViewHolder>() : Se
         val oldPlaying = mPlayingItem
         mPlayingItem = if(position >= 0) position else -1
         if(oldPlaying >= 0)
-            notifyItemChanged(oldPlaying)
+            notifyItemChanged(oldPlaying, PAYLOAD_IS_PLAYING)
         if(mPlayingItem >= 0)
-            notifyItemChanged(position)
+            notifyItemChanged(position, PAYLOAD_IS_PLAYING)
     }
 }

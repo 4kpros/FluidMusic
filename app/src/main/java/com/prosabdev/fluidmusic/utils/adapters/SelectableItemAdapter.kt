@@ -2,15 +2,16 @@ package com.prosabdev.fluidmusic.utils.adapters
 
 import android.util.Log
 import android.util.SparseBooleanArray
+import android.view.View
 import androidx.core.util.contains
-import androidx.core.util.forEach
 import androidx.core.util.size
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import java.util.*
-import kotlin.collections.ArrayList
 
 abstract class SelectableRecycleViewAdapter<VH : RecyclerView.ViewHolder>() : RecyclerView.Adapter<VH>() {
+    public val PAYLOAD_IS_SELECTED = "PAYLOAD_IS_SELECTED"
     private val TAG: String = SelectableRecycleViewAdapter::class.java.simpleName
     private var mSelectedItems: SparseBooleanArray = SparseBooleanArray()
     private var mMinSelected: Int = -1
@@ -19,6 +20,24 @@ abstract class SelectableRecycleViewAdapter<VH : RecyclerView.ViewHolder>() : Re
 
     interface OnSelectSelectableItemListener{
         fun onTotalSelectedItemChange(totalSelected : Int)
+    }
+
+    private fun onNotifyItemChanged(position : Int, layoutManager : GridLayoutManager?){
+        if(layoutManager != null){
+            if(isItemPositionVisible(position, layoutManager))
+                notifyItemChanged(position, PAYLOAD_IS_SELECTED)
+        }else{
+            notifyItemChanged(position, PAYLOAD_IS_SELECTED)
+        }
+    }
+    private fun isItemPositionVisible(position : Int, layoutManager : GridLayoutManager?): Boolean {
+        var tempResult : Boolean? = false
+        val tempFirstVisiblePosition = layoutManager?.findFirstVisibleItemPosition() ?: -1
+        val tempLastVisiblePosition = layoutManager?.findLastVisibleItemPosition() ?: -1
+        if(position in tempFirstVisiblePosition ..  tempLastVisiblePosition)
+            tempResult = true
+        Log.i(ConstantValues.TAG, "View visibility at $position : $tempResult")
+        return tempResult ?: true
     }
 
     protected fun selectableItemGetSelectedItemCount(): Int {
@@ -38,14 +57,15 @@ abstract class SelectableRecycleViewAdapter<VH : RecyclerView.ViewHolder>() : Re
     }
 
     protected fun selectableItemSetSelectionMode(
-        value: Boolean
+        value: Boolean,
+        layoutManager : GridLayoutManager? = null
     ) {
         if(value == mSelectionMode)
             return
         if(mSelectedItems.size > 0){
             for (i in 0 until itemCount) {
                 mSelectedItems.delete(i)
-                notifyItemChanged(i)
+                onNotifyItemChanged(i, layoutManager)
             }
         }
         mSelectedItems.clear()
@@ -54,7 +74,7 @@ abstract class SelectableRecycleViewAdapter<VH : RecyclerView.ViewHolder>() : Re
         mSelectionMode = value
     }
 
-    protected fun selectableItemToggleSelection(position: Int) {
+    protected fun selectableItemToggleSelection(position: Int, layoutManager : GridLayoutManager? = null) {
         if (mSelectedItems.contains(position)) {
             mSelectedItems.delete(position)
             findNewMinMaxSelected(position)
@@ -62,10 +82,10 @@ abstract class SelectableRecycleViewAdapter<VH : RecyclerView.ViewHolder>() : Re
             mSelectedItems.put(position, true)
             compareAndSetMinMax(position)
         }
-        notifyItemChanged(position)
+        onNotifyItemChanged(position, layoutManager)
     }
 
-    protected fun selectableItemUpdateSelection(position: Int, value : Boolean) {
+    protected fun selectableItemUpdateSelection(position: Int, value : Boolean, layoutManager : GridLayoutManager? = null) {
         if(mSelectedItems.contains(position)){
             if(!value){
                 mSelectedItems.delete(position)
@@ -77,23 +97,24 @@ abstract class SelectableRecycleViewAdapter<VH : RecyclerView.ViewHolder>() : Re
                 compareAndSetMinMax(position)
             }
         }
+        onNotifyItemChanged(position, layoutManager)
     }
-    protected fun selectableItemSelectAll() {
+    protected fun selectableItemSelectAll(layoutManager : GridLayoutManager? = null) {
         mMinSelected = 0
         mMaxSelected = itemCount
         for (i in 0 until itemCount) {
             if (!mSelectedItems.contains(i)) {
                 mSelectedItems.put(i, true)
-                notifyItemChanged(i)
+                onNotifyItemChanged(i, layoutManager)
             }
         }
     }
-    protected fun selectableItemClearAllSelection() {
+    protected fun selectableItemClearAllSelection(layoutManager : GridLayoutManager? = null) {
         if(mSelectedItems.size > 0){
             for (i in 0 until itemCount) {
                 if (mSelectedItems.contains(i)) {
                     mSelectedItems.delete(i)
-                    notifyItemChanged(i)
+                    onNotifyItemChanged(i, layoutManager)
                 }
             }
         }
@@ -102,24 +123,24 @@ abstract class SelectableRecycleViewAdapter<VH : RecyclerView.ViewHolder>() : Re
         mSelectedItems.clear()
     }
 
-    protected fun selectableItemToggleSelectRange(mOnSelectSelectableItemListener: OnSelectSelectableItemListener) {
+    protected fun selectableItemToggleSelectRange(mOnSelectSelectableItemListener: OnSelectSelectableItemListener, layoutManager : GridLayoutManager? = null) {
         val oldSize = mSelectedItems.size()
         if(mMinSelected >= 0 && mMaxSelected >= 0) {
             if (mMinSelected in 0 until mMaxSelected) {
-                selectableItemSelectRange()
+                selectableItemSelectRange(layoutManager)
             }
         }
         if(mSelectedItems.size() != oldSize)
             mOnSelectSelectableItemListener.onTotalSelectedItemChange(mSelectedItems.size)
     }
-    private fun selectableItemSelectRange() {
+    private fun selectableItemSelectRange(layoutManager : GridLayoutManager? = null) {
         if(mMinSelected >= 0 && mMaxSelected >= 0){
             if(mMinSelected in 0 until mMaxSelected)
             {
                 for (i in mMinSelected .. mMaxSelected){
                     if(!mSelectedItems.contains(i)){
                         mSelectedItems.put(i, true)
-                        notifyItemChanged(i)
+                        onNotifyItemChanged(i, layoutManager)
                     }
                 }
             }
@@ -130,7 +151,7 @@ abstract class SelectableRecycleViewAdapter<VH : RecyclerView.ViewHolder>() : Re
 //            if(mSelectedItems.size  > 0) {
 //                for (i in mMinSelected..mMaxSelected) {
 //                    mSelectedItems.delete(i)
-//                    notifyItemChanged(i)
+//                    onNotifyItemChanged(i)
 //                }
 //            }
 //        }

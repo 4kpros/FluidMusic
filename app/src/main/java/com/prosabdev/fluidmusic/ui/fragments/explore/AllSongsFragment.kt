@@ -20,8 +20,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
-import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.adapters.callbacks.SongItemMoveCallback
+import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
@@ -49,6 +49,7 @@ class AllSongsFragment : Fragment() {
     private var mSongItemAdapter: SongItemAdapter? = null
     private var mRecyclerView: RecyclerView? = null
     private var mLoadingContentProgress: ConstraintLayout? = null
+    private var mLayoutManager: GridLayoutManager? = null
 
     private var mSongList : ArrayList<SongItem> = ArrayList<SongItem>()
 
@@ -99,17 +100,18 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun onToggleRangeChanged() {
-        mSongItemAdapter?.selectableToggleSelectRange()
+        mSongItemAdapter?.selectableToggleSelectRange(mLayoutManager)
     }
     private fun onTotalSelectedItemsChanged(it: Int?) {
         if((it ?: 0) > 0 && (it ?: 0) >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
-            mSongItemAdapter?.selectableSelectAll()
+            mSongItemAdapter?.selectableSelectAll(mLayoutManager)
         }else if((it ?: 0) <= 0 && (mSongItemAdapter?.selectableGetSelectedItemCount() ?: 0) > 0){
-            mSongItemAdapter?.selectableClearSelection()
+            mSongItemAdapter?.selectableClearSelection(mLayoutManager)
         }
     }
     private fun onSelectionModeChanged(it: Boolean?) {
         mSongItemAdapter?.selectableSetSelectionMode(it?:false)
+        mHeadlineTopPlayShuffleAdapter?.onSelectModeValue(it ?: false)
     }
     private fun onCurrentPlayingSongChanged(it: Int?) {
         if (mPlayerFragmentViewModel.getSourceOfQueueList().value == ConstantValues.EXPLORE_ALL_SONGS)
@@ -138,6 +140,17 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun checkInteractions() {
+        mRecyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (!recyclerView.canScrollVertically(1) && dy > 0) {
+                    Log.i(ConstantValues.TAG, "Scrolled to BOTTOM")
+                } else if (!recyclerView.canScrollVertically(-1) && dy < 0) {
+                    Log.i(ConstantValues.TAG, "Scrolled to TOP")
+                }else{
+                    Log.i(ConstantValues.TAG, "Scrolled state changed to ${mRecyclerView?.scrollState}")
+                }
+            }
+        })
     }
 
     private fun setupRecyclerViewAdapter() {
@@ -166,7 +179,7 @@ class AllSongsFragment : Fragment() {
             object : SongItemAdapter.OnItemClickListener{
                 override fun onSongItemClicked(position: Int) {
                     if(mSongItemAdapter?.selectableGetSelectionMode() == true){
-                        mSongItemAdapter?.selectableToggleSelection(position)
+                        mSongItemAdapter?.selectableToggleSelection(position, mLayoutManager)
                         mMainFragmentViewModel.setTotalSelected(mSongItemAdapter?.selectableGetSelectedItemCount() ?: 0)
                     }else{
                         updateCurrentPlayingSong(position)
@@ -177,12 +190,12 @@ class AllSongsFragment : Fragment() {
                 }
                 override fun onSongItemLongClicked(position: Int) {
                     if(mSongItemAdapter?.selectableGetSelectionMode() == true){
-//                        mSongItemAdapter?.selectableToggleSelection(position)
-//                        mMainFragmentViewModel.setTotalSelected(mSongItemAdapter?.selectableGetSelectedItemCount() ?: 0)
+                        mSongItemAdapter?.selectableToggleSelection(position, mLayoutManager)
+                        mMainFragmentViewModel.setTotalSelected(mSongItemAdapter?.selectableGetSelectedItemCount() ?: 0)
                     }else{
-                        mSongItemAdapter?.selectableSetSelectionMode(true)
+                        mSongItemAdapter?.selectableSetSelectionMode(true, mLayoutManager)
                         mMainFragmentViewModel.setSelectMode(mSongItemAdapter?.selectableGetSelectionMode() ?: false)
-                        mSongItemAdapter?.selectableToggleSelection(position)
+                        mSongItemAdapter?.selectableToggleSelection(position, mLayoutManager)
                         mMainFragmentViewModel.setTotalSelected(mSongItemAdapter?.selectableGetSelectedItemCount() ?: 0)
                     }
                 }
@@ -226,8 +239,8 @@ class AllSongsFragment : Fragment() {
         mRecyclerView?.adapter = concatAdapter
 
         //Add Layout manager
-        val layoutManager = GridLayoutManager(mContext, spanCount, GridLayoutManager.VERTICAL, false)
-        mRecyclerView?.layoutManager = layoutManager
+        mLayoutManager = GridLayoutManager(mContext, spanCount, GridLayoutManager.VERTICAL, false)
+        mRecyclerView?.layoutManager = mLayoutManager
 
         //Setup Item touch helper callback for drag feature
         val callback : ItemTouchHelper.Callback = SongItemMoveCallback(mSongItemAdapter!!)

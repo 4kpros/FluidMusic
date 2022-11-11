@@ -2,12 +2,13 @@ package com.prosabdev.fluidmusic.adapters
 
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.VISIBLE
 import android.view.ViewGroup
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 
 class HeadlinePlayShuffleAdapter(
@@ -15,6 +16,8 @@ class HeadlinePlayShuffleAdapter(
     private val mResourceId : Int,
     private val mListener: OnItemClickListener
     ) : RecyclerView.Adapter<HeadlinePlayShuffleAdapter.HeadlinePlayShuffleHolder>() {
+
+    private var mIsSelectMode: Boolean = false
 
     interface OnItemClickListener {
         fun onPlayButtonClicked()
@@ -41,10 +44,16 @@ class HeadlinePlayShuffleAdapter(
 
         //Bind listener for to capture click events
         holder.bindListener(mListener)
+        holder.updateOnSelectModeEnabledUI(mIsSelectMode)
     }
 
     override fun getItemCount(): Int {
         return mHeadLines.size
+    }
+
+    fun onSelectModeValue(value : Boolean){
+        mIsSelectMode = value
+        notifyItemChanged(0)
     }
 
     class HeadlinePlayShuffleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -54,6 +63,8 @@ class HeadlinePlayShuffleAdapter(
             itemView.findViewById<MaterialButton>(R.id.button_shuffle)
         private var mFilterButton: MaterialButton? =
             itemView.findViewById<MaterialButton>(R.id.button_filter)
+        private var mHoverView: View? =
+            itemView.findViewById<View>(R.id.hover_view)
         var mCustomEmptyBottomSpace: ConstraintLayout? =
             itemView.findViewById<ConstraintLayout>(R.id.custom_empty_bottom_space)
 
@@ -68,7 +79,16 @@ class HeadlinePlayShuffleAdapter(
             mFilterButton?.setOnClickListener {
                 listener.onFilterButtonClicked()
             }
-//            CustomViewModifiers.updateBottomViewInsets(mCustomEmptyBottomSpace)
+        }
+
+        fun updateOnSelectModeEnabledUI(mIsSelectMode: Boolean) {
+            if(mIsSelectMode){
+                if(mHoverView?.visibility != VISIBLE)
+                    CustomAnimators.crossFadeUp(mHoverView!!, true, 200, 0.8f)
+            }else{
+                if (mHoverView != null && mHoverView?.visibility != View.GONE)
+                    CustomAnimators.crossFadeDown(mHoverView!!, true, 200)
+            }
         }
     }
 }
