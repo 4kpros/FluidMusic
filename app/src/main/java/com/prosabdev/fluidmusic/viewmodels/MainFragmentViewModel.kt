@@ -9,8 +9,6 @@ class MainFragmentViewModel : ViewModel() {
     private val mMutableToggleOnRange = MutableLiveData<Int>(0)
     private val mMutableTotalSelected = MutableLiveData<Int>(0)
     private val mMutableTotalCount = MutableLiveData<Int>(0)
-    private val mMutableMinimumSelectedIndex = MutableLiveData<Int>(-1)
-    private val mMutableMaximumSelectedIndex = MutableLiveData<Int>(-1)
     private val mMutableActivePage = MutableLiveData<Int>(0)
     private val mMutableActionBarState = MutableLiveData<Boolean>()
 
@@ -18,10 +16,8 @@ class MainFragmentViewModel : ViewModel() {
     private val mToggleOnRange: LiveData<Int> get() = mMutableToggleOnRange
     private val mTotalSelected: LiveData<Int> get() = mMutableTotalSelected
     private val mTotalCount: LiveData<Int> get() = mMutableTotalCount
-    private val mMinimumSelectedIndex: LiveData<Int> get() = mMutableMinimumSelectedIndex
-    private val mMaximumSelectedIndex: LiveData<Int> get() = mMutableMaximumSelectedIndex
     private val mActivePage: LiveData<Int> get() = mMutableActivePage
-    val mActionBarState: LiveData<Boolean> get() = mMutableActionBarState
+    private val mActionBarState: LiveData<Boolean> get() = mMutableActionBarState
 
     fun setSelectMode(value : Boolean) {
         mMutableSelectMode.value = value
@@ -59,5 +55,8 @@ class MainFragmentViewModel : ViewModel() {
     }
     fun setOnActionBarClickListened(item: Boolean) {
         mMutableActionBarState.value = item
+    }
+    fun getOnActionBarClickListened() : LiveData<Boolean> {
+        return mActionBarState
     }
 }

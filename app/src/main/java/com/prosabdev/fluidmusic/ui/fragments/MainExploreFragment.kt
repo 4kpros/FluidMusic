@@ -118,9 +118,11 @@ class MainExploreFragment : Fragment() {
     }
     private  fun updateSelectModeUI(selectMode : Boolean, animate : Boolean = true){
         if (selectMode) {
+            mViewPager.isUserInputEnabled = false
             if(mSelectionRightSelectionMenu.visibility != VISIBLE)
                 CustomAnimators.crossTranslateInFromHorizontal(mSelectionRightSelectionMenu as View, 1, animate, 300)
         }else {
+            mViewPager.isUserInputEnabled = true
             if(mSelectionRightSelectionMenu.visibility != GONE)
                 CustomAnimators.crossTranslateOutFromHorizontal(mSelectionRightSelectionMenu as View, 1, animate, 300)
         }

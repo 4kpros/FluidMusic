@@ -106,32 +106,11 @@ class AlbumsFragment : Fragment() {
         mAlbumItemAdapter = AlbumItemAdapter(mAlbumList, mContext!!, object : AlbumItemAdapter.OnItemClickListener{
             override fun onAlbumItemClicked(position: Int) {
             }
-
             override fun onAlbumItemLongClicked(position: Int) {
             }
-
         },
             object : SelectableRecycleViewAdapter.OnSelectSelectableItemListener{
-                override fun onSelectionModeChange(selectMode: Boolean, totalSelected: Int) {
-                }
-
                 override fun onTotalSelectedItemChange(totalSelected: Int) {
-                }
-
-                override fun onTotalSelectedItemChangeFromRange(totalSelected: Int) {
-
-                }
-
-                override fun onTotalSelectedItemChangeFromToggle(totalSelected: Int) {
-
-                }
-
-                override fun onMinSelectedItemChange(minSelected: Int) {
-
-                }
-
-                override fun onMaxSelectedItemChange(maxSelected: Int) {
-
                 }
 
             })

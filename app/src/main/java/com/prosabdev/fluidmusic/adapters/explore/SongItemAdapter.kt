@@ -16,7 +16,6 @@ import com.google.android.material.color.MaterialColors
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.callbacks.SongItemMoveCallback
 import com.prosabdev.fluidmusic.models.SongItem
-import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomFormatters
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import com.prosabdev.fluidmusic.utils.adapters.SelectablePlayingItemAdapter
@@ -59,37 +58,32 @@ class SongItemAdapter(
     fun selectableGetSelectionMode(): Boolean {
         return selectableItemGetSelectionMode()
     }
-    fun selectableSetSelectionMode(value : Boolean, notifyListener: Boolean = true) {
-        return selectableItemSetSelectionMode(mOnSelectSelectableItemListener, value, notifyListener)
+    fun selectableSetSelectionMode(value : Boolean) {
+        return selectableItemSetSelectionMode(value)
     }
     fun selectableIsSelected(position: Int): Boolean {
         return selectableItemIsSelected(position)
     }
     fun selectableToggleSelection(position: Int) {
-        selectableItemToggleSelection(mOnSelectSelectableItemListener, position)
+        selectableItemToggleSelection(position)
     }
     fun selectableUpdateSelection(position: Int, value : Boolean) {
-        selectableItemUpdateSelection(position, value, mOnSelectSelectableItemListener)
+        selectableItemUpdateSelection(position, value)
     }
-    fun selectableSelectRange(startRange: Int, endRange: Int) {
-        selectableItemSelectRange(startRange, endRange, mOnSelectSelectableItemListener)
-    }
-    fun selectableClearRange(startRange: Int, endRange: Int) {
-        selectableItemClearRange(startRange, endRange, mOnSelectSelectableItemListener)
+    fun selectableToggleSelectRange() {
+        selectableItemToggleSelectRange(mOnSelectSelectableItemListener)
     }
     fun selectableGetSelectedItemCount(): Int {
         return selectableItemGetSelectedItemCount()
     }
-    fun selectableGetSelectedItems(): List<Int?> {
-        return selectableItemGetSelectedItems()
-    }
     fun selectableSelectAll() {
-        selectableItemSelectAll(mOnSelectSelectableItemListener)
+        selectableItemSelectAll()
     }
-    fun selectableClearSelection(notifyListener: Boolean = true) {
-        selectableItemClearAllSelection(mOnSelectSelectableItemListener, notifyListener)
+    fun selectableClearSelection() {
+        selectableItemClearAllSelection()
     }
 
+    //
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongItemHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_song, parent, false)
@@ -112,14 +106,14 @@ class SongItemAdapter(
         mOnItemClickListener.onItemMovedTo(mToPosition)
         if (mFromPosition < mToPosition) {
             for (i in mFromPosition until mToPosition) {
-                selectableItemUpdateSelection(i, selectableIsSelected(i + 1), mOnSelectSelectableItemListener)
-                selectableItemUpdateSelection(i + 1, selectableIsSelected(i), mOnSelectSelectableItemListener)
+                selectableItemUpdateSelection(i, selectableIsSelected(i + 1))
+                selectableItemUpdateSelection(i + 1, selectableIsSelected(i))
                 Collections.swap(mSongList, i, i + 1)
             }
         } else {
             for (i in mFromPosition downTo mToPosition + 1) {
-                selectableItemUpdateSelection(i, selectableIsSelected(i - 1), mOnSelectSelectableItemListener)
-                selectableItemUpdateSelection(i - 1, selectableIsSelected(i), mOnSelectSelectableItemListener)
+                selectableItemUpdateSelection(i, selectableIsSelected(i - 1))
+                selectableItemUpdateSelection(i - 1, selectableIsSelected(i))
                 Collections.swap(mSongList, i, i - 1)
             }
         }

@@ -125,13 +125,6 @@ class MainActivity : AppCompatActivity(){
     }
 
     private fun observeLiveData() {
-        //Listen for queue list updated
-        mPlayerFragmentViewModel.getSongList().observe(this as LifecycleOwner, object : Observer<ArrayList<SongItem>>{
-            override fun onChanged(songList: ArrayList<SongItem>?) {
-                updateQueueList(songList)
-            }
-        })
-        //Listen for current song updated
         mPlayerFragmentViewModel.getCurrentSong().observe(this as LifecycleOwner, object : Observer<Int>{
             override fun onChanged(currentSong: Int?) {
                 MainScope().launch {
@@ -139,19 +132,11 @@ class MainActivity : AppCompatActivity(){
                 }
             }
         })
-        //Listen for source of queue list updated
-        mPlayerFragmentViewModel.getSourceOfQueueList().observe(this as LifecycleOwner, object : Observer<String> {
-            override fun onChanged(sourceOf: String?) {
-                updateDataFromSource(sourceOf)
-            }
-        })
-    }
-
-    private fun updateDataFromSource(sourceOf: String?) {
-        //
     }
 
     private suspend fun updateCurrentPlayingSong(currentSong: Int?)  = coroutineScope{
+        if((currentSong ?: 0) < 0)
+            return@coroutineScope
         if ((mPlayerFragmentViewModel.getSongList().value?.size ?: 0) > 0) {
             val bundle = createQueueListBundle(currentSong ?: 0)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -161,7 +146,6 @@ class MainActivity : AppCompatActivity(){
                 )
             }
         }
-
     }
 
     private fun createQueueListBundle(currentSong: Int): Bundle {
@@ -204,10 +188,6 @@ class MainActivity : AppCompatActivity(){
         return bundle
     }
 
-    private fun updateQueueList(songList: ArrayList<SongItem>?) {
-        //
-    }
-
     public override fun onStart() {
         super.onStart()
         mMediaBrowser?.connect()
@@ -220,20 +200,13 @@ class MainActivity : AppCompatActivity(){
 
     public override fun onStop() {
         super.onStop()
-        // (see "stay in sync with the MediaSession")
         MediaControllerCompat.getMediaController(this)?.unregisterCallback(mControllerCallback)
         mMediaBrowser?.disconnect()
     }
 
     private fun checkInteractions() {
-        mMainFragmentViewModel.mActionBarState.observe(this, Observer { item ->
-            if(item){
-                mDrawerLayout?.open()
-            }
-        })
     }
 
-    //Initialize views
     private fun initViews(savedInstanceState : Bundle?) {
         mDrawerLayout = findViewById(R.id.drawer_layout)
         mNavigationView = findViewById(R.id.navigation_view)

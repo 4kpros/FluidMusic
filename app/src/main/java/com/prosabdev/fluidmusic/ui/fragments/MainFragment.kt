@@ -123,18 +123,18 @@ class MainFragment : Fragment() {
         ){ updateTotalSelectedUI(it ?: 0) }
     }
     private fun updateTotalSelectedUI(totalSelected: Int, animate : Boolean = true) {
-        if (totalSelected >= 2 && mHoverMenuRange?.visibility != GONE)
-            CustomAnimators.crossFadeDown(mHoverMenuRange!!, animate, 200)
-        else if(totalSelected < 2 && mHoverMenuRange?.visibility != VISIBLE)
-            CustomAnimators.crossFadeUp(mHoverMenuRange!!, animate, 200, 0.8f)
 
-        if(totalSelected >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
+        if(totalSelected > 0 && totalSelected >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
             mButtonSelectAll?.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box)
+
+            CustomAnimators.crossFadeUp(mHoverMenuRange!!, false, 200, 0.8f)
+        }else{
+            mButtonSelectAll?.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box_outline_blank)
 
             if (totalSelected >= 2 && mHoverMenuRange?.visibility != GONE)
                 CustomAnimators.crossFadeDown(mHoverMenuRange!!, animate, 200)
-        }else{
-            mButtonSelectAll?.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box_outline_blank)
+            else if(totalSelected < 2 && mHoverMenuRange?.visibility != VISIBLE)
+                CustomAnimators.crossFadeUp(mHoverMenuRange!!, animate, 200, 0.8f)
         }
         mTextSelectedCount?.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
     }
