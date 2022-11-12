@@ -7,11 +7,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -21,24 +17,23 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.callbacks.SongItemMoveCallback
 import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.SortOrganizeItemsBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomMathComputations
-import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 import com.prosabdev.fluidmusic.utils.adapters.SelectableRecycleViewAdapter
 import com.prosabdev.fluidmusic.viewmodels.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.explore.AllSongsFragmentViewModel
-import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+
 
 class AllSongsFragment : Fragment() {
     private var mPageIndex: Int? = -1
@@ -256,19 +251,7 @@ class AllSongsFragment : Fragment() {
     private fun onShowFilterDialog() {
         if(mContext == null)
             return
-//        MaterialAlertDialogBuilder(mContext!!)
-//            .setTitle(resources.getString(R.string.dialog_delete_selection_title))
-//            .setMessage(resources.getString(R.string.supporting_text))
-//            .setNeutralButton(resources.getString(R.string.cancel)) { dialog, which ->
-//                // Respond to neutral button press
-//            }
-//            .setNegativeButton(resources.getString(R.string.decline)) { dialog, which ->
-//                // Respond to negative button press
-//            }
-//            .setPositiveButton(resources.getString(R.string.accept)) { dialog, which ->
-//                // Respond to positive button press
-//            }
-//            .show()
+        SortOrganizeItemsBottomSheetDialog().show(childFragmentManager, SortOrganizeItemsBottomSheetDialog.TAG)
     }
 
     private fun onLongPressedToItemSong(position: Int) {

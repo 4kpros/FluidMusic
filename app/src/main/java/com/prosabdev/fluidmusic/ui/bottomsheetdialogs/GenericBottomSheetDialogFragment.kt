@@ -1,11 +1,11 @@
-package com.prosabdev.fluidmusic.dialogs
+package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 
 import android.app.Dialog
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
-class GenericBottomSheetDialogFragment: AppCompatDialogFragment() {
+open class GenericBottomSheetDialogFragment: AppCompatDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return BottomSheetDialog(requireContext(), theme)

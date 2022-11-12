@@ -24,8 +24,8 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.slider.Slider
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
-import com.prosabdev.fluidmusic.dialogs.PlayerMoreDialog
-import com.prosabdev.fluidmusic.dialogs.PlayerQueueMusicDialog
+import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreDialog
+import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerQueueMusicDialog
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
@@ -315,7 +315,8 @@ class PlayerFragment : Fragment() {
         })
         //
         mButtonMore?.setOnClickListener(View.OnClickListener {
-            mPlayerMoreDialog = PlayerMoreDialog()
+            if(mPlayerMoreDialog == null)
+                mPlayerMoreDialog = PlayerMoreDialog()
             mPlayerMoreDialog?.show(childFragmentManager, PlayerMoreDialog.TAG)
         })
         mButtonQueueMusic?.setOnClickListener(View.OnClickListener {
@@ -375,6 +376,7 @@ class PlayerFragment : Fragment() {
         mButtonRepeat = view.findViewById(R.id.button_repeat)
         //
         mButtonQueueMusic = view.findViewById(R.id.button_queue_music)
+        mButtonMore = view.findViewById(R.id.button_more)
         mButtonEqualizer = view.findViewById(R.id.button_equalizer)
         mButtonArrowDown = view.findViewById(R.id.button_arrow_down)
 

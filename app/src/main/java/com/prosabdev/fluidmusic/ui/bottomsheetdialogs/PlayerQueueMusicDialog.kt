@@ -1,4 +1,4 @@
-package com.prosabdev.fluidmusic.dialogs
+package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 
 import android.content.res.Resources
 import android.os.Bundle
@@ -25,6 +25,6 @@ class PlayerQueueMusicDialog : BottomSheetDialogFragment() {
         }
     }
     companion object {
-        const val TAG = "QueueMusicDialog"
+        const val TAG = "PlayerQueueMusicDialog"
     }
 }

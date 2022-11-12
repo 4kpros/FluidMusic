@@ -179,9 +179,9 @@ class MainExploreFragment : Fragment() {
         MaterialAlertDialogBuilder(mContext!!)
             .setTitle(resources.getString(R.string.dialog_delete_selection_title))
             .setMessage(resources.getString(R.string.dialog_delete_selection_description))
-            .setNeutralButton(resources.getString(R.string.delete_files)) { dialog, which ->
-                onDeleteForeverFilesSelection()
-            }
+//            .setNeutralButton(resources.getString(R.string.delete_files)) { dialog, which ->
+//                onDeleteForeverFilesSelection()
+//            }
             .setNegativeButton(resources.getString(R.string.decline)) { dialog, which ->
                 dialog.dismiss()
             }

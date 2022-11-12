@@ -1,23 +1,33 @@
-package com.prosabdev.fluidmusic.dialogs
+package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 
-import android.app.Dialog
-import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.prosabdev.fluidmusic.R
 
-class PlayerMoreDialog : BottomSheetDialogFragment() {
+class PlayerMoreDialog : GenericBottomSheetDialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.dialog_player_more, container, false)
+
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_player_more, container, false)
+
+        initViews(view)
+        checkInteractions()
+
+        return view
+    }
+
+    private fun checkInteractions() {
+
+    }
+
+    private fun initViews(view: View?) {
+
     }
 
     companion object {

@@ -55,12 +55,16 @@
     <string name="browse">Browse</string>
     <string name="artist">Artist</string>
     <string name="album">Album</string>
-    <string name="added_modification_date">Added/modification date</string>
     <string name="playing_date">Playing date</string>
     <string name="play_count">Play count</string>
     <string name="invert">Invert</string>
     <string name="selection">Selection</string>
     <string name="end_of_list">End of list</string>
+    <string name="decline">Decline</string>
+    <string name="more_settings">More settings</string>
+    <string name="organize">Organize</string>
+    <string name="others">Others</string>
+    <string name="added_updated">Added/Updated</string>
     //Dialogs messages
     //Main filter dialog
     <string name="dialog_sort_title">Sort and set disposition option : </string>
@@ -78,8 +82,4 @@
     <string name="dialog_add_to_playlist_title">Add on playlist</string>
     //Covert art details dialog
     <string name="dialog_covert_art_details_title">Covert art details</string>
-    <string name="decline">Decline</string>
-    <string name="more_settings">More settings</string>
-    <string name="organize">Organize</string>
-    <string name="others">Others</string>
 </resources>
