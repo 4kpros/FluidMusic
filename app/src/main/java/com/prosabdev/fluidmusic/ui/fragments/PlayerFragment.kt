@@ -38,6 +38,7 @@ class PlayerFragment : Fragment() {
 
     private var mPlayerPagerAdapter: PlayerPageAdapter? = null
     private var mSongList: ArrayList<SongItem> = ArrayList<SongItem>()
+
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 
     //Text view var

@@ -10,9 +10,22 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/main_margin"
-        android:paddingTop="25dp"
         android:paddingBottom="@dimen/main_margin"
         >
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/MaterialAlertDialog.Material3.Title.Panel"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/main_margin"
+            >
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/MaterialAlertDialog.Material3.Title.Text"
+                android:text="Sort and organize your songs from : All songs"
+                />
+        </androidx.appcompat.widget.LinearLayoutCompat>
         <include layout="@layout/_bottom_sheet_sort_items"/>
         <include layout="@layout/_bottom_sheet_organize_items"/>
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,7 +36,7 @@
                 android:id="@+id/button_more_settings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/Widget.Material3.Button.TextButton.Dialog"
+                style="@style/Widget.Material3.Button.TonalButton"
                 android:text="@string/more_settings"
                 app:icon="@drawable/settings"
                 app:layout_constraintTop_toTopOf="parent"
@@ -33,7 +46,7 @@
                 android:id="@+id/button_close"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/Widget.Material3.Button.TextButton.Dialog"
+                style="@style/Widget.Material3.Button.TonalButton"
                 android:text="@string/close"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

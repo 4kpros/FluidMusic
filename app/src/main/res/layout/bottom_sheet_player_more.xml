@@ -4,12 +4,16 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="@dimen/main_medium_margin"
+    android:paddingHorizontal="@dimen/main_margin"
+    android:paddingBottom="@dimen/main_margin"
     >
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        style="@style/MaterialAlertDialog.Material3.Title.Panel"
+        android:orientation="horizontal"
+        android:paddingBottom="@dimen/main_margin"
+        >
         <com.google.android.material.card.MaterialCardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -18,8 +22,9 @@
             android:layout_margin="1dp"
             >
             <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="60dp"
-                android:layout_height="55dp"
+                android:id="@+id/covert_art"
+                android:layout_width="@dimen/song_card_image_small_w"
+                android:layout_height="@dimen/song_card_image_small_h"
                 android:src="@drawable/ic_fluid_music_icon_with_padding"
                 android:layout_gravity="center"
                 />
@@ -32,38 +37,65 @@
             android:layout_gravity="center_vertical"
             >
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/text_artist_title"
+                android:id="@+id/text_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="La fouine - Papa"
-                android:textAppearance="?attr/textAppearanceBody1"
-                android:textColor="?attr/colorPrimary"
+                android:text="@string/unknown_title"
+                style="?attr/textAppearanceTitleMedium"
+                android:gravity="start"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit ="marquee_forever"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:scrollHorizontally="true"
+                />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_artist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/unknown_artist"
+                android:gravity="start"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit ="marquee_forever"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:scrollHorizontally="true"
                 />
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                >
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/text_duration"
+                    android:id="@+id/song_item_duration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="03:30"
-                    android:textColor="?attr/colorPrimary"
+                    android:alpha="0.5"
+                    android:text="--:--"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textAppearance="?attr/textAppearanceLabelSmall"
                     />
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/vertical_separator"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="|"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:textColor="?attr/colorPrimary"
+                    android:alpha="0.5"
+                    android:text=" | "
+                    android:maxLines="1"
+                    android:textAppearance="?attr/textAppearanceLabelSmall"
                     />
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/text_mime_type"
+                    android:id="@+id/song_item_type_mime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="MP3"
-                    android:textColor="?attr/colorPrimary"
+                    android:alpha="0.5"
+                    android:text=""
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textAppearance="?attr/textAppearanceLabelSmall"
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -72,7 +104,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="20dp"
         >
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
@@ -88,7 +119,7 @@
                 >
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_info"
-                    style="@style/Widget.Material3.Button.IconButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/info"
@@ -104,7 +135,7 @@
                 >
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_timer"
-                    style="@style/Widget.Material3.Button.IconButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/timer"
@@ -127,10 +158,10 @@
                 >
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_covert_art"
-                    style="@style/Widget.Material3.Button.IconButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/photo_album"
+                    app:icon="@drawable/add_photo_alternate"
                     app:iconPadding="2dp"
                     android:text="Covert art"
                     />
@@ -143,7 +174,7 @@
                 >
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_goto"
-                    style="@style/Widget.Material3.Button.IconButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/link"
@@ -166,7 +197,7 @@
                 >
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_lyrics"
-                    style="@style/Widget.Material3.Button.IconButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/lyrics"
@@ -182,7 +213,7 @@
                 >
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_set_as"
-                    style="@style/Widget.Material3.Button.IconButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/ring_volume"
@@ -205,7 +236,7 @@
                 >
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_share"
-                    style="@style/Widget.Material3.Button.IconButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/share"
@@ -221,7 +252,7 @@
                 >
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_delete"
-                    style="@style/Widget.Material3.Button.IconButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/delete"
