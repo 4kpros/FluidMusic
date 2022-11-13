@@ -154,6 +154,7 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() {
     }
 
     private fun initViews(view: View) {
+
         mTextTitle = view.findViewById<AppCompatTextView>(R.id.text_title)
         mTextArtist = view.findViewById<AppCompatTextView>(R.id.text_artist)
         mTextMimeType = view.findViewById<AppCompatTextView>(R.id.song_item_type_mime)
@@ -169,6 +170,8 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() {
         mButtonGoTo = view.findViewById<MaterialButton>(R.id.button_goto)
         mButtonSetAs = view.findViewById<MaterialButton>(R.id.button_set_as)
         mButtonDelete = view.findViewById<MaterialButton>(R.id.button_delete)
+
+        mCovertArtImageView?.layout(0,0,0,0)
     }
 
     companion object {

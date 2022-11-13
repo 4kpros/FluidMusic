@@ -87,7 +87,11 @@ class AllSongsFragment : Fragment() {
             mAllSongsFragmentViewModel.requestLoadDataAsync(mActivity as Activity, 0, 1000)
         }
         mAllSongsFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner
-        ) { onSongListRetrieved(it) }
+        ) {
+            MainScope().launch {
+                addSongsToAdapter(it)
+            }
+        }
         mAllSongsFragmentViewModel.getIsLoading().observe(mActivity as LifecycleOwner
         ) { onLoadingStateChanged(it) }
         mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner
@@ -130,11 +134,6 @@ class AllSongsFragment : Fragment() {
             CustomAnimators.crossFadeDown(mLoadingContentProgress as View, true, 50)
         } else {
             CustomAnimators.crossFadeUp(mLoadingContentProgress as View, true, 100)
-        }
-    }
-    private fun onSongListRetrieved(it: ArrayList<SongItem>?) {
-        MainScope().launch {
-            addSongsToAdapter(it)
         }
     }
     private suspend fun addSongsToAdapter(songList: ArrayList<SongItem>?) = coroutineScope{

@@ -55,7 +55,7 @@ class SortOrganizeItemsBottomSheetDialog : GenericBottomSheetDialogFragment() {
         mMainContainer = view.findViewById<LinearLayoutCompat>(R.id.constraint_sort_organize_container)
 
         if(mMainContainer!= null)
-        CustomViewModifiers.updateBottomViewInsets(mMainContainer!!)
+            CustomViewModifiers.updateBottomViewInsets(mMainContainer!!)
     }
 
     companion object {

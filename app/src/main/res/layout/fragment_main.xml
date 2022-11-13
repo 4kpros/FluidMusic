@@ -1,70 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.fragments.MainFragment"
-    android:id="@+id/sliding_up_panel"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:umanoPanelHeight="0dp"
-    app:umanoDragView="@id/constraint_mini_player_container"
-    app:umanoScrollInterpolator="?attr/motionEasingEmphasizedDecelerateInterpolator"
-    app:umanoClipPanel="false"
-    app:umanoOverlay="true"
-    android:gravity="bottom"
-    app:umanoShadowHeight="2dp">
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <FrameLayout
-            android:id="@+id/main_fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            />
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_mini_player_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            style="@style/DefaultBackground"
-            >
-            <include layout="@layout/component_mini_player"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_bottom_selection_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            style="@style/DefaultBackground"
-            android:visibility="gone"
-            android:alpha="0"
-            android:translationY="0dp"
-            >
-            <include layout="@layout/component_bottom_selection_menu"
-                />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_top_selection_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            style="@style/DefaultBackground"
-            android:visibility="gone"
-            android:alpha="0"
-            android:translationY="0dp"
-            >
-            <include layout="@layout/component_top_selection_menu"
-                />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- SLIDING LAYOUT -->
-    <FrameLayout
-        android:id="@+id/player_fragment_container"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        tools:context=".ui.fragments.MainFragment"
+        android:id="@+id/sliding_up_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center|top"
-        android:visibility="visible"
-        android:alpha="1"
-        />
-</com.sothree.slidinguppanel.SlidingUpPanelLayout>
+        app:umanoPanelHeight="0dp"
+        app:umanoScrollInterpolator="?attr/motionEasingEmphasizedDecelerateInterpolator"
+        app:umanoInitialState="expanded"
+        android:gravity="bottom"
+        app:umanoShadowHeight="0dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:id="@+id/main_fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_mini_player_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                style="@style/DefaultBackground">
+
+                <include
+                    android:id="@+id/constraint_mini_player_include"
+                    layout="@layout/component_mini_player"
+                    />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_bottom_selection_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                style="@style/DefaultBackground"
+                android:visibility="gone"
+                android:alpha="0"
+                android:translationY="0dp">
+
+                <include
+                    android:id="@+id/constraint_bottom_selection_include"
+                    layout="@layout/component_bottom_selection_menu" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_top_selection_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                style="@style/DefaultBackground"
+                android:visibility="gone"
+                android:alpha="0"
+                android:translationY="0dp">
+
+                <include
+                    android:id="@+id/constraint_top_selection_include"
+                    layout="@layout/component_top_selection_menu" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- SLIDING LAYOUT -->
+        <FrameLayout
+            android:id="@+id/player_fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center|top"
+            android:visibility="visible"
+            android:alpha="1" />
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+</layout>

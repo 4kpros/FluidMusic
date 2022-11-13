@@ -29,6 +29,9 @@ import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerQueueMusicDialog
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlin.math.*
 
 
@@ -83,9 +86,9 @@ class PlayerFragment : Fragment() {
         // Inflate the layout for this fragment
         val view: View = inflater.inflate(R.layout.fragment_player, container, false)
 
-        initViews(view)
-        setupViewPagerAdapter()
-        checkInteractions()
+//        initViews(view)
+//        setupViewPagerAdapter()
+//        checkInteractions()
 
         return view
     }
@@ -93,7 +96,7 @@ class PlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        observeLiveData()
+//        observeLiveData()
     }
 
     override fun onResume() {
@@ -149,23 +152,14 @@ class PlayerFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-        //Request load songs from database or media file scanner
-        if(mPlayerFragmentViewModel.getIsLoadingInBackground().value == false && (mPlayerFragmentViewModel.getDataRequestCounter().value ?: 0) <= 0){
-            mPlayerFragmentViewModel.requestLoadDataAsync(mActivity as Activity, 50)
-        }
-        mPlayerFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner, object : Observer<ArrayList<SongItem>>{
-            override fun onChanged(songList: ArrayList<SongItem>?) {
-                updateQueueList(songList)
-            }
-        })
-        mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner, object : Observer<Int>{
-            override fun onChanged(currentSong: Int?) {
-                updateCurrentPlayingSong(currentSong)
-            }
-        })
         mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner, object : Observer<String> {
             override fun onChanged(sourceOf: String?) {
                 updateDataFromSource(sourceOf)
+            }
+        })
+        mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner, object : Observer<Int> {
+            override fun onChanged(t: Int?) {
+                updateCurrentPlayingSong(t)
             }
         })
         mPlayerFragmentViewModel.getIsPlaying().observe(mActivity as LifecycleOwner, object : Observer<Boolean> {
@@ -189,10 +183,8 @@ class PlayerFragment : Fragment() {
             }
         })
     }
-
     private fun updateProgress(progressValue: Long?) {
     }
-
     private fun updateRepeatUI(repeat: Int?) {
         when (repeat) {
             PlaybackStateCompat.REPEAT_MODE_ALL -> {
@@ -209,7 +201,6 @@ class PlayerFragment : Fragment() {
             }
         }
     }
-
     private fun updateShuffleUI(shuffle: Int?) {
         when (shuffle) {
             PlaybackStateCompat.SHUFFLE_MODE_ALL -> {
@@ -222,7 +213,6 @@ class PlayerFragment : Fragment() {
             }
         }
     }
-
     private fun updatePlayerButtonsUI() {
         if(mPlayerFragmentViewModel.getIsPlaying().value == true){
             mButtonPlayPause?.icon = ContextCompat.getDrawable(mContext, R.drawable.pause_circle)
@@ -234,13 +224,17 @@ class PlayerFragment : Fragment() {
     private fun updateCurrentPlayingSong(currentSong: Int?) {
         mPlayerViewPager?.setCurrentItem(currentSong ?: 0, true)
     }
-
     private fun updateDataFromSource(sourceOf: String?) {
-        //
+        if(sourceOf == ConstantValues.EXPLORE_ALL_SONGS){
+            mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner, object : Observer<Int>{
+                override fun onChanged(currentSong: Int?) {
+                    updateCurrentPlayingSong(currentSong)
+                }
+            })
+        }
     }
 
-    private fun updateQueueList(songList: ArrayList<SongItem>?) {
-//        Log.i(ConstantValues.TAG, "SIZE : $mSongList.size")
+    private suspend fun updateQueueList(songList: ArrayList<SongItem>?) = coroutineScope{
         if (songList != null) {
             mSongList.clear()
             val startPosition: Int = mSongList.size

@@ -1,101 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/constraint_organize_container"
-    >
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraint_radio_group_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        android:paddingBottom="@dimen/main_medium_margin"
-        >
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/text_organize"
+        android:id="@+id/constraint_organize_container">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_radio_group_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            style="@style/MaterialAlertDialog.Material3.Body.Text"
-            android:text="@string/organize"
-            />
-        <com.google.android.material.divider.MaterialDivider
-            android:id="@+id/organize_divider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            app:layout_constraintTop_toBottomOf="@+id/text_organize"
-            />
-        <RadioGroup
-            android:id="@+id/radio_group_organize"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/organize_divider"
-            android:orientation="horizontal"
-            >
-            <androidx.appcompat.widget.LinearLayoutCompat
+            android:paddingBottom="@dimen/main_medium_margin">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text_organize"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                >
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/radio_dialog_small_list"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/dialog_small_list"
-                    app:useMaterialThemeColors="true"
-                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                    />
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/radio_file_dialog_medium_list"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/dialog_medium_list"
-                    app:useMaterialThemeColors="true"
-                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                    />
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/radio_dialog_large_list"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/dialog_large_list"
-                    app:useMaterialThemeColors="true"
-                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                    />
-            </androidx.appcompat.widget.LinearLayoutCompat>
-            <androidx.appcompat.widget.LinearLayoutCompat
+                app:layout_constraintTop_toTopOf="parent"
+                style="@style/MaterialAlertDialog.Material3.Body.Text"
+                android:text="@string/organize" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/organize_divider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                >
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/radio_dialog_small_grid"
-                    android:layout_width="wrap_content"
+                android:layout_marginTop="2dp"
+                app:layout_constraintTop_toBottomOf="@+id/text_organize" />
+
+            <RadioGroup
+                android:id="@+id/radio_group_organize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/organize_divider"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/dialog_small_grid"
-                    app:useMaterialThemeColors="true"
-                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                    />
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/radio_file_dialog_medium_grid"
-                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/radio_dialog_small_list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dialog_small_list"
+                        app:useMaterialThemeColors="true"
+                        style="@style/Widget.Material3.CompoundButton.RadioButton" />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/radio_file_dialog_medium_list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dialog_medium_list"
+                        app:useMaterialThemeColors="true"
+                        style="@style/Widget.Material3.CompoundButton.RadioButton" />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/radio_dialog_large_list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dialog_large_list"
+                        app:useMaterialThemeColors="true"
+                        style="@style/Widget.Material3.CompoundButton.RadioButton" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/dialog_medium_grid"
-                    app:useMaterialThemeColors="true"
-                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                    />
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/radio_dialog_large_grid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/dialog_large_grid"
-                    app:useMaterialThemeColors="true"
-                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                    />
-            </androidx.appcompat.widget.LinearLayoutCompat>
-        </RadioGroup>
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/radio_dialog_small_grid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dialog_small_grid"
+                        app:useMaterialThemeColors="true"
+                        style="@style/Widget.Material3.CompoundButton.RadioButton" />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/radio_file_dialog_medium_grid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dialog_medium_grid"
+                        app:useMaterialThemeColors="true"
+                        style="@style/Widget.Material3.CompoundButton.RadioButton" />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/radio_dialog_large_grid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dialog_large_grid"
+                        app:useMaterialThemeColors="true"
+                        style="@style/Widget.Material3.CompoundButton.RadioButton" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </RadioGroup>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

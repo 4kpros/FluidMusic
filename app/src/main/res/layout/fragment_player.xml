@@ -1,267 +1,273 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/player_motion_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    style="@style/DefaultBackground"
-    android:clickable="false"
-    android:focusable="false"
-    tools:context=".ui.fragments.PlayerFragment">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <ImageView
-        android:id="@+id/blurred_imageview"
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/player_motion_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         style="@style/DefaultBackground"
-        android:scaleType="centerCrop"
-        />
+        android:clickable="false"
+        android:focusable="false"
+        tools:context=".ui.fragments.PlayerFragment">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        style="@style/DefaultBackground"
-        android:alpha="0.4"
-        />
-
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/player_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-        <RelativeLayout
-            android:id="@+id/relative_player"
+        <ImageView
+            android:id="@+id/blurred_imageview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            >
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/linear_controls"
+            style="@style/DefaultBackground"
+            android:scaleType="centerCrop" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            style="@style/DefaultBackground"
+            android:alpha="0.4" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/player_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:id="@+id/relative_player"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_alignParentBottom="true"
-                android:gravity="center_horizontal"
-                android:paddingHorizontal="@dimen/main_margin"
-                >
+                android:layout_height="match_parent">
+
                 <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/linear_song_title"
+                    android:id="@+id/linear_controls"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    >
+                    android:orientation="vertical"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center_horizontal"
+                    android:paddingHorizontal="@dimen/main_margin">
+
                     <androidx.appcompat.widget.LinearLayoutCompat
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/text_title"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/unknown_title"
-                            android:textAppearance="?attr/textAppearanceTitleLarge"
-                            android:gravity="center"
-                            android:singleLine="true"
-                            android:ellipsize="marquee"
-                            android:marqueeRepeatLimit ="marquee_forever"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
-                            android:scrollHorizontally="true"
-                            />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/text_artist"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.5"
-                            android:text="@string/unknown_artist"
-                            android:textAppearance="?attr/textAppearanceTitleMedium"
-                            android:gravity="center"
-                            android:singleLine="true"
-                            android:ellipsize="marquee"
-                            android:marqueeRepeatLimit ="marquee_forever"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
-                            android:scrollHorizontally="true"
-                            />
-                    </androidx.appcompat.widget.LinearLayoutCompat>
-                </androidx.appcompat.widget.LinearLayoutCompat>
-                <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/linear_progress_bar_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <RelativeLayout
+                        android:id="@+id/linear_song_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/text_duration_current"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_centerVertical="true"
-                            android:text="--:--"
-                            android:textAppearance="?attr/textAppearanceLabelSmall" />
-
-                        <com.google.android.material.slider.Slider
-                            android:id="@+id/slider"
+                        <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_toStartOf="@+id/text_duration"
-                            android:layout_toEndOf="@+id/text_duration_current"
-                            android:value="100"
-                            android:valueFrom="0"
-                            android:valueTo="100"
-                            app:trackHeight="2dp" />
+                            android:orientation="vertical">
 
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/text_duration"
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/text_title"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/unknown_title"
+                                android:textAppearance="?attr/textAppearanceTitleLarge"
+                                android:gravity="center"
+                                android:singleLine="true"
+                                android:ellipsize="marquee"
+                                android:marqueeRepeatLimit="marquee_forever"
+                                android:focusable="true"
+                                android:focusableInTouchMode="true"
+                                android:scrollHorizontally="true" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/text_artist"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:alpha="0.5"
+                                android:text="@string/unknown_artist"
+                                android:textAppearance="?attr/textAppearanceTitleMedium"
+                                android:gravity="center"
+                                android:singleLine="true"
+                                android:ellipsize="marquee"
+                                android:marqueeRepeatLimit="marquee_forever"
+                                android:focusable="true"
+                                android:focusableInTouchMode="true"
+                                android:scrollHorizontally="true" />
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/linear_progress_bar_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/text_duration_current"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentStart="true"
+                                android:layout_centerVertical="true"
+                                android:text="--:--"
+                                android:textAppearance="?attr/textAppearanceLabelSmall" />
+
+                            <com.google.android.material.slider.Slider
+                                android:id="@+id/slider"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_toStartOf="@+id/text_duration"
+                                android:layout_toEndOf="@+id/text_duration_current"
+                                android:value="100"
+                                android:valueFrom="0"
+                                android:valueTo="100"
+                                app:trackHeight="2dp" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/text_duration"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:text="--:--"
+                                android:textAppearance="?attr/textAppearanceLabelSmall" />
+                        </RelativeLayout>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/linear_buttons_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_shuffle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:text="--:--"
-                            android:textAppearance="?attr/textAppearanceLabelSmall" />
-                    </RelativeLayout>
+                            style="?attr/materialIconButtonStyle"
+                            android:layout_gravity="center_vertical"
+                            app:icon="@drawable/shuffle" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_skip_prev"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="?attr/materialIconButtonStyle"
+                            android:layout_gravity="center_vertical"
+                            app:icon="@drawable/skip_previous"
+                            app:iconSize="30dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_play_pause"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="?attr/materialIconButtonStyle"
+                            android:layout_gravity="center_vertical"
+                            app:icon="@drawable/play_circle"
+                            android:padding="0dp"
+                            app:iconSize="70dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_skip_next"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="?attr/materialIconButtonStyle"
+                            android:layout_gravity="center_vertical"
+                            app:icon="@drawable/skip_next"
+                            app:iconSize="30dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_repeat"
+                            style="?attr/materialIconButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            app:icon="@drawable/repeat" />
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/linear_more_buttons"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight="1"
+                            android:gravity="center">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/button_arrow_down"
+                                style="?attr/materialIconButtonStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                app:icon="@drawable/keyboard_arrow_down" />
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight="1"
+                            android:gravity="center">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/button_equalizer"
+                                style="?attr/materialIconButtonStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                app:icon="@drawable/equalizer" />
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight="1"
+                            android:gravity="center">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/button_queue_music"
+                                style="?attr/materialIconButtonStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                app:icon="@drawable/queue_music" />
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight="1"
+                            android:gravity="center">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/button_more"
+                                style="?attr/materialIconButtonStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                app:icon="@drawable/more_horiz" />
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
                 </androidx.appcompat.widget.LinearLayoutCompat>
+
                 <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/linear_buttons_container"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    >
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_shuffle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="?attr/materialIconButtonStyle"
-                        android:layout_gravity="center_vertical"
-                        app:icon="@drawable/shuffle" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_skip_prev"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="?attr/materialIconButtonStyle"
-                        android:layout_gravity="center_vertical"
-                        app:icon="@drawable/skip_previous"
-                        app:iconSize="30dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_play_pause"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="?attr/materialIconButtonStyle"
-                        android:layout_gravity="center_vertical"
-                        app:icon="@drawable/play_circle"
-                        android:padding="0dp"
-                        app:iconSize="70dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_skip_next"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="?attr/materialIconButtonStyle"
-                        android:layout_gravity="center_vertical"
-                        app:icon="@drawable/skip_next"
-                        app:iconSize="30dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_repeat"
-                        style="?attr/materialIconButtonStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        app:icon="@drawable/repeat" />
-                </androidx.appcompat.widget.LinearLayoutCompat>
-                <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/linear_more_buttons"
+                    android:id="@+id/linear_viewpager"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_height="0dp"
+                    android:orientation="vertical"
+                    android:layout_alignParentTop="true"
+                    android:layout_above="@+id/linear_controls">
 
-                    <androidx.appcompat.widget.LinearLayoutCompat
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:gravity="center">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/button_arrow_down"
-                            style="?attr/materialIconButtonStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            app:icon="@drawable/keyboard_arrow_down" />
-                    </androidx.appcompat.widget.LinearLayoutCompat>
-
-                    <androidx.appcompat.widget.LinearLayoutCompat
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:gravity="center">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/button_equalizer"
-                            style="?attr/materialIconButtonStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            app:icon="@drawable/equalizer" />
-                    </androidx.appcompat.widget.LinearLayoutCompat>
-
-                    <androidx.appcompat.widget.LinearLayoutCompat
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:gravity="center">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/button_queue_music"
-                            style="?attr/materialIconButtonStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            app:icon="@drawable/queue_music" />
-                    </androidx.appcompat.widget.LinearLayoutCompat>
-
-                    <androidx.appcompat.widget.LinearLayoutCompat
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:gravity="center">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/button_more"
-                            style="?attr/materialIconButtonStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            app:icon="@drawable/more_horiz" />
-                    </androidx.appcompat.widget.LinearLayoutCompat>
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/view_pager_player"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
-            </androidx.appcompat.widget.LinearLayoutCompat>
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/linear_viewpager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:orientation="vertical"
-                android:layout_alignParentTop="true"
-                android:layout_above="@+id/linear_controls"
-                >
-                <androidx.viewpager2.widget.ViewPager2
-                    android:id="@+id/view_pager_player"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </androidx.appcompat.widget.LinearLayoutCompat>
-        </RelativeLayout>
-    </androidx.appcompat.widget.LinearLayoutCompat>
+            </RelativeLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

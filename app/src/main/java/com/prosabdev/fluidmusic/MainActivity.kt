@@ -15,6 +15,7 @@ import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
@@ -22,6 +23,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.navigation.NavigationView
+import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.services.MediaPlaybackService
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
@@ -36,9 +38,8 @@ import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity(){
 
-    private var mNavigationView : NavigationView? = null
-    private var mDrawerLayout : DrawerLayout? = null
-    private val mMainFragmentViewModel: MainFragmentViewModel by viewModels()
+    private lateinit var mActivityMainBinding: ActivityMainBinding
+
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by viewModels()
 
     private var mMediaBrowser: MediaBrowserCompat? = null
@@ -104,14 +105,19 @@ class MainActivity : AppCompatActivity(){
         }
 
         setContentView(R.layout.activity_main)
-
+        mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         runBlocking {
-            initViews(savedInstanceState)
-            createMediaBrowserService()
+            loadSettingsAndSetupSettingsViewModel()
+            initViews()
             checkInteractions()
             observeLiveData()
+            createMediaBrowserService()
         }
+    }
+
+    private fun loadSettingsAndSetupSettingsViewModel() {
+        //
     }
 
     private fun createMediaBrowserService() {
@@ -188,34 +194,29 @@ class MainActivity : AppCompatActivity(){
         return bundle
     }
 
+    private fun checkInteractions() {
+        mActivityMainBinding.navigationView.setNavigationItemSelectedListener { menuItem ->
+            menuItem.isChecked = true
+            mActivityMainBinding.drawerLayout.close()
+            true
+        }
+    }
+
+    private fun initViews(){
+        mActivityMainBinding.navigationView.setCheckedItem(0)
+    }
+
     public override fun onStart() {
         super.onStart()
         mMediaBrowser?.connect()
     }
-
     public override fun onResume() {
         super.onResume()
         volumeControlStream = AudioManager.STREAM_MUSIC
     }
-
     public override fun onStop() {
         super.onStop()
         MediaControllerCompat.getMediaController(this)?.unregisterCallback(mControllerCallback)
         mMediaBrowser?.disconnect()
-    }
-
-    private fun checkInteractions() {
-    }
-
-    private fun initViews(savedInstanceState : Bundle?) {
-        mDrawerLayout = findViewById(R.id.drawer_layout)
-        mNavigationView = findViewById(R.id.navigation_view)
-
-        mNavigationView?.setNavigationItemSelectedListener { menuItem ->
-            // Handle menu item selected
-            menuItem.isChecked = true
-            mDrawerLayout?.close()
-            true
-        }
     }
 }
