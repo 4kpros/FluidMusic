@@ -2,58 +2,59 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/main_library"
-        android:title="Library">
+        android:title="@string/main"
+        >
         <menu>
             <item
-                android:id="@+id/device"
-                android:icon="@drawable/smartphone"
-                android:title="Device"
+                android:id="@+id/music_library"
+                android:icon="@drawable/library_music"
+                android:title="@string/music_library"
                 android:checkable="true"/>
             <item
-                android:id="@+id/folders_hierarchy"
-                android:icon="@drawable/folder"
-                android:title="Folder hierarchy"
+                android:id="@+id/device_explorer"
+                android:icon="@drawable/smartphone"
+                android:title="@string/device_explorer"
                 android:checkable="true"/>
             <item
                 android:id="@+id/playlists"
                 android:icon="@drawable/playlist_play"
-                android:title="Playlist"
+                android:title="@string/playlists"
                 android:checkable="true"/>
             <item
                 android:id="@+id/favorites"
                 android:icon="@drawable/favorite"
-                android:title="Favorites"
+                android:title="@string/favorites"
                 android:checkable="true"/>
             <item
                 android:id="@+id/queue_music"
                 android:icon="@drawable/queue_music"
-                android:title="Queue play"
+                android:title="@string/queue_music"
                 android:checkable="true"/>
         </menu>
     </item>
     <item
         android:id="@+id/main_others"
-        android:title="Others">
+        android:title="@string/others">
         <menu>
             <item
                 android:id="@+id/settings"
                 android:icon="@drawable/settings"
-                android:title="Settings"
+                android:title="@string/settings"
                 android:checkable="true"/>
             <item
                 android:id="@+id/request_features"
                 android:icon="@drawable/featured_play_list"
-                android:title="Request features"
+                android:title="@string/request_features"
                 android:checkable="true"/>
             <item
                 android:id="@+id/change_log"
                 android:icon="@drawable/update"
-                android:title="Change log"
+                android:title="@string/change_log"
                 android:checkable="true"/>
             <item
                 android:id="@+id/help"
                 android:icon="@drawable/help"
-                android:title="Help"
+                android:title="@string/help"
                 android:checkable="true"/>
         </menu>
     </item>

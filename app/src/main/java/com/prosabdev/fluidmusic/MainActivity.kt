@@ -1,6 +1,9 @@
 package com.prosabdev.fluidmusic
 
 import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.media.AudioManager
 import android.net.Uri
@@ -12,6 +15,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
@@ -22,14 +26,14 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.google.android.material.color.DynamicColors
-import com.google.android.material.navigation.NavigationView
 import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
-import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.services.MediaPlaybackService
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
+import com.prosabdev.fluidmusic.ui.fragments.PermissionsFragment
 import com.prosabdev.fluidmusic.utils.AudioFileInfoExtractor
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.viewmodels.MainFragmentViewModel
+import com.prosabdev.fluidmusic.utils.PermissionsManager
+import com.prosabdev.fluidmusic.viewmodels.PermissionsFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.coroutineScope
@@ -41,6 +45,7 @@ class MainActivity : AppCompatActivity(){
     private lateinit var mActivityMainBinding: ActivityMainBinding
 
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by viewModels()
+    private val mPermissionsFragmentViewModel: PermissionsFragmentViewModel by viewModels()
 
     private var mMediaBrowser: MediaBrowserCompat? = null
     private var mConnectionCallbacks: ConnectionCallback = object : ConnectionCallback(){
@@ -97,27 +102,34 @@ class MainActivity : AppCompatActivity(){
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                add<MainFragment>(R.id.main_activity_fragment_container)
-            }
-        }
+        mActivityMainBinding = DataBindingUtil.setContentView(this@MainActivity, R.layout.activity_main)
 
-        setContentView(R.layout.activity_main)
-        mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
-        runBlocking {
-            loadSettingsAndSetupSettingsViewModel()
-            initViews()
-            checkInteractions()
-            observeLiveData()
-            createMediaBrowserService()
+        initViews()
+        if(!loadMainFragmentFromPermissionsResult()) {
+            return
         }
+//        runBlocking {
+//            checkInteractions()
+//            observeLiveData()
+//            createMediaBrowserService()
+//        }
     }
 
-    private fun loadSettingsAndSetupSettingsViewModel() {
-        //
+    private fun loadMainFragmentFromPermissionsResult(): Boolean {
+        if(PermissionsManager.haveStoragePermissions(this@MainActivity.applicationContext)){
+//            mActivityMainBinding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+//            supportFragmentManager.commit {
+//                setReorderingAllowed(true)
+//                replace(R.id.main_activity_fragment_container, MainFragment.newInstance())
+//            }
+            return true
+        }
+        mActivityMainBinding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            replace(R.id.main_activity_fragment_container, PermissionsFragment.newInstance())
+        }
+        return false
     }
 
     private fun createMediaBrowserService() {
@@ -131,13 +143,12 @@ class MainActivity : AppCompatActivity(){
     }
 
     private fun observeLiveData() {
-        mPlayerFragmentViewModel.getCurrentSong().observe(this as LifecycleOwner, object : Observer<Int>{
-            override fun onChanged(currentSong: Int?) {
-                MainScope().launch {
-                    updateCurrentPlayingSong(currentSong)
-                }
+        mPlayerFragmentViewModel.getCurrentSong().observe(this as LifecycleOwner
+        ) { currentSong ->
+            MainScope().launch {
+                updateCurrentPlayingSong(currentSong)
             }
-        })
+        }
     }
 
     private suspend fun updateCurrentPlayingSong(currentSong: Int?)  = coroutineScope{
@@ -203,7 +214,25 @@ class MainActivity : AppCompatActivity(){
     }
 
     private fun initViews(){
-        mActivityMainBinding.navigationView.setCheckedItem(0)
+        mActivityMainBinding.navigationView.setCheckedItem(R.id.music_library)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode) {
+            ConstantValues.STORAGE_PERMISSION_CODE -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    mPermissionsFragmentViewModel.setHaveStorageAccess(true)
+
+                }
+                return
+            }
+        }
     }
 
     public override fun onStart() {
@@ -213,6 +242,7 @@ class MainActivity : AppCompatActivity(){
     public override fun onResume() {
         super.onResume()
         volumeControlStream = AudioManager.STREAM_MUSIC
+        loadMainFragmentFromPermissionsResult()
     }
     public override fun onStop() {
         super.onStop()

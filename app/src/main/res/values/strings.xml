@@ -82,4 +82,18 @@
     <string name="dialog_add_to_playlist_title">Add on playlist</string>
     //Covert art details dialog
     <string name="dialog_covert_art_details_title">Covert art details</string>
+    <string name="get_started">Get started</string>
+    <string name="get_permissions">Get permissions</string>
+    <string name="queue_music">Queue music</string>
+    <string name="favorites">Favorites</string>
+    <string name="playlists">Playlists</string>
+    <string name="device_explorer">Device explorer</string>
+    <string name="music_library">Music library</string>
+    <string name="settings">Settings</string>
+    <string name="request_features">Request features</string>
+    <string name="change_log">Change log</string>
+    <string name="help">Help</string>
+    <string name="main">Main</string>
+    <string name="waiting_for_permissions">Waiting for permissions</string>
+    <string name="loading_configurations">Loading configurations</string>
 </resources>
