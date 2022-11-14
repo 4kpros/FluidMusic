@@ -14,13 +14,12 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetStorageAccessBinding
 import com.prosabdev.fluidmusic.viewmodels.StorageAccessActivityViewModel
 
-class StorageAccessDialog : GenericBottomSheetDialogFragment() {
+class StorageAccessDialog(private val mStorageAccessActivityViewModel: StorageAccessActivityViewModel) : GenericBottomSheetDialogFragment() {
 
     private lateinit var mContext: Context
     private lateinit var mActivity: FragmentActivity
 
     private lateinit var mBottomSheetStorageAccessBinding : BottomSheetStorageAccessBinding
-    private val mStorageAccessActivityViewModel: StorageAccessActivityViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,21 +44,14 @@ class StorageAccessDialog : GenericBottomSheetDialogFragment() {
     }
 
     private fun checkInteractions() {
-        mBottomSheetStorageAccessBinding.buttonRestoreDefault.setOnClickListener(){
-            onRestoreDefaultSettings()
-        }
-        mBottomSheetStorageAccessBinding.buttonRollbackPrevious.setOnClickListener(){
-            onRollbackPreviousSettings()
-        }
         mBottomSheetStorageAccessBinding.buttonRemoveAll.setOnClickListener(){
             showRemoveAllDialog()
         }
     }
-
     private fun showRemoveAllDialog() {
         MaterialAlertDialogBuilder(mContext)
             .setTitle("Remove all folders ?")
-            .setMessage("All folders will be removed from your accessible files. Do you want to delete all anyway ?")
+            .setMessage("All folders with songs(on your database, not on device) will be removed from your accessible files. Do you want to remove all anyway ?")
             .setNegativeButton(resources.getString(R.string.decline)) { dialog, which ->
                 dialog.dismiss()
             }
@@ -70,49 +62,7 @@ class StorageAccessDialog : GenericBottomSheetDialogFragment() {
         dismiss()
     }
     private fun removeAllFolder(dialog: DialogInterface) {
-        //
-        dialog.dismiss()
-    }
-
-    private fun onRollbackPreviousSettings() {
-        showRollbackPreviousSettingsDialog()
-    }
-    private fun showRollbackPreviousSettingsDialog() {
-        MaterialAlertDialogBuilder(mContext)
-            .setTitle("Restore previous selected folder ?")
-            .setMessage("This will only restore previous saved folders.")
-            .setNegativeButton("No") { dialog, which ->
-                dialog.dismiss()
-            }
-            .setPositiveButton("Yes") { dialog, which ->
-                rollbackPreviousSettings(dialog)
-            }
-            .show()
-        dismiss()
-    }
-    private fun rollbackPreviousSettings(dialog: DialogInterface) {
-        //
-        dialog.dismiss()
-    }
-
-    private fun onRestoreDefaultSettings() {
-        showRestoreDefaultDialog()
-    }
-    private fun showRestoreDefaultDialog() {
-        MaterialAlertDialogBuilder(mContext)
-            .setTitle("Reset to default ?")
-            .setMessage("All folders will be removed from your accessible files. Do you want to delete restore anyway ?")
-            .setNegativeButton("No") { dialog, which ->
-                dialog.dismiss()
-            }
-            .setPositiveButton("Yes") { dialog, which ->
-                restoreDefault(dialog)
-            }
-            .show()
-        dismiss()
-    }
-    private fun restoreDefault(dialog: DialogInterface) {
-        //
+        mStorageAccessActivityViewModel.setRemoveAllFoldersCounter()
         dialog.dismiss()
     }
 

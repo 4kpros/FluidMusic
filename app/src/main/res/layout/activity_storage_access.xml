@@ -54,7 +54,6 @@
             android:gravity="center"
             android:padding="@dimen/main_margin"
             android:layout_marginBottom="50dp"
-            android:visibility="gone"
             >
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="100dp"
@@ -66,19 +65,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Waiting for folder permissions"
+                android:text="No folder found !"
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:layout_marginVertical="@dimen/main_medium_margin"
                 />
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                >
-                <include layout="@layout/component_loading_view"
-                    />
-            </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/text_loading_details"
@@ -87,13 +78,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:gravity="center"
-            android:text="This app nee to request storage access in order to read songs, edit tags and cover art from your device. Note that we use Android Storage Access Framework for target folder. Click on add folder button to begin."
-            android:maxLines="5"
+            android:text="This app needs to request storage access in order to read songs, edit tags and cover art from your device. Note that we use Android Storage Access Framework for target folder permissions. Click on add folder button to begin."
+            android:maxLines="10"
             android:ellipsize="end"
             android:paddingHorizontal="@dimen/main_margin"
             app:layout_constraintTop_toBottomOf="@+id/constraint_loading_content"
             app:layout_constraintBottom_toTopOf="@+id/linear_buttons_container"
-            android:visibility="gone"
             />
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linear_buttons_container"

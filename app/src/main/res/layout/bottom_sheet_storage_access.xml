@@ -25,33 +25,11 @@
             android:layout_marginBottom="@dimen/main_margin"
             android:orientation="vertical">
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_rollback_previous"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:text="Rollback previous data"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:layout_gravity="center"
-                android:gravity="center"
-                />
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_restore_default"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:text="Restore to default"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:layout_gravity="center"
-                android:gravity="center"
-                />
-            <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_remove_all"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Widget.Material3.Button.TextButton"
-                android:text="Delete all"
+                android:text="Remove all"
                 app:icon="@drawable/delete"
                 android:maxLines="1"
                 android:ellipsize="end"

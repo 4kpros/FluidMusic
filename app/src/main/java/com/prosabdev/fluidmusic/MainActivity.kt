@@ -45,30 +45,26 @@ import java.util.*
 
         mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        initViews()
-        if(!checkFoldersUrisSelected()) {
-            return
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            replace(R.id.main_activity_fragment_container, MainFragment.newInstance())
         }
+
+        initViews()
+        checkFolderSAFSelected()
         checkInteractions()
         createMediaBrowserService()
     }
 
-    private fun checkFoldersUrisSelected(): Boolean {
-        if(
+    private fun checkFolderSAFSelected() {
+        if(!(
             SharedPreferenceManager.loadSelectionFolderFromSAF(baseContext) != null
             &&
             (SharedPreferenceManager.loadSelectionFolderFromSAF(baseContext)?.size ?: 0) > 0
+            )
         ){
-            mActivityMainBinding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                replace(R.id.main_activity_fragment_container, MainFragment.newInstance())
-            }
-            return true
+            startActivity(Intent(this, StorageAccessActivity::class.java).apply {})
         }
-        startActivity(Intent(this, StorageAccessActivity::class.java).apply {
-        })
-        return false
     }
 
     private fun createMediaBrowserService() {

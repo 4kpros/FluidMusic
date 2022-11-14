@@ -5,7 +5,7 @@ import android.net.Uri
 class FolderSAF {
     var pathTree: String? = null
     var path: String? = null
-    var uriTree: Uri? = null
+    var uriTree: String? = null
     var lastPathSegment: String? = null
     var name: String? = null
     var normalizeScheme: String? = null

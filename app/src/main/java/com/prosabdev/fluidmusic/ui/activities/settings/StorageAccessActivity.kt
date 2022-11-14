@@ -4,8 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import android.window.OnBackInvokedDispatcher
@@ -28,12 +26,11 @@ import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.StorageAccessAdapter
 import com.prosabdev.fluidmusic.databinding.ActivityStorageAccessBinding
 import com.prosabdev.fluidmusic.models.FolderSAF
-import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreDialog
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.StorageAccessDialog
-import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 import com.prosabdev.fluidmusic.utils.MediaFileScanner
+import com.prosabdev.fluidmusic.utils.SharedPreferenceManager
 import com.prosabdev.fluidmusic.viewmodels.StorageAccessActivityViewModel
 import kotlinx.coroutines.launch
 
@@ -47,6 +44,8 @@ import kotlinx.coroutines.launch
     private var mStorageAccessAdapter: StorageAccessAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
 
+    private var mHaveBeenUpdated: Boolean = false
+
     private var mFolderSelectionList : ArrayList<FolderSAF> = ArrayList<FolderSAF>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +57,7 @@ import kotlinx.coroutines.launch
         mActivityStorageAccessBinding = DataBindingUtil.setContentView(this, R.layout.activity_storage_access)
 
         initViews()
+        loadFolderSAF()
         setupAdapter()
         observeLiveData()
         checkInteractions()
@@ -69,7 +69,7 @@ import kotlinx.coroutines.launch
             onBackInvokedDispatcher.registerOnBackInvokedCallback(
                 OnBackInvokedDispatcher.PRIORITY_DEFAULT
             ) {
-                if(mStorageAccessActivityViewModel.getHaveBeenUpdated().value == true){
+                if(mHaveBeenUpdated){
                     showDialogToAlertSaveBefore()
                 }else{
                     finish()
@@ -78,8 +78,7 @@ import kotlinx.coroutines.launch
         } else {
             onBackPressedDispatcher.addCallback(this /* lifecycle owner */, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    Log.i(ConstantValues.TAG, "On back pressed. Storage Access changed = ${mStorageAccessActivityViewModel.getHaveBeenUpdated().value}")
-                    if(mStorageAccessActivityViewModel.getHaveBeenUpdated().value == true){
+                    if(mHaveBeenUpdated){
                         showDialogToAlertSaveBefore()
                     }else{
                         finish()
@@ -102,47 +101,37 @@ import kotlinx.coroutines.launch
     }
 
     private fun observeLiveData() {
-        mStorageAccessActivityViewModel.getRemoveFolderSAF().observe(this){
-            if(it >= 0){
-                mStorageAccessActivityViewModel.setRemoveFolderSAF(-1)
-                removeFolder(it)
-            }
-        }
-        mStorageAccessActivityViewModel.getAddFolderSAF().observe(this){
-            addToFolderList(it)
-        }
-        mStorageAccessActivityViewModel.getFoldersList().observe(this){
+        mStorageAccessActivityViewModel.getFoldersCounter().observe(this){
             updateLoadingUI(it)
         }
-        mStorageAccessActivityViewModel.getRequestAddFolder().observe(this){
-            if(it > 0)
-                requestForSAF()
+        mStorageAccessActivityViewModel.getRemoveAllFoldersCounter().observe(this){
+            removeAllFolders(it)
         }
     }
 
-    private fun requestForSAF() {
-        mOpenSAFDocumentTreeLauncher.launch(null)
+    private fun removeAllFolders(i: Int) {
+        if(i <= 0 || mFolderSelectionList.size <= 0)
+            return
+        val folderSize: Int = mFolderSelectionList.size
+        mStorageAccessAdapter?.notifyItemRangeRemoved(0, folderSize)
+        mFolderSelectionList.clear()
+        mStorageAccessActivityViewModel.setFoldersCounter(mFolderSelectionList.size)
+        mHaveBeenUpdated = true
     }
-    private fun updateLoadingUI(folderSAFS: ArrayList<FolderSAF>) {
-        if(folderSAFS.size > 0){
+
+    private fun updateLoadingUI(folderSAFS: Int) {
+        if(folderSAFS > 0){
             //Hide loading view
             if(mActivityStorageAccessBinding.constraintLoadingContent.alpha == 1.0f){
-                CustomAnimators.crossFadeDown(mActivityStorageAccessBinding.constraintLoadingContent)
-                CustomAnimators.crossFadeDown(mActivityStorageAccessBinding.textLoadingDetails)
+                CustomAnimators.crossFadeDown(mActivityStorageAccessBinding.constraintLoadingContent, true)
+                CustomAnimators.crossFadeDown(mActivityStorageAccessBinding.textLoadingDetails, true)
             }
         }else{
             //show loading view
             if(mActivityStorageAccessBinding.constraintLoadingContent.visibility != View.VISIBLE){
-                CustomAnimators.crossFadeUp(mActivityStorageAccessBinding.constraintLoadingContent)
-                CustomAnimators.crossFadeUp(mActivityStorageAccessBinding.textLoadingDetails)
+                CustomAnimators.crossFadeUp(mActivityStorageAccessBinding.constraintLoadingContent, true)
+                CustomAnimators.crossFadeUp(mActivityStorageAccessBinding.textLoadingDetails, true)
             }
-        }
-    }
-    private fun addToFolderList(it: FolderSAF?) {
-        if(it != null){
-            mFolderSelectionList.add(it)
-            mStorageAccessAdapter?.notifyItemInserted(mFolderSelectionList.size - 1)
-            mStorageAccessActivityViewModel.setAddFolderSAF(null)
         }
     }
 
@@ -167,17 +156,11 @@ import kotlinx.coroutines.launch
     }
 
     private fun showBottomSheetDialog() {
-        StorageAccessDialog().show(supportFragmentManager, StorageAccessDialog.TAG)
-    }
-
-    private fun saveFolderSAF() {
-        //
+        StorageAccessDialog(mStorageAccessActivityViewModel).show(supportFragmentManager, StorageAccessDialog.TAG)
     }
 
     private fun requestNewFolderFromSAF() {
-        var tempReCounter = mStorageAccessActivityViewModel.getRequestAddFolder().value ?: 0
-        tempReCounter++
-        mStorageAccessActivityViewModel.setRequestAddFolder(tempReCounter)
+        mOpenSAFDocumentTreeLauncher.launch(null)
     }
 
     private fun setupAdapter() {
@@ -188,7 +171,7 @@ import kotlinx.coroutines.launch
             }
         })
         val emptyList: ArrayList<String> = ArrayList()
-        emptyList.add("Empty")
+        emptyList.add("")
         mEmptyBottomAdapter = EmptyBottomAdapter(emptyList)
 
         val concatAdapter = ConcatAdapter()
@@ -201,10 +184,10 @@ import kotlinx.coroutines.launch
 
     }
     private fun onShowRemoveFolderDialog(position: Int) {
-        if (position >= (mStorageAccessActivityViewModel.getFoldersList().value?.size ?: 0))
+        if (position >= mFolderSelectionList.size)
             return
         MaterialAlertDialogBuilder(this)
-            .setTitle("Remove this folder ${mStorageAccessActivityViewModel.getFoldersList().value?.get(position)?.path} ?")
+            .setTitle("Remove this folder ${mFolderSelectionList[position].path} ?")
             .setMessage("This folder will be removed from your accessible files. And also all song currently on this folder will be removed from all playlists")
             .setNegativeButton(resources.getString(R.string.decline)) { dialog, which ->
                 dialog.dismiss()
@@ -218,9 +201,26 @@ import kotlinx.coroutines.launch
         if (position < 0)
             return
         mFolderSelectionList.removeAt(position)
-        mStorageAccessActivityViewModel.removeFromFoldersList(position)
         mStorageAccessAdapter?.notifyItemRemoved(position)
         mStorageAccessAdapter?.notifyItemRangeChanged(position, mStorageAccessAdapter!!.itemCount)
+        mStorageAccessActivityViewModel.setFoldersCounter(mFolderSelectionList.size)
+        mHaveBeenUpdated = true
+    }
+
+
+    private fun saveFolderSAF() {
+        SharedPreferenceManager.saveSelectionFolderFromSAF(this.baseContext, mFolderSelectionList as List<FolderSAF>)
+        mHaveBeenUpdated = false
+        Toast.makeText(this, "Preferences saved !", Toast.LENGTH_SHORT).show()
+        onBackPressedDispatcher.onBackPressed()
+    }
+
+    private fun loadFolderSAF() {
+        val mTempLoadedFiles : List<FolderSAF>? = SharedPreferenceManager.loadSelectionFolderFromSAF(this.baseContext)
+        if(mTempLoadedFiles != null){
+            mFolderSelectionList = mTempLoadedFiles as ArrayList<FolderSAF>
+            mStorageAccessActivityViewModel.setFoldersCounter(mFolderSelectionList.size)
+        }
     }
 
     private fun initViews() {
@@ -251,7 +251,7 @@ import kotlinx.coroutines.launch
 
         val tempFolderSAF : FolderSAF = FolderSAF()
         tempFolderSAF.name = documentFile?.name
-        tempFolderSAF.uriTree = documentFile?.uri
+        tempFolderSAF.uriTree = documentFile?.uri.toString()
         tempFolderSAF.lastPathSegment = uri.lastPathSegment
         tempFolderSAF.pathTree = uri.path.toString().trim()
         tempFolderSAF.normalizeScheme = uri.normalizeScheme().toString()
@@ -265,36 +265,39 @@ import kotlinx.coroutines.launch
                 MediaFileScanner.getDeviceName()
 
         if(!isFolderSAFExist(tempFolderSAF)){
-            mStorageAccessActivityViewModel.setAddFolderSAF(tempFolderSAF)
+            addToFolderList(tempFolderSAF)
         }else{
             Toast.makeText(this, "This folder have already been added", Toast.LENGTH_SHORT).show()
         }
     }
+    private fun addToFolderList(it: FolderSAF?) {
+        if(it != null){
+            mFolderSelectionList.add(it)
+            mStorageAccessAdapter?.notifyItemInserted(mFolderSelectionList.size - 1)
+            mStorageAccessActivityViewModel.setFoldersCounter(mFolderSelectionList.size)
+            mHaveBeenUpdated = true
+        }
+    }
     private fun isFolderSAFExist(folderSAF : FolderSAF): Boolean {
-        if(mStorageAccessActivityViewModel.getFoldersList().value != null &&
-            (mStorageAccessActivityViewModel.getFoldersList().value?.size ?: 0) > 0
-        ){
-            val tempSize = mStorageAccessActivityViewModel.getFoldersList().value?.size ?: 0
+        if(mFolderSelectionList.size > 0){
             var returnFalse = 0
-            for(i in 0 until tempSize){
-                val tempData : FolderSAF? = mStorageAccessActivityViewModel.getFoldersList().value?.get(i)
-                if(tempData != null){
-                    if(
-                        tempData.normalizeScheme.toString() == folderSAF.normalizeScheme.toString() ||
-                        (
-                                (
-                                        tempData.normalizeScheme.toString().contains(folderSAF.normalizeScheme.toString()) ||
-                                                folderSAF.normalizeScheme.toString().contains(tempData.normalizeScheme.toString())
-                                        )
-                                        &&
-                                        tempData.pathTree.toString() != folderSAF.pathTree.toString()
-                                )
-                    ) {
-                        if(tempData.normalizeScheme.toString() > folderSAF.normalizeScheme.toString()){
-                            mStorageAccessActivityViewModel.setRemoveFolderSAF(i)
-                        }else{
-                            returnFalse++
-                        }
+            for(i in (mFolderSelectionList.size-1) downTo  0){
+                val tempData : FolderSAF = mFolderSelectionList[i]
+                if(
+                    tempData.normalizeScheme.toString() == folderSAF.normalizeScheme.toString() ||
+                    (
+                            (
+                                    tempData.normalizeScheme.toString().contains(folderSAF.normalizeScheme.toString()) ||
+                                            folderSAF.normalizeScheme.toString().contains(tempData.normalizeScheme.toString())
+                                    )
+                                    &&
+                                    tempData.pathTree.toString() != folderSAF.pathTree.toString()
+                            )
+                ) {
+                    if(tempData.normalizeScheme.toString() > folderSAF.normalizeScheme.toString()){
+                        removeFromFolderList(i)
+                    }else{
+                        returnFalse++
                     }
                 }
             }
@@ -302,5 +305,11 @@ import kotlinx.coroutines.launch
                 return true
         }
         return false
+    }
+    private fun removeFromFolderList(i: Int) {
+        mFolderSelectionList.removeAt(i)
+        mStorageAccessAdapter?.notifyItemRemoved(i)
+        mStorageAccessActivityViewModel.setFoldersCounter(mFolderSelectionList.size)
+        mHaveBeenUpdated = true
     }
 }
