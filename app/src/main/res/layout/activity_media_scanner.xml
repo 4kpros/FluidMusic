@@ -70,6 +70,8 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
+                            android:clickable="true"
+                            android:focusable="true"
                             >
                             <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
@@ -182,6 +184,8 @@
                             android:orientation="vertical"
                             android:layout_marginTop="@dimen/main_medium_margin"
                             android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
                             >
                             <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
@@ -218,6 +222,8 @@
                             android:orientation="vertical"
                             android:layout_marginTop="@dimen/main_medium_margin"
                             android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
                             >
                             <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
@@ -254,31 +260,47 @@
                             android:orientation="vertical"
                             android:layout_marginTop="@dimen/main_medium_margin"
                             android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
                             >
                             <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
+                                android:orientation="horizontal"
                                 android:layout_weight="1"
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:paddingHorizontal="@dimen/main_margin"
                                 android:paddingVertical="@dimen/main_medium_margin"
                                 >
-                                <com.google.android.material.textview.MaterialTextView
+                                <androidx.appcompat.widget.LinearLayoutCompat
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    style="@style/TextAppearance.Material3.TitleMedium"
-                                    android:text="Scan m3u playlists"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"
-                                    />
-                                <com.google.android.material.textview.MaterialTextView
-                                    android:layout_width="match_parent"
+                                    android:orientation="vertical"
+                                    android:layout_weight="1"
+                                    android:layout_marginEnd="@dimen/main_medium_margin"
+                                    >
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        style="@style/TextAppearance.Material3.TitleMedium"
+                                        android:text="Scan m3u playlists"
+                                        android:maxLines="1"
+                                        android:ellipsize="end"
+                                        />
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="M3u files are files extensions for storing playlist in order to export on any device. This will scan your m3u playlist and add into Fluid Music."
+                                        android:maxLines="5"
+                                        android:ellipsize="end"
+                                        />
+                                </androidx.appcompat.widget.LinearLayoutCompat>
+                                <com.google.android.material.materialswitch.MaterialSwitch
+                                    android:id="@+id/switch_m3u_playlists"
+                                    android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="M3u files are are files extensions for storing playlist in order to export on any device. This will scann your m3u playlist and add into Fluid Music."
-                                    android:maxLines="5"
-                                    android:ellipsize="end"
+                                    style="@style/Widget.Material3.CompoundButton.MaterialSwitch"
                                     />
                             </androidx.appcompat.widget.LinearLayoutCompat>
                         </com.google.android.material.card.MaterialCardView>
@@ -301,20 +323,32 @@
                                 android:paddingHorizontal="@dimen/main_margin"
                                 android:paddingVertical="@dimen/main_medium_margin"
                                 >
-                                <com.google.android.material.textview.MaterialTextView
+                                <androidx.appcompat.widget.LinearLayoutCompat
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    style="@style/TextAppearance.Material3.TitleMedium"
-                                    android:text="Ignore shorts songs files"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"
-                                    />
-                                <com.google.android.material.textview.MaterialTextView
+                                    android:orientation="vertical"
+                                    android:layout_weight="1"
+                                    >
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        style="@style/TextAppearance.Material3.TitleMedium"
+                                        android:text="Ignore shorts songs files"
+                                        android:maxLines="1"
+                                        android:ellipsize="end"
+                                        />
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Files likes 10sec or similar are skipped dy default. But you can change."
+                                        android:maxLines="5"
+                                        android:ellipsize="end"
+                                        />
+                                </androidx.appcompat.widget.LinearLayoutCompat>
+                                <com.google.android.material.slider.Slider
+                                    android:id="@+id/seekbar_ignore_short_files"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Files likes 10sec or similar are skiped dy default. But you can change."
-                                    android:maxLines="5"
-                                    android:ellipsize="end"
                                     />
                             </androidx.appcompat.widget.LinearLayoutCompat>
                         </com.google.android.material.card.MaterialCardView>
@@ -326,33 +360,49 @@
                             android:orientation="vertical"
                             android:layout_marginTop="@dimen/main_medium_margin"
                             android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
                             >
                             <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
+                                android:orientation="horizontal"
                                 android:layout_weight="1"
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:paddingHorizontal="@dimen/main_margin"
                                 android:paddingVertical="@dimen/main_medium_margin"
                                 >
-                                <com.google.android.material.textview.MaterialTextView
+                                <androidx.appcompat.widget.LinearLayoutCompat
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    style="@style/TextAppearance.Material3.TitleMedium"
-                                    android:text="Ignore videos"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"
-                                    />
-                                <com.google.android.material.textview.MaterialTextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:text="Don't add videos files likes MP4, 3GP, AVI etc.."
-                                    android:maxLines="5"
-                                    android:ellipsize="end"
-                                    />
-                            </androidx.appcompat.widget.LinearLayoutCompat>
+                                    android:orientation="vertical"
+                                    android:layout_weight="1"
+                                    android:layout_marginEnd="@dimen/main_medium_margin"
+                                    >
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        style="@style/TextAppearance.Material3.TitleMedium"
+                                        android:text="Ignore videos"
+                                        android:maxLines="1"
+                                        android:ellipsize="end"
+                                        />
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Don't add videos files likes MP4, 3GP, AVI etc.."
+                                        android:maxLines="5"
+                                        android:ellipsize="end"
+                                        />
+                                </androidx.appcompat.widget.LinearLayoutCompat>
+                            <com.google.android.material.materialswitch.MaterialSwitch
+                                android:id="@+id/switch_ignore_videos"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                style="@style/Widget.Material3.CompoundButton.MaterialSwitch"
+                                />
+                        </androidx.appcompat.widget.LinearLayoutCompat>
                         </com.google.android.material.card.MaterialCardView>
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/card_view_automatic_scan"
@@ -362,16 +412,25 @@
                             android:orientation="vertical"
                             android:layout_marginTop="@dimen/main_medium_margin"
                             android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
                             >
                             <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
+                                android:orientation="horizontal"
                                 android:layout_weight="1"
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:paddingHorizontal="@dimen/main_margin"
                                 android:paddingVertical="@dimen/main_medium_margin"
+                                >
+                            <androidx.appcompat.widget.LinearLayoutCompat
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="@dimen/main_medium_margin"
                                 >
                                 <com.google.android.material.textview.MaterialTextView
                                     android:layout_width="match_parent"
@@ -389,6 +448,13 @@
                                     android:ellipsize="end"
                                     />
                             </androidx.appcompat.widget.LinearLayoutCompat>
+                                <com.google.android.material.materialswitch.MaterialSwitch
+                                    android:id="@+id/switch_automatic_scanner"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    style="@style/Widget.Material3.CompoundButton.MaterialSwitch"
+                                    />
+                            </androidx.appcompat.widget.LinearLayoutCompat>
                         </com.google.android.material.card.MaterialCardView>
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/card_view_usb_scanner"
@@ -398,6 +464,8 @@
                             android:orientation="vertical"
                             android:layout_marginTop="@dimen/main_medium_margin"
                             android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
                             >
                             <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
@@ -434,6 +502,8 @@
                             android:orientation="vertical"
                             android:layout_marginTop="@dimen/main_medium_margin"
                             android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
                             >
                             <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
@@ -443,7 +513,7 @@
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_small_margin"
+                                android:paddingVertical="@dimen/main_medium_margin"
                                 >
                                 <com.google.android.material.textview.MaterialTextView
                                     android:layout_width="match_parent"

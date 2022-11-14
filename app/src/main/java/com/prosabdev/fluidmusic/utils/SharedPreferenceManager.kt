@@ -12,7 +12,7 @@ import com.prosabdev.fluidmusic.models.FolderSAF
 import java.lang.reflect.Type
 
 abstract class SharedPreferenceManager {
-    companion object {
+    companion object MainSharedData {
         fun loadSelectionFolderFromSAF(context: Context): List<FolderSAF>? {
             val sharedPreferences: SharedPreferences = context.getSharedPreferences(
                 context.getString(R.string.preference_file_key),
