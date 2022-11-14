@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.viewmodels.generic
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -21,7 +22,7 @@ open class GenericDataListFetcherViewModel : ViewModel() {
     private val mDataList: LiveData<ArrayList<Any>> get() = mMutableDataList
 
     open fun requestLoadDataAsync(
-        activity : Activity,
+        context: Context,
         startCursor: Int = 0,
         maxDataCount: Int = 50
     ){

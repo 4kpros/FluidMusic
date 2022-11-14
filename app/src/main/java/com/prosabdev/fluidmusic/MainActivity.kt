@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.media.AudioManager
@@ -12,7 +13,9 @@ import android.support.v4.media.MediaBrowserCompat.ConnectionCallback
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.AttributeSet
 import android.util.Log
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BuildCompat
@@ -23,11 +26,15 @@ import androidx.fragment.app.commit
 import com.google.android.material.color.DynamicColors
 import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
 import com.prosabdev.fluidmusic.services.MediaPlaybackService
+import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerActivity
 import com.prosabdev.fluidmusic.ui.activities.settings.StorageAccessActivity
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 
@@ -45,26 +52,28 @@ import java.util.*
 
         mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            replace(R.id.main_activity_fragment_container, MainFragment.newInstance())
+        if(checkIsFirstTimeToOpenApp()){
+            startActivity(Intent(this, MediaScannerActivity::class.java).apply {})
         }
-
         initViews()
-        checkFolderSAFSelected()
+        attachFragments()
         checkInteractions()
         createMediaBrowserService()
     }
 
-    private fun checkFolderSAFSelected() {
-        if(!(
-            SharedPreferenceManager.loadSelectionFolderFromSAF(baseContext) != null
-            &&
-            (SharedPreferenceManager.loadSelectionFolderFromSAF(baseContext)?.size ?: 0) > 0
-            )
-        ){
-            startActivity(Intent(this, StorageAccessActivity::class.java).apply {})
+    private fun attachFragments() {
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            replace(R.id.main_activity_fragment_container, MainFragment.newInstance())
         }
+    }
+
+    private fun checkIsFirstTimeToOpenApp(): Boolean {
+        if(SharedPreferenceManager.loadIsFirstTimeOpenApp(this)) {
+//        SharedPreferenceManager.saveIsFirstTimeOpenApp(this, false)
+            return true
+        }
+        return false
     }
 
     private fun createMediaBrowserService() {

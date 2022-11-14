@@ -8,7 +8,7 @@ import com.prosabdev.fluidmusic.models.FolderSAF
 class StorageAccessActivityViewModel : ViewModel() {
 
     private val mMutableRequestRemoveAllFolders = MutableLiveData<Int>(0)
-    private val mMutableFoldersCounter = MutableLiveData<Int>(0)
+    private val mMutableFoldersCounter = MutableLiveData<Int>(-1)
 
     private val mRequestRemoveAllFolders: LiveData<Int> get() = mMutableRequestRemoveAllFolders
     private val mFoldersCounter: LiveData<Int> get() = mMutableFoldersCounter

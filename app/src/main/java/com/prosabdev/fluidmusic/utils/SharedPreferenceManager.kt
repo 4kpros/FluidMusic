@@ -33,25 +33,42 @@ abstract class SharedPreferenceManager {
             val json: String = gson.toJson(folderList)
             editor.putString("foldersselectionlistfromsaf", json)
             editor.apply()
+            if(folderList.isNotEmpty())
+                saveHaveFoldersSAF(context, true)
+            else
+                saveHaveFoldersSAF(context, false)
             Log.i(ConstantValues.TAG, "Storage access folders saved !")
         }
 
-        fun getRepeat(context: Context): Int {
+        fun loadHaveFoldersSAF(context: Context): Boolean {
             val sharedPref: SharedPreferences = context.getSharedPreferences(
                 context.getString(R.string.preference_file_key), Context.MODE_PRIVATE
             )
-            return sharedPref.getInt(ConstantValues.SHARED_PREFERENCES_REPEAT,
-                PlaybackStateCompat.REPEAT_MODE_ONE
-            )
+            return sharedPref.getBoolean("havefolderssaf", true)
         }
-
-        fun setRepeat(context: Context, repeat: Int) {
+        private fun saveHaveFoldersSAF(context: Context, b: Boolean) {
             val sharedPref: SharedPreferences = context.getSharedPreferences(
                 context.getString(R.string.preference_file_key),
                 Context.MODE_PRIVATE
             )
             val editor: SharedPreferences.Editor = sharedPref.edit()
-            editor.putInt(ConstantValues.SHARED_PREFERENCES_REPEAT, repeat)
+            editor.putBoolean("havefolderssaf", b)
+            editor.apply()
+        }
+
+        fun loadIsFirstTimeOpenApp(context: Context): Boolean {
+            val sharedPref: SharedPreferences = context.getSharedPreferences(
+                context.getString(R.string.preference_file_key), Context.MODE_PRIVATE
+            )
+            return sharedPref.getBoolean("firsttimeopenapp", true)
+        }
+        fun saveIsFirstTimeOpenApp(context: Context, value: Boolean) {
+            val sharedPref: SharedPreferences = context.getSharedPreferences(
+                context.getString(R.string.preference_file_key),
+                Context.MODE_PRIVATE
+            )
+            val editor: SharedPreferences.Editor = sharedPref.edit()
+            editor.putBoolean("firsttimeopenapp", value)
             editor.apply()
         }
     }

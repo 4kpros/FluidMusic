@@ -1,9 +1,11 @@
 package com.prosabdev.fluidmusic.ui.activities.settings
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.AttributeSet
 import android.view.View
 import android.widget.Toast
 import android.window.OnBackInvokedDispatcher
@@ -32,6 +34,8 @@ import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 import com.prosabdev.fluidmusic.utils.MediaFileScanner
 import com.prosabdev.fluidmusic.utils.SharedPreferenceManager
 import com.prosabdev.fluidmusic.viewmodels.StorageAccessActivityViewModel
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @BuildCompat.PrereleaseSdkCheck class StorageAccessActivity : AppCompatActivity() {
@@ -57,11 +61,13 @@ import kotlinx.coroutines.launch
         mActivityStorageAccessBinding = DataBindingUtil.setContentView(this, R.layout.activity_storage_access)
 
         initViews()
-        loadFolderSAF()
-        setupAdapter()
-        observeLiveData()
-        checkInteractions()
-        registerOnBackPressedCallback()
+        MainScope().launch {
+            loadFolderSAF()
+            setupAdapter()
+            observeLiveData()
+            checkInteractions()
+            registerOnBackPressedCallback()
+        }
     }
 
     private fun registerOnBackPressedCallback() {
@@ -105,13 +111,15 @@ import kotlinx.coroutines.launch
             updateLoadingUI(it)
         }
         mStorageAccessActivityViewModel.getRemoveAllFoldersCounter().observe(this){
-            removeAllFolders(it)
+            MainScope().launch {
+                removeAllFolders(it)
+            }
         }
     }
 
-    private fun removeAllFolders(i: Int) {
+    private suspend fun removeAllFolders(i: Int) = coroutineScope{
         if(i <= 0 || mFolderSelectionList.size <= 0)
-            return
+            return@coroutineScope
         val folderSize: Int = mFolderSelectionList.size
         mStorageAccessAdapter?.notifyItemRangeRemoved(0, folderSize)
         mFolderSelectionList.clear()
@@ -120,19 +128,7 @@ import kotlinx.coroutines.launch
     }
 
     private fun updateLoadingUI(folderSAFS: Int) {
-        if(folderSAFS > 0){
-            //Hide loading view
-            if(mActivityStorageAccessBinding.constraintLoadingContent.alpha == 1.0f){
-                CustomAnimators.crossFadeDown(mActivityStorageAccessBinding.constraintLoadingContent, true)
-                CustomAnimators.crossFadeDown(mActivityStorageAccessBinding.textLoadingDetails, true)
-            }
-        }else{
-            //show loading view
-            if(mActivityStorageAccessBinding.constraintLoadingContent.visibility != View.VISIBLE){
-                CustomAnimators.crossFadeUp(mActivityStorageAccessBinding.constraintLoadingContent, true)
-                CustomAnimators.crossFadeUp(mActivityStorageAccessBinding.textLoadingDetails, true)
-            }
-        }
+        mActivityStorageAccessBinding.foldersCounter = folderSAFS
     }
 
     private fun checkInteractions() {
@@ -211,12 +207,13 @@ import kotlinx.coroutines.launch
     private fun saveFolderSAF() {
         SharedPreferenceManager.saveSelectionFolderFromSAF(this.baseContext, mFolderSelectionList as List<FolderSAF>)
         mHaveBeenUpdated = false
-        Toast.makeText(this, "Preferences saved !", Toast.LENGTH_SHORT).show()
+//        startActivity(Intent(this, MediaScannerActivity::class.java))
         onBackPressedDispatcher.onBackPressed()
+        Toast.makeText(this, "Folder selection saved !", Toast.LENGTH_SHORT).show()
     }
 
-    private fun loadFolderSAF() {
-        val mTempLoadedFiles : List<FolderSAF>? = SharedPreferenceManager.loadSelectionFolderFromSAF(this.baseContext)
+    private suspend fun loadFolderSAF() = coroutineScope {
+        val mTempLoadedFiles : List<FolderSAF>? = SharedPreferenceManager.loadSelectionFolderFromSAF(this@StorageAccessActivity)
         if(mTempLoadedFiles != null){
             mFolderSelectionList = mTempLoadedFiles as ArrayList<FolderSAF>
             mStorageAccessActivityViewModel.setFoldersCounter(mFolderSelectionList.size)
@@ -226,6 +223,7 @@ import kotlinx.coroutines.launch
     private fun initViews() {
         CustomViewModifiers.updateTopViewInsets(mActivityStorageAccessBinding.coordinator)
         CustomViewModifiers.updateBottomViewInsets(mActivityStorageAccessBinding.constraintMainContainer)
+        mActivityStorageAccessBinding.foldersCounter = mStorageAccessActivityViewModel.getFoldersCounter().value
     }
 
     private var treeUri: String?
@@ -246,8 +244,8 @@ import kotlinx.coroutines.launch
             }
         }
     }
-    private fun formatAndAddFolderSource(uri: Uri) {
-        val documentFile = DocumentFile.fromTreeUri(this, uri)
+    private suspend fun formatAndAddFolderSource(uri: Uri) = coroutineScope{
+        val documentFile = DocumentFile.fromTreeUri(this@StorageAccessActivity, uri)
 
         val tempFolderSAF : FolderSAF = FolderSAF()
         tempFolderSAF.name = documentFile?.name
@@ -267,10 +265,10 @@ import kotlinx.coroutines.launch
         if(!isFolderSAFExist(tempFolderSAF)){
             addToFolderList(tempFolderSAF)
         }else{
-            Toast.makeText(this, "This folder have already been added", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@StorageAccessActivity, "This folder have already been added !", Toast.LENGTH_SHORT).show()
         }
     }
-    private fun addToFolderList(it: FolderSAF?) {
+    private suspend fun addToFolderList(it: FolderSAF?) {
         if(it != null){
             mFolderSelectionList.add(it)
             mStorageAccessAdapter?.notifyItemInserted(mFolderSelectionList.size - 1)
@@ -278,7 +276,7 @@ import kotlinx.coroutines.launch
             mHaveBeenUpdated = true
         }
     }
-    private fun isFolderSAFExist(folderSAF : FolderSAF): Boolean {
+    private suspend fun isFolderSAFExist(folderSAF : FolderSAF): Boolean = coroutineScope {
         if(mFolderSelectionList.size > 0){
             var returnFalse = 0
             for(i in (mFolderSelectionList.size-1) downTo  0){
@@ -302,11 +300,11 @@ import kotlinx.coroutines.launch
                 }
             }
             if(returnFalse > 0)
-                return true
+                return@coroutineScope true
         }
-        return false
+        return@coroutineScope false
     }
-    private fun removeFromFolderList(i: Int) {
+    private suspend fun removeFromFolderList(i: Int) {
         mFolderSelectionList.removeAt(i)
         mStorageAccessAdapter?.notifyItemRemoved(i)
         mStorageAccessActivityViewModel.setFoldersCounter(mFolderSelectionList.size)

@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.viewmodels.explore
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.prosabdev.fluidmusic.models.SongItem
@@ -19,8 +20,8 @@ class AllSongsFragmentViewModel : GenericSongItemDataListViewModel() {
         super.setDataList(songList as ArrayList<Any>)
     }
 
-    override fun requestLoadDataAsync(activity: Activity, startCursor: Int, maxDataCount: Int) {
-        super.requestLoadDataAsync(activity, startCursor, maxDataCount)
+    override fun requestLoadDataAsync(context: Context, startCursor: Int, maxDataCount: Int) {
+        super.requestLoadDataAsync(context, startCursor, maxDataCount)
 
         Log.i(ConstantValues.TAG, "ON REQUEST LOAD DATA FROM EXPLORE SONGS")
 
@@ -29,11 +30,11 @@ class AllSongsFragmentViewModel : GenericSongItemDataListViewModel() {
         setIsLoadingInBackground(true)
 
         //Else load songs from MediaFileScanner
-        MediaFileScanner.scanAudioFilesOnDevice(
-            activity,
-            this@AllSongsFragmentViewModel as GenericSongItemDataListViewModel,
-            startCursor,
-            maxDataCount
-        )
+//        MediaFileScanner.scanAudioFilesOnDevice(
+//            context,
+//            this@AllSongsFragmentViewModel as GenericSongItemDataListViewModel,
+//            startCursor,
+//            maxDataCount
+//        )
     }
 }

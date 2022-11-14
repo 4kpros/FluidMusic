@@ -64,13 +64,14 @@ class MainFragment : Fragment() {
             add<PlayerFragment>(R.id.player_fragment_container)
         }
 
+        initViews(view)
+
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initViews(view)
         checkInteractions()
         observeLiveData()
     }

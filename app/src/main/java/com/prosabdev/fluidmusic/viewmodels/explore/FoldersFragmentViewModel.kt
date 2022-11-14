@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.viewmodels.explore
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.MediaFileScanner
@@ -11,12 +12,8 @@ import kotlinx.coroutines.launch
 
 class FoldersFragmentViewModel : GenericSongItemDataListViewModel() {
 
-    override fun requestLoadDataAsync(
-        activity: Activity,
-        startCursor: Int,
-        maxDataCount: Int
-    ) {
-        super.requestLoadDataAsync(activity, startCursor, maxDataCount)
+    override fun requestLoadDataAsync(context: Context, startCursor: Int, maxDataCount: Int) {
+        super.requestLoadDataAsync(context, startCursor, maxDataCount)
 
         Log.i(ConstantValues.TAG, "ON REQUEST LOAD DATA FROM EXPLORE FOLDERS")
 
@@ -25,11 +22,11 @@ class FoldersFragmentViewModel : GenericSongItemDataListViewModel() {
         setIsLoadingInBackground(true)
 
         //Else load songs from MediaFileScanner
-        MediaFileScanner.scanAudioFilesOnDevice(
-            activity,
-            this@FoldersFragmentViewModel as GenericSongItemDataListViewModel,
-            startCursor,
-            maxDataCount
-        )
+//        MediaFileScanner.scanAudioFilesOnDevice(
+//            context,
+//            this@FoldersFragmentViewModel as GenericSongItemDataListViewModel,
+//            startCursor,
+//            maxDataCount
+//        )
     }
 }

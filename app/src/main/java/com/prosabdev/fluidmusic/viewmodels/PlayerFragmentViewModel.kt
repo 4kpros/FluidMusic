@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.viewmodels
 
 import android.app.Activity
+import android.content.Context
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -32,8 +33,8 @@ class PlayerFragmentViewModel : GenericSongItemDataListViewModel()  {
     private val mShuffle: LiveData<Int> get() = mMutableShuffle
     private val mRepeat: LiveData<Int> get() = mMutableRepeat
 
-    override fun requestLoadDataAsync(activity: Activity, startCursor: Int, maxDataCount: Int) {
-        super.requestLoadDataAsync(activity, startCursor, maxDataCount)
+    override fun requestLoadDataAsync(context: Context, startCursor: Int, maxDataCount: Int) {
+        super.requestLoadDataAsync(context, startCursor, maxDataCount)
 
         Log.i(ConstantValues.TAG, "ON REQUEST LOAD DATA FROM PLAYER FRAGMENT")
 
@@ -42,12 +43,12 @@ class PlayerFragmentViewModel : GenericSongItemDataListViewModel()  {
         setIsLoadingInBackground(true)
 
         //Else load songs from MediaFileScanner
-        MediaFileScanner.scanAudioFilesOnDevice(
-            activity,
-            this@PlayerFragmentViewModel as GenericSongItemDataListViewModel,
-            startCursor,
-            maxDataCount
-        )
+//        MediaFileScanner.scanAudioFilesOnDevice(
+//            context,
+//            this@PlayerFragmentViewModel as GenericSongItemDataListViewModel,
+//            startCursor,
+//            maxDataCount
+//        )
     }
 
     fun setIsPlaying(value : Boolean){

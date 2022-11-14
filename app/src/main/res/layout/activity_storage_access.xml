@@ -4,7 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <import type="android.view.View"/>
+        <variable
+            name="foldersCounter"
+            type="java.lang.Integer" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -37,7 +40,6 @@
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_constraintTop_toTopOf="parent"
                 android:fillViewport="true"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 />
@@ -54,6 +56,7 @@
             android:gravity="center"
             android:padding="@dimen/main_margin"
             android:layout_marginBottom="50dp"
+            android:visibility="@{( foldersCounter != 0) ? View.GONE : View.VISIBLE, default=gone}"
             >
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="100dp"
@@ -84,6 +87,7 @@
             android:paddingHorizontal="@dimen/main_margin"
             app:layout_constraintTop_toBottomOf="@+id/constraint_loading_content"
             app:layout_constraintBottom_toTopOf="@+id/linear_buttons_container"
+            android:visibility="@{( foldersCounter != 0) ? View.GONE : View.VISIBLE, default=gone}"
             />
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linear_buttons_container"
