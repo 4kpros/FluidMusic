@@ -1,54 +1,41 @@
 package com.prosabdev.fluidmusic
 
-import android.app.Activity
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.hardware.usb.UsbDevice.getDeviceName
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.storage.StorageManager
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserCompat.ConnectionCallback
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.edit
+import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
-import androidx.documentfile.provider.DocumentFile
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.commit
-import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
 import com.google.android.material.color.DynamicColors
 import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
-import com.prosabdev.fluidmusic.models.FolderSAF
 import com.prosabdev.fluidmusic.services.MediaPlaybackService
+import com.prosabdev.fluidmusic.ui.activities.settings.StorageAccessActivity
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
-import com.prosabdev.fluidmusic.ui.fragments.StorageAccessFragment
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.StorageAccessFragmentViewModel
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import java.util.*
 
 
-class MainActivity : AppCompatActivity(){
+@BuildCompat.PrereleaseSdkCheck class MainActivity : AppCompatActivity(){
 
     private lateinit var mActivityMainBinding: ActivityMainBinding
 
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by viewModels()
-    private val mStorageAccessFragmentViewModel: StorageAccessFragmentViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,10 +43,9 @@ class MainActivity : AppCompatActivity(){
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        mActivityMainBinding = DataBindingUtil.setContentView(this@MainActivity, R.layout.activity_main)
+        mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         initViews()
-        observeLiveData()
         if(!checkFoldersUrisSelected()) {
             return
         }
@@ -80,11 +66,8 @@ class MainActivity : AppCompatActivity(){
             }
             return true
         }
-        mActivityMainBinding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            replace(R.id.main_activity_fragment_container, StorageAccessFragment.newInstance())
-        }
+        startActivity(Intent(this, StorageAccessActivity::class.java).apply {
+        })
         return false
     }
 
@@ -98,21 +81,6 @@ class MainActivity : AppCompatActivity(){
         )
     }
 
-    private fun observeLiveData() {
-//        mPlayerFragmentViewModel.getCurrentSong().observe(this as LifecycleOwner
-//        ) { currentSong ->
-//            MainScope().launch {
-//                updateCurrentPlayingSong(currentSong)
-//            }
-//        }
-        mStorageAccessFragmentViewModel.getRequestAddFolder().observe(this@MainActivity){
-            if(it > 0)
-                requestForSAF()
-        }
-    }
-    private fun requestForSAF() {
-        mOpenSAFDocumentTreeLauncher.launch(null)
-    }
     private suspend fun updateCurrentPlayingSong(currentSong: Int?)  = coroutineScope{
         if((currentSong ?: 0) < 0)
             return@coroutineScope
@@ -178,72 +146,6 @@ class MainActivity : AppCompatActivity(){
         mActivityMainBinding.navigationView.setCheckedItem(R.id.music_library)
     }
 
-    private var treeUri: String?
-        get() = PreferenceManager.getDefaultSharedPreferences(this@MainActivity).getString("tree_uri", null)
-        set(value) {
-            PreferenceManager.getDefaultSharedPreferences(this@MainActivity).edit {
-                putString("tree_uri", value)
-            }
-        }
-
-    private val mOpenSAFDocumentTreeLauncher = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
-        if (uri != null) {
-            treeUri = uri.toString()
-            val takeFlags: Int =
-                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-            this@MainActivity.contentResolver.takePersistableUriPermission(uri, takeFlags)
-            lifecycleScope.launch {
-                formatAndAddFolderSource(uri)
-            }
-        }
-    }
-    private fun formatAndAddFolderSource(uri: Uri) {
-        val documentFile = DocumentFile.fromTreeUri(this@MainActivity, uri)
-        val tempFolderSAF : FolderSAF = FolderSAF()
-        tempFolderSAF.name = documentFile?.name
-        tempFolderSAF.uriTree = documentFile?.uri
-        tempFolderSAF.lastPathSegment = uri.lastPathSegment
-        tempFolderSAF.pathTree = uri.path
-        tempFolderSAF.normalizeScheme = uri.normalizeScheme().toString()
-        tempFolderSAF.path = (uri.lastPathSegment ?: "").substringAfter(":")
-        if(tempFolderSAF.path!!.isEmpty())
-            tempFolderSAF.path = documentFile?.name
-        tempFolderSAF.deviceName =
-            if((uri.lastPathSegment ?: "").substringBefore(":") == "primary")
-                MediaFileScanner.getDeviceName()
-            else
-                MediaFileScanner.getDeviceName()
-
-        if(!isFolderSAFExist(tempFolderSAF)){
-            Log.i(ConstantValues.TAG, "THIS NORMALIZED SCHEME DOESN'T EXIST : !!!")
-            mStorageAccessFragmentViewModel.setAddFolderSAF(tempFolderSAF)
-        }else{
-            Log.i(ConstantValues.TAG, "THIS NORMALIZED SCHEME ALSO EXIST : !!!")
-            Toast.makeText(this@MainActivity.baseContext, "This folder have already been added !!", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun isFolderSAFExist(folderSAF : FolderSAF): Boolean {
-        Log.i(ConstantValues.TAG, "FolderSAF normalizeScheme : ${folderSAF.normalizeScheme}")
-        if(mStorageAccessFragmentViewModel.getFoldersList().value != null &&
-            (mStorageAccessFragmentViewModel.getFoldersList().value?.size ?: 0) > 0
-        ){
-            val tempSize = mStorageAccessFragmentViewModel.getFoldersList().value?.size ?: 0
-            for(i in 0 until tempSize){
-                val tempData : FolderSAF? = mStorageAccessFragmentViewModel.getFoldersList().value?.get(i)
-                if(tempData != null){
-                    Log.i(ConstantValues.TAG, "TempData normalizeScheme ---> : ${tempData.normalizeScheme}")
-                    if(
-                        tempData.normalizeScheme?.contains(folderSAF.normalizeScheme ?: "") == true ||
-                        folderSAF.normalizeScheme?.contains(tempData.normalizeScheme ?: "") == true
-                    )
-                        return true
-                }
-            }
-        }
-        return false
-    }
-
     private var mMediaBrowser: MediaBrowserCompat? = null
     private var mConnectionCallbacks: ConnectionCallback = object : ConnectionCallback(){
         override fun onConnected() {
@@ -283,7 +185,7 @@ class MainActivity : AppCompatActivity(){
     }
 
     private fun buildTransportControls() {
-        val mediaController = MediaControllerCompat.getMediaController(this@MainActivity)
+        val mediaController = MediaControllerCompat.getMediaController(this)
         mediaController.transportControls.prepare()
 
         // Display the initial state

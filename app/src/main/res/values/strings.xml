@@ -3,7 +3,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="preference_file_key">fluidmusicpreferenceskey</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_storage_access">Storage access</string>
+    <string name="title_activity_equalizer">Equalizer</string>
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
