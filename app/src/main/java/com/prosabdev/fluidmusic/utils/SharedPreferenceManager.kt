@@ -3,48 +3,33 @@ package com.prosabdev.fluidmusic.utils
 import android.content.Context
 import android.content.SharedPreferences
 import android.support.v4.media.session.PlaybackStateCompat
+import androidx.appcompat.app.AppCompatActivity
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.prosabdev.fluidmusic.R
+import java.lang.reflect.Type
 
 abstract class SharedPreferenceManager {
     companion object {
-        fun getRequestBroadcastLoading(context: Context): Boolean {
-            val sharedPref: SharedPreferences = context.getSharedPreferences(
-                context.getString(R.string.preference_file_key), Context.MODE_PRIVATE
-            )
-            return sharedPref.getBoolean(
-                ConstantValues.SHARED_PREFERENCES_BROADCAST,
-                false
-            )
-        }
-
-        fun setRequestBroadcastLoading(context: Context, isLoaded: Boolean) {
-            val sharedPref: SharedPreferences = context.getSharedPreferences(
+        fun loadSelectionFolderFromSAF(context: Context): List<String>? {
+            val sharedPreferences: SharedPreferences = context.getSharedPreferences(
                 context.getString(R.string.preference_file_key),
-                Context.MODE_PRIVATE
+                AppCompatActivity.MODE_PRIVATE
             )
-            val editor: SharedPreferences.Editor = sharedPref.edit()
-            editor.putBoolean(
-                ConstantValues.SHARED_PREFERENCES_BROADCAST,
-                isLoaded
-            )
-            editor.apply()
+            val gson: Gson = Gson()
+            val itemListJsonString: String? = sharedPreferences.getString("foldersselectionlistfromsaf", null)
+            val itemType = object : TypeToken<List<String>>() {}.type
+            return gson.fromJson<List<String>>(itemListJsonString, itemType)
         }
-
-
-        fun getShuffle(context: Context): Boolean {
-            val sharedPref: SharedPreferences = context.getSharedPreferences(
-                context.getString(R.string.preference_file_key), Context.MODE_PRIVATE
-            )
-            return sharedPref.getBoolean(ConstantValues.SHARED_PREFERENCES_SHUFFLE, false)
-        }
-
-        fun setShuffle(context: Context, shuffle: Boolean) {
-            val sharedPref: SharedPreferences = context.getSharedPreferences(
+        private fun saveSelectionFolderFromSAF(context: Context, folderList : List<String>) {
+            val sharedPreferences: SharedPreferences = context.getSharedPreferences(
                 context.getString(R.string.preference_file_key),
-                Context.MODE_PRIVATE
+                AppCompatActivity.MODE_PRIVATE
             )
-            val editor: SharedPreferences.Editor = sharedPref.edit()
-            editor.putBoolean(ConstantValues.SHARED_PREFERENCES_SHUFFLE, shuffle)
+            val editor: SharedPreferences.Editor = sharedPreferences.edit()
+            val gson: Gson = Gson()
+            val json: String = gson.toJson(folderList)
+            editor.putString("foldersselectionlistfromsaf", json)
             editor.apply()
         }
 

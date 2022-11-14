@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="position"
+            type="java.lang.Integer" />
+        <variable
+            name="folderSAF"
+            type="com.prosabdev.fluidmusic.models.FolderSAF" />
+
+        <variable
+            name="itemClickListener"
+            type="com.prosabdev.fluidmusic.adapters.StorageAccessAdapter.OnItemClickListener" />
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.Material3.CardView.Outlined"
+        android:layout_marginTop="2dp"
+        >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/main_margin"
+            >
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/image_folder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@+id/linear_text_container"
+                app:layout_constraintStart_toStartOf="parent"
+                android:src="@drawable/folder_open"
+                app:srcCompat="@drawable/folder_open"
+                />
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/linear_text_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/image_folder"
+                app:layout_constraintEnd_toStartOf="@+id/button_remove"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="@dimen/main_small_margin"
+                android:layout_marginVertical="@dimen/main_medium_margin"
+                >
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/text_folder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/TextAppearance.Material3.BodyLarge"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:scrollHorizontally="true"
+                    android:text="@{folderSAF.path}"
+                    />
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/text_volume"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/TextAppearance.Material3.BodyMedium"
+                    android:alpha="0.5"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:scrollHorizontally="true"
+                    android:text="@{folderSAF.deviceName}"
+                    />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_remove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                style="@style/Widget.Material3.Button.IconButton"
+                app:icon="@drawable/delete"
+                android:onClickListener="@{() -> itemClickListener.onRemoveFolder(position)}"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</layout>

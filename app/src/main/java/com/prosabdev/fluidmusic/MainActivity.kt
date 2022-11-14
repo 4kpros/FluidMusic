@@ -1,100 +1,54 @@
 package com.prosabdev.fluidmusic
 
+import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.hardware.usb.UsbDevice.getDeviceName
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.storage.StorageManager
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserCompat.ConnectionCallback
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
+import androidx.documentfile.provider.DocumentFile
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
 import com.google.android.material.color.DynamicColors
 import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
+import com.prosabdev.fluidmusic.models.FolderSAF
 import com.prosabdev.fluidmusic.services.MediaPlaybackService
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
-import com.prosabdev.fluidmusic.ui.fragments.PermissionsFragment
-import com.prosabdev.fluidmusic.utils.AudioFileInfoExtractor
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.PermissionsManager
-import com.prosabdev.fluidmusic.viewmodels.PermissionsFragmentViewModel
+import com.prosabdev.fluidmusic.ui.fragments.StorageAccessFragment
+import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
-import kotlinx.coroutines.MainScope
+import com.prosabdev.fluidmusic.viewmodels.StorageAccessFragmentViewModel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import java.util.*
+
 
 class MainActivity : AppCompatActivity(){
 
     private lateinit var mActivityMainBinding: ActivityMainBinding
 
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by viewModels()
-    private val mPermissionsFragmentViewModel: PermissionsFragmentViewModel by viewModels()
-
-    private var mMediaBrowser: MediaBrowserCompat? = null
-    private var mConnectionCallbacks: ConnectionCallback = object : ConnectionCallback(){
-        override fun onConnected() {
-            super.onConnected()
-            Log.i(ConstantValues.TAG, "ConnectionCallback onConnected")
-            mMediaBrowser?.sessionToken.also { token ->
-                val mediaController = MediaControllerCompat(
-                    this@MainActivity, // Context
-                    token!!
-                )
-                MediaControllerCompat.setMediaController(this@MainActivity, mediaController)
-            }
-
-            // Finish building the UI
-            buildTransportControls()
-        }
-
-        override fun onConnectionSuspended() {
-            super.onConnectionSuspended()
-            Log.i(ConstantValues.TAG, "ConnectionCallback onConnectionSuspended")
-        }
-
-        override fun onConnectionFailed() {
-            super.onConnectionFailed()
-            Log.i(ConstantValues.TAG, "ConnectionCallback onConnectionFailed")
-        }
-    }
-    private var mControllerCallback = object : MediaControllerCompat.Callback() {
-
-        override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-            Log.i(ConstantValues.TAG, "MediaControllerCompat onMetadataChanged : $metadata")
-        }
-
-        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-            Log.i(ConstantValues.TAG, "MediaControllerCompat onPlaybackStateChanged : $state")
-        }
-    }
-
-    private fun buildTransportControls() {
-        val mediaController = MediaControllerCompat.getMediaController(this@MainActivity)
-        mediaController.transportControls.prepare()
-
-        // Display the initial state
-        val metadata = mediaController.metadata
-        val pbState = mediaController.playbackState
-
-        mediaController.registerCallback(mControllerCallback)
-    }
+    private val mStorageAccessFragmentViewModel: StorageAccessFragmentViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,29 +59,31 @@ class MainActivity : AppCompatActivity(){
         mActivityMainBinding = DataBindingUtil.setContentView(this@MainActivity, R.layout.activity_main)
 
         initViews()
-        if(!loadMainFragmentFromPermissionsResult()) {
+        observeLiveData()
+        if(!checkFoldersUrisSelected()) {
             return
         }
-//        runBlocking {
-//            checkInteractions()
-//            observeLiveData()
-//            createMediaBrowserService()
-//        }
+        checkInteractions()
+        createMediaBrowserService()
     }
 
-    private fun loadMainFragmentFromPermissionsResult(): Boolean {
-        if(PermissionsManager.haveStoragePermissions(this@MainActivity.applicationContext)){
-//            mActivityMainBinding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-//            supportFragmentManager.commit {
-//                setReorderingAllowed(true)
-//                replace(R.id.main_activity_fragment_container, MainFragment.newInstance())
-//            }
+    private fun checkFoldersUrisSelected(): Boolean {
+        if(
+            SharedPreferenceManager.loadSelectionFolderFromSAF(baseContext) != null
+            &&
+            (SharedPreferenceManager.loadSelectionFolderFromSAF(baseContext)?.size ?: 0) > 0
+        ){
+            mActivityMainBinding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                replace(R.id.main_activity_fragment_container, MainFragment.newInstance())
+            }
             return true
         }
         mActivityMainBinding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            replace(R.id.main_activity_fragment_container, PermissionsFragment.newInstance())
+            replace(R.id.main_activity_fragment_container, StorageAccessFragment.newInstance())
         }
         return false
     }
@@ -143,14 +99,20 @@ class MainActivity : AppCompatActivity(){
     }
 
     private fun observeLiveData() {
-        mPlayerFragmentViewModel.getCurrentSong().observe(this as LifecycleOwner
-        ) { currentSong ->
-            MainScope().launch {
-                updateCurrentPlayingSong(currentSong)
-            }
+//        mPlayerFragmentViewModel.getCurrentSong().observe(this as LifecycleOwner
+//        ) { currentSong ->
+//            MainScope().launch {
+//                updateCurrentPlayingSong(currentSong)
+//            }
+//        }
+        mStorageAccessFragmentViewModel.getRequestAddFolder().observe(this@MainActivity){
+            if(it > 0)
+                requestForSAF()
         }
     }
-
+    private fun requestForSAF() {
+        mOpenSAFDocumentTreeLauncher.launch(null)
+    }
     private suspend fun updateCurrentPlayingSong(currentSong: Int?)  = coroutineScope{
         if((currentSong ?: 0) < 0)
             return@coroutineScope
@@ -164,7 +126,6 @@ class MainActivity : AppCompatActivity(){
             }
         }
     }
-
     private fun createQueueListBundle(currentSong: Int): Bundle {
         val bundle = Bundle()
         //Get queue list
@@ -217,22 +178,119 @@ class MainActivity : AppCompatActivity(){
         mActivityMainBinding.navigationView.setCheckedItem(R.id.music_library)
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        when (requestCode) {
-            ConstantValues.STORAGE_PERMISSION_CODE -> {
-                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    mPermissionsFragmentViewModel.setHaveStorageAccess(true)
-
-                }
-                return
+    private var treeUri: String?
+        get() = PreferenceManager.getDefaultSharedPreferences(this@MainActivity).getString("tree_uri", null)
+        set(value) {
+            PreferenceManager.getDefaultSharedPreferences(this@MainActivity).edit {
+                putString("tree_uri", value)
             }
         }
+
+    private val mOpenSAFDocumentTreeLauncher = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+        if (uri != null) {
+            treeUri = uri.toString()
+            val takeFlags: Int =
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            this@MainActivity.contentResolver.takePersistableUriPermission(uri, takeFlags)
+            lifecycleScope.launch {
+                formatAndAddFolderSource(uri)
+            }
+        }
+    }
+    private fun formatAndAddFolderSource(uri: Uri) {
+        val documentFile = DocumentFile.fromTreeUri(this@MainActivity, uri)
+        val tempFolderSAF : FolderSAF = FolderSAF()
+        tempFolderSAF.name = documentFile?.name
+        tempFolderSAF.uriTree = documentFile?.uri
+        tempFolderSAF.lastPathSegment = uri.lastPathSegment
+        tempFolderSAF.pathTree = uri.path
+        tempFolderSAF.normalizeScheme = uri.normalizeScheme().toString()
+        tempFolderSAF.path = (uri.lastPathSegment ?: "").substringAfter(":")
+        if(tempFolderSAF.path!!.isEmpty())
+            tempFolderSAF.path = documentFile?.name
+        tempFolderSAF.deviceName =
+            if((uri.lastPathSegment ?: "").substringBefore(":") == "primary")
+                MediaFileScanner.getDeviceName()
+            else
+                MediaFileScanner.getDeviceName()
+
+        if(!isFolderSAFExist(tempFolderSAF)){
+            Log.i(ConstantValues.TAG, "THIS NORMALIZED SCHEME DOESN'T EXIST : !!!")
+            mStorageAccessFragmentViewModel.setAddFolderSAF(tempFolderSAF)
+        }else{
+            Log.i(ConstantValues.TAG, "THIS NORMALIZED SCHEME ALSO EXIST : !!!")
+            Toast.makeText(this@MainActivity.baseContext, "This folder have already been added !!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun isFolderSAFExist(folderSAF : FolderSAF): Boolean {
+        Log.i(ConstantValues.TAG, "FolderSAF normalizeScheme : ${folderSAF.normalizeScheme}")
+        if(mStorageAccessFragmentViewModel.getFoldersList().value != null &&
+            (mStorageAccessFragmentViewModel.getFoldersList().value?.size ?: 0) > 0
+        ){
+            val tempSize = mStorageAccessFragmentViewModel.getFoldersList().value?.size ?: 0
+            for(i in 0 until tempSize){
+                val tempData : FolderSAF? = mStorageAccessFragmentViewModel.getFoldersList().value?.get(i)
+                if(tempData != null){
+                    Log.i(ConstantValues.TAG, "TempData normalizeScheme ---> : ${tempData.normalizeScheme}")
+                    if(
+                        tempData.normalizeScheme?.contains(folderSAF.normalizeScheme ?: "") == true ||
+                        folderSAF.normalizeScheme?.contains(tempData.normalizeScheme ?: "") == true
+                    )
+                        return true
+                }
+            }
+        }
+        return false
+    }
+
+    private var mMediaBrowser: MediaBrowserCompat? = null
+    private var mConnectionCallbacks: ConnectionCallback = object : ConnectionCallback(){
+        override fun onConnected() {
+            super.onConnected()
+            Log.i(ConstantValues.TAG, "ConnectionCallback onConnected")
+            mMediaBrowser?.sessionToken.also { token ->
+                val mediaController = MediaControllerCompat(
+                    this@MainActivity, // Context
+                    token!!
+                )
+                MediaControllerCompat.setMediaController(this@MainActivity, mediaController)
+            }
+
+            // Finish building the UI
+            buildTransportControls()
+        }
+
+        override fun onConnectionSuspended() {
+            super.onConnectionSuspended()
+            Log.i(ConstantValues.TAG, "ConnectionCallback onConnectionSuspended")
+        }
+
+        override fun onConnectionFailed() {
+            super.onConnectionFailed()
+            Log.i(ConstantValues.TAG, "ConnectionCallback onConnectionFailed")
+        }
+    }
+    private var mControllerCallback = object : MediaControllerCompat.Callback() {
+
+        override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+            Log.i(ConstantValues.TAG, "MediaControllerCompat onMetadataChanged : $metadata")
+        }
+
+        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+            Log.i(ConstantValues.TAG, "MediaControllerCompat onPlaybackStateChanged : $state")
+        }
+    }
+
+    private fun buildTransportControls() {
+        val mediaController = MediaControllerCompat.getMediaController(this@MainActivity)
+        mediaController.transportControls.prepare()
+
+        // Display the initial state
+        val metadata = mediaController.metadata
+        val pbState = mediaController.playbackState
+
+        mediaController.registerCallback(mControllerCallback)
     }
 
     public override fun onStart() {
@@ -242,7 +300,6 @@ class MainActivity : AppCompatActivity(){
     public override fun onResume() {
         super.onResume()
         volumeControlStream = AudioManager.STREAM_MUSIC
-        loadMainFragmentFromPermissionsResult()
     }
     public override fun onStop() {
         super.onStop()

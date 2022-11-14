@@ -15,6 +15,26 @@ import kotlin.collections.ArrayList
 
 abstract class MediaFileScanner {
     companion object {
+        fun getDeviceName(): String {
+            val manufacturer = Build.MANUFACTURER
+            val model = Build.MODEL
+            return if (model.startsWith(manufacturer)) {
+                capitalize(model)
+            } else {
+                capitalize(manufacturer) + " " + model
+            }
+        }
+        private fun capitalize(s: String?): String {
+            if (s == null || s.isEmpty()) {
+                return ""
+            }
+            val first = s[0]
+            return if (Character.isUpperCase(first)) {
+                s
+            } else {
+                first.uppercaseChar().toString() + s.substring(1)
+            }
+        }
         fun scanAudioFilesOnDevice(
             activity: Activity,
             viewModel : GenericSongItemDataListViewModel,
