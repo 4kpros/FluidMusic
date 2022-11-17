@@ -7,18 +7,15 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DecodeFormat
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.card.MaterialCardView
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.models.AlbumItem
+import com.prosabdev.fluidmusic.models.collections.AlbumItem
 import com.prosabdev.fluidmusic.utils.CustomFormatters
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import com.prosabdev.fluidmusic.utils.adapters.SelectablePlayingItemAdapter
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 class AlbumItemAdapter(
     private val mAlbumList: List<AlbumItem>?,
@@ -79,7 +76,9 @@ class AlbumItemAdapter(
             mIsSelectedCheckbox?.visibility = if(selected) View.VISIBLE else View.GONE
             //Set song covert art
             val tempBinary: ByteArray? = albumItem.covertArt?.binaryData
-            CustomUILoaders.loadCovertArtFromBinaryData(context, mCovertArt, tempBinary, 100)
+            MainScope().launch {
+                CustomUILoaders.loadCovertArtFromBinaryData(context, mCovertArt, tempBinary, 100)
+            }
         }
 
         //Method used to bind one listener with items events click

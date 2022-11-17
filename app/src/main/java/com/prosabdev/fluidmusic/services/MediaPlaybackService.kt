@@ -15,12 +15,10 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.HandlerThread
-import android.provider.CallLog.Calls.PRIORITY_NORMAL
 import android.service.media.MediaBrowserService
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.MediaSessionCompat.QueueItem
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.media.MediaBrowserServiceCompat

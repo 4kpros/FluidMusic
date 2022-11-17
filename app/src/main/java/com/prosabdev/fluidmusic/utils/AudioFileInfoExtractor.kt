@@ -1,11 +1,9 @@
 package com.prosabdev.fluidmusic.utils
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.collections.SongItem
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.audio.exceptions.CannotReadException
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
@@ -20,9 +18,9 @@ import java.io.IOException
 
 abstract class AudioFileInfoExtractor {
     companion object {
-        //Return audio info
+
         fun getAudioInfo(absolutePath: String?): SongItem {
-            val songItem : SongItem = SongItem()
+            val songItem = SongItem()
             if (absolutePath != null && absolutePath.isNotEmpty()) {
                 val tempFile = File(absolutePath)
                 try {
@@ -44,8 +42,6 @@ abstract class AudioFileInfoExtractor {
                     val album: String = tag.getFirst(FieldKey.ALBUM)
                     val genre: String = tag.getFirst(FieldKey.GENRE)
                     val year: String = tag.getFirst(FieldKey.YEAR)
-                    val comment: String = tag.getFirst(FieldKey.COMMENT)
-                    val lyrics: String = tag.getFirst(FieldKey.LYRICS)
                     songItem.covertArt = artwork
                     songItem.covertArtUrl = artwork?.imageUrl
                     songItem.title = title
@@ -56,6 +52,8 @@ abstract class AudioFileInfoExtractor {
                     songItem.sampleRate = sampleRate
                     songItem.typeMime = format
                     songItem.bitrate = bitrate
+                    Log.i(ConstantValues.TAG, "file title = $title")
+                    Log.i(ConstantValues.TAG, "file artist = $artist")
                 } catch (e: CannotReadException) {
                     e.printStackTrace()
                 } catch (e: IOException) {

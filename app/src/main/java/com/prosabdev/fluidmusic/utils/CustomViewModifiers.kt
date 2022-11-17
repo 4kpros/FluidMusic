@@ -1,15 +1,10 @@
 package com.prosabdev.fluidmusic.utils
 
 import android.os.Build
-import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.forEach
 import androidx.core.view.updatePadding
-import com.sothree.slidinguppanel.SlidingUpPanelLayout
 
 abstract class CustomViewModifiers {
     companion object{

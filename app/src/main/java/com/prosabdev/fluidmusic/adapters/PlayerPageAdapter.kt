@@ -1,17 +1,18 @@
 package com.prosabdev.fluidmusic.adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.collections.SongItem
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import kotlinx.coroutines.Job
@@ -21,10 +22,9 @@ import kotlinx.coroutines.launch
 
 
 class PlayerPageAdapter(
-    private val mSongList: List<SongItem>?,
     private val mContext: Context,
     private val mListener: OnItemClickListener
-) : Adapter<PlayerPageAdapter.PlayerPageHolder>() {
+) : ListAdapter<SongItem,PlayerPageAdapter.PlayerPageHolder>(DiffCallback) {
 
     interface OnItemClickListener {
         fun onButtonLyricsClicked(position: Int)
@@ -56,12 +56,10 @@ class PlayerPageAdapter(
 
     private fun loadCovertArt(covertArtView: ImageView?, position: Int) {
         covertArtView?.layout(0,0,0,0)
-        val tempBinary: ByteArray? = mSongList!![position].covertArt?.binaryData
-        CustomUILoaders.loadCovertArtFromBinaryData(mContext, covertArtView, tempBinary, 450)
-    }
-
-    override fun getItemCount(): Int {
-        return mSongList?.size ?: 0
+        val tempBinary: ByteArray? = getItem(position).covertArt?.binaryData
+        MainScope().launch{
+            CustomUILoaders.loadCovertArtFromBinaryData(mContext, covertArtView, tempBinary, 450)
+        }
     }
 
     class PlayerPageHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -102,6 +100,19 @@ class PlayerPageAdapter(
             delay(2000)
             CustomAnimators.crossFadeDown(this.mLyricsButton as View, true)
             CustomAnimators.crossFadeDown(mFullscreenButton as View, true)
+        }
+    }
+
+    companion object {
+        private val DiffCallback = object : DiffUtil.ItemCallback<SongItem>() {
+            override fun areItemsTheSame(oldItem: SongItem, newItem: SongItem): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            @SuppressLint("DiffUtilEquals")
+            override fun areContentsTheSame(oldItem: SongItem, newItem: SongItem): Boolean {
+                return oldItem.absolutePath == newItem.absolutePath
+            }
         }
     }
 }

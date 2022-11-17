@@ -1,13 +1,11 @@
 package com.prosabdev.fluidmusic.utils
 
-import android.*
 import android.Manifest.permission.*
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
-
 import androidx.core.content.ContextCompat
 
 

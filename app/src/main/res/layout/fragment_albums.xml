@@ -16,7 +16,5 @@
             android:id="@+id/content_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-
-        <include layout="@layout/component_loading_view" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

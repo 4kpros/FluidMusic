@@ -1,12 +1,8 @@
 package com.prosabdev.fluidmusic.adapters
 
-import android.os.Bundle
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
-import com.prosabdev.fluidmusic.utils.ConstantValues
 
 class TabLayoutAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int {

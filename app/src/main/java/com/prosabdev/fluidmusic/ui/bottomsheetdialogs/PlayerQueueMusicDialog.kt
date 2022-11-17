@@ -3,51 +3,27 @@ package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
-import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.button.MaterialButton
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
-import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.adapters.callbacks.SongItemMoveCallback
 import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.collections.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomMathComputations
-import com.prosabdev.fluidmusic.utils.CustomViewModifiers
-import com.prosabdev.fluidmusic.utils.adapters.SelectableRecycleViewAdapter
-import com.prosabdev.fluidmusic.viewmodels.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.explore.AllSongsFragmentViewModel
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import com.prosabdev.fluidmusic.utils.adapters.SelectableItemListAdapter
 
 class PlayerQueueMusicDialog : BottomSheetDialogFragment() {
 
     private var mContext: Context? = null
     private var mActivity: FragmentActivity? = null
-
-    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
-    private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
 
     private var mSongItemAdapter: SongItemAdapter? = null
     private var mRecyclerView: RecyclerView? = null
@@ -83,20 +59,6 @@ class PlayerQueueMusicDialog : BottomSheetDialogFragment() {
     }
 
     private fun observeLiveData() {
-        mPlayerFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner
-        ) {
-            MainScope().launch {
-                updateQueueList(it)
-            }
-        }
-        mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner
-        ) { currentSong -> updateCurrentPlayingSong(currentSong) }
-        mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner
-        ) { sourceOf -> updateDataFromSource(sourceOf) }
-    }
-
-    private fun updateDataFromSource(sourceOf: String?) {
-
     }
 
     private fun updateCurrentPlayingSong(currentSong: Int?) {
@@ -119,7 +81,6 @@ class PlayerQueueMusicDialog : BottomSheetDialogFragment() {
         var touchHelper : ItemTouchHelper? = null
         //Setup song adapter
         mSongItemAdapter = SongItemAdapter(
-            mSongList,
             mContext!!,
             object : SongItemAdapter.OnItemClickListener{
                 override fun onSongItemClicked(position: Int) {
@@ -141,7 +102,7 @@ class PlayerQueueMusicDialog : BottomSheetDialogFragment() {
                 }
 
             },
-            object : SelectableRecycleViewAdapter.OnSelectSelectableItemListener {
+            object : SelectableItemListAdapter.OnSelectSelectableItemListener {
                 override fun onTotalSelectedItemChange(totalSelected: Int) {
 //                    mMainFragmentViewModel.setTotalSelected(totalSelected)
                 }
@@ -168,21 +129,9 @@ class PlayerQueueMusicDialog : BottomSheetDialogFragment() {
         Log.i(ConstantValues.TAG, "scrollDrag To $position")
     }
     private fun onLongPressedToItemSong(position: Int) {
-        if(mSongItemAdapter?.selectableGetSelectionMode() == true){
-            mSongItemAdapter?.selectableToggleSelection(position, mLayoutManager)
-            mMainFragmentViewModel.setTotalSelected(mSongItemAdapter?.selectableGetSelectedItemCount() ?: 0)
-        }else{
-            mSongItemAdapter?.selectableSetSelectionMode(true, mLayoutManager)
-            mMainFragmentViewModel.setSelectMode(mSongItemAdapter?.selectableGetSelectionMode() ?: false)
-            mSongItemAdapter?.selectableToggleSelection(position, mLayoutManager)
-            mMainFragmentViewModel.setTotalSelected(mSongItemAdapter?.selectableGetSelectedItemCount() ?: 0)
-        }
+
     }
     private fun onPlayButton(position: Int) {
-        mPlayerFragmentViewModel.setShuffle( PlaybackStateCompat.SHUFFLE_MODE_NONE)
-        mPlayerFragmentViewModel.setRepeat( PlaybackStateCompat.REPEAT_MODE_NONE)
-        updateCurrentPlayingSong(position)
-        mMainFragmentViewModel.setScrollingState(-1)
     }
 
     private fun checkInteractions() {

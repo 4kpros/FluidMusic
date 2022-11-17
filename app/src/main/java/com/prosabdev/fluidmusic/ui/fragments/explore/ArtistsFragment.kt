@@ -2,25 +2,21 @@ package com.prosabdev.fluidmusic.ui.fragments.explore
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.ArtistItemAdapter
-import com.prosabdev.fluidmusic.models.ArtistItem
+import com.prosabdev.fluidmusic.models.collections.ArtistItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.viewmodels.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.explore.ArtistsFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.views.fragments.explore.ArtistsFragmentViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -30,13 +26,8 @@ class ArtistsFragment : Fragment() {
     private var mContext: Context? = null
     private var mActivity: FragmentActivity? = null
 
-    private val mArtistsFragmentViewModel: ArtistsFragmentViewModel by activityViewModels()
-    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
-    private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
-
     private var mArtistItemAdapter: ArtistItemAdapter? = null
     private var mRecyclerView: RecyclerView? = null
-    private var mLoadingContentProgress: ConstraintLayout? = null
 
     private var mArtistList : ArrayList<ArtistItem> = ArrayList<ArtistItem>()
 
@@ -93,7 +84,6 @@ class ArtistsFragment : Fragment() {
 
     private fun initViews(view: View) {
         mRecyclerView = view.findViewById<RecyclerView>(R.id.content_recycler_view)
-        mLoadingContentProgress = view.findViewById<ConstraintLayout>(R.id.loading_content_progress)
     }
 
     companion object {

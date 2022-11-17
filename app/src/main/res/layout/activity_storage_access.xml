@@ -102,23 +102,14 @@
                 android:id="@+id/button_add_folder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/Widget.Material3.Button.ElevatedButton"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:text="Add folder"
-                android:layout_marginStart="@dimen/main_margin" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_next"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 style="@style/Widget.Material3.Button"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:text="Save"
-                android:layout_marginEnd="@dimen/main_margin" />
+                app:icon="@drawable/folder_open"
+                android:text="Add folder"
+                android:layout_marginHorizontal="@dimen/main_margin"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

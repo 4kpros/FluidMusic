@@ -1,6 +1,5 @@
 package com.prosabdev.fluidmusic.services
 
-import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler

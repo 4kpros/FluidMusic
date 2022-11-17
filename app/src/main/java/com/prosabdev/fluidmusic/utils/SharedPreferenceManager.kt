@@ -2,28 +2,26 @@ package com.prosabdev.fluidmusic.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.models.FolderSAF
-import java.lang.reflect.Type
+import com.prosabdev.fluidmusic.models.FolderUriTree
 
 abstract class SharedPreferenceManager {
-    companion object MainSharedData {
-        fun loadSelectionFolderFromSAF(context: Context): List<FolderSAF>? {
+    companion object {
+        fun loadSelectionFolderFromSAF(context: Context): List<FolderUriTree>? {
             val sharedPreferences: SharedPreferences = context.getSharedPreferences(
                 context.getString(R.string.preference_file_key),
                 AppCompatActivity.MODE_PRIVATE
             )
             val gson: Gson = Gson()
             val itemListJsonString: String? = sharedPreferences.getString("foldersselectionlistfromsaf", null)
-            val itemType = object : TypeToken<List<FolderSAF>>() {}.type
-            return gson.fromJson<List<FolderSAF>>(itemListJsonString, itemType)
+            val itemType = object : TypeToken<List<FolderUriTree>>() {}.type
+            return gson.fromJson<List<FolderUriTree>>(itemListJsonString, itemType)
         }
-        fun saveSelectionFolderFromSAF(context: Context, folderList: List<FolderSAF>) {
+        fun saveSelectionFolderFromSAF(context: Context, folderList: List<FolderUriTree>) {
             val sharedPreferences: SharedPreferences = context.getSharedPreferences(
                 context.getString(R.string.preference_file_key),
                 AppCompatActivity.MODE_PRIVATE

@@ -33,8 +33,11 @@ android {
     dataBinding {
         android.buildFeatures.dataBinding = true
     }
+    buildFeatures {
+        prefab true
+    }
 }
-
+apply plugin: 'kotlin-kapt'
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.9.0'
@@ -54,10 +57,14 @@ dependencies {
     implementation "androidx.slidingpanelayout:slidingpanelayout:1.2.0"
     implementation 'androidx.documentfile:documentfile:1.0.1'
 
+    implementation "androidx.room:room-runtime:2.4.3"
+    kapt "androidx.room:room-compiler:2.4.3"
+    implementation "androidx.room:room-ktx:2.4.3"
+    implementation 'com.google.oboe:oboe:1.6.1'
     implementation 'com.google.code.gson:gson:2.10'
     //Glide image loader dependencies
     implementation 'com.github.bumptech.glide:glide:4.12.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+    kapt 'com.github.bumptech.glide:compiler:4.12.0'
 
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
 

@@ -2,9 +2,8 @@ package com.prosabdev.fluidmusic.utils.adapters
 
 import androidx.recyclerview.widget.RecyclerView
 
-abstract class SelectablePlayingItemAdapter<VH : RecyclerView.ViewHolder>() : SelectableRecycleViewAdapter<VH>() {
-    private val TAG: String = SelectablePlayingItemAdapter::class.java.simpleName
-    public val PAYLOAD_IS_PLAYING = "PAYLOAD_IS_PLAYING"
+abstract class SelectablePlayingItemAdapter<VH : RecyclerView.ViewHolder> : SelectableItemListAdapter<VH>() {
+    private val mTAG: String = SelectablePlayingItemAdapter::class.java.simpleName
     private var mPlayingItem: Int = -1
 
     protected fun selectablePlayingIsPlaying(position: Int): Boolean {
@@ -20,5 +19,9 @@ abstract class SelectablePlayingItemAdapter<VH : RecyclerView.ViewHolder>() : Se
             notifyItemChanged(oldPlaying, PAYLOAD_IS_PLAYING)
         if(mPlayingItem >= 0)
             notifyItemChanged(position, PAYLOAD_IS_PLAYING)
+    }
+
+    companion object {
+        const val PAYLOAD_IS_PLAYING = "PAYLOAD_IS_PLAYING"
     }
 }

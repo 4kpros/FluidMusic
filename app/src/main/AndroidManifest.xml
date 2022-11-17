@@ -8,6 +8,7 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
+        android:name=".roomdatabase.bus.DatabaseAccessApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
@@ -51,9 +52,8 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|uiMode|smallestScreenSize"
             android:exported="true"
-            android:theme="@style/AppTheme">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

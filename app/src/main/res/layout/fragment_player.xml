@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <RelativeLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/relative_player"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -45,7 +45,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_alignParentBottom="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     android:gravity="center_horizontal"
                     android:paddingHorizontal="@dimen/main_margin">
 
@@ -252,21 +252,49 @@
                         </androidx.appcompat.widget.LinearLayoutCompat>
                     </androidx.appcompat.widget.LinearLayoutCompat>
                 </androidx.appcompat.widget.LinearLayoutCompat>
-
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/linear_viewpager"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:orientation="vertical"
-                    android:layout_alignParentTop="true"
-                    android:layout_above="@+id/linear_controls">
-
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/linear_controls"
+                    >
                     <androidx.viewpager2.widget.ViewPager2
                         android:id="@+id/view_pager_player"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
-            </RelativeLayout>
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/linear_rescan_device_container"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@+id/linear_viewpager"
+                    app:layout_constraintStart_toStartOf="@+id/linear_viewpager"
+                    app:layout_constraintEnd_toEndOf="@+id/linear_viewpager"
+                    android:layout_marginBottom="50dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    >
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_rescan_device"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:text="@string/rescan_device"
+                        app:icon="@drawable/settings"
+                        />
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="@dimen/main_margin"
+                        android:text="No sound found !"
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -55,6 +55,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    android:layout_marginVertical="@dimen/main_small_margin"
                     >
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:id="@+id/linear_items_container"
@@ -73,22 +74,21 @@
                             android:clickable="true"
                             android:focusable="true"
                             >
-                            <androidx.appcompat.widget.LinearLayoutCompat
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:padding="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin"
-                                android:orientation="horizontal"
-                                android:layout_gravity="center"
-                                android:gravity="center"
                                 >
                                 <androidx.appcompat.widget.LinearLayoutCompat
+                                    android:id="@+id/linear_card_container"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
                                     android:layout_gravity="center"
                                     android:gravity="center"
+                                    android:layout_margin="@dimen/main_margin"
                                     >
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -166,14 +166,29 @@
                                             />
                                     </androidx.appcompat.widget.LinearLayoutCompat>
                                 </androidx.appcompat.widget.LinearLayoutCompat>
-                                <com.google.android.material.progressindicator.CircularProgressIndicator
-                                    android:id="@+id/progress_circular"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="100dp"
+                                    android:layout_height="0dp"
+                                    android:src="@drawable/ic_fluid_music_icon"
+                                    app:layout_constraintTop_toTopOf="@+id/linear_card_container"
+                                    app:layout_constraintBottom_toBottomOf="@+id/linear_card_container"
+                                    app:layout_constraintEnd_toEndOf="@+id/linear_card_container"
+                                    android:alpha="0.25"
+                                    />
+                                <com.google.android.material.progressindicator.LinearProgressIndicator
+                                    android:layout_width="match_parent"
+                                    android:layout_height="5dp"
+                                    app:layout_constraintTop_toTopOf="parent"
                                     android:indeterminate="true"
                                     android:visibility="@{ isLoading ? View.VISIBLE : View.GONE}"
+                                    android:indeterminateBehavior="cycle"
+                                    android:indeterminateDuration="@integer/material_motion_duration_long_1"
+                                    android:indeterminateOnly="true"
+                                    android:interpolator="?motionEasingEmphasizedInterpolator"
+                                    app:indeterminateAnimationType="disjoint"
+                                    app:indicatorDirectionLinear="startToEnd"
                                     />
-                            </androidx.appcompat.widget.LinearLayoutCompat>
+                            </androidx.constraintlayout.widget.ConstraintLayout>
                         </com.google.android.material.card.MaterialCardView>
 
                         <com.google.android.material.card.MaterialCardView
@@ -198,6 +213,7 @@
                                 android:paddingVertical="@dimen/main_medium_margin"
                                 >
                                 <com.google.android.material.textview.MaterialTextView
+                                    android:id="@+id/text_select_folders_title"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     style="@style/TextAppearance.Material3.TitleMedium"
@@ -206,6 +222,7 @@
                                     android:ellipsize="end"
                                     />
                                 <com.google.android.material.textview.MaterialTextView
+                                    android:id="@+id/text_select_folders_sub_title"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="Select your folders to get data from this"
@@ -457,44 +474,6 @@
                             </androidx.appcompat.widget.LinearLayoutCompat>
                         </com.google.android.material.card.MaterialCardView>
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/card_view_usb_scanner"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            style="@style/Widget.Material3.CardView.Filled"
-                            android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
-                            android:backgroundTint="@color/transparent"
-                            android:clickable="true"
-                            android:focusable="true"
-                            >
-                            <androidx.appcompat.widget.LinearLayoutCompat
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:layout_weight="1"
-                                android:layout_gravity="center"
-                                android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin"
-                                >
-                                <com.google.android.material.textview.MaterialTextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    style="@style/TextAppearance.Material3.TitleMedium"
-                                    android:text="Scan usb devices"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"
-                                    />
-                                <com.google.android.material.textview.MaterialTextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:text="This will propose you to scan new usb device all times you connect new ones. By default it is disabled"
-                                    android:maxLines="5"
-                                    android:ellipsize="end"
-                                    />
-                            </androidx.appcompat.widget.LinearLayoutCompat>
-                        </com.google.android.material.card.MaterialCardView>
-                        <com.google.android.material.card.MaterialCardView
                             android:id="@+id/card_view_restore_default"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -519,7 +498,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     style="@style/TextAppearance.Material3.TitleMedium"
-                                    android:text="Restore default settings"
+                                    android:text="Restore to default settings"
                                     android:maxLines="1"
                                     android:ellipsize="end"
                                     />

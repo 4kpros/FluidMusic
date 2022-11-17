@@ -11,7 +11,6 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.utils.CustomAnimators
-import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 
 class HeadlinePlayShuffleAdapter(
     private val mHeadLines: ArrayList<Long>,

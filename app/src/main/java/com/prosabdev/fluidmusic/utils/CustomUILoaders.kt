@@ -14,11 +14,17 @@ import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.prosabdev.fluidmusic.R
 import jp.wasabeef.blurry.Blurry
+import kotlinx.coroutines.coroutineScope
 
 
 abstract class CustomUILoaders {
     companion object{
-        fun loadCovertArtFromBinaryData(context : Context, imageView : ImageView?, binaryData: ByteArray?, widthHeight: Int) {
+        suspend fun loadCovertArtFromBinaryData(
+            context : Context,
+            imageView : ImageView?,
+            binaryData: ByteArray?,
+            widthHeight: Int
+        ) = coroutineScope {
             loadWithBinaryData(
                 context,
                 imageView,
@@ -26,10 +32,15 @@ abstract class CustomUILoaders {
                 widthHeight
             )
         }
-        fun loadBlurredWithImageLoader(context : Context, imageView : ImageView?, binaryData: ByteArray?, widthHeight: Int = 10) {
+        suspend fun loadBlurredWithImageLoader(
+            context : Context,
+            imageView : ImageView?,
+            binaryData: ByteArray?,
+            widthHeight: Int = 10
+        ) = coroutineScope {
             if(binaryData == null || binaryData.isEmpty()){
                 loadWithBinaryData(context, imageView, null, widthHeight, true)
-                return
+                return@coroutineScope
             }
             val customTarget: CustomTarget<Bitmap?> = object : CustomTarget<Bitmap?>() {
                 override fun onResourceReady(
@@ -55,9 +66,14 @@ abstract class CustomUILoaders {
                 .apply(RequestOptions().override(widthHeight, widthHeight))
                 .into(customTarget)
         }
-        fun loadWithBinaryDataWithCrossFade(context : Context, imageView : ImageView?, binaryData: ByteArray?, widthHeight: Int, transparent : Boolean = false){
+        suspend fun loadWithBinaryDataWithCrossFade(
+            context : Context,
+            imageView : ImageView?,
+            binaryData: ByteArray?,
+            widthHeight: Int
+        ) = coroutineScope {
             if(imageView == null)
-                return
+                return@coroutineScope
             Glide.with(context)
                 .load(binaryData)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
@@ -67,9 +83,15 @@ abstract class CustomUILoaders {
                 .apply(RequestOptions().override(widthHeight, widthHeight))
                 .into(imageView)
         }
-        private fun loadWithBinaryData(context : Context, imageView : ImageView?, binaryData: ByteArray?, widthHeight: Int, transparent : Boolean = false){
+        private suspend fun loadWithBinaryData(
+            context : Context,
+            imageView : ImageView?,
+            binaryData: ByteArray?,
+            widthHeight: Int,
+            transparent : Boolean = false
+        ) = coroutineScope {
             if(imageView == null)
-                return
+                return@coroutineScope
             var placeHolderImage : Int = R.drawable.ic_fluid_music_icon_with_padding
             if(transparent)
                 placeHolderImage = android.R.color.transparent
@@ -81,9 +103,14 @@ abstract class CustomUILoaders {
                 .apply(RequestOptions().override(widthHeight, widthHeight))
                 .into(imageView)
         }
-        fun loadWithResourceID(context : Context, imageView : ImageView?, resourceId: Int?, widthHeight: Int){
+        suspend fun loadWithResourceID(
+            context : Context,
+            imageView : ImageView?,
+            resourceId: Int?,
+            widthHeight: Int
+        ) = coroutineScope {
             if(imageView == null)
-                return
+                return@coroutineScope
             Glide.with(context)
                 .load(0)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)

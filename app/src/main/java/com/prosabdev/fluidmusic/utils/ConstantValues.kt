@@ -65,5 +65,12 @@ abstract class ConstantValues {
         const val EXPLORE_ALBUMS = "EXPLORE_ALBUMS"
         const val EXPLORE_ALL_ARTISTS = "EXPLORE_ALL_ARTISTS"
         const val EXPLORE_ALL_GENRES = "EXPLORE_ALL_GENRES"
+
+
+
+        const val FLUID_MUSIC_DATABASE_NAME = "fluid_music_database_name"
+        const val FLUID_MUSIC_FOLDER_URI_TREE = "folder_uri_tree"
+        const val FLUID_MUSIC_SONG_TABLE = "songs"
+        const val FLUID_MUSIC_QUEUE_MUSIC_TABLE = "queue_music"
     }
 }

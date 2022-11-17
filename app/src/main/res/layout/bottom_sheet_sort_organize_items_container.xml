@@ -28,7 +28,8 @@
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/MaterialAlertDialog.Material3.Title.Text"
+                    style="@style/TextAppearance.Material3.TitleLarge"
+                    android:gravity="center"
                     android:text="Sort and organize your songs from : All songs" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -45,8 +46,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     style="@style/Widget.Material3.Button.TonalButton"
-                    android:text="@string/more_settings"
-                    app:icon="@drawable/settings"
+                    android:text="Close"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
 
@@ -54,8 +54,8 @@
                     android:id="@+id/button_close"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:text="@string/close"
+                    style="@style/Widget.Material3.Button"
+                    android:text="Save changes"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>

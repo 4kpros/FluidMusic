@@ -1,57 +1,52 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
-import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.content.ContextCompat
+import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.*
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.slider.Slider
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
-import com.prosabdev.fluidmusic.databinding.FragmentMainBinding
 import com.prosabdev.fluidmusic.databinding.FragmentPlayerBinding
+import com.prosabdev.fluidmusic.models.collections.SongItem
+import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreDialog
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerQueueMusicDialog
-import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.*
-import com.prosabdev.fluidmusic.viewmodels.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModelFactory
+import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModelFactory
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlin.math.*
+import kotlin.math.abs
 
 
-class PlayerFragment : Fragment() {
+@BuildCompat.PrereleaseSdkCheck class PlayerFragment : Fragment() {
 
     private lateinit var mFragmentPlayerBinding: FragmentPlayerBinding
 
     private lateinit var mContext: Context
     private lateinit var mActivity: FragmentActivity
 
-    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
+    private lateinit var mPlayerFragmentViewModel: PlayerFragmentViewModel
 
     private var mPlayerPagerAdapter: PlayerPageAdapter? = null
-    private var mSongList: ArrayList<SongItem> = ArrayList<SongItem>()
 
-    //Dialog var
     private var mPlayerMoreDialog: PlayerMoreDialog? = null
     private var mPlayerQueueMusicDialog: PlayerQueueMusicDialog? = null
 
@@ -71,8 +66,6 @@ class PlayerFragment : Fragment() {
         val view = mFragmentPlayerBinding.root
 
         initViews()
-        setupViewPagerAdapter()
-        checkInteractions()
 
         return view
     }
@@ -80,17 +73,16 @@ class PlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        observeLiveData()
-    }
-
-    override fun onResume() {
-        updatePlayerUI(mPlayerFragmentViewModel.getCurrentSong().value ?: 0)
-        super.onResume()
+        MainScope().launch {
+            setupViewPagerAdapter()
+            checkInteractions()
+            observeLiveData()
+        }
     }
 
     private fun setupViewPagerAdapter() {
         mPlayerPagerAdapter =
-            PlayerPageAdapter(mSongList, mContext, object : PlayerPageAdapter.OnItemClickListener {
+            PlayerPageAdapter(mContext, object : PlayerPageAdapter.OnItemClickListener {
                 override fun onButtonLyricsClicked(position: Int) {
                     Toast.makeText(context, "onButtonLyricsClicked", Toast.LENGTH_SHORT).show()
                 }
@@ -101,7 +93,7 @@ class PlayerFragment : Fragment() {
 
             })
         mFragmentPlayerBinding.viewPagerPlayer.adapter = mPlayerPagerAdapter
-        mFragmentPlayerBinding.viewPagerPlayer.setCurrentItem(0, true)
+        mFragmentPlayerBinding.viewPagerPlayer.setCurrentItem(0, false)
         mFragmentPlayerBinding.viewPagerPlayer.clipToPadding = false
         mFragmentPlayerBinding.viewPagerPlayer.clipChildren = false
         mFragmentPlayerBinding.viewPagerPlayer.offscreenPageLimit = 5
@@ -118,7 +110,6 @@ class PlayerFragment : Fragment() {
         })
         transformPageScale(mFragmentPlayerBinding.viewPagerPlayer)
     }
-
     private fun transformPageScale(viewPager: ViewPager2?) {
         if(viewPager == null)
             return
@@ -186,140 +177,122 @@ class PlayerFragment : Fragment() {
             mFragmentPlayerBinding.buttonPlayPause.icon = ContextCompat.getDrawable(mContext, R.drawable.play_circle)
         }
     }
-
     private fun updateCurrentPlayingSong(currentSong: Int?) {
         mFragmentPlayerBinding.viewPagerPlayer.setCurrentItem(currentSong ?: 0, true)
     }
     private fun updateDataFromSource(sourceOf: String?) {
         if(sourceOf == ConstantValues.EXPLORE_ALL_SONGS){
-            mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner, object : Observer<Int>{
-                override fun onChanged(currentSong: Int?) {
-                    updateCurrentPlayingSong(currentSong)
-                }
-            })
+            mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner
+            ) { currentSong -> updateCurrentPlayingSong(currentSong) }
         }
-    }
-
-    private suspend fun updateQueueList(songList: ArrayList<SongItem>?) = coroutineScope{
-        if (songList != null) {
-            mSongList.clear()
-            val startPosition: Int = mSongList.size
-            val itemCount: Int = songList.size
-            mSongList.addAll(startPosition, songList)
-            mPlayerPagerAdapter?.notifyItemRangeInserted(startPosition, itemCount)
-        }
-        mFragmentPlayerBinding.viewPagerPlayer.currentItem = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
     }
     private fun changeCurrentSong(position: Int) {
         mPlayerFragmentViewModel.setCurrentSong(position)
     }
+    private suspend fun updatePlayerUI(position: Int) = lifecycleScope.launch(context = Dispatchers.Default) {
+        val  tempCurrentItem : SongItem? = mPlayerPagerAdapter?.currentList?.get(position)
+        MainScope().launch {
+            if(tempCurrentItem != null){
+                mFragmentPlayerBinding.textTitle.text = if(tempCurrentItem.title!!.isNotEmpty()) tempCurrentItem.title else tempCurrentItem.fileName //Set song title
 
-    private fun updatePlayerUI(position: Int) {
-        //Update current song info
-        if(mSongList.size > 0 && position >= 0){
-            mFragmentPlayerBinding.textTitle.text = if(mSongList[position].title != null && mSongList[position].title!!.isNotEmpty()) mSongList[position].title else mSongList[position].fileName //Set song title
+                mFragmentPlayerBinding.textArtist.text = if(tempCurrentItem.artist!!.isNotEmpty()) tempCurrentItem.artist else mContext.getString(R.string.unknown_artist)
 
-            mFragmentPlayerBinding.textArtist.text = if(mSongList[position].artist!!.isNotEmpty()) mSongList[position].artist else mContext.getString(R.string.unknown_artist)
+                mFragmentPlayerBinding.textDurationCurrent.text = CustomFormatters.formatSongDurationToString(0)
 
-            mFragmentPlayerBinding.textDurationCurrent.text = CustomFormatters.formatSongDurationToString(0)
+                mFragmentPlayerBinding.textDuration.text = CustomFormatters.formatSongDurationToString(tempCurrentItem.duration)
 
-            mFragmentPlayerBinding.textDuration.text = CustomFormatters.formatSongDurationToString(mSongList[position].duration)
-
-            mFragmentPlayerBinding.slider.value = 0.0f
+                mFragmentPlayerBinding.slider.value = 0.0f
+            }
         }
-        //Update blurred background
-        val tempBinary : ByteArray? = if(mSongList.size > 0) mSongList[position].covertArt?.binaryData else null
-        CustomUILoaders.loadBlurredWithImageLoader(mContext, mFragmentPlayerBinding.blurredImageview, tempBinary, 100)
+        val tempBinary : ByteArray? = if(tempCurrentItem != null ) tempCurrentItem.covertArt?.binaryData else null
+        CustomUILoaders.loadCovertArtFromBinaryData(mContext, mFragmentPlayerBinding.blurredImageview, tempBinary, 500)
     }
 
-    private fun checkInteractions() {
+    private suspend fun checkInteractions() = lifecycleScope.launch(context = Dispatchers.Default){
         mFragmentPlayerBinding.viewPagerPlayer.registerOnPageChangeCallback(object : OnPageChangeCallback(){
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                //
-            }
-
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                changeCurrentSong(position)
-                updatePlayerUI(position)
-            }
-
-            override fun onPageScrollStateChanged(state: Int) {
-                super.onPageScrollStateChanged(state)
+                MainScope().launch {
+                    changeCurrentSong(position)
+                    updatePlayerUI(position)
+                }
             }
         })
-        mFragmentPlayerBinding.buttonPlayPause.setOnClickListener(View.OnClickListener {
+        mFragmentPlayerBinding.buttonPlayPause.setOnClickListener {
             onPlayPause()
-        })
-        mFragmentPlayerBinding.buttonSkipNext.setOnClickListener(View.OnClickListener {
+        }
+        mFragmentPlayerBinding.buttonSkipNext.setOnClickListener {
             onNextPage()
-        })
-        mFragmentPlayerBinding.buttonSkipPrev.setOnClickListener(View.OnClickListener {
+        }
+        mFragmentPlayerBinding.buttonSkipPrev.setOnClickListener {
             onPrevPage()
-        })
-        mFragmentPlayerBinding.buttonShuffle.setOnClickListener(View.OnClickListener {
+        }
+        mFragmentPlayerBinding.buttonShuffle.setOnClickListener {
             onShuffle()
-        })
-        mFragmentPlayerBinding.buttonRepeat.setOnClickListener(View.OnClickListener {
+        }
+        mFragmentPlayerBinding.buttonRepeat.setOnClickListener {
             onRepeat()
-        })
-        //
-        mFragmentPlayerBinding.buttonMore.setOnClickListener(View.OnClickListener {
-            if(mPlayerMoreDialog == null)
+        }
+        mFragmentPlayerBinding.buttonMore.setOnClickListener {
+            if (mPlayerMoreDialog == null)
                 mPlayerMoreDialog = PlayerMoreDialog()
             mPlayerMoreDialog?.show(childFragmentManager, PlayerMoreDialog.TAG)
-        })
-        mFragmentPlayerBinding.buttonQueueMusic.setOnClickListener(View.OnClickListener {
+        }
+        mFragmentPlayerBinding.buttonQueueMusic.setOnClickListener {
             mPlayerQueueMusicDialog = PlayerQueueMusicDialog()
             mPlayerQueueMusicDialog?.show(childFragmentManager, PlayerQueueMusicDialog.TAG)
-        })
-        mFragmentPlayerBinding.buttonEqualizer.setOnClickListener(View.OnClickListener {
+        }
+        mFragmentPlayerBinding.buttonEqualizer.setOnClickListener {
             mActivity.supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 add<EqualizerFragment>(R.id.main_activity_fragment_container)
                 addToBackStack(null)
             }
-        })
-        mFragmentPlayerBinding.buttonArrowDown.setOnClickListener(View.OnClickListener {
+        }
+        mFragmentPlayerBinding.buttonArrowDown.setOnClickListener {
             //
-        })
+        }
+        mFragmentPlayerBinding.buttonRescanDevice.setOnClickListener {
+            openMediaScannerActivity()
+        }
+    }
+    private fun openMediaScannerActivity() {
+        startActivity(Intent(mContext, MediaScannerActivity::class.java).apply {})
     }
 
-    fun onPlayPause(){
+    private fun onPlayPause(){
+        if((mPlayerPagerAdapter?.itemCount ?: 0) <= 0)
+            return
         val tempPP : Boolean = !(mPlayerFragmentViewModel.getIsPlaying().value ?: false)
         mPlayerFragmentViewModel.setIsPlaying(tempPP)
     }
-    fun onNextPage(){
+    private fun onNextPage(){
+        if((mPlayerPagerAdapter?.itemCount ?: 0) <= 0)
+            return
         val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
-        if(mSongList.size > 0 && tempCS < mSongList.size-1)
+        if((mPlayerPagerAdapter?.itemCount ?: 0) > 0 && tempCS < (mPlayerPagerAdapter?.itemCount ?: 0) - 1)
             mPlayerFragmentViewModel.setCurrentSong(tempCS + 1)
     }
-    fun onPrevPage(){
+    private fun onPrevPage(){
+        if((mPlayerPagerAdapter?.itemCount ?: 0) <= 0)
+            return
         val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
         if(tempCS > 0)
             mPlayerFragmentViewModel.setCurrentSong(tempCS - 1)
     }
-    fun onShuffle(){
-        val tempS :Int = mPlayerFragmentViewModel.getShuffle().value ?: 0
-//        if(tempS > 0)
-//            mPlayerFragmentViewModel.setShuffle(tempS)
+    private fun onShuffle(){
     }
-    fun onRepeat(){
-        val tempR :Int = mPlayerFragmentViewModel.getRepeat().value ?: 0
-//        if(tempR > 0)
-//            mPlayerFragmentViewModel.setRepeat(tempR)
+    private fun onRepeat(){
     }
 
     private fun initViews() {
+        mPlayerFragmentViewModel = PlayerFragmentViewModelFactory().create(PlayerFragmentViewModel::class.java)
+
         mFragmentPlayerBinding.blurredImageview.layout(0,0,0,0)
         mFragmentPlayerBinding.textTitle.isSelected = true
         mFragmentPlayerBinding.textArtist.isSelected = true
 
+        CustomViewModifiers.updateTopViewInsets(mFragmentPlayerBinding.linearRescanDeviceContainer)
         CustomViewModifiers.updateTopViewInsets(mFragmentPlayerBinding.linearViewpager)
         CustomViewModifiers.updateBottomViewInsets(mFragmentPlayerBinding.linearControls)
     }

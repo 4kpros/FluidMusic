@@ -8,11 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetStorageAccessBinding
-import com.prosabdev.fluidmusic.viewmodels.StorageAccessActivityViewModel
+import com.prosabdev.fluidmusic.viewmodels.views.activities.StorageAccessActivityViewModel
 
 class StorageAccessDialog(private val mStorageAccessActivityViewModel: StorageAccessActivityViewModel) : GenericBottomSheetDialogFragment() {
 

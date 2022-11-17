@@ -99,4 +99,5 @@
     <string name="waiting_for_permissions">Waiting for permissions</string>
     <string name="loading_configurations">Loading configurations</string>
     <string name="title_activity_media_scanner">Media scanner</string>
+    <string name="rescan_device">Rescan device</string>
 </resources>

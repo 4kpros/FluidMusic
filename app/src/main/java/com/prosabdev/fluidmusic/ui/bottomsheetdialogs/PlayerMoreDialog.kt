@@ -7,18 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.textview.MaterialTextView
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.utils.CustomFormatters
-import com.prosabdev.fluidmusic.utils.CustomUILoaders
-import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModel
 
 class PlayerMoreDialog : GenericBottomSheetDialogFragment() {
 
@@ -63,35 +56,37 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        observeLiveData()
+//        observeLiveData()
     }
 
-    private fun observeLiveData() {
-        mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner
-        ) { updatePlayerUI(it) }
-        mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner
-        ) { updatePlayerUI(mPlayerFragmentViewModel.getCurrentSong().value ?: 0) }
-        mPlayerFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner
-        ) { updatePlayerUI(mPlayerFragmentViewModel.getCurrentSong().value ?: 0) }
-    }
-
-    private fun updatePlayerUI(position: Int) {
-        val tempSongSize : Int = mPlayerFragmentViewModel.getSongList().value?.size ?: 0
-        //Update current song info
-        if(tempSongSize > 0 && position >= 0){
-            if(mTextTitle != null)
-                mTextTitle?.text = if(mPlayerFragmentViewModel.getSongList().value!![position].title != null && mPlayerFragmentViewModel.getSongList().value!![position].title!!.isNotEmpty()) mPlayerFragmentViewModel.getSongList().value!![position].title else mPlayerFragmentViewModel.getSongList().value!![position].fileName
-
-            if(mTextArtist != null)
-                mTextArtist?.text = if(mPlayerFragmentViewModel.getSongList().value!![position].artist!!.isNotEmpty()) mPlayerFragmentViewModel.getSongList().value!![position].artist else mContext.getString(R.string.unknown_artist)
-
-            mTextDuration?.text = CustomFormatters.formatSongDurationToString(mPlayerFragmentViewModel.getSongList().value!![position].duration)
-            mTextMimeType?.text = mPlayerFragmentViewModel.getSongList().value!![position].typeMime
-        }
-        //Update blurred background
-        val tempBinary : ByteArray? = if(tempSongSize > 0) mPlayerFragmentViewModel.getSongList().value!![position].covertArt?.binaryData else null
-        CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtImageView, tempBinary, 100)
-    }
+//    private fun observeLiveData() {
+//        mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner
+//        ) { updatePlayerUI(it) }
+//        mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner
+//        ) { updatePlayerUI(mPlayerFragmentViewModel.getCurrentSong().value ?: 0) }
+//        mPlayerFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner
+//        ) { updatePlayerUI(mPlayerFragmentViewModel.getCurrentSong().value ?: 0) }
+//    }
+//
+//    private fun updatePlayerUI(position: Int) {
+//        val tempSongSize : Int = mPlayerFragmentViewModel.getSongList().value?.size ?: 0
+//        //Update current song info
+//        if(tempSongSize > 0 && position >= 0){
+//            if(mTextTitle != null)
+//                mTextTitle?.text = if(mPlayerFragmentViewModel.getSongList().value!![position].title != null && mPlayerFragmentViewModel.getSongList().value!![position].title!!.isNotEmpty()) mPlayerFragmentViewModel.getSongList().value!![position].title else mPlayerFragmentViewModel.getSongList().value!![position].fileName
+//
+//            if(mTextArtist != null)
+//                mTextArtist?.text = if(mPlayerFragmentViewModel.getSongList().value!![position].artist!!.isNotEmpty()) mPlayerFragmentViewModel.getSongList().value!![position].artist else mContext.getString(R.string.unknown_artist)
+//
+//            mTextDuration?.text = CustomFormatters.formatSongDurationToString(mPlayerFragmentViewModel.getSongList().value!![position].duration)
+//            mTextMimeType?.text = mPlayerFragmentViewModel.getSongList().value!![position].typeMime
+//        }
+//        //Update blurred background
+//        val tempBinary : ByteArray? = if(tempSongSize > 0) mPlayerFragmentViewModel.getSongList().value!![position].covertArt?.binaryData else null
+//        MainScope().launch {
+//            CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtImageView, tempBinary, 100)
+//        }
+//    }
 
     private fun checkInteractions() {
         mButtonInfo?.setOnClickListener(){

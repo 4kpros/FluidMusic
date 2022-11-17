@@ -2,31 +2,28 @@ package com.prosabdev.fluidmusic.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.ImageView
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.*
 import androidx.lifecycle.LifecycleOwner
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.progressindicator.LinearProgressIndicator
-import com.google.android.material.textview.MaterialTextView
+import androidx.lifecycle.lifecycleScope
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
 import com.prosabdev.fluidmusic.databinding.FragmentMainBinding
-import com.prosabdev.fluidmusic.models.SongItem
-import com.prosabdev.fluidmusic.utils.*
-import com.prosabdev.fluidmusic.viewmodels.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.PlayerFragmentViewModel
-import com.sothree.slidinguppanel.SlidingUpPanelLayout
+import com.prosabdev.fluidmusic.models.collections.SongItem
+import com.prosabdev.fluidmusic.utils.CustomAnimators
+import com.prosabdev.fluidmusic.utils.CustomUILoaders
+import com.prosabdev.fluidmusic.utils.CustomViewModifiers
+import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModelFactory
+import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModelFactory
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 class MainFragment : Fragment() {
 
@@ -35,8 +32,8 @@ class MainFragment : Fragment() {
     private lateinit var mContext: Context
     private lateinit var mActivity: FragmentActivity
 
-    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
-    private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
+    private lateinit var mPlayerFragmentViewModel: PlayerFragmentViewModel
+    private lateinit var mMainFragmentViewModel: MainFragmentViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,7 +61,7 @@ class MainFragment : Fragment() {
             add<PlayerFragment>(R.id.player_fragment_container)
         }
 
-        initViews(view)
+        initViews()
 
         return view
     }
@@ -72,30 +69,49 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        checkInteractions()
-        observeLiveData()
-    }
-
-    override fun onResume() {
-        updateMiniPlayerUI(false)
-        super.onResume()
+        MainScope().launch {
+            checkInteractions()
+            observeLiveData()
+        }
     }
 
     private fun observeLiveData() {
-        mPlayerFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner
-        ) { updateMiniPlayerUI() }
         mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner
-        ) { updateMiniPlayerUI() }
+        ) {
+            MainScope().launch {
+                updateMiniPlayerUI()
+            }
+        }
         mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner
-        ) { updateMiniPlayerUI() }
+        ) {
+            MainScope().launch {
+                updateMiniPlayerUI()
+            }
+        }
         mPlayerFragmentViewModel.getIsPlaying().observe(mActivity as LifecycleOwner
-        ) { updatePlayerButtonsUI() }
+        ) {
+            MainScope().launch {
+                updatePlayerButtonsUI()
+            }
+        }
         mPlayerFragmentViewModel.getPlayingProgressValue().observe(mActivity as LifecycleOwner
-        ) { updatePlayerButtonsUI() }
+        ) {
+            MainScope().launch {
+                updatePlayerButtonsUI()
+            }
+        }
         mMainFragmentViewModel.getSelectMode().observe(mActivity as LifecycleOwner
-        ) { selectMode -> updateSelectModeUI(selectMode ?: false) }
+        ) { selectMode ->
+            MainScope().launch {
+                updateSelectModeUI(selectMode ?: false)
+            }
+        }
         mMainFragmentViewModel.getTotalSelected().observe(mActivity as LifecycleOwner
-        ){ updateTotalSelectedUI(it ?: 0) }
+        ){
+            MainScope().launch {
+                updateTotalSelectedUI(it ?: 0)
+            }
+        }
         mMainFragmentViewModel.getScrollingState().observe(mActivity as LifecycleOwner
         ){ animateScrollStateUI(it ?: 0) }
     }
@@ -126,22 +142,34 @@ class MainFragment : Fragment() {
             CustomAnimators.crossTranslateInFromVertical(mFragmentMainBinding.constraintMiniPlayerContainer,  1, animate, 150,300.0f)
         }
     }
-    private fun updateTotalSelectedUI(totalSelected: Int, animate : Boolean = true) {
+    private suspend fun updateTotalSelectedUI(
+        totalSelected: Int,
+        animate : Boolean = true
+    ) = lifecycleScope.launch(context = Dispatchers.Default) {
         if(totalSelected > 0 && totalSelected >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
-            mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box)
+            MainScope().launch {
+                mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box)
+            }
 
             CustomAnimators.crossFadeUp(mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover, false, 200, 0.8f)
         }else{
-            mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box_outline_blank)
+            MainScope().launch {
+                mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box_outline_blank)
+            }
 
             if (totalSelected >= 2 && mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover.visibility != GONE)
                 CustomAnimators.crossFadeDown(mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover, animate, 200)
             else if(totalSelected < 2 && mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover.visibility != VISIBLE)
                 CustomAnimators.crossFadeUp(mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover, animate, 200, 0.8f)
         }
-        mFragmentMainBinding.constraintTopSelectionInclude.textSelectedCount.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
+        MainScope().launch {
+            mFragmentMainBinding.constraintTopSelectionInclude.textSelectedCount.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
+        }
     }
-    private fun updateSelectModeUI(selectMode : Boolean, animate : Boolean = true){
+    private suspend fun updateSelectModeUI(
+        selectMode : Boolean,
+        animate : Boolean = true
+    ) = lifecycleScope.launch(context = Dispatchers.Default) {
         if (selectMode) {
             if(mFragmentMainBinding.constraintBottomSelectionContainer.visibility != VISIBLE)
                 CustomAnimators.crossTranslateInFromVertical(mFragmentMainBinding.constraintBottomSelectionContainer as View, 1, animate, 300)
@@ -154,33 +182,37 @@ class MainFragment : Fragment() {
                 CustomAnimators.crossTranslateOutFromVertical(mFragmentMainBinding.constraintTopSelectionContainer as View, -1, animate, 300)
         }
     }
-    private fun updatePlayerButtonsUI() {
-        if(mPlayerFragmentViewModel.getIsPlaying().value == true){
-            mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = ContextCompat.getDrawable(mContext, R.drawable.pause)
-        }else{
-            mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = ContextCompat.getDrawable(mContext, R.drawable.play_arrow)
+    private suspend fun updatePlayerButtonsUI() {
+        MainScope().launch {
+            if(mPlayerFragmentViewModel.getIsPlaying().value == true){
+                mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = ContextCompat.getDrawable(mContext, R.drawable.pause)
+            }else{
+                mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = ContextCompat.getDrawable(mContext, R.drawable.play_arrow)
+            }
         }
     }
-    private fun updateMiniPlayerUI(animate : Boolean = true) {
-        val tempQL : ArrayList<SongItem>? = mPlayerFragmentViewModel.getSongList().value
+    private suspend fun updateMiniPlayerUI(animate : Boolean = true) = lifecycleScope.launch(context = Dispatchers.Default) {
+        val tempQL : ArrayList<SongItem>? = null
         val tempPositionInQL : Int = mPlayerFragmentViewModel.getCurrentSong().value ?: -1
         if(tempQL!= null && tempQL.size > 0 && tempPositionInQL >= 0){
-            var tempTitle : String = ""
-            var tempArtist : String = ""
+            var tempTitle = ""
+            var tempArtist = ""
             tempTitle = if(tempQL[tempPositionInQL].title != null && tempQL[tempPositionInQL].title!!.isNotEmpty()) tempQL[tempPositionInQL].title.toString() else tempQL[tempPositionInQL].fileName.toString() //Set song title
 
             tempArtist = if(tempQL[tempPositionInQL].artist != null && tempQL[tempPositionInQL].artist!!.isNotEmpty()) tempQL[tempPositionInQL].artist.toString() else mContext.getString(R.string.unknown_artist)
 
             val tempBinary : ByteArray? = if(tempQL.size > 0) tempQL[tempPositionInQL].covertArt?.binaryData else null
 
-            mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.text = tempTitle
-            mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text = tempArtist
+            MainScope().launch {
+                mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.text = tempTitle
+                mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text = tempArtist
+            }
             CustomUILoaders.loadWithBinaryDataWithCrossFade(mContext, mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer, tempBinary, 60)
             CustomUILoaders.loadBlurredWithImageLoader(mContext, mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer, tempBinary, 10)
         }
     }
 
-    private fun checkInteractions() {
+    private suspend fun checkInteractions() {
         mFragmentMainBinding.constraintMiniPlayerInclude.buttonSkipNext.setOnClickListener{
             onNextPage()
         }
@@ -233,19 +265,22 @@ class MainFragment : Fragment() {
         }
     }
     fun onPlayPause(){
-        mMainFragmentViewModel.setScrollingState(-1)
-        val tempPP : Boolean = !(mPlayerFragmentViewModel.getIsPlaying().value ?: false)
-        mPlayerFragmentViewModel.setIsPlaying(tempPP)
+//        mMainFragmentViewModel.setScrollingState(-1)
+//        val tempPP : Boolean = !(mPlayerFragmentViewModel.getIsPlaying().value ?: false)
+//        mPlayerFragmentViewModel.setIsPlaying(tempPP)
     }
     fun onNextPage(){
-        mMainFragmentViewModel.setScrollingState(-1)
-        val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
-        val tempSongListSize :Int = mPlayerFragmentViewModel.getSongList().value?.size ?: 0
-        if(tempSongListSize > 0 && tempCS < tempSongListSize - 1)
-            mPlayerFragmentViewModel.setCurrentSong(tempCS + 1)
+//        mMainFragmentViewModel.setScrollingState(-1)
+//        val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
+//        val tempSongListSize :Int = mPlayerFragmentViewModel.getSongList().value?.size ?: 0
+//        if(tempSongListSize > 0 && tempCS < tempSongListSize - 1)
+//            mPlayerFragmentViewModel.setCurrentSong(tempCS + 1)
     }
 
-    private fun initViews(view: View) {
+    private fun initViews() {
+        mPlayerFragmentViewModel = PlayerFragmentViewModelFactory().create(PlayerFragmentViewModel::class.java)
+        mMainFragmentViewModel = MainFragmentViewModelFactory().create(MainFragmentViewModel::class.java)
+
         mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer.layout(0,0,0,0)
         mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer.layout(0,0,0,0)
         mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.isSelected = true

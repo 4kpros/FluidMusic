@@ -17,28 +17,27 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.color.MaterialColors
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.callbacks.SongItemMoveCallback
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.collections.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomFormatters
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import com.prosabdev.fluidmusic.utils.adapters.SelectablePlayingItemAdapter
-import com.prosabdev.fluidmusic.utils.adapters.SelectableRecycleViewAdapter
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import java.util.*
 
 
 class SongItemAdapter(
-    private val mSongList: List<SongItem>,
     private val mContext: Context,
     private val mOnItemClickListener: OnItemClickListener,
-    private val mOnSelectSelectableItemListener: SelectableRecycleViewAdapter.OnSelectSelectableItemListener,
+    private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener,
     private val mOnTouchListener: OnTouchListener,
     ) : SelectablePlayingItemAdapter<SongItemAdapter.SongItemHolder>(),
         SongItemMoveCallback.ItemTouchHelperContract
     {
-    public val PAYLOAD_IS_COVERT_ART_TEXT = "PAYLOAD_IS_COVERT_ART_TEXT"
 
-    interface OnItemClickListener {
+        interface OnItemClickListener {
         fun onSongItemClicked(position: Int)
         fun onSongItemPlayClicked(position: Int)
         fun onSongItemLongClicked(position: Int)
@@ -97,7 +96,7 @@ class SongItemAdapter(
     }
     override fun onBindViewHolder(holder: SongItemHolder, position: Int) {
         holder.bindListener(holder, position, mOnItemClickListener, mOnTouchListener)
-        holder.updateAllUI(mContext, mSongList[position], isPlaying(position), selectableIsSelected(position))
+        holder.updateAllUI(mContext, getItem(position), isPlaying(position), selectableIsSelected(position))
     }
     override fun onBindViewHolder(holder: SongItemHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.isNotEmpty()) {
@@ -111,9 +110,9 @@ class SongItemAdapter(
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_PLAYING")
                         holder.updateIsPlayingStateUI(isPlaying(position))
                     }
-                    PAYLOAD_IS_COVERT_ART_TEXT -> {
+                    Companion.PAYLOAD_IS_COVERT_ART_TEXT -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
-                        holder.updateCovertArtAndTitleUI(mContext, mSongList[position])
+                        holder.updateCovertArtAndTitleUI(mContext, getItem(position))
                     }
                     else -> {
                         super.onBindViewHolder(holder, position, payloads)
@@ -129,22 +128,19 @@ class SongItemAdapter(
         super.onViewRecycled(holder)
         holder.recycleItem()
     }
-    override fun getItemCount(): Int {
-        return mSongList.size
-    }
     override fun onRowMoved(mFromPosition: Int, mToPosition: Int) {
         mOnItemClickListener.onItemMovedTo(mToPosition)
         if (mFromPosition < mToPosition) {
             for (i in mFromPosition until mToPosition) {
                 selectableItemUpdateSelection(i, selectableIsSelected(i + 1))
                 selectableItemUpdateSelection(i + 1, selectableIsSelected(i))
-                Collections.swap(mSongList, i, i + 1)
+                Collections.swap(currentList, i, i + 1)
             }
         } else {
             for (i in mFromPosition downTo mToPosition + 1) {
                 selectableItemUpdateSelection(i, selectableIsSelected(i - 1))
                 selectableItemUpdateSelection(i - 1, selectableIsSelected(i))
-                Collections.swap(mSongList, i, i - 1)
+                Collections.swap(currentList, i, i - 1)
             }
         }
         notifyItemMoved(mFromPosition, mToPosition)
@@ -157,18 +153,18 @@ class SongItemAdapter(
     }
 
     class SongItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private var mContainer: MaterialCardView? = itemView.findViewById<MaterialCardView>(R.id.song_item_container)
-        private var mCovertArt: ImageView? = itemView.findViewById<ImageView>(R.id.song_item_imageview)
-        private var mTitle: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.song_item_title)
-        private var mArtist: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.song_item_artist)
-        private var mDuration: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.song_item_duration)
-        private var mTypeMime: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.song_item_type_mime)
-        private var mVerticalSeparator: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.vertical_separator)
-        private var mCurrentlyPlaying: AppCompatTextView? = itemView.findViewById<AppCompatTextView>(R.id.song_currently_playing)
+        private var mContainer: MaterialCardView? = itemView.findViewById(R.id.song_item_container)
+        private var mCovertArt: ImageView? = itemView.findViewById(R.id.song_item_imageview)
+        private var mTitle: AppCompatTextView? = itemView.findViewById(R.id.song_item_title)
+        private var mArtist: AppCompatTextView? = itemView.findViewById(R.id.song_item_artist)
+        private var mDuration: AppCompatTextView? = itemView.findViewById(R.id.song_item_duration)
+        private var mTypeMime: AppCompatTextView? = itemView.findViewById(R.id.song_item_type_mime)
+        private var mVerticalSeparator: AppCompatTextView? = itemView.findViewById(R.id.vertical_separator)
+        private var mCurrentlyPlaying: AppCompatTextView? = itemView.findViewById(R.id.song_currently_playing)
 
-        private var mSelectedItemBackground: View? = itemView.findViewById<View>(R.id.song_item_is_selected)
+        private var mSelectedItemBackground: View? = itemView.findViewById(R.id.song_item_is_selected)
 
-        private var mDragHand: MaterialButton? = itemView.findViewById<MaterialButton>(R.id.button_drag_hand)
+        private var mDragHand: MaterialButton? = itemView.findViewById(R.id.button_drag_hand)
 
         fun updateAllUI(context: Context, songItem: SongItem, isPlaying: Boolean, selected: Boolean){
             updateSelectedStateUI(selected, false)
@@ -190,7 +186,9 @@ class SongItemAdapter(
             mTypeMime?.text = songItem.typeMime
 
             val tempBinary: ByteArray? = songItem.covertArt?.binaryData
-            CustomUILoaders.loadCovertArtFromBinaryData(context, mCovertArt, tempBinary, 100)
+            MainScope().launch {
+                CustomUILoaders.loadCovertArtFromBinaryData(context, mCovertArt, tempBinary, 100)
+            }
         }
         fun updateIsPlayingStateUI(playing: Boolean) {
             if(playing){
@@ -251,16 +249,18 @@ class SongItemAdapter(
             mCovertArt?.setOnClickListener {
                 mOnItemClickListener.onSongItemPlayClicked(position)
             }
-            mDragHand?.setOnTouchListener(object : android.view.View.OnTouchListener{
-                override fun onTouch(view: View?, event: MotionEvent?): Boolean {
-                    if (event?.action == MotionEvent.ACTION_DOWN) {
-                        mOnTouchListener.requestDrag(holder)
-                    }else if(event?.action == MotionEvent.ACTION_UP){
-                        view?.performClick();
-                    }
-                    return false
+            mDragHand?.setOnTouchListener { view, event ->
+                if (event?.action == MotionEvent.ACTION_DOWN) {
+                    mOnTouchListener.requestDrag(holder)
+                } else if (event?.action == MotionEvent.ACTION_UP) {
+                    view?.performClick();
                 }
-            })
+                false
+            }
         }
     }
-}
+
+        companion object {
+            const val PAYLOAD_IS_COVERT_ART_TEXT = "PAYLOAD_IS_COVERT_ART_TEXT"
+        }
+    }

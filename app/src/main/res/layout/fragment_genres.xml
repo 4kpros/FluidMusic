@@ -19,6 +19,5 @@
             android:visibility="visible"
             android:alpha="1" />
 
-        <include layout="@layout/component_loading_view" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
