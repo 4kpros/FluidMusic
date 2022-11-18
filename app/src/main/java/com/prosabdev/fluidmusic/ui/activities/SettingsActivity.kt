@@ -12,6 +12,7 @@ import com.google.android.material.color.DynamicColors
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivitySettingsBinding
 import com.prosabdev.fluidmusic.ui.activities.settings.InterfaceSettingsActivity
+import com.prosabdev.fluidmusic.ui.activities.settings.LanguageSettingsActivity
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 
@@ -62,11 +63,32 @@ import com.prosabdev.fluidmusic.utils.CustomViewModifiers
                 else -> false
             }
         }
+        mActivitySettingsBinding.cardViewLanguage.setOnClickListener{
+            startActivity(Intent(this, LanguageSettingsActivity::class.java).apply {})
+        }
         mActivitySettingsBinding.cardViewInterface.setOnClickListener{
             startActivity(Intent(this, InterfaceSettingsActivity::class.java).apply {})
         }
+        mActivitySettingsBinding.cardViewCoverArt.setOnClickListener{
+            //
+        }
+        mActivitySettingsBinding.cardViewNowPlaying.setOnClickListener{
+            //
+        }
+        mActivitySettingsBinding.cardViewAudio.setOnClickListener{
+            //
+        }
+        mActivitySettingsBinding.cardViewNotifications.setOnClickListener{
+            //
+        }
         mActivitySettingsBinding.cardViewLibraryScanner.setOnClickListener{
             startActivity(Intent(this, MediaScannerSettingsActivity::class.java).apply {})
+        }
+        mActivitySettingsBinding.cardViewHeadsetBluetooth.setOnClickListener{
+            //
+        }
+        mActivitySettingsBinding.cardViewAbout.setOnClickListener{
+            //
         }
     }
 

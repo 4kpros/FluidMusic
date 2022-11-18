@@ -7,4 +7,6 @@
     <dimen name="song_card_image_small_h">55dp</dimen>
     <dimen name="song_card_image_small_w">60dp</dimen>
     <dimen name="setting_icon_size">30dp</dimen>
+    <dimen name="accent_color_chip_height">40dp</dimen>
+    <dimen name="accent_color_chip_icon_size">30dp</dimen>
 </resources>
