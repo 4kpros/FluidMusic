@@ -21,7 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.FolderUriTreeAdapter
-import com.prosabdev.fluidmusic.databinding.ActivityStorageAccessBinding
+import com.prosabdev.fluidmusic.databinding.ActivityStorageAccessSettingsBinding
 import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.StorageAccessDialog
@@ -36,9 +36,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-@BuildCompat.PrereleaseSdkCheck class StorageAccessActivity : AppCompatActivity() {
+@BuildCompat.PrereleaseSdkCheck class StorageAccessSettingsActivity : AppCompatActivity() {
 
-    private lateinit var mActivityStorageAccessBinding: ActivityStorageAccessBinding
+    private lateinit var mActivityStorageAccessSettingsBinding: ActivityStorageAccessSettingsBinding
 
     private lateinit var mFolderUriTreeViewModel: FolderUriTreeViewModel
     private lateinit var mStorageAccessActivityViewModel: StorageAccessActivityViewModel
@@ -53,7 +53,7 @@ import kotlinx.coroutines.launch
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        mActivityStorageAccessBinding = DataBindingUtil.setContentView(this, R.layout.activity_storage_access)
+        mActivityStorageAccessSettingsBinding = DataBindingUtil.setContentView(this, R.layout.activity_storage_access_settings)
 
         initViews()
         MainScope().launch {
@@ -105,17 +105,17 @@ import kotlinx.coroutines.launch
 
     private fun updateFolderUriTrees(folderUriTrees: List<FolderUriTree>) {
         mFolderUriTreeAdapter?.submitList(folderUriTrees)
-        mActivityStorageAccessBinding.foldersCounter = folderUriTrees.size
+        mActivityStorageAccessSettingsBinding.foldersCounter = folderUriTrees.size
     }
 
     private fun checkInteractions() {
-        mActivityStorageAccessBinding.buttonAddFolder.setOnClickListener{
+        mActivityStorageAccessSettingsBinding.buttonAddFolder.setOnClickListener{
             requestNewFolderFromSAF()
         }
-        mActivityStorageAccessBinding.topAppBar.setNavigationOnClickListener{
+        mActivityStorageAccessSettingsBinding.topAppBar.setNavigationOnClickListener{
             onBackPressedDispatcher.onBackPressed()
         }
-        mActivityStorageAccessBinding.topAppBar.setOnMenuItemClickListener {
+        mActivityStorageAccessSettingsBinding.topAppBar.setOnMenuItemClickListener {
             when(it.itemId) {
                 R.id.menu_remove_all -> {
                     showBottomSheetDialog()
@@ -147,10 +147,10 @@ import kotlinx.coroutines.launch
         val concatAdapter = ConcatAdapter()
         concatAdapter.addAdapter(mFolderUriTreeAdapter!!)
         concatAdapter.addAdapter(mEmptyBottomAdapter!!)
-        mActivityStorageAccessBinding.recyclerView.adapter = concatAdapter
+        mActivityStorageAccessSettingsBinding.recyclerView.adapter = concatAdapter
 
         mLayoutManager = GridLayoutManager(this.baseContext, spanCount, GridLayoutManager.VERTICAL, false)
-        mActivityStorageAccessBinding.recyclerView.layoutManager = mLayoutManager
+        mActivityStorageAccessSettingsBinding.recyclerView.layoutManager = mLayoutManager
 
     }
     private fun onShowRemoveFolderDialog(position: Int) {
@@ -172,8 +172,8 @@ import kotlinx.coroutines.launch
         ).create(FolderUriTreeViewModel::class.java)
         mStorageAccessActivityViewModel = StorageAccessActivityViewModelFactory().create(StorageAccessActivityViewModel::class.java)
 
-        CustomViewModifiers.updateTopViewInsets(mActivityStorageAccessBinding.coordinator)
-        CustomViewModifiers.updateBottomViewInsets(mActivityStorageAccessBinding.constraintMainContainer)
+        CustomViewModifiers.updateTopViewInsets(mActivityStorageAccessSettingsBinding.coordinatorSettingsActivity)
+        CustomViewModifiers.updateBottomViewInsets(mActivityStorageAccessSettingsBinding.linearButtonsContainer)
     }
 
     private var treeUri: String?
@@ -191,7 +191,7 @@ import kotlinx.coroutines.launch
             this.contentResolver.takePersistableUriPermission(uri, takeFlags)
 
             lifecycleScope.launch(context = Dispatchers.Default) {
-                addToFolderList(MediaFileScanner.formatAndReturnFolderUriSAF(this@StorageAccessActivity, uri))
+                addToFolderList(MediaFileScanner.formatAndReturnFolderUriSAF(this@StorageAccessSettingsActivity, uri))
             }
         }
     }
@@ -204,7 +204,7 @@ import kotlinx.coroutines.launch
             }
         }else{
             MainScope().launch {
-                Toast.makeText(this@StorageAccessActivity, "This folder have already been added !", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@StorageAccessSettingsActivity, "This folder have already been added !", Toast.LENGTH_SHORT).show()
             }
         }
     }

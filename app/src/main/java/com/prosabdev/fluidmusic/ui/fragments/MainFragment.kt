@@ -7,7 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.add
+import androidx.fragment.app.commit
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.prosabdev.fluidmusic.R
@@ -52,16 +55,8 @@ class MainFragment : Fragment() {
         mFragmentMainBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_main,container,false)
         val view = mFragmentMainBinding.root
 
-        mActivity.supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            add<MainExploreFragment>(R.id.main_fragment_container)
-        }
-        mActivity.supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            add<PlayerFragment>(R.id.player_fragment_container)
-        }
-
         initViews()
+        setupFragments()
 
         return view
     }
@@ -142,7 +137,7 @@ class MainFragment : Fragment() {
             CustomAnimators.crossTranslateInFromVertical(mFragmentMainBinding.constraintMiniPlayerContainer,  1, animate, 150,300.0f)
         }
     }
-    private suspend fun updateTotalSelectedUI(
+    private fun updateTotalSelectedUI(
         totalSelected: Int,
         animate : Boolean = true
     ) = lifecycleScope.launch(context = Dispatchers.Default) {
@@ -166,7 +161,7 @@ class MainFragment : Fragment() {
             mFragmentMainBinding.constraintTopSelectionInclude.textSelectedCount.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
         }
     }
-    private suspend fun updateSelectModeUI(
+    private fun updateSelectModeUI(
         selectMode : Boolean,
         animate : Boolean = true
     ) = lifecycleScope.launch(context = Dispatchers.Default) {
@@ -182,7 +177,7 @@ class MainFragment : Fragment() {
                 CustomAnimators.crossTranslateOutFromVertical(mFragmentMainBinding.constraintTopSelectionContainer as View, -1, animate, 300)
         }
     }
-    private suspend fun updatePlayerButtonsUI() {
+    private fun updatePlayerButtonsUI() {
         MainScope().launch {
             if(mPlayerFragmentViewModel.getIsPlaying().value == true){
                 mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = ContextCompat.getDrawable(mContext, R.drawable.pause)
@@ -275,6 +270,18 @@ class MainFragment : Fragment() {
 //        val tempSongListSize :Int = mPlayerFragmentViewModel.getSongList().value?.size ?: 0
 //        if(tempSongListSize > 0 && tempCS < tempSongListSize - 1)
 //            mPlayerFragmentViewModel.setCurrentSong(tempCS + 1)
+    }
+
+
+    private fun setupFragments() {
+        mActivity.supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            add<MusicLibraryFragment>(R.id.main_fragment_container)
+        }
+        mActivity.supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            add<PlayerFragment>(R.id.player_fragment_container)
+        }
     }
 
     private fun initViews() {

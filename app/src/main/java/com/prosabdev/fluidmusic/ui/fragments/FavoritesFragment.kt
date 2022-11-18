@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.prosabdev.fluidmusic.R
 
-class EqualizerFragment : Fragment() {
+class FavoritesFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -18,13 +18,14 @@ class EqualizerFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_equalizer, container, false)
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_favorites, container, false)
     }
 
     companion object {
         @JvmStatic
         fun newInstance() =
-            EqualizerFragment().apply {
+            FavoritesFragment().apply {
                 arguments = Bundle().apply {
                 }
             }

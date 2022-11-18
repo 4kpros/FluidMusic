@@ -25,11 +25,6 @@
                 android:icon="@drawable/favorite"
                 android:title="@string/favorites"
                 android:checkable="true"/>
-            <item
-                android:id="@+id/queue_music"
-                android:icon="@drawable/queue_music"
-                android:title="@string/queue_music"
-                android:checkable="true"/>
         </menu>
     </item>
     <item
@@ -40,21 +35,6 @@
                 android:id="@+id/settings"
                 android:icon="@drawable/settings"
                 android:title="@string/settings"
-                android:checkable="true"/>
-            <item
-                android:id="@+id/request_features"
-                android:icon="@drawable/featured_play_list"
-                android:title="@string/request_features"
-                android:checkable="true"/>
-            <item
-                android:id="@+id/change_log"
-                android:icon="@drawable/update"
-                android:title="@string/change_log"
-                android:checkable="true"/>
-            <item
-                android:id="@+id/help"
-                android:icon="@drawable/help"
-                android:title="@string/help"
                 android:checkable="true"/>
         </menu>
     </item>

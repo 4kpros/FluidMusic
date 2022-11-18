@@ -37,7 +37,7 @@
 
                 <include
                     android:id="@+id/constraint_mini_player_include"
-                    layout="@layout/component_mini_player"
+                    layout="@layout/_component_mini_player"
                     />
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -11,7 +11,10 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.add
+import androidx.fragment.app.commit
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.CompositePageTransformer
@@ -22,12 +25,10 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentPlayerBinding
 import com.prosabdev.fluidmusic.models.collections.SongItem
-import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerActivity
+import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreDialog
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerQueueMusicDialog
 import com.prosabdev.fluidmusic.utils.*
-import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModelFactory
 import kotlinx.coroutines.Dispatchers
@@ -257,7 +258,7 @@ import kotlin.math.abs
         }
     }
     private fun openMediaScannerActivity() {
-        startActivity(Intent(mContext, MediaScannerActivity::class.java).apply {})
+        startActivity(Intent(mContext, MediaScannerSettingsActivity::class.java).apply {})
     }
 
     private fun onPlayPause(){

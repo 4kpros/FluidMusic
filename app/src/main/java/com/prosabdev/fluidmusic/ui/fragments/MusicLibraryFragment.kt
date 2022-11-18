@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -19,7 +18,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
-import com.prosabdev.fluidmusic.databinding.FragmentMainExploreBinding
+import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModel
@@ -27,8 +26,8 @@ import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class MainExploreFragment : Fragment() {
-    private lateinit var mFragmentMainExploreBinding: FragmentMainExploreBinding
+class MusicLibraryFragment : Fragment() {
+    private lateinit var mFragmentMusicLibraryBinding: FragmentMusicLibraryBinding
 
     private lateinit var mContext: Context
     private lateinit var mActivity: FragmentActivity
@@ -49,8 +48,8 @@ class MainExploreFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mFragmentMainExploreBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_main_explore,container,false)
-        val view = mFragmentMainExploreBinding.root
+        mFragmentMusicLibraryBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_music_library,container,false)
+        val view = mFragmentMusicLibraryBinding.root
 
         initViews()
 
@@ -69,12 +68,12 @@ class MainExploreFragment : Fragment() {
 
     private fun setupTabLayoutViewPagerAdapter() {
         mTabLayoutAdapter = TabLayoutAdapter(this)
-        mFragmentMainExploreBinding.viewPagerMainExplore.adapter = mTabLayoutAdapter
-        mFragmentMainExploreBinding.viewPagerMainExplore.offscreenPageLimit = 5
-        TabLayoutMediator(mFragmentMainExploreBinding.tabLayout, mFragmentMainExploreBinding.viewPagerMainExplore){tab,position->
+        mFragmentMusicLibraryBinding.viewPagerMainExplore.adapter = mTabLayoutAdapter
+        mFragmentMusicLibraryBinding.viewPagerMainExplore.offscreenPageLimit = 5
+        TabLayoutMediator(mFragmentMusicLibraryBinding.tabLayout, mFragmentMusicLibraryBinding.viewPagerMainExplore){tab,position->
             applyToolBarTitle(position, tab)
         }.attach()
-        mFragmentMainExploreBinding.viewPagerMainExplore.currentItem = mMainFragmentViewModel.getActivePage().value ?: 0
+        mFragmentMusicLibraryBinding.viewPagerMainExplore.currentItem = mMainFragmentViewModel.getActivePage().value ?: 0
         applyAppBarTitle(mMainFragmentViewModel.getActivePage().value ?: 0)
     }
     private fun applyToolBarTitle(position: Int, tab: TabLayout.Tab) {
@@ -104,28 +103,28 @@ class MainExploreFragment : Fragment() {
         ) { totalSelected -> updateTotalSelectedItemsUI(totalSelected ?: 0) }
     }
     private  fun updateTotalSelectedItemsUI(totalSelected : Int, animate : Boolean = true){
-        if (totalSelected > 0 && mFragmentMainExploreBinding.constraintSideMenuHoverInclude.constraintSideMenuHover.visibility != GONE)
-            CustomAnimators.crossFadeDown(mFragmentMainExploreBinding.constraintSideMenuHoverInclude.constraintSideMenuHover, animate, 200)
-        else if(totalSelected <= 0 && mFragmentMainExploreBinding.constraintSideMenuHoverInclude.constraintSideMenuHover.visibility != VISIBLE)
-            CustomAnimators.crossFadeUp(mFragmentMainExploreBinding.constraintSideMenuHoverInclude.constraintSideMenuHover, animate, 200, 0.8f)
+        if (totalSelected > 0 && mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover.visibility != GONE)
+            CustomAnimators.crossFadeDown(mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover, animate, 200)
+        else if(totalSelected <= 0 && mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover.visibility != VISIBLE)
+            CustomAnimators.crossFadeUp(mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover, animate, 200, 0.8f)
     }
     private  fun updateSelectModeUI(selectMode : Boolean, animate : Boolean = true){
         if (selectMode) {
-            mFragmentMainExploreBinding.viewPagerMainExplore.isUserInputEnabled = false
-            if(mFragmentMainExploreBinding.constraintSideMenuHoverContainer.visibility != VISIBLE)
-                CustomAnimators.crossTranslateInFromHorizontal(mFragmentMainExploreBinding.constraintSideMenuHoverContainer as View, 1, animate, 300)
+            mFragmentMusicLibraryBinding.viewPagerMainExplore.isUserInputEnabled = false
+            if(mFragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != VISIBLE)
+                CustomAnimators.crossTranslateInFromHorizontal(mFragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View, 1, animate, 300)
         }else {
-            mFragmentMainExploreBinding.viewPagerMainExplore.isUserInputEnabled = true
-            if(mFragmentMainExploreBinding.constraintSideMenuHoverContainer.visibility != GONE)
-                CustomAnimators.crossTranslateOutFromHorizontal(mFragmentMainExploreBinding.constraintSideMenuHoverContainer as View, 1, animate, 300)
+            mFragmentMusicLibraryBinding.viewPagerMainExplore.isUserInputEnabled = true
+            if(mFragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != GONE)
+                CustomAnimators.crossTranslateOutFromHorizontal(mFragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View, 1, animate, 300)
         }
     }
 
     private suspend fun checkInteractions() {
-        mFragmentMainExploreBinding.topAppBar.setNavigationOnClickListener {
+        mFragmentMusicLibraryBinding.topAppBar.setNavigationOnClickListener {
             mMainFragmentViewModel.setOnActionBarClickListened(true)
         }
-        mFragmentMainExploreBinding.viewPagerMainExplore.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+        mFragmentMusicLibraryBinding.viewPagerMainExplore.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 applyAppBarTitle(position)
@@ -133,19 +132,19 @@ class MainExploreFragment : Fragment() {
                 updateSelectModeUI(false)
             }
         })
-        mFragmentMainExploreBinding.constraintSideMenuHoverInclude.buttonPlayAfter.setOnClickListener {
+        mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter.setOnClickListener {
             onAddToPlayAfter()
         }
-        mFragmentMainExploreBinding.constraintSideMenuHoverInclude.buttonQueueMusicAdd.setOnClickListener {
+        mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonQueueMusicAdd.setOnClickListener {
             onAddSelectionToQueueMusicDialog()
         }
-        mFragmentMainExploreBinding.constraintSideMenuHoverInclude.buttonPlaylistAdd.setOnClickListener {
+        mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlaylistAdd.setOnClickListener {
             onShowAddSelectionToPlaylistDialog()
         }
-        mFragmentMainExploreBinding.constraintSideMenuHoverInclude.buttonShare.setOnClickListener {
+        mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonShare.setOnClickListener {
             onShareSelectionDialog()
         }
-        mFragmentMainExploreBinding.constraintSideMenuHoverInclude.buttonDelete.setOnClickListener {
+        mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonDelete.setOnClickListener {
             onShowDeleteSelectionDialog()
         }
     }
@@ -188,19 +187,19 @@ class MainExploreFragment : Fragment() {
     private fun applyAppBarTitle(position: Int) {
         when(position){
             0->{
-                mFragmentMainExploreBinding.topAppBar.title = getString(R.string.songs)
+                mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.songs)
             }
             1->{
-                mFragmentMainExploreBinding.topAppBar.title = getString(R.string.folders)
+                mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.folders)
             }
             2->{
-                mFragmentMainExploreBinding.topAppBar.title = getString(R.string.albums)
+                mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.albums)
             }
             3->{
-                mFragmentMainExploreBinding.topAppBar.title = getString(R.string.artists)
+                mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.artists)
             }
             4->{
-                mFragmentMainExploreBinding.topAppBar.title = getString(R.string.genre)
+                mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.genre)
             }
         }
     }
@@ -212,7 +211,7 @@ class MainExploreFragment : Fragment() {
     companion object {
         @JvmStatic
         fun newInstance(exploreContent: Int = 0) =
-            MainExploreFragment().apply {
+            MusicLibraryFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ConstantValues.ARGS_EXPLORE_CONTENT, exploreContent)
                 }

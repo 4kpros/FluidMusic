@@ -7,6 +7,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
@@ -17,7 +19,7 @@ import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.databinding.ActivityMediaScannerBinding
+import com.prosabdev.fluidmusic.databinding.ActivityMediaScannerSettingsBinding
 import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
@@ -30,9 +32,9 @@ import com.prosabdev.fluidmusic.viewmodels.views.activities.MediaScannerActivity
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-@BuildCompat.PrereleaseSdkCheck class MediaScannerActivity : AppCompatActivity() {
+@BuildCompat.PrereleaseSdkCheck class MediaScannerSettingsActivity : AppCompatActivity() {
 
-    private lateinit var mActivityMediaScannerBinding : ActivityMediaScannerBinding
+    private lateinit var mActivityMediaScannerSettingsBinding : ActivityMediaScannerSettingsBinding
 
     private lateinit var mSongItemViewModel: SongItemViewModel
     private lateinit var mMediaScannerActivityViewModel: MediaScannerActivityViewModel
@@ -46,13 +48,30 @@ import kotlinx.coroutines.launch
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        mActivityMediaScannerBinding = DataBindingUtil.setContentView(this, R.layout.activity_media_scanner)
+        mActivityMediaScannerSettingsBinding = DataBindingUtil.setContentView(this, R.layout.activity_media_scanner_settings)
 
         initializeUIs()
         MainScope().launch {
             initViewsModels()
             observeLiveData()
             checkInteractions()
+            registerOnBackPressedCallback()
+        }
+    }
+
+    private fun registerOnBackPressedCallback() {
+        if (BuildCompat.isAtLeastT()) {
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT
+            ) {
+                finish()
+            }
+        } else {
+            onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    finish()
+                }
+            })
         }
     }
 
@@ -68,43 +87,46 @@ import kotlinx.coroutines.launch
     }
 
     private fun checkInteractions() {
-        mActivityMediaScannerBinding.cardViewScanDevice.setOnClickListener{
+        mActivityMediaScannerSettingsBinding.topAppBar.setNavigationOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
+        mActivityMediaScannerSettingsBinding.cardViewScanDevice.setOnClickListener{
             MainScope().launch {
                 tryToScanDevice()
             }
         }
-        mActivityMediaScannerBinding.cardViewSelectFolders.setOnClickListener{
-            startActivity(Intent(this, StorageAccessActivity::class.java).apply {})
+        mActivityMediaScannerSettingsBinding.cardViewSelectFolders.setOnClickListener{
+            startActivity(Intent(this, StorageAccessSettingsActivity::class.java).apply {})
         }
-        mActivityMediaScannerBinding.cardViewRescanAll.setOnClickListener{
+        mActivityMediaScannerSettingsBinding.cardViewRescanAll.setOnClickListener{
             onRescanAllButtonClicked()
         }
-        mActivityMediaScannerBinding.cardViewRestoreDefault.setOnClickListener{
+        mActivityMediaScannerSettingsBinding.cardViewRestoreDefault.setOnClickListener{
             onRestoreAllButtonClicked()
         }
-        mActivityMediaScannerBinding.switchM3uPlaylists.setOnClickListener{
+        mActivityMediaScannerSettingsBinding.switchM3uPlaylists.setOnClickListener{
             //
         }
-        mActivityMediaScannerBinding.switchIgnoreVideos.setOnClickListener{
+        mActivityMediaScannerSettingsBinding.switchIgnoreVideos.setOnClickListener{
             //
         }
-        mActivityMediaScannerBinding.switchAutomaticScanner.setOnClickListener{
+        mActivityMediaScannerSettingsBinding.switchAutomaticScanner.setOnClickListener{
             //
         }
-        mActivityMediaScannerBinding.seekbarIgnoreShortFiles.addOnChangeListener(object : Slider.OnChangeListener{
+        mActivityMediaScannerSettingsBinding.seekbarIgnoreShortFiles.addOnChangeListener(object : Slider.OnChangeListener{
             override fun onValueChange(slider: Slider, value: Float, fromUser: Boolean) {
                 //
             }
 
         })
-        mActivityMediaScannerBinding.cardViewScanM3uPlaylists.setOnClickListener{
-            mActivityMediaScannerBinding.switchM3uPlaylists.isChecked = !mActivityMediaScannerBinding.switchM3uPlaylists.isChecked
+        mActivityMediaScannerSettingsBinding.cardViewScanM3uPlaylists.setOnClickListener{
+            mActivityMediaScannerSettingsBinding.switchM3uPlaylists.isChecked = !mActivityMediaScannerSettingsBinding.switchM3uPlaylists.isChecked
         }
-        mActivityMediaScannerBinding.cardViewSkipVideos.setOnClickListener{
-            mActivityMediaScannerBinding.switchIgnoreVideos.isChecked = !mActivityMediaScannerBinding.switchIgnoreVideos.isChecked
+        mActivityMediaScannerSettingsBinding.cardViewSkipVideos.setOnClickListener{
+            mActivityMediaScannerSettingsBinding.switchIgnoreVideos.isChecked = !mActivityMediaScannerSettingsBinding.switchIgnoreVideos.isChecked
         }
-        mActivityMediaScannerBinding.cardViewAutomaticScan.setOnClickListener{
-            mActivityMediaScannerBinding.switchAutomaticScanner.isChecked = !mActivityMediaScannerBinding.switchAutomaticScanner.isChecked
+        mActivityMediaScannerSettingsBinding.cardViewAutomaticScan.setOnClickListener{
+            mActivityMediaScannerSettingsBinding.switchAutomaticScanner.isChecked = !mActivityMediaScannerSettingsBinding.switchAutomaticScanner.isChecked
         }
     }
 
@@ -146,7 +168,7 @@ import kotlinx.coroutines.launch
 
     private fun tryToScanDevice() {
         if(mMediaScannerActivityViewModel.getIsLoadingInBackground().value == false)
-            mMediaScannerActivityViewModel.requestLoadDataAsync(this@MediaScannerActivity, mFolderUriTreeViewModel, mSongItemViewModel)
+            mMediaScannerActivityViewModel.requestLoadDataAsync(this@MediaScannerSettingsActivity, mFolderUriTreeViewModel, mSongItemViewModel)
     }
 
     private fun observeLiveData() {
@@ -174,8 +196,8 @@ import kotlinx.coroutines.launch
 
     private fun updateEmptyFolderUriTreeUI(it: Int?) {
         if((it ?: 0) > 0){
-            fadeInOut(mActivityMediaScannerBinding.textSelectFoldersSubTitle)
-            fadeInOut(mActivityMediaScannerBinding.textSelectFoldersTitle)
+            fadeInOut(mActivityMediaScannerSettingsBinding.textSelectFoldersSubTitle)
+            fadeInOut(mActivityMediaScannerSettingsBinding.textSelectFoldersTitle)
         }
     }
 
@@ -212,23 +234,23 @@ import kotlinx.coroutines.launch
     }
 
     private fun updatePlaylistCounterUI(it: Int?) {
-        mActivityMediaScannerBinding.playlistCounter = it
+        mActivityMediaScannerSettingsBinding.playlistCounter = it
     }
 
     private fun updateSongsCounterUI(it: Int?) {
-        mActivityMediaScannerBinding.songsCounter = it
+        mActivityMediaScannerSettingsBinding.songsCounter = it
     }
 
     private fun updateFoldersCounterUI(it: Int) {
-        mActivityMediaScannerBinding.folderCounter = it
+        mActivityMediaScannerSettingsBinding.folderCounter = it
     }
 
     private fun updateLoadingUI(it: Boolean?) {
-        mActivityMediaScannerBinding.isLoading = it
+        mActivityMediaScannerSettingsBinding.isLoading = it
     }
 
     private fun initializeUIs() {
-        CustomViewModifiers.updateTopViewInsets(mActivityMediaScannerBinding.coordinator)
-        CustomViewModifiers.updateBottomViewInsets(mActivityMediaScannerBinding.constraintMainContainer)
+        CustomViewModifiers.updateTopViewInsets(mActivityMediaScannerSettingsBinding.coordinatorSettingsActivity)
+        CustomViewModifiers.updateBottomViewInsets(mActivityMediaScannerSettingsBinding.emptyView)
     }
 }
