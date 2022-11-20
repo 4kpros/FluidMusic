@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.window.OnBackInvokedDispatcher
@@ -17,7 +18,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.coroutineScope
 import androidx.work.*
-import androidx.work.OneTimeWorkRequest
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
@@ -25,7 +25,6 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityMediaScannerSettingsBinding
 import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
-import com.prosabdev.fluidmusic.services.worker.MediaScannerWorker
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 import com.prosabdev.fluidmusic.viewmodels.FolderUriTreeViewModel
@@ -42,14 +41,8 @@ import kotlinx.coroutines.launch
     private lateinit var mActivityMediaScannerSettingsBinding : ActivityMediaScannerSettingsBinding
 
     private lateinit var mSongItemViewModel: SongItemViewModel
-    private lateinit var mMediaScannerActivityViewModel: MediaScannerActivityViewModel
     private lateinit var mFolderUriTreeViewModel: FolderUriTreeViewModel
-
-    private var mScanDeviceWorkRequest: OneTimeWorkRequest = OneTimeWorkRequestBuilder<MediaScannerWorker>()
-            .setInputData(workDataOf(ConstantValues.MEDIA_SCANNER_WORKER_METHOD to ConstantValues.MEDIA_SCANNER_WORKER_METHOD_ADD_NEW))
-            .build()
-
-    private var mFolderUriList: List<FolderUriTree> = ArrayList()
+    private lateinit var mMediaScannerActivityViewModel: MediaScannerActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,7 +81,7 @@ import kotlinx.coroutines.launch
         mSongItemViewModel = SongItemViewModelFactory(
             (this.application as DatabaseAccessApplication).database.songItemDao()
         ).create(SongItemViewModel::class.java)
-        mMediaScannerActivityViewModel = MediaScannerActivityViewModelFactory().create(
+        mMediaScannerActivityViewModel = MediaScannerActivityViewModelFactory(this.application).create(
             MediaScannerActivityViewModel::class.java)
         mFolderUriTreeViewModel = FolderUriTreeViewModelFactory(
             (this.application as DatabaseAccessApplication).database.folderUriTreeDao()
@@ -177,10 +170,7 @@ import kotlinx.coroutines.launch
         if(mMediaScannerActivityViewModel.getIsLoadingInBackground().value == true)
             return
         mMediaScannerActivityViewModel.setIsLoadingInBackground(true)
-
-        WorkManager
-            .getInstance(this@MediaScannerSettingsActivity)
-            .enqueue(mScanDeviceWorkRequest)
+        mMediaScannerActivityViewModel.scanDevice(ConstantValues.MEDIA_SCANNER_WORKER_METHOD_ADD_NEW)
     }
 
     private fun observeLiveData() {
@@ -204,14 +194,42 @@ import kotlinx.coroutines.launch
         mMediaScannerActivityViewModel.getEmptyFolderUriCounter().observe(this as LifecycleOwner){
             updateEmptyFolderUriTreeUI(it)
         }
-        WorkManager
-            .getInstance(this@MediaScannerSettingsActivity)
-            .getWorkInfoByIdLiveData(mScanDeviceWorkRequest.id)
-            .observe(this, Observer { workInfo ->
-                if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-                    mMediaScannerActivityViewModel.setIsLoadingInBackground(false)
-                }
-            })
+        mMediaScannerActivityViewModel.getOutputWorkInfoList().observe(this){
+            checkStatusOfScanningDevice(it)
+        }
+    }
+
+    private fun checkStatusOfScanningDevice(it: List<WorkInfo>?) {
+        if (it.isNullOrEmpty()){
+            return
+        }
+
+        val workInfo = it[0]
+
+        if(workInfo.state.isFinished){
+            Log.i(ConstantValues.TAG, "Device scan finished.")
+            mMediaScannerActivityViewModel.updateWorkInfoData(workInfo)
+            mMediaScannerActivityViewModel.setIsLoadingInBackground(false)
+        }else{
+            Log.i(ConstantValues.TAG, "Working on background ...")
+        }
+    }
+    private fun mediaScannerWorkInfoObserver(): Observer<List<WorkInfo>> {
+        return Observer {
+            if (it.isNullOrEmpty()){
+                return@Observer
+            }
+
+            val workInfo = it[0]
+
+            if(workInfo.state.isFinished){
+                Log.i(ConstantValues.TAG, "Device scan finished.")
+                mMediaScannerActivityViewModel.updateWorkInfoData(workInfo)
+                mMediaScannerActivityViewModel.setIsLoadingInBackground(false)
+            }else{
+                Log.i(ConstantValues.TAG, "Working on background ...")
+            }
+        }
     }
 
     private fun updateEmptyFolderUriTreeUI(it: Int?) {
@@ -250,7 +268,7 @@ import kotlinx.coroutines.launch
     }
 
     private fun updateFolderUriTrees(it: List<FolderUriTree>) {
-        mFolderUriList = it
+
     }
 
     private fun updatePlaylistCounterUI(it: Int?) {

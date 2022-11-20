@@ -1,12 +1,17 @@
 package com.prosabdev.fluidmusic.viewmodels.views.activities
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.work.*
+import com.prosabdev.fluidmusic.workers.DatabaseUpdateEntriesWorker
+import com.prosabdev.fluidmusic.workers.MediaScannerWorker
+import com.prosabdev.fluidmusic.utils.ConstantValues
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class MediaScannerActivityViewModel : ViewModel() {
+class MediaScannerActivityViewModel(application: Application) : AndroidViewModel(application) {
 
     private val mMutableIsLoadingInBackground = MutableLiveData<Boolean>(false)
     private val mMutableFoldersCounter = MutableLiveData<Int>(0)
@@ -20,7 +25,44 @@ class MediaScannerActivityViewModel : ViewModel() {
     private val mPlaylistsCounter: LiveData<Int> get() = mMutablePlaylistsCounter
     private val mEmptyFolderUriCounter: LiveData<Int> get() = mMutableEmptyFolderUriCounter
 
+    private val outputWorkInfoItems : LiveData<List<WorkInfo>>
+    private val workManager : WorkManager = WorkManager.getInstance(application)
+    init {
+        outputWorkInfoItems = workManager.getWorkInfosByTagLiveData(ConstantValues.MEDIA_SCANNER_WORKER_OUTPUT)
+    }
+    internal fun scanDevice(scannerMethod : String = ConstantValues.MEDIA_SCANNER_WORKER_METHOD_ADD_NEW){
 
+        val scanDeviceWorkRequest: OneTimeWorkRequest =
+            OneTimeWorkRequestBuilder<MediaScannerWorker>()
+                .setInputData(workDataOf(ConstantValues.MEDIA_SCANNER_WORKER_SCAN_METHOD to scannerMethod))
+                .addTag(ConstantValues.MEDIA_SCANNER_WORKER_OUTPUT)
+                .build()
+
+        val updateDatabaseEntriesWorkRequest: OneTimeWorkRequest =
+            OneTimeWorkRequest.from(DatabaseUpdateEntriesWorker::class.java)
+
+        workManager
+            .beginUniqueWork(
+                ConstantValues.MEDIA_SCANNER_WORKER_NAME,
+                ExistingWorkPolicy.REPLACE,
+                scanDeviceWorkRequest
+            )
+            .then(
+                updateDatabaseEntriesWorkRequest
+            ).enqueue()
+    }
+
+    fun updateWorkInfoData(workInfo : WorkInfo){
+        val outputData = workInfo.outputData.getIntArray(ConstantValues.MEDIA_SCANNER_WORKER_OUTPUT)
+        if(outputData != null && outputData.isNotEmpty()){
+            setFoldersCounter(outputData[0])
+            setSongsCounter(outputData[1])
+            setPlaylistsCounter(outputData[2])
+        }
+    }
+    fun getOutputWorkInfoList(): LiveData<List<WorkInfo>> {
+        return outputWorkInfoItems
+    }
     fun setIsLoadingInBackground(isLoading : Boolean) {
         MainScope().launch {
             mMutableIsLoadingInBackground.value = isLoading

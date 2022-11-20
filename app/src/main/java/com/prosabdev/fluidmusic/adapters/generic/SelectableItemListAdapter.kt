@@ -1,4 +1,4 @@
-package com.prosabdev.fluidmusic.utils.adapters
+package com.prosabdev.fluidmusic.adapters.generic
 
 import android.util.Log
 import android.util.SparseBooleanArray
@@ -8,10 +8,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.prosabdev.fluidmusic.models.FolderUriTree
+import com.prosabdev.fluidmusic.models.QueueMusicItem
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 
-abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder> : ListAdapter<SongItem, VH>(DiffCallback) {
+abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallback: DiffUtil.ItemCallback<Any>) : ListAdapter<Any, VH>(
+    diffCallback
+) {
     private val mTAG: String = SelectableItemListAdapter::class.java.simpleName
     private var mSelectedItems: SparseBooleanArray = SparseBooleanArray()
     private var mMinSelected: Int = -1
@@ -25,9 +29,9 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder> : ListAda
     private fun onNotifyItemChanged(position : Int, layoutManager : GridLayoutManager?){
         if(layoutManager != null){
             if(isItemPositionVisible(position, layoutManager))
-                notifyItemChanged(position, PAYLOAD_IS_SELECTED)
+                notifyItemChanged(position, Companion.PAYLOAD_IS_SELECTED)
         }else{
-            notifyItemChanged(position, PAYLOAD_IS_SELECTED)
+            notifyItemChanged(position, Companion.PAYLOAD_IS_SELECTED)
         }
     }
     private fun isItemPositionVisible(position : Int, layoutManager : GridLayoutManager?): Boolean {
@@ -172,16 +176,8 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder> : ListAda
             }
         }
     }
-    companion object {
-        private val DiffCallback = object : DiffUtil.ItemCallback<SongItem>() {
-            override fun areItemsTheSame(oldItem: SongItem, newItem: SongItem): Boolean {
-                return oldItem.id == newItem.id
-            }
 
-            override fun areContentsTheSame(oldItem: SongItem, newItem: SongItem): Boolean {
-                return oldItem.absolutePath == newItem.absolutePath
-            }
-        }
+    companion object {
         const val PAYLOAD_IS_SELECTED = "PAYLOAD_IS_SELECTED"
     }
 }

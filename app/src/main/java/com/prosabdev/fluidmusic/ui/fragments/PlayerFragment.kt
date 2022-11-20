@@ -28,7 +28,9 @@ import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreDialog
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicDialog
+import com.prosabdev.fluidmusic.ui.fragments.explore.AllSongsFragment
 import com.prosabdev.fluidmusic.utils.*
+import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModel
 import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModelFactory
 import kotlinx.coroutines.Dispatchers
@@ -45,6 +47,7 @@ import kotlin.math.abs
     private lateinit var mActivity: FragmentActivity
 
     private lateinit var mPlayerFragmentViewModel: PlayerFragmentViewModel
+    private lateinit var mSongItemViewModel: SongItemViewModel
 
     private var mPlayerPagerAdapter: PlayerPageAdapter? = null
 
@@ -77,9 +80,14 @@ import kotlin.math.abs
 
         MainScope().launch {
             setupViewPagerAdapter()
+            loadPlayingLastSession()
             checkInteractions()
             observeLiveData()
         }
+    }
+
+    private fun loadPlayingLastSession() {
+        //
     }
 
     private fun setupViewPagerAdapter() {
@@ -129,16 +137,8 @@ import kotlin.math.abs
     }
 
     private fun observeLiveData() {
-        mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner
-        ) { sourceOf -> updateDataFromSource(sourceOf) }
-        mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner
-        ) { t -> updateCurrentPlayingSong(t) }
         mPlayerFragmentViewModel.getIsPlaying().observe(mActivity as LifecycleOwner
         ) { updatePlayerButtonsUI() }
-        mPlayerFragmentViewModel.getShuffle().observe(mActivity as LifecycleOwner
-        ) { shuffle -> updateShuffleUI(shuffle) }
-        mPlayerFragmentViewModel.getRepeat().observe(mActivity as LifecycleOwner
-        ) { repeat -> updateRepeatUI(repeat) }
         mPlayerFragmentViewModel.getPlayingProgressValue().observe(mActivity as LifecycleOwner
         ) { progressValue -> updateProgress(progressValue) }
     }
@@ -185,11 +185,8 @@ import kotlin.math.abs
     private fun updateDataFromSource(sourceOf: String?) {
         if(sourceOf == ConstantValues.EXPLORE_ALL_SONGS){
             mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner
-            ) { currentSong -> updateCurrentPlayingSong(currentSong) }
+            ) { currentSong -> updateCurrentPlayingSong(null) }
         }
-    }
-    private fun changeCurrentSong(position: Int) {
-        mPlayerFragmentViewModel.setCurrentSong(position)
     }
     private suspend fun updatePlayerUI(position: Int) = lifecycleScope.launch(context = Dispatchers.Default) {
         val  tempCurrentItem : SongItem? = mPlayerPagerAdapter?.currentList?.get(position)
@@ -215,7 +212,6 @@ import kotlin.math.abs
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 MainScope().launch {
-                    changeCurrentSong(position)
                     updatePlayerUI(position)
                 }
             }
@@ -269,18 +265,18 @@ import kotlin.math.abs
         mPlayerFragmentViewModel.setIsPlaying(tempPP)
     }
     private fun onNextPage(){
-        if((mPlayerPagerAdapter?.itemCount ?: 0) <= 0)
-            return
-        val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
-        if((mPlayerPagerAdapter?.itemCount ?: 0) > 0 && tempCS < (mPlayerPagerAdapter?.itemCount ?: 0) - 1)
-            mPlayerFragmentViewModel.setCurrentSong(tempCS + 1)
+//        if((mPlayerPagerAdapter?.itemCount ?: 0) <= 0)
+//            return
+//        val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
+//        if((mPlayerPagerAdapter?.itemCount ?: 0) > 0 && tempCS < (mPlayerPagerAdapter?.itemCount ?: 0) - 1)
+//            mPlayerFragmentViewModel.setCurrentSong(tempCS + 1)
     }
     private fun onPrevPage(){
-        if((mPlayerPagerAdapter?.itemCount ?: 0) <= 0)
-            return
-        val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
-        if(tempCS > 0)
-            mPlayerFragmentViewModel.setCurrentSong(tempCS - 1)
+//        if((mPlayerPagerAdapter?.itemCount ?: 0) <= 0)
+//            return
+//        val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
+//        if(tempCS > 0)
+//            mPlayerFragmentViewModel.setCurrentSong(tempCS - 1)
     }
     private fun onShuffle(){
     }

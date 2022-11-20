@@ -1,5 +1,6 @@
 package com.prosabdev.fluidmusic.adapters.explore
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
 import android.util.Log
@@ -9,34 +10,33 @@ import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
 import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.ItemGenericExploreListBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
-import com.prosabdev.fluidmusic.utils.adapters.SelectablePlayingItemAdapter
+import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapter
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+
 
 
 class SongItemAdapter(
     private val mContext: Context,
     private val mOnItemClickListener: OnItemClickListener,
     private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener
-    ) : SelectablePlayingItemAdapter<SongItemAdapter.SongItemViewHolder>()
+    ) : SelectablePlayingItemListAdapter<SongItemAdapter.SongItemViewHolder>(diffCallback)
     {
-
-        interface OnItemClickListener {
+    interface OnItemClickListener {
         fun onSongItemClicked(position: Int)
         fun onSongItemPlayClicked(position: Int)
         fun onSongItemLongClicked(position: Int)
-    }
-    interface OnTouchListener {
-        fun requestDrag(viewHolder: RecyclerView.ViewHolder?)
     }
 
     //Methods for selectable playing
@@ -90,13 +90,13 @@ class SongItemAdapter(
     }
     override fun onBindViewHolder(holder: SongItemViewHolder, position: Int) {
         holder.bindListener(position, mOnItemClickListener)
-        holder.updateAllUI(mContext, getItem(position), isPlaying(position), selectableIsSelected(position))
+        holder.updateAllUI(mContext, getItem(position) as SongItem, isPlaying(position), selectableIsSelected(position))
     }
     override fun onBindViewHolder(holder: SongItemViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.isNotEmpty()) {
             for (payload in payloads) {
                 when (payload) {
-                    PAYLOAD_IS_SELECTED -> {
+                    SelectableItemListAdapter.PAYLOAD_IS_SELECTED -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_SELECTED")
                         holder.updateSelectedStateUI(selectableIsSelected(position))
                     }
@@ -106,7 +106,7 @@ class SongItemAdapter(
                     }
                     PAYLOAD_IS_COVERT_ART_TEXT -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
-                        holder.updateCovertArtAndTitleUI(mContext, getItem(position))
+                        holder.updateCovertArtAndTitleUI(mContext, getItem(position) as SongItem)
                     }
                     else -> {
                         super.onBindViewHolder(holder, position, payloads)
@@ -195,5 +195,16 @@ class SongItemAdapter(
 
         companion object {
             const val PAYLOAD_IS_COVERT_ART_TEXT = "PAYLOAD_IS_COVERT_ART_TEXT"
+
+            val diffCallback = object : DiffUtil.ItemCallback<Any>() {
+                override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
+                    return (oldItem as SongItem).id == (newItem as SongItem).id
+                }
+
+                @SuppressLint("DiffUtilEquals")
+                override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
+                    return (oldItem as SongItem) == (newItem as SongItem)
+                }
+            }
         }
-    }
+}

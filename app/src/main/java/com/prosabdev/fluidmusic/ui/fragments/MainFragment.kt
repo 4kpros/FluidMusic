@@ -185,24 +185,24 @@ class MainFragment : Fragment() {
         }
     }
     private suspend fun updateMiniPlayerUI(animate : Boolean = true) = lifecycleScope.launch(context = Dispatchers.Default) {
-        val tempQL : ArrayList<SongItem>? = null
-        val tempPositionInQL : Int = mPlayerFragmentViewModel.getCurrentSong().value ?: -1
-        if(tempQL!= null && tempQL.size > 0 && tempPositionInQL >= 0){
-            var tempTitle = ""
-            var tempArtist = ""
-            tempTitle = if(tempQL[tempPositionInQL].title != null && tempQL[tempPositionInQL].title!!.isNotEmpty()) tempQL[tempPositionInQL].title.toString() else tempQL[tempPositionInQL].fileName.toString() //Set song title
-
-            tempArtist = if(tempQL[tempPositionInQL].artist != null && tempQL[tempPositionInQL].artist!!.isNotEmpty()) tempQL[tempPositionInQL].artist.toString() else mContext.getString(R.string.unknown_artist)
-
-            val tempBinary : ByteArray? = if(tempQL.size > 0) tempQL[tempPositionInQL].covertArt?.binaryData else null
-
-            MainScope().launch {
-                mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.text = tempTitle
-                mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text = tempArtist
-            }
-            CustomUILoaders.loadWithBinaryDataWithCrossFade(mContext, mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer, tempBinary, 60)
-            CustomUILoaders.loadBlurredWithImageLoader(mContext, mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer, tempBinary, 10)
-        }
+//        val tempQL : ArrayList<SongItem>? = null
+//        val tempPositionInQL : Int = mPlayerFragmentViewModel.getCurrentSong().value ?: -1
+//        if(tempQL!= null && tempQL.size > 0 && tempPositionInQL >= 0){
+//            var tempTitle = ""
+//            var tempArtist = ""
+//            tempTitle = if(tempQL[tempPositionInQL].title != null && tempQL[tempPositionInQL].title!!.isNotEmpty()) tempQL[tempPositionInQL].title.toString() else tempQL[tempPositionInQL].fileName.toString() //Set song title
+//
+//            tempArtist = if(tempQL[tempPositionInQL].artist != null && tempQL[tempPositionInQL].artist!!.isNotEmpty()) tempQL[tempPositionInQL].artist.toString() else mContext.getString(R.string.unknown_artist)
+//
+//            val tempBinary : ByteArray? = if(tempQL.size > 0) tempQL[tempPositionInQL].covertArt?.binaryData else null
+//
+//            MainScope().launch {
+//                mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.text = tempTitle
+//                mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text = tempArtist
+//            }
+//            CustomUILoaders.loadWithBinaryDataWithCrossFade(mContext, mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer, tempBinary, 60)
+//            CustomUILoaders.loadBlurredWithImageLoader(mContext, mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer, tempBinary, 10)
+//        }
     }
 
     private suspend fun checkInteractions() {

@@ -1,4 +1,4 @@
-package com.prosabdev.fluidmusic.services.worker
+package com.prosabdev.fluidmusic.workers
 
 import android.content.Context
 import android.media.MediaMetadataRetriever
@@ -9,31 +9,27 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.prosabdev.fluidmusic.models.FolderUriTree
+import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.FolderUriTreeViewModel
 import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModel
 import kotlinx.coroutines.*
 
 class MediaScannerWorker(
-    private val mContext: Context,
-    private val mFolderUriTreeViewModel: FolderUriTreeViewModel,
-    private val mSongItemViewModel: SongItemViewModel? = null,
-    workerParams: WorkerParameters
-) : CoroutineWorker(mContext, workerParams) {
+    ctx: Context,
+    params: WorkerParameters
+) : CoroutineWorker(ctx, params) {
 
     override suspend fun doWork(): Result {
-        val updateMethod = inputData.getString(ConstantValues.MEDIA_SCANNER_WORKER_METHOD)
-        return try {
-            if(updateMethod == ConstantValues.MEDIA_SCANNER_WORKER_METHOD_REMOVE_FOLDER_URI_TREE){
-                val tempPosition = inputData.getInt(ConstantValues.MEDIA_SCANNER_WORKER_METHOD_REMOVE_FOLDER_URI_TREE_POSITION, -1)
-                removeFolderUriTreeAndAllDataFromDatabase(mContext, tempPosition, mFolderUriTreeViewModel)
-            }else{
-                scanDeviceFolderUriTrees(mContext, mFolderUriTreeViewModel, mSongItemViewModel!!, updateMethod)
+        val updateMethod = inputData.getString(ConstantValues.MEDIA_SCANNER_WORKER_SCAN_METHOD)
+        return withContext(Dispatchers.IO) {
+            try {
+                scanDeviceFolderUriTrees(applicationContext, updateMethod)
+                Log.i(ConstantValues.TAG, "Scan finished !")
+                Result.success()
+            } catch (error: Throwable) {
+                Result.failure()
             }
-
-            Result.success()
-        } catch (error: Throwable) {
-            Result.failure()
         }
     }
 
@@ -45,24 +41,24 @@ class MediaScannerWorker(
 
     private suspend fun scanDeviceFolderUriTrees(
         context: Context,
-        folderUriTreeViewModel: FolderUriTreeViewModel,
-        songItemViewModel: SongItemViewModel,
-        updateMethod : String?,
-    ) = coroutineScope {
+        updateMethod : String?
+    ) {
         val tempFolderSelected: ArrayList<FolderUriTree> =
-            folderUriTreeViewModel.getAllFolderUriTreesDirectly() as ArrayList<FolderUriTree>
+            AppDatabase.getDatabase(applicationContext).folderUriTreeDao().getAllFolderUriTreesDirectly() as ArrayList<FolderUriTree>
 
         if (tempFolderSelected.isEmpty()){
             MainScope().launch {
-                Toast.makeText(context, "Please select folders to scan", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Please select folders to scan !", Toast.LENGTH_LONG).show()
             }
-            return@coroutineScope
+            return
         }
         if(updateMethod != null && updateMethod == ConstantValues.MEDIA_SCANNER_WORKER_METHOD_CLEAR_ALL) {
-            songItemViewModel.deleteAllFromSongs()
-            folderUriTreeViewModel.resetAllFolderUriTreesLastModified()
+            Log.i(ConstantValues.TAG, "Cleaning up old database ...")
+            AppDatabase.getDatabase(applicationContext).songItemDao().deleteAllFromSongs()
+            AppDatabase.getDatabase(applicationContext).folderUriTreeDao().resetAllFolderUriTreesLastModified()
         }
-        launch {
+        Log.i(ConstantValues.TAG, "Starting scanning")
+        coroutineScope {
             for (i in 0 until tempFolderSelected.size){
                 val tempDocFile: DocumentFile? =
                     DocumentFile.fromTreeUri(context, Uri.parse(tempFolderSelected[i].uriTree))
@@ -70,15 +66,13 @@ class MediaScannerWorker(
                 scanDocumentUriContent(
                     context,
                     tempDocFile?.uri,
-                    songItemViewModel,
                 )
             }
         }
     }
     private suspend fun scanDocumentUriContent(
         context: Context,
-        uriTree: Uri?,
-        songItemViewModel: SongItemViewModel
+        uriTree: Uri?
     ): Unit = coroutineScope {
         if(uriTree == null)
             return@coroutineScope
@@ -91,7 +85,7 @@ class MediaScannerWorker(
                     if (tempDocFile.listFiles()[i].isDirectory) {
                         launch{
                             val tempRecursiveUri = tempDocFile.listFiles()[i].uri
-                            scanDocumentUriContent(context, tempRecursiveUri, songItemViewModel)
+                            scanDocumentUriContent(context, tempRecursiveUri)
                         }
                     }else{
                         launch{

@@ -8,13 +8,13 @@ import org.jaudiotagger.tag.images.Artwork
     foreignKeys = [
         ForeignKey(entity = FolderUriTree::class, parentColumns = ["id"], childColumns = ["uriTreeId"], onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE)
     ],
-    indices = [Index(value = ["id", "absolutePath"], unique = true)],
+    indices = [Index(value = ["id", "uri"], unique = true)],
     primaryKeys = ["id"]
 )
 open class SongItem() {
     var id : Long = -1
     var uriTreeId: Long = -1
-    var absolutePath: String = ""
+    var uri: String? = null
     var fileName: String? = null
     var title: String? = null
     var artist: String? = null

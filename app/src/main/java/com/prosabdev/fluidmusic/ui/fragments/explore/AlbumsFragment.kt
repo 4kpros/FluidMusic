@@ -11,7 +11,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
-import com.prosabdev.fluidmusic.adapters.explore.AlbumItemAdapter
+import com.prosabdev.fluidmusic.adapters.explore.AlbumItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentAlbumsBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.views.explore.AlbumItemViewModel
@@ -29,7 +29,7 @@ class AlbumsFragment : Fragment() {
     private lateinit var mAlbumItemViewModel: AlbumItemViewModel
 
     private var mEmptyBottomSpaceAdapter: HeadlinePlayShuffleAdapter? = null
-    private var mAlbumItemAdapter: AlbumItemAdapter? = null
+    private var mAlbumItemAdapter: AlbumItemListAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

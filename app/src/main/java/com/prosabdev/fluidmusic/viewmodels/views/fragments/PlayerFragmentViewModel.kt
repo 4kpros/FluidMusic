@@ -4,6 +4,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.prosabdev.fluidmusic.models.explore.SongItem
 
 class PlayerFragmentViewModel : ViewModel()  {
 
@@ -13,13 +14,13 @@ class PlayerFragmentViewModel : ViewModel()  {
     private val mMutableSourceOfQueueListValue = MutableLiveData<String>("")
     private val mMutableShuffle = MutableLiveData<Int>(PlaybackStateCompat.SHUFFLE_MODE_NONE)
     private val mMutableRepeat = MutableLiveData<Int>(PlaybackStateCompat.REPEAT_MODE_NONE)
-    private val mMutableCurrentSong = MutableLiveData<Int>(0)
+    private val mMutableCurrentSong = MutableLiveData<SongItem>(null)
 
     private val mIsPlaying: LiveData<Boolean> get() = mMutableIsPlaying
     private val mPlayingProgressValue: LiveData<Long> get() = mMutablePlayingProgressValue
     private val mSourceOfQueueList: LiveData<String> get() = mMutableSourceOfQueueList
     private val mSourceOfQueueListValue: LiveData<String> get() = mMutableSourceOfQueueListValue
-    private val mCurrentSong: LiveData<Int> get() = mMutableCurrentSong
+    private val mCurrentSong: LiveData<SongItem> get() = mMutableCurrentSong
     private val mShuffle: LiveData<Int> get() = mMutableShuffle
     private val mRepeat: LiveData<Int> get() = mMutableRepeat
 
@@ -47,10 +48,10 @@ class PlayerFragmentViewModel : ViewModel()  {
     fun getSourceOfQueueListValue(): LiveData<String> {
         return mSourceOfQueueListValue
     }
-    fun setCurrentSong(newCurrentSong : Int){
+    fun setCurrentSong(newCurrentSong : SongItem){
         mMutableCurrentSong.value = newCurrentSong
     }
-    fun getCurrentSong(): LiveData<Int> {
+    fun getCurrentSong(): LiveData<SongItem> {
         return mCurrentSong
     }
     fun setShuffle(newShuffleValue : Int){

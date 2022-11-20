@@ -1,5 +1,6 @@
 package com.prosabdev.fluidmusic.adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
 import android.util.Log
@@ -9,27 +10,29 @@ import android.view.View
 import android.view.View.*
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.callbacks.QueueMusicItemCallback
+import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.ItemQueueMusicBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
-import com.prosabdev.fluidmusic.utils.adapters.SelectablePlayingItemAdapter
+import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapter
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.*
 
-class QueueMusicItemAdapter(
+class QueueMusicItemListAdapter(
     private val mContext: Context,
     private val mOnItemClickListener: OnItemClickListener,
     private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener,
     private val mOnTouchListener: OnTouchListener,
-) : SelectablePlayingItemAdapter<QueueMusicItemAdapter.QueueMusicItemViewHolder>(),
+) : SelectablePlayingItemListAdapter<QueueMusicItemListAdapter.QueueMusicItemViewHolder>(diffCallback),
     QueueMusicItemCallback.ItemTouchHelperContract
 {
 
@@ -95,13 +98,13 @@ class QueueMusicItemAdapter(
     }
     override fun onBindViewHolder(holder: QueueMusicItemViewHolder, position: Int) {
         holder.bindListener(holder, position, mOnItemClickListener, mOnTouchListener)
-        holder.updateAllUI(mContext, getItem(position), isPlaying(position), selectableIsSelected(position))
+        holder.updateAllUI(mContext, getItem(position) as SongItem, isPlaying(position), selectableIsSelected(position))
     }
     override fun onBindViewHolder(holder: QueueMusicItemViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.isNotEmpty()) {
             for (payload in payloads) {
                 when (payload) {
-                    PAYLOAD_IS_SELECTED -> {
+                    SelectableItemListAdapter.PAYLOAD_IS_SELECTED -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_SELECTED")
                         holder.updateSelectedStateUI(selectableIsSelected(position))
                     }
@@ -111,7 +114,7 @@ class QueueMusicItemAdapter(
                     }
                     PAYLOAD_IS_COVERT_ART_TEXT -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
-                        holder.updateCovertArtAndTitleUI(mContext, getItem(position))
+                        holder.updateCovertArtAndTitleUI(mContext, getItem(position) as SongItem)
                     }
                     else -> {
                         super.onBindViewHolder(holder, position, payloads)
@@ -238,5 +241,16 @@ class QueueMusicItemAdapter(
 
     companion object {
         const val PAYLOAD_IS_COVERT_ART_TEXT = "PAYLOAD_IS_COVERT_ART_TEXT"
+
+        val diffCallback = object : DiffUtil.ItemCallback<Any>() {
+            override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
+                return (oldItem as SongItem).id == (newItem as SongItem).id
+            }
+
+            @SuppressLint("DiffUtilEquals")
+            override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
+                return (oldItem as SongItem) == (newItem as SongItem)
+            }
+        }
     }
 }

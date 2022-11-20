@@ -13,7 +13,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
@@ -24,7 +23,7 @@ import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.SortOrganizeItemsBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.adapters.SelectableItemListAdapter
+import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModel
 import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModel
@@ -32,7 +31,6 @@ import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
@@ -123,7 +121,7 @@ class AllSongsFragment : Fragment() {
 //            mSongItemAdapter?.setCurrentPlayingSong(it ?: -1)
     }
     private suspend fun addSongsToAdapter(songList: ArrayList<SongItem>?) = coroutineScope{
-        mSongItemAdapter?.submitList(songList)
+        mSongItemAdapter?.submitList(songList as ArrayList<Any>)
         mMainFragmentViewModel.setTotalCount(songList?.size ?: 0)
     }
 
@@ -204,11 +202,13 @@ class AllSongsFragment : Fragment() {
         concatAdapter.addAdapter(mHeadlineTopPlayShuffleAdapter!!)
         concatAdapter.addAdapter(mSongItemAdapter!!)
         concatAdapter.addAdapter(mEmptyBottomAdapter!!)
-        mFragmentAllSongsBinding.recyclerView.adapter = concatAdapter
 
         //Add Layout manager
         mLayoutManager = GridLayoutManager(mContext, spanCount, GridLayoutManager.VERTICAL, false)
-        mFragmentAllSongsBinding.recyclerView.layoutManager = mLayoutManager
+        MainScope().launch {
+            mFragmentAllSongsBinding.recyclerView.adapter = concatAdapter
+            mFragmentAllSongsBinding.recyclerView.layoutManager = mLayoutManager
+        }
     }
 
     private fun onShowFilterDialog() {

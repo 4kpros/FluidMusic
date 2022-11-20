@@ -108,7 +108,7 @@ class PlayerPageAdapter(
 
             @SuppressLint("DiffUtilEquals")
             override fun areContentsTheSame(oldItem: SongItem, newItem: SongItem): Boolean {
-                return oldItem.absolutePath == newItem.absolutePath
+                return oldItem == newItem
             }
         }
     }

@@ -1,54 +1,54 @@
 package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.button.MaterialButton
 import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.databinding.BottomSheetPlayerMoreBinding
+import com.prosabdev.fluidmusic.databinding.DialogQueueMusicBinding
+import com.prosabdev.fluidmusic.models.explore.SongItem
+import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
+import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.utils.CustomFormatters
+import com.prosabdev.fluidmusic.utils.CustomUILoaders
+import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModel
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
-class PlayerMoreDialog : GenericBottomSheetDialogFragment() {
+class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
+    SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private lateinit var mBottomSheetPlayerMoreBinding: BottomSheetPlayerMoreBinding
 
     private lateinit var mContext: Context
     private var mActivity: FragmentActivity? = null
 
-    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
-
-    private var mTextTitle: AppCompatTextView? = null
-    private var mTextArtist: AppCompatTextView? = null
-    private var mTextMimeType: AppCompatTextView? = null
-    private var mTextDuration: AppCompatTextView? = null
-    private var mCovertArtImageView: AppCompatImageView? = null
-
-    private var mButtonInfo: MaterialButton? = null
-    private var mButtonCovertArt: MaterialButton? = null
-    private var mButtonLyrics: MaterialButton? = null
-    private var mButtonShare: MaterialButton? = null
-
-    private var mButtonTimer: MaterialButton? = null
-    private var mButtonGoTo: MaterialButton? = null
-    private var mButtonSetAs: MaterialButton? = null
-    private var mButtonDelete: MaterialButton? = null
+    private lateinit var mSongItemViewModel: SongItemViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         mContext = requireContext()
         mActivity = requireActivity()
 
-        val view = layoutInflater.inflate(R.layout.bottom_sheet_player_more, container, false)
+        mBottomSheetPlayerMoreBinding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_player_more, container, false)
+        val view = mBottomSheetPlayerMoreBinding.root
 
-        initViews(view)
-        checkInteractions()
+        initViews()
 
         return view
     }
@@ -56,64 +56,63 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        observeLiveData()
+        MainScope().launch {
+            checkInteractions()
+            observeLiveData()
+        }
     }
 
-//    private fun observeLiveData() {
-//        mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner
-//        ) { updatePlayerUI(it) }
-//        mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner
-//        ) { updatePlayerUI(mPlayerFragmentViewModel.getCurrentSong().value ?: 0) }
-//        mPlayerFragmentViewModel.getSongList().observe(mActivity as LifecycleOwner
-//        ) { updatePlayerUI(mPlayerFragmentViewModel.getCurrentSong().value ?: 0) }
-//    }
-//
-//    private fun updatePlayerUI(position: Int) {
-//        val tempSongSize : Int = mPlayerFragmentViewModel.getSongList().value?.size ?: 0
-//        //Update current song info
-//        if(tempSongSize > 0 && position >= 0){
-//            if(mTextTitle != null)
-//                mTextTitle?.text = if(mPlayerFragmentViewModel.getSongList().value!![position].title != null && mPlayerFragmentViewModel.getSongList().value!![position].title!!.isNotEmpty()) mPlayerFragmentViewModel.getSongList().value!![position].title else mPlayerFragmentViewModel.getSongList().value!![position].fileName
-//
-//            if(mTextArtist != null)
-//                mTextArtist?.text = if(mPlayerFragmentViewModel.getSongList().value!![position].artist!!.isNotEmpty()) mPlayerFragmentViewModel.getSongList().value!![position].artist else mContext.getString(R.string.unknown_artist)
-//
-//            mTextDuration?.text = CustomFormatters.formatSongDurationToString(mPlayerFragmentViewModel.getSongList().value!![position].duration)
-//            mTextMimeType?.text = mPlayerFragmentViewModel.getSongList().value!![position].typeMime
-//        }
-//        //Update blurred background
-//        val tempBinary : ByteArray? = if(tempSongSize > 0) mPlayerFragmentViewModel.getSongList().value!![position].covertArt?.binaryData else null
-//        MainScope().launch {
-//            CustomUILoaders.loadCovertArtFromBinaryData(mContext, mCovertArtImageView, tempBinary, 100)
-//        }
-//    }
+    private fun observeLiveData() {
+    }
+
+    private fun updatePlayerUI(songItem: SongItem) {
+        mBottomSheetPlayerMoreBinding.textTitle.text =
+            if(
+                songItem.title != null && songItem.title!!.isNotEmpty()
+            )
+                songItem.title
+            else
+                songItem.fileName
+
+        mBottomSheetPlayerMoreBinding.textArtist.text =
+            if(songItem.artist != null && songItem.artist!!.isNotEmpty())
+                songItem.artist
+            else
+                mContext.getString(R.string.unknown_artist)
+
+        mBottomSheetPlayerMoreBinding.textDescription.text = mContext.getString(R.string.item_song_card_text_details, songItem.duration, songItem.typeMime)
+
+        val tempBinary : ByteArray? = songItem.covertArt?.binaryData
+        MainScope().launch {
+            CustomUILoaders.loadCovertArtFromBinaryData(mContext, mBottomSheetPlayerMoreBinding.covertArt, tempBinary, 100)
+        }
+    }
 
     private fun checkInteractions() {
-        mButtonInfo?.setOnClickListener(){
+        mBottomSheetPlayerMoreBinding.buttonInfo.setOnClickListener(){
             onGetSongDetails()
         }
-        mButtonCovertArt?.setOnClickListener(){
+        mBottomSheetPlayerMoreBinding.buttonCovertArt.setOnClickListener(){
             onFetchCovertArtSong()
         }
-        mButtonLyrics?.setOnClickListener(){
+        mBottomSheetPlayerMoreBinding.buttonLyrics.setOnClickListener(){
             onFetchLyrics()
         }
-        mButtonShare?.setOnClickListener(){
+        mBottomSheetPlayerMoreBinding.buttonShare.setOnClickListener(){
             onShareSong()
         }
-        mButtonTimer?.setOnClickListener(){
+        mBottomSheetPlayerMoreBinding.buttonTimer.setOnClickListener(){
             onSetTimer()
         }
-        mButtonGoTo?.setOnClickListener(){
+        mBottomSheetPlayerMoreBinding.buttonGoto.setOnClickListener(){
             onGoToSong()
         }
-        mButtonSetAs?.setOnClickListener(){
+        mBottomSheetPlayerMoreBinding.buttonSetAs.setOnClickListener(){
             onSetSongAsRingtone()
         }
-        mButtonDelete?.setOnClickListener(){
+        mBottomSheetPlayerMoreBinding.buttonDelete.setOnClickListener(){
             onDeleteSong()
         }
-
     }
 
     private fun onDeleteSong() {
@@ -148,28 +147,24 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() {
         //On delete song
     }
 
-    private fun initViews(view: View) {
+    private fun initViews() {
+        mBottomSheetPlayerMoreBinding.covertArt.layout(0,0,0,0)
 
-        mTextTitle = view.findViewById<AppCompatTextView>(R.id.text_title)
-        mTextArtist = view.findViewById<AppCompatTextView>(R.id.text_artist)
-        mTextMimeType = view.findViewById<AppCompatTextView>(R.id.song_item_type_mime)
-        mTextDuration = view.findViewById<AppCompatTextView>(R.id.song_item_duration)
-        mCovertArtImageView = view.findViewById<AppCompatImageView>(R.id.covert_art)
-
-        mButtonInfo = view.findViewById<MaterialButton>(R.id.button_info)
-        mButtonCovertArt = view.findViewById<MaterialButton>(R.id.button_covert_art)
-        mButtonLyrics = view.findViewById<MaterialButton>(R.id.button_lyrics)
-        mButtonShare = view.findViewById<MaterialButton>(R.id.button_share)
-
-        mButtonTimer = view.findViewById<MaterialButton>(R.id.button_timer)
-        mButtonGoTo = view.findViewById<MaterialButton>(R.id.button_goto)
-        mButtonSetAs = view.findViewById<MaterialButton>(R.id.button_set_as)
-        mButtonDelete = view.findViewById<MaterialButton>(R.id.button_delete)
-
-        mCovertArtImageView?.layout(0,0,0,0)
+        mSongItemViewModel = SongItemViewModelFactory(
+            (activity?.application as DatabaseAccessApplication).database.songItemDao()
+        ).create(SongItemViewModel::class.java)
     }
 
     companion object {
         const val TAG = "PlayerMoreDialog"
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if(key == ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG)
+            decodeSharedPrefsChanged(sharedPreferences)
+    }
+
+    private fun decodeSharedPrefsChanged(sharedPreferences: SharedPreferences?) {
+//        updatePlayerUI()
     }
 }

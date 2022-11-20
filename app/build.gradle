@@ -38,6 +38,7 @@ android {
     }
 }
 apply plugin: 'kotlin-kapt'
+
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.9.0'
@@ -51,7 +52,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
     androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
     implementation 'androidx.appcompat:appcompat:1.7.0-alpha01'
-
     implementation("androidx.fragment:fragment-ktx:1.5.4")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.recyclerview:recyclerview-selection:1.1.0")
@@ -66,7 +66,6 @@ dependencies {
     //Glide image loader dependencies
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     kapt 'com.github.bumptech.glide:compiler:4.12.0'
-
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
 
     //BlurView

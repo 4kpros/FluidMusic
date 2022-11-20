@@ -15,14 +15,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.QueueMusicItemAdapter
+import com.prosabdev.fluidmusic.adapters.QueueMusicItemListAdapter
 import com.prosabdev.fluidmusic.adapters.callbacks.QueueMusicItemCallback
-import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.databinding.DialogQueueMusicBinding
-import com.prosabdev.fluidmusic.databinding.FragmentGenresBinding
-import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.adapters.SelectableItemListAdapter
+import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -33,7 +30,7 @@ class QueueMusicDialog : BottomSheetDialogFragment() {
     private var mContext: Context? = null
     private var mActivity: FragmentActivity? = null
 
-    private var mQueueMusicItemAdapter: QueueMusicItemAdapter? = null
+    private var mQueueMusicItemAdapter: QueueMusicItemListAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
 
     override fun onCreateView(
@@ -69,9 +66,9 @@ class QueueMusicDialog : BottomSheetDialogFragment() {
         val spanCount = 1
         var touchHelper : ItemTouchHelper? = null
 
-        mQueueMusicItemAdapter = QueueMusicItemAdapter(
+        mQueueMusicItemAdapter = QueueMusicItemListAdapter(
             mContext!!,
-            object : QueueMusicItemAdapter.OnItemClickListener{
+            object : QueueMusicItemListAdapter.OnItemClickListener{
                 override fun onSongItemClicked(position: Int) {
                     if(mQueueMusicItemAdapter?.selectableGetSelectionMode() == true){
                         mQueueMusicItemAdapter?.selectableToggleSelection(position, mLayoutManager)
@@ -96,7 +93,7 @@ class QueueMusicDialog : BottomSheetDialogFragment() {
 //                    mMainFragmentViewModel.setTotalSelected(totalSelected)
                 }
             },
-            object : QueueMusicItemAdapter.OnTouchListener{
+            object : QueueMusicItemListAdapter.OnTouchListener{
                 override fun requestDrag(viewHolder: RecyclerView.ViewHolder?) {
                     if (viewHolder != null) {
                         touchHelper?.startDrag(viewHolder)
