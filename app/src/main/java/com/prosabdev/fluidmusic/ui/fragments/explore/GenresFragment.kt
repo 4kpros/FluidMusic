@@ -5,44 +5,50 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.GenreItemAdapter
-import com.prosabdev.fluidmusic.models.collections.GenreItem
+import com.prosabdev.fluidmusic.databinding.FragmentGenresBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.viewmodels.views.explore.GenreItemViewModel
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class GenresFragment : Fragment() {
     private var mPageIndex: Int? = -1
 
+    private lateinit var mFragmentGenresBinding: FragmentGenresBinding
+
     private var mContext: Context? = null
     private var mActivity: FragmentActivity? = null
 
-    private var mGenreItemAdapter: GenreItemAdapter? = null
-    private var mRecyclerView: RecyclerView? = null
+    private lateinit var mGenreItemViewModel: GenreItemViewModel
 
-    private var mGenreList : ArrayList<GenreItem> = ArrayList<GenreItem>()
+    private var mEmptyBottomSpaceAdapter: HeadlinePlayShuffleAdapter? = null
+    private var mGenreItemAdapter: GenreItemAdapter? = null
+    private var mLayoutManager: GridLayoutManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            mPageIndex = it.getInt(ConstantValues.EXPLORE_ALL_GENRES)
+            mPageIndex = it.getInt(ConstantValues.EXPLORE_GENRES)
         }
+        mContext = requireContext()
+        mActivity = requireActivity()
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
-        val view : View = inflater.inflate(R.layout.fragment_genres, container, false)
+        mFragmentGenresBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_genres, container,false)
+        val view = mFragmentGenresBinding.root
 
-        mContext = requireContext()
-        mActivity = requireActivity()
+        initViews()
 
         return view
     }
@@ -50,13 +56,10 @@ class GenresFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        runBlocking {
-            launch {
-                initViews(view)
-                setupRecyclerViewAdapter()
-                observeLiveData()
-                checkInteractions()
-            }
+        MainScope().launch {
+            setupRecyclerViewAdapter()
+            observeLiveData()
+            checkInteractions()
         }
     }
 
@@ -69,17 +72,9 @@ class GenresFragment : Fragment() {
     }
 
     private fun setupRecyclerViewAdapter() {
-        val spanCount = 1
-
-//        mRecyclerView?.adapter = mGenreItemAdapter
-
-        //Add Layout manager
-        val layoutManager = GridLayoutManager(mContext, spanCount, GridLayoutManager.VERTICAL, false)
-        mRecyclerView?.layoutManager = layoutManager
     }
 
-    private fun initViews(view: View) {
-        mRecyclerView = view.findViewById<RecyclerView>(R.id.content_recycler_view)
+    private fun initViews() {
     }
 
     companion object {
@@ -87,7 +82,7 @@ class GenresFragment : Fragment() {
         fun newInstance(pageIndex: Int) =
             GenresFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(ConstantValues.EXPLORE_ALL_GENRES, pageIndex)
+                    putInt(ConstantValues.EXPLORE_GENRES, pageIndex)
                 }
             }
     }

@@ -14,7 +14,10 @@ import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.lifecycle.coroutineScope
+import androidx.work.*
+import androidx.work.OneTimeWorkRequest
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
@@ -22,13 +25,15 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityMediaScannerSettingsBinding
 import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
+import com.prosabdev.fluidmusic.services.worker.MediaScannerWorker
+import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 import com.prosabdev.fluidmusic.viewmodels.FolderUriTreeViewModel
 import com.prosabdev.fluidmusic.viewmodels.FolderUriTreeViewModelFactory
-import com.prosabdev.fluidmusic.viewmodels.SongItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.SongItemViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.views.activities.MediaScannerActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.views.activities.MediaScannerActivityViewModelFactory
+import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModelFactory
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -39,6 +44,10 @@ import kotlinx.coroutines.launch
     private lateinit var mSongItemViewModel: SongItemViewModel
     private lateinit var mMediaScannerActivityViewModel: MediaScannerActivityViewModel
     private lateinit var mFolderUriTreeViewModel: FolderUriTreeViewModel
+
+    private var mScanDeviceWorkRequest: OneTimeWorkRequest = OneTimeWorkRequestBuilder<MediaScannerWorker>()
+            .setInputData(workDataOf(ConstantValues.MEDIA_SCANNER_WORKER_METHOD to ConstantValues.MEDIA_SCANNER_WORKER_METHOD_ADD_NEW))
+            .build()
 
     private var mFolderUriList: List<FolderUriTree> = ArrayList()
 
@@ -91,9 +100,7 @@ import kotlinx.coroutines.launch
             onBackPressedDispatcher.onBackPressed()
         }
         mActivityMediaScannerSettingsBinding.cardViewScanDevice.setOnClickListener{
-            MainScope().launch {
-                tryToScanDevice()
-            }
+            tryToScanDevice()
         }
         mActivityMediaScannerSettingsBinding.cardViewSelectFolders.setOnClickListener{
             startActivity(Intent(this, StorageAccessSettingsActivity::class.java).apply {})
@@ -167,8 +174,13 @@ import kotlinx.coroutines.launch
     }
 
     private fun tryToScanDevice() {
-        if(mMediaScannerActivityViewModel.getIsLoadingInBackground().value == false)
-            mMediaScannerActivityViewModel.requestLoadDataAsync(this@MediaScannerSettingsActivity, mFolderUriTreeViewModel, mSongItemViewModel)
+        if(mMediaScannerActivityViewModel.getIsLoadingInBackground().value == true)
+            return
+        mMediaScannerActivityViewModel.setIsLoadingInBackground(true)
+
+        WorkManager
+            .getInstance(this@MediaScannerSettingsActivity)
+            .enqueue(mScanDeviceWorkRequest)
     }
 
     private fun observeLiveData() {
@@ -192,6 +204,14 @@ import kotlinx.coroutines.launch
         mMediaScannerActivityViewModel.getEmptyFolderUriCounter().observe(this as LifecycleOwner){
             updateEmptyFolderUriTreeUI(it)
         }
+        WorkManager
+            .getInstance(this@MediaScannerSettingsActivity)
+            .getWorkInfoByIdLiveData(mScanDeviceWorkRequest.id)
+            .observe(this, Observer { workInfo ->
+                if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
+                    mMediaScannerActivityViewModel.setIsLoadingInBackground(false)
+                }
+            })
     }
 
     private fun updateEmptyFolderUriTreeUI(it: Int?) {

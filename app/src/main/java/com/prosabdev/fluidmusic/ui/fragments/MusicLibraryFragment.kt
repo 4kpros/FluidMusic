@@ -213,7 +213,7 @@ class MusicLibraryFragment : Fragment() {
         fun newInstance(exploreContent: Int = 0) =
             MusicLibraryFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(ConstantValues.ARGS_EXPLORE_CONTENT, exploreContent)
+                    putInt(ConstantValues.ARGS_EXPLORE_MUSIC_LIBRARY, exploreContent)
                 }
             }
     }

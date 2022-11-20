@@ -22,11 +22,10 @@ import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.SortOrganizeItemsBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.adapters.SelectableItemListAdapter
-import com.prosabdev.fluidmusic.viewmodels.SongItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.SongItemViewModelFactory
+import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 
@@ -77,7 +76,7 @@ class AllSongsFragment : Fragment() {
     }
 
     private suspend fun observeLiveData() = lifecycleScope.launch(context = Dispatchers.IO){
-        var tempList = mSongItemViewModel.getAllSongs(null, null)
+        val tempList = mSongItemViewModel.getAllSongs(null, null)
         Log.i(ConstantValues.TAG, "Songs : ${tempList}")
     }
 
@@ -140,7 +139,7 @@ class AllSongsFragment : Fragment() {
 //        mMainFragmentViewModel.setTotalCount(mSongList.size)
 //    }
 
-    private suspend fun checkInteractions() = coroutineScope {
+    private fun checkInteractions() {
         mFragmentAllSongsBinding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if(dy < 0){
@@ -161,13 +160,13 @@ class AllSongsFragment : Fragment() {
         })
     }
 
-    private suspend fun setupRecyclerViewAdapter() {
+    private fun setupRecyclerViewAdapter() = lifecycleScope.launch(context = Dispatchers.Default){
         val spanCount = 1
-        var touchHelper : ItemTouchHelper ? = null
+        val touchHelper : ItemTouchHelper ? = null
         //Setup headline adapter
         val listHeadlines : ArrayList<Long> = ArrayList<Long>()
         listHeadlines.add(0)
-        mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, R.layout.item_top_play_shuffle, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
+        mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
             override fun onPlayButtonClicked() {
 //                onPlayButton(0)
             }

@@ -24,10 +24,10 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentPlayerBinding
-import com.prosabdev.fluidmusic.models.collections.SongItem
+import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreDialog
-import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerQueueMusicDialog
+import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicDialog
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModelFactory
@@ -49,11 +49,12 @@ import kotlin.math.abs
     private var mPlayerPagerAdapter: PlayerPageAdapter? = null
 
     private var mPlayerMoreDialog: PlayerMoreDialog? = null
-    private var mPlayerQueueMusicDialog: PlayerQueueMusicDialog? = null
+    private var mQueueMusicDialog: QueueMusicDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        arguments?.let {
+        }
         mContext = requireContext()
         mActivity = requireActivity()
     }
@@ -240,8 +241,8 @@ import kotlin.math.abs
             mPlayerMoreDialog?.show(childFragmentManager, PlayerMoreDialog.TAG)
         }
         mFragmentPlayerBinding.buttonQueueMusic.setOnClickListener {
-            mPlayerQueueMusicDialog = PlayerQueueMusicDialog()
-            mPlayerQueueMusicDialog?.show(childFragmentManager, PlayerQueueMusicDialog.TAG)
+            mQueueMusicDialog = QueueMusicDialog()
+            mQueueMusicDialog?.show(childFragmentManager, QueueMusicDialog.TAG)
         }
         mFragmentPlayerBinding.buttonEqualizer.setOnClickListener {
             mActivity.supportFragmentManager.commit {

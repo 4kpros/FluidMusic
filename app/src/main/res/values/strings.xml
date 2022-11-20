@@ -101,4 +101,6 @@
     <string name="title_activity_media_scanner">Media scanner</string>
     <string name="rescan_device">Rescan device</string>
     <string name="equalizer">Equalizer</string>
+    <string name="streams">Streams</string>
+    <string name="folders_hierarchy">Folders hierarchy</string>
 </resources>

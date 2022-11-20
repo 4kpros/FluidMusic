@@ -2,12 +2,8 @@ package com.prosabdev.fluidmusic.viewmodels
 
 import androidx.lifecycle.ViewModel
 import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.roomdatabase.FolderUriTreeDao
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
+import com.prosabdev.fluidmusic.roomdatabase.dao.FolderUriTreeDao
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
 class FolderUriTreeViewModel(private val mFolderUriTreeDao: FolderUriTreeDao) : ViewModel()  {
 
@@ -15,6 +11,10 @@ class FolderUriTreeViewModel(private val mFolderUriTreeDao: FolderUriTreeDao) : 
     suspend fun getAllFolderUriTrees(): Flow<List<FolderUriTree>> = mFolderUriTreeDao.getAllFolderUriTrees()
     suspend fun getAllFolderUriTreesDirectly(): List<FolderUriTree> = mFolderUriTreeDao.getAllFolderUriTreesDirectly()
     suspend fun deleteAll() = mFolderUriTreeDao.deleteAll()
+    suspend fun deleteItemAtPosition(position : Int) = mFolderUriTreeDao.DeleteAtPosition(position)
     suspend fun deleteItem(folderUriTree : FolderUriTree?) = mFolderUriTreeDao.Delete(folderUriTree)
+    suspend fun resetAllFolderUriTreesLastModified() = mFolderUriTreeDao.resetAllFolderUriTreesLastModified()
+    suspend fun updateItem(folderUriTree : FolderUriTree?) = mFolderUriTreeDao.Update(folderUriTree)
+
 
 }

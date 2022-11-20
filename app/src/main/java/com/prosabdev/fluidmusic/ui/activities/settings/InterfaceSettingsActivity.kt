@@ -8,7 +8,6 @@ import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityInterfaceSettingsBinding
-import com.prosabdev.fluidmusic.databinding.ActivityLanguageSettingsBinding
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 
 @BuildCompat.PrereleaseSdkCheck class InterfaceSettingsActivity : AppCompatActivity() {

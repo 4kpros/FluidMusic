@@ -15,7 +15,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentMainBinding
-import com.prosabdev.fluidmusic.models.collections.SongItem
+import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
@@ -42,7 +42,6 @@ class MainFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
         }
-
         mContext = requireContext()
         mActivity = requireActivity()
     }
@@ -51,7 +50,6 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         mFragmentMainBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_main,container,false)
         val view = mFragmentMainBinding.root
 

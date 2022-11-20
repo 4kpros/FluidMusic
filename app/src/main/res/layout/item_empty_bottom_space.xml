@@ -7,27 +7,24 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/custom_empty_bottom_space">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        android:paddingTop="@dimen/main_margin"
+        >
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_end"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="?attr/minTouchTargetSize"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/text_end"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:text="@string/end_of_list"
-                android:gravity="center"
-                android:alpha="0" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="@string/end_of_list"
+            android:gravity="center"
+            />
+        <View
+            android:id="@+id/view_empty_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/minTouchTargetSize"
+            app:layout_constraintTop_toBottomOf="@+id/text_end"
+            />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

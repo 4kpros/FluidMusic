@@ -2,10 +2,16 @@
 <resources>
     <dimen name="main_small_margin">5dp</dimen>
     <dimen name="main_medium_margin">10dp</dimen>
-    <dimen name="main_margin">15dp</dimen>
-    <dimen name="player_card_view">20dp</dimen>
-    <dimen name="song_card_image_small_h">55dp</dimen>
-    <dimen name="song_card_image_small_w">60dp</dimen>
+    <dimen name="main_margin">16dp</dimen>
+
+    <dimen name="image_list_small_size">60dp</dimen>
+    <dimen name="image_list_medium_size">90dp</dimen>
+    <dimen name="image_list_big_size">125dp</dimen>
+
+    <dimen name="image_grid_small_size">80dp</dimen>
+    <dimen name="image_grid_medium_size">100dp</dimen>
+    <dimen name="image_grid_big_size">180dp</dimen>
+
     <dimen name="setting_icon_size">30dp</dimen>
     <dimen name="accent_color_chip_height">40dp</dimen>
     <dimen name="accent_color_chip_icon_size">30dp</dimen>

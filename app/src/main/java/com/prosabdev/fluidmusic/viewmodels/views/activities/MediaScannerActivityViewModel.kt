@@ -1,15 +1,10 @@
 package com.prosabdev.fluidmusic.viewmodels.views.activities
 
-import android.content.Context
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.prosabdev.fluidmusic.utils.MediaFileScanner
-import com.prosabdev.fluidmusic.viewmodels.FolderUriTreeViewModel
-import com.prosabdev.fluidmusic.viewmodels.SongItemViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 class MediaScannerActivityViewModel : ViewModel() {
 
@@ -25,22 +20,6 @@ class MediaScannerActivityViewModel : ViewModel() {
     private val mPlaylistsCounter: LiveData<Int> get() = mMutablePlaylistsCounter
     private val mEmptyFolderUriCounter: LiveData<Int> get() = mMutableEmptyFolderUriCounter
 
-    private var mJob : Job? = null
-    fun requestLoadDataAsync(context: Context, folderUriTreeViewModel : FolderUriTreeViewModel, songItemViewModel : SongItemViewModel) {
-        if(mJob != null)
-            mJob?.cancel()
-
-        MainScope().launch {
-            mMutableFoldersCounter.value = 0
-            mMutableSongsCounter.value = 0
-            mMutablePlaylistsCounter.value = 0
-            mMutableIsLoadingInBackground.value = true
-        }
-        mJob = CoroutineScope(Dispatchers.IO).launch {
-            MediaFileScanner.scanAudioFilesOnDevice(context, folderUriTreeViewModel, songItemViewModel, this@MediaScannerActivityViewModel)
-        }
-        mJob?.start()
-    }
 
     fun setIsLoadingInBackground(isLoading : Boolean) {
         MainScope().launch {

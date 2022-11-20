@@ -2,7 +2,7 @@ package com.prosabdev.fluidmusic.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.prosabdev.fluidmusic.roomdatabase.QueueMusicItemDao
+import com.prosabdev.fluidmusic.roomdatabase.dao.QueueMusicItemDao
 
 class QueueMusicItemViewModelFactory(private val mQueueMusicItemDao : QueueMusicItemDao) : ViewModelProvider.Factory {
 

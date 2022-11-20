@@ -5,32 +5,37 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.ArtistItemAdapter
-import com.prosabdev.fluidmusic.models.collections.ArtistItem
+import com.prosabdev.fluidmusic.databinding.FragmentArtistsBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.viewmodels.views.explore.ArtistItemViewModel
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class ArtistsFragment : Fragment() {
     private var mPageIndex: Int? = -1
 
+    private lateinit var mFragmentArtistsBinding: FragmentArtistsBinding
+
     private var mContext: Context? = null
     private var mActivity: FragmentActivity? = null
 
-    private var mArtistItemAdapter: ArtistItemAdapter? = null
-    private var mRecyclerView: RecyclerView? = null
+    private lateinit var mArtistItemViewModel: ArtistItemViewModel
 
-    private var mArtistList : ArrayList<ArtistItem> = ArrayList<ArtistItem>()
+    private var mEmptyBottomSpaceAdapter: HeadlinePlayShuffleAdapter? = null
+    private var mArtistItemAdapter: ArtistItemAdapter? = null
+    private var mLayoutManager: GridLayoutManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            mPageIndex = it.getInt(ConstantValues.EXPLORE_ALL_ARTISTS)
+            mPageIndex = it.getInt(ConstantValues.EXPLORE_ARTISTS)
         }
     }
 
@@ -38,11 +43,10 @@ class ArtistsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
-        val view : View = inflater.inflate(R.layout.fragment_artists, container, false)
+        mFragmentArtistsBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_artists, container,false)
+        val view = mFragmentArtistsBinding.root
 
-        mContext = requireContext()
-        mActivity = requireActivity()
+        initViews()
 
         return view
     }
@@ -50,13 +54,10 @@ class ArtistsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        runBlocking {
-            launch {
-                initViews(view)
-                setupRecyclerViewAdapter()
-                observeLiveData()
-                checkInteractions()
-            }
+        MainScope().launch {
+            setupRecyclerViewAdapter()
+            observeLiveData()
+            checkInteractions()
         }
     }
 
@@ -69,17 +70,9 @@ class ArtistsFragment : Fragment() {
     }
 
     private fun setupRecyclerViewAdapter() {
-        val spanCount = 1
-
-//        mRecyclerView?.adapter = mArtistItemAdapter
-
-        //Add Layout manager
-        val layoutManager = GridLayoutManager(mContext, spanCount, GridLayoutManager.VERTICAL, false)
-        mRecyclerView?.layoutManager = layoutManager
     }
 
-    private fun initViews(view: View) {
-        mRecyclerView = view.findViewById<RecyclerView>(R.id.content_recycler_view)
+    private fun initViews() {
     }
 
     companion object {
@@ -87,7 +80,7 @@ class ArtistsFragment : Fragment() {
         fun newInstance(pageIndex: Int) =
             ArtistsFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(ConstantValues.EXPLORE_ALL_ARTISTS, pageIndex)
+                    putInt(ConstantValues.EXPLORE_ARTISTS, pageIndex)
                 }
             }
     }

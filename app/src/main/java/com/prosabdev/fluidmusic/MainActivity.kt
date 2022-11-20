@@ -21,9 +21,13 @@ import com.prosabdev.fluidmusic.services.MediaPlaybackService
 import com.prosabdev.fluidmusic.ui.activities.SettingsActivity
 import com.prosabdev.fluidmusic.ui.fragments.*
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 
 @BuildCompat.PrereleaseSdkCheck class MainActivity : AppCompatActivity(){
+
+    private val TAG = MainActivity::class.java.name
 
     private lateinit var mActivityMainBinding: ActivityMainBinding
 
@@ -36,9 +40,12 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
         mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         initViews()
-        attachFragments()
-        checkInteractions()
-        createMediaBrowserService()
+
+        MainScope().launch {
+            attachFragments()
+            checkInteractions()
+            createMediaBrowserService()
+        }
     }
 
     private fun attachFragments() {
@@ -68,11 +75,11 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
                             replace(R.id.main_fragment_container, MusicLibraryFragment.newInstance())
                         }
                     }
-                    R.id.device_explorer -> {
+                    R.id.folders_hierarchy -> {
                         mActivityMainBinding.drawerLayout.close()
                         supportFragmentManager.commit {
                             setReorderingAllowed(true)
-                            replace(R.id.main_fragment_container, DeviceExplorerFragment.newInstance())
+                            replace(R.id.main_fragment_container, FoldersHierarchyFragment.newInstance())
                         }
                     }
                     R.id.playlists -> {
@@ -82,11 +89,11 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
                             replace(R.id.main_fragment_container, PlaylistsFragment.newInstance())
                         }
                     }
-                    R.id.favorites -> {
+                    R.id.streams -> {
                         mActivityMainBinding.drawerLayout.close()
                         supportFragmentManager.commit {
                             setReorderingAllowed(true)
-                            replace(R.id.main_fragment_container, FavoritesFragment.newInstance())
+                            replace(R.id.main_fragment_container, StreamsFragment.newInstance())
                         }
                     }
                 }
@@ -106,14 +113,14 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
             is MusicLibraryFragment -> {
                 mActivityMainBinding.navigationView.setCheckedItem(R.id.music_library)
             }
-            is DeviceExplorerFragment -> {
-                mActivityMainBinding.navigationView.setCheckedItem(R.id.device_explorer)
+            is FoldersHierarchyFragment -> {
+                mActivityMainBinding.navigationView.setCheckedItem(R.id.folders_hierarchy)
             }
             is PlaylistsFragment -> {
                 mActivityMainBinding.navigationView.setCheckedItem(R.id.playlists)
             }
-            is FavoritesFragment -> {
-                mActivityMainBinding.navigationView.setCheckedItem(R.id.favorites)
+            is StreamsFragment -> {
+                mActivityMainBinding.navigationView.setCheckedItem(R.id.streams)
             }
         }
     }
@@ -163,8 +170,6 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
 
         mediaController.registerCallback(mControllerCallback)
     }
-
-
 
 //    private fun createQueueListBundle(currentSong: Int): Bundle {
 //        val bundle = Bundle()

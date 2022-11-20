@@ -3,7 +3,7 @@ package com.prosabdev.fluidmusic.utils
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import com.prosabdev.fluidmusic.models.collections.SongItem
+import com.prosabdev.fluidmusic.models.explore.SongItem
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.audio.exceptions.CannotReadException
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException

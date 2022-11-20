@@ -60,8 +60,8 @@
 
                 <ImageView
                     android:id="@+id/imageview_mini_player"
-                    android:layout_width="@dimen/song_card_image_small_w"
-                    android:layout_height="@dimen/song_card_image_small_h"
+                    android:layout_width="@dimen/image_list_small_size"
+                    android:layout_height="@dimen/image_list_small_size"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_fluid_music_icon_with_padding" />
             </com.google.android.material.card.MaterialCardView>

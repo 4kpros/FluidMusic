@@ -5,14 +5,13 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.models.collections.SongItem
+import com.prosabdev.fluidmusic.databinding.ItemPlayerCardViewBinding
+import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import kotlinx.coroutines.Job
@@ -32,21 +31,21 @@ class PlayerPageAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerPageHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.component_player_carview, parent, false)
-
-        return PlayerPageHolder(view)
+        val tempItemPlayerCardViewBinding: ItemPlayerCardViewBinding = DataBindingUtil.inflate(
+            LayoutInflater.from(parent.context),
+            R.layout.item_player_card_view, parent, false
+        )
+        return PlayerPageHolder(
+            tempItemPlayerCardViewBinding
+        )
     }
 
     override fun onBindViewHolder(
         holder: PlayerPageHolder,
         position: Int
     ) {
-        //Bind listener for to capture click events
-        holder.bindListener(position, mListener);
-
-        //Set covert art
-        loadCovertArt(holder.mCovertArt, position);
+        holder.bindListener(position, mListener)
+        holder.loadCovertArt(mContext, getItem(position).covertArt?.binaryData)
     }
 
     override fun onViewRecycled(holder: PlayerPageHolder) {
@@ -54,40 +53,27 @@ class PlayerPageAdapter(
         holder.recycleItem()
     }
 
-    private fun loadCovertArt(covertArtView: ImageView?, position: Int) {
-        covertArtView?.layout(0,0,0,0)
-        val tempBinary: ByteArray? = getItem(position).covertArt?.binaryData
-        MainScope().launch{
-            CustomUILoaders.loadCovertArtFromBinaryData(mContext, covertArtView, tempBinary, 450)
-        }
-    }
-
-    class PlayerPageHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var mContainer: MaterialCardView? = itemView.findViewById(R.id.player_viewpager_container)
-        var mCovertArt: ImageView? = itemView.findViewById(R.id.player_viewpager_imageview)
-        var mLyricsButton: MaterialButton? = itemView.findViewById(R.id.button_lyrics)
-        var mFullscreenButton: MaterialButton? = itemView.findViewById(R.id.button_fullscreen)
-
+    class PlayerPageHolder(private val mItemPlayerCardViewBinding: ItemPlayerCardViewBinding) : RecyclerView.ViewHolder(mItemPlayerCardViewBinding.root) {
         fun recycleItem(){
-            mCovertArt?.layout(0,0,0,0)
-            mCovertArt?.setImageDrawable(null)
+            mItemPlayerCardViewBinding.playerViewpagerImageview.layout(0,0,0,0)
+            mItemPlayerCardViewBinding.playerViewpagerImageview.setImageDrawable(null)
         }
 
         var job : Job? = null
         fun bindListener(position: Int, listener: OnItemClickListener) {
-            mContainer?.setOnClickListener(View.OnClickListener {
+            mItemPlayerCardViewBinding.playerViewpagerContainer.setOnClickListener(View.OnClickListener {
                 if(job != null)
                     job?.cancel()
                 job = MainScope().launch {
                     animateButtons()
                 }
             })
-            mLyricsButton?.setOnClickListener(View.OnClickListener {
+            mItemPlayerCardViewBinding.buttonLyrics.setOnClickListener(View.OnClickListener {
                 listener.onButtonLyricsClicked(
                     position
                 )
             })
-            mFullscreenButton?.setOnClickListener(View.OnClickListener {
+            mItemPlayerCardViewBinding.buttonFullscreen.setOnClickListener(View.OnClickListener {
                 listener.onButtonFullscreenClicked(
                     position
                 )
@@ -95,11 +81,22 @@ class PlayerPageAdapter(
         }
 
         private suspend fun animateButtons() {
-            CustomAnimators.crossFadeUp(this.mLyricsButton as View, true)
-            CustomAnimators.crossFadeUp(mFullscreenButton as View, true)
+            CustomAnimators.crossFadeUp(mItemPlayerCardViewBinding.buttonLyrics as View, true)
+            CustomAnimators.crossFadeUp(mItemPlayerCardViewBinding.buttonFullscreen as View, true)
             delay(2000)
-            CustomAnimators.crossFadeDown(this.mLyricsButton as View, true)
-            CustomAnimators.crossFadeDown(mFullscreenButton as View, true)
+            CustomAnimators.crossFadeDown(mItemPlayerCardViewBinding.buttonLyrics as View, true)
+            CustomAnimators.crossFadeDown(mItemPlayerCardViewBinding.buttonFullscreen as View, true)
+        }
+
+        fun loadCovertArt(context: Context, tempBinary: ByteArray?) {
+            mItemPlayerCardViewBinding.playerViewpagerImageview.layout(0,0,0,0)
+            MainScope().launch{
+                CustomUILoaders.loadCovertArtFromBinaryData(
+                    context,
+                    mItemPlayerCardViewBinding.playerViewpagerImageview,
+                    tempBinary,
+                    450)
+            }
         }
     }
 

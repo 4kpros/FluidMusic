@@ -2,7 +2,7 @@ package com.prosabdev.fluidmusic.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.prosabdev.fluidmusic.roomdatabase.FolderUriTreeDao
+import com.prosabdev.fluidmusic.roomdatabase.dao.FolderUriTreeDao
 
 class FolderUriTreeViewModelFactory(private val mFolderUriTreeDao : FolderUriTreeDao) : ViewModelProvider.Factory {
 
