@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 class SongItemViewModel(private val mSongItemDao: SongItemDao) : ViewModel() {
 
-    suspend fun getAllSongs(orderBy: String?, ascDescMode : String?): Flow<List<SongItem>> = mSongItemDao.getSongsList(orderBy, ascDescMode)
+    suspend fun getAllSongs(orderBy: String = "title", ascDescMode : String = "ASC"): Flow<List<SongItem>> = mSongItemDao.getSongsList(orderBy, ascDescMode)
     suspend fun insertSongIntoDatabase(songItem : SongItem){
         mSongItemDao.Insert(songItem)
     }

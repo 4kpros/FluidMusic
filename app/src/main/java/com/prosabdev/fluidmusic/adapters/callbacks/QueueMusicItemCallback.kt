@@ -3,12 +3,12 @@ package com.prosabdev.fluidmusic.adapters.callbacks
 import android.util.Log
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
+import com.prosabdev.fluidmusic.adapters.QueueMusicItemAdapter
 import com.prosabdev.fluidmusic.utils.ConstantValues
 
-class SongItemMoveCallback(adapter : SongItemAdapter) : ItemTouchHelper.Callback() {
+class QueueMusicItemCallback(adapter : QueueMusicItemAdapter) : ItemTouchHelper.Callback() {
 
-    private val mAdapter : SongItemAdapter = adapter
+    private val mAdapter : QueueMusicItemAdapter = adapter
     private var mFromPosition : Int = -1
     private var mToPosition : Int = -1
     private var mFromValue : Boolean = false
@@ -18,8 +18,8 @@ class SongItemMoveCallback(adapter : SongItemAdapter) : ItemTouchHelper.Callback
 
     interface ItemTouchHelperContract {
         fun onRowMoved(mFromPosition: Int, mToPosition: Int)
-        fun onRowSelected(myViewHolder: SongItemAdapter.SongItemHolder?)
-        fun onRowClear(myViewHolder: SongItemAdapter.SongItemHolder?)
+        fun onRowSelected(myViewHolder: QueueMusicItemAdapter.QueueMusicItemViewHolder?)
+        fun onRowClear(myViewHolder: QueueMusicItemAdapter.QueueMusicItemViewHolder?)
     }
 
     override fun isLongPressDragEnabled(): Boolean {
@@ -64,9 +64,9 @@ class SongItemMoveCallback(adapter : SongItemAdapter) : ItemTouchHelper.Callback
 
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
-            if (viewHolder is SongItemAdapter.SongItemHolder) {
-                val myViewHolder: SongItemAdapter.SongItemHolder =
-                    viewHolder as SongItemAdapter.SongItemHolder
+            if (viewHolder is QueueMusicItemAdapter.QueueMusicItemViewHolder) {
+                val myViewHolder: QueueMusicItemAdapter.QueueMusicItemViewHolder =
+                    viewHolder as QueueMusicItemAdapter.QueueMusicItemViewHolder
                 mAdapter.onRowSelected(myViewHolder)
             }
         }
@@ -75,9 +75,9 @@ class SongItemMoveCallback(adapter : SongItemAdapter) : ItemTouchHelper.Callback
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         super.clearView(recyclerView, viewHolder)
-        if (viewHolder is SongItemAdapter.SongItemHolder) {
-            val myViewHolder: SongItemAdapter.SongItemHolder =
-                viewHolder as SongItemAdapter.SongItemHolder
+        if (viewHolder is QueueMusicItemAdapter.QueueMusicItemViewHolder) {
+            val myViewHolder: QueueMusicItemAdapter.QueueMusicItemViewHolder =
+                viewHolder as QueueMusicItemAdapter.QueueMusicItemViewHolder
 
             mDragStarted = false
             Log.i(ConstantValues.TAG, "Finally : from = $mFromPosition = $mToValue and to = $mToPosition = $mFromValue")

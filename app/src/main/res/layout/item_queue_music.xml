@@ -8,7 +8,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/main_small_margin"
+        android:layout_marginBottom="@dimen/main_small_margin"
         >
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_view_clickable"
@@ -62,14 +62,13 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@+id/text_subtitle"
             app:layout_constraintStart_toEndOf="@+id/linear_cover_art_container"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/button_drag"
             android:text=""
             android:maxLines="1"
             android:ellipsize="end"
             android:textAppearance="?attr/textAppearanceBody2"
             android:textStyle="bold"
-            android:layout_marginStart="@dimen/main_medium_margin"
-            android:layout_marginEnd="@dimen/main_margin"
+            android:layout_marginHorizontal="@dimen/main_medium_margin"
             />
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_subtitle"
@@ -107,9 +106,21 @@
             android:textAppearance="?attr/textAppearanceLabelSmall"
             android:maxLength="10"
             android:alpha="0.5"
-            android:text="Playing"
+            android:text=""
             android:maxLines="1"
             android:ellipsize="end"
             />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_drag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.Material3.Button.IconButton"
+            app:icon="@drawable/drag_handle"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="@dimen/main_margin"
+            />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

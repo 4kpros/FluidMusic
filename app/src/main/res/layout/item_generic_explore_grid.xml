@@ -6,8 +6,9 @@
 
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/main_small_margin"
         >
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_view_clickable"
@@ -26,14 +27,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 style="@style/SongSelectedBackground"
-                android:alpha="1"
-                android:visibility="visible"
+                android:alpha=".35"
                 />
         </com.google.android.material.card.MaterialCardView>
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/linear_cover_art_container"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/image_grid_medium_size"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -63,12 +63,12 @@
             app:layout_constraintTop_toBottomOf="@+id/linear_cover_art_container"
             app:layout_constraintStart_toStartOf="@+id/linear_cover_art_container"
             app:layout_constraintEnd_toEndOf="@+id/linear_cover_art_container"
-            android:text="@string/unknown_title"
+            android:text=""
             android:maxLines="1"
             android:ellipsize="end"
             android:textAppearance="?attr/textAppearanceBody2"
             android:textStyle="bold"
-            android:layout_marginTop="@dimen/main_medium_margin"
+            android:layout_marginTop="@dimen/main_small_margin"
             android:layout_marginHorizontal="@dimen/main_medium_margin"
             />
         <androidx.appcompat.widget.AppCompatTextView
@@ -78,25 +78,38 @@
             app:layout_constraintTop_toBottomOf="@+id/text_title"
             app:layout_constraintStart_toStartOf="@+id/text_title"
             app:layout_constraintEnd_toEndOf="@+id/text_title"
-            android:text="@string/unknown_artist"
+            android:text=""
             android:maxLines="1"
             android:ellipsize="end"
             android:textAppearance="?attr/textAppearanceBody2"
             />
-
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_details"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/text_subtitle"
             app:layout_constraintStart_toStartOf="@+id/text_title"
-            app:layout_constraintEnd_toEndOf="@+id/text_title"
+            app:layout_constraintEnd_toStartOf="@+id/text_now_playing"
+            android:layout_marginEnd="@dimen/main_medium_margin"
             android:textAppearance="?attr/textAppearanceLabelSmall"
             android:alpha="0.5"
-            android:text="--:-- | mp3"
+            android:text=""
             android:maxLines="1"
             android:ellipsize="end"
             android:paddingBottom="@dimen/main_small_margin"
+            />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/text_now_playing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/text_subtitle"
+            app:layout_constraintEnd_toEndOf="@+id/text_title"
+            android:textAppearance="?attr/textAppearanceLabelSmall"
+            android:maxLength="10"
+            android:alpha="0.5"
+            android:text=""
+            android:maxLines="1"
+            android:ellipsize="end"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

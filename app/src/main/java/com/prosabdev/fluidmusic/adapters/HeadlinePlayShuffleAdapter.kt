@@ -11,7 +11,7 @@ import com.prosabdev.fluidmusic.databinding.ItemHeadlinePlayShuffleBinding
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 
 class HeadlinePlayShuffleAdapter(
-    private val mHeadLines: ArrayList<Long>,
+    private val mHeadLines: ArrayList<Int>,
     private val mListener: OnItemClickListener
     ) : RecyclerView.Adapter<HeadlinePlayShuffleAdapter.HeadlinePlayShuffleHolder>() {
 

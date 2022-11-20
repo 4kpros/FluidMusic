@@ -4,44 +4,36 @@ import android.content.Context
 import android.graphics.Typeface
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.view.View.*
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.appcompat.widget.AppCompatTextView
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.color.MaterialColors
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.callbacks.SongItemMoveCallback
+import com.prosabdev.fluidmusic.databinding.ItemGenericExploreListBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
-import com.prosabdev.fluidmusic.utils.CustomFormatters
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import com.prosabdev.fluidmusic.utils.adapters.SelectablePlayingItemAdapter
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import java.util.*
 
 
 class SongItemAdapter(
     private val mContext: Context,
     private val mOnItemClickListener: OnItemClickListener,
-    private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener,
-    private val mOnTouchListener: OnTouchListener,
-    ) : SelectablePlayingItemAdapter<SongItemAdapter.SongItemHolder>(),
-        SongItemMoveCallback.ItemTouchHelperContract
+    private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener
+    ) : SelectablePlayingItemAdapter<SongItemAdapter.SongItemViewHolder>()
     {
 
         interface OnItemClickListener {
         fun onSongItemClicked(position: Int)
         fun onSongItemPlayClicked(position: Int)
         fun onSongItemLongClicked(position: Int)
-        fun onItemMovedTo(position: Int)
     }
     interface OnTouchListener {
         fun requestDrag(viewHolder: RecyclerView.ViewHolder?)
@@ -87,18 +79,20 @@ class SongItemAdapter(
         selectableItemClearAllSelection(layoutManager)
     }
 
-    //
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongItemHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_song, parent, false)
-
-        return SongItemHolder(view)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongItemViewHolder {
+        val tempItemGenericExploreListBinding: ItemGenericExploreListBinding = DataBindingUtil.inflate(
+            LayoutInflater.from(parent.context),
+            R.layout.item_queue_music, parent, false
+        )
+        return SongItemViewHolder(
+            tempItemGenericExploreListBinding
+        )
     }
-    override fun onBindViewHolder(holder: SongItemHolder, position: Int) {
-        holder.bindListener(holder, position, mOnItemClickListener, mOnTouchListener)
+    override fun onBindViewHolder(holder: SongItemViewHolder, position: Int) {
+        holder.bindListener(position, mOnItemClickListener)
         holder.updateAllUI(mContext, getItem(position), isPlaying(position), selectableIsSelected(position))
     }
-    override fun onBindViewHolder(holder: SongItemHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(holder: SongItemViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.isNotEmpty()) {
             for (payload in payloads) {
                 when (payload) {
@@ -110,7 +104,7 @@ class SongItemAdapter(
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_PLAYING")
                         holder.updateIsPlayingStateUI(isPlaying(position))
                     }
-                    Companion.PAYLOAD_IS_COVERT_ART_TEXT -> {
+                    PAYLOAD_IS_COVERT_ART_TEXT -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
                         holder.updateCovertArtAndTitleUI(mContext, getItem(position))
                     }
@@ -124,138 +118,77 @@ class SongItemAdapter(
         }
     }
 
-    override fun onViewRecycled(holder: SongItemHolder) {
+    override fun onViewRecycled(holder: SongItemViewHolder) {
         super.onViewRecycled(holder)
         holder.recycleItem()
     }
-    override fun onRowMoved(mFromPosition: Int, mToPosition: Int) {
-        mOnItemClickListener.onItemMovedTo(mToPosition)
-        if (mFromPosition < mToPosition) {
-            for (i in mFromPosition until mToPosition) {
-                selectableItemUpdateSelection(i, selectableIsSelected(i + 1))
-                selectableItemUpdateSelection(i + 1, selectableIsSelected(i))
-                Collections.swap(currentList, i, i + 1)
-            }
-        } else {
-            for (i in mFromPosition downTo mToPosition + 1) {
-                selectableItemUpdateSelection(i, selectableIsSelected(i - 1))
-                selectableItemUpdateSelection(i - 1, selectableIsSelected(i))
-                Collections.swap(currentList, i, i - 1)
-            }
-        }
-        notifyItemMoved(mFromPosition, mToPosition)
-    }
-    override fun onRowSelected(myViewHolder: SongItemHolder?) {
-        myViewHolder?.updateItemTouchHelper(true)
-    }
-    override fun onRowClear(myViewHolder: SongItemHolder?) {
-        myViewHolder?.updateItemTouchHelper(false)
-    }
 
-    class SongItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private var mContainer: MaterialCardView? = itemView.findViewById(R.id.song_item_container)
-        private var mCovertArt: ImageView? = itemView.findViewById(R.id.song_item_imageview)
-        private var mTitle: AppCompatTextView? = itemView.findViewById(R.id.song_item_title)
-        private var mArtist: AppCompatTextView? = itemView.findViewById(R.id.song_item_artist)
-        private var mDuration: AppCompatTextView? = itemView.findViewById(R.id.song_item_duration)
-        private var mTypeMime: AppCompatTextView? = itemView.findViewById(R.id.song_item_type_mime)
-        private var mVerticalSeparator: AppCompatTextView? = itemView.findViewById(R.id.vertical_separator)
-        private var mCurrentlyPlaying: AppCompatTextView? = itemView.findViewById(R.id.song_currently_playing)
-
-        private var mSelectedItemBackground: View? = itemView.findViewById(R.id.song_item_is_selected)
-
-        private var mDragHand: MaterialButton? = itemView.findViewById(R.id.button_drag_hand)
-
+    class SongItemViewHolder(private val mItemGenericExploreListBinding: ItemGenericExploreListBinding) : RecyclerView.ViewHolder(mItemGenericExploreListBinding.root) {
         fun updateAllUI(context: Context, songItem: SongItem, isPlaying: Boolean, selected: Boolean){
             updateSelectedStateUI(selected, false)
             updateIsPlayingStateUI(isPlaying)
             updateCovertArtAndTitleUI(context, songItem)
         }
-
         fun recycleItem(){
-            mCovertArt?.setImageDrawable(null)
-        }
-        fun updateItemTouchHelper(selected : Boolean){
-//            if(selected) CustomAnimators.crossScaleIn(mContainer as View, true) else CustomAnimators.crossScaleOut(mContainer as View, true)
+            mItemGenericExploreListBinding.imageviewCoverArt.setImageDrawable(null)
         }
         fun updateCovertArtAndTitleUI(context: Context, songItem: SongItem) {
-            mTitle?.text = if(songItem.title != null && songItem.title!!.isNotEmpty()) songItem.title else songItem.fileName
-            mArtist?.text = if(songItem.artist!!.isNotEmpty()) songItem.artist else context.getString(
+            mItemGenericExploreListBinding.textTitle.text = if(songItem.title != null && songItem.title!!.isNotEmpty()) songItem.title else songItem.fileName
+            mItemGenericExploreListBinding.textSubtitle.text = if(songItem.artist!!.isNotEmpty()) songItem.artist else context.getString(
                 R.string.unknown_artist)
-            mDuration?.text = CustomFormatters.formatSongDurationToString(songItem.duration)
-            mTypeMime?.text = songItem.typeMime
+            mItemGenericExploreListBinding.textDetails.text = context.getString(R.string.item_song_card_text_details, songItem.duration, songItem.typeMime)
 
             val tempBinary: ByteArray? = songItem.covertArt?.binaryData
             MainScope().launch {
-                CustomUILoaders.loadCovertArtFromBinaryData(context, mCovertArt, tempBinary, 100)
+                CustomUILoaders.loadCovertArtFromBinaryData(context, mItemGenericExploreListBinding.imageviewCoverArt, tempBinary, 100)
             }
         }
         fun updateIsPlayingStateUI(playing: Boolean) {
             if(playing){
-                mTitle?.setTypeface(null, Typeface.BOLD)
-                mArtist?.setTypeface(null, Typeface.BOLD)
-                mDuration?.setTypeface(null, Typeface.BOLD)
-                mTypeMime?.setTypeface(null, Typeface.BOLD)
-                mVerticalSeparator?.setTypeface(null, Typeface.BOLD)
-                mCurrentlyPlaying?.setTypeface(null, Typeface.BOLD)
+                mItemGenericExploreListBinding.textTitle.setTypeface(null, Typeface.BOLD)
+                mItemGenericExploreListBinding.textSubtitle.setTypeface(null, Typeface.BOLD)
+                mItemGenericExploreListBinding.textDetails.setTypeface(null, Typeface.BOLD)
+                mItemGenericExploreListBinding.textNowPlaying.setTypeface(null, Typeface.BOLD)
 
-                val value = MaterialColors.getColor(mTitle as View, com.google.android.material.R.attr.colorPrimary)
-                mTitle?.setTextColor(value)
-                mArtist?.setTextColor(value)
-                mDuration?.setTextColor(value)
-                mTypeMime?.setTextColor(value)
-                mVerticalSeparator?.setTextColor(value)
-                mCurrentlyPlaying?.setTextColor(value)
-                mCurrentlyPlaying?.visibility = VISIBLE
+                val value = MaterialColors.getColor(mItemGenericExploreListBinding.textTitle  as View, com.google.android.material.R.attr.colorPrimary)
+                mItemGenericExploreListBinding.textTitle.setTextColor(value)
+                mItemGenericExploreListBinding.textSubtitle.setTextColor(value)
+                mItemGenericExploreListBinding.textDetails.setTextColor(value)
+                mItemGenericExploreListBinding.textNowPlaying.setTextColor(value)
+                mItemGenericExploreListBinding.textNowPlaying.visibility = VISIBLE
             }else{
-                mTitle?.setTypeface(null, Typeface.NORMAL)
-                mArtist?.setTypeface(null, Typeface.NORMAL)
-                mDuration?.setTypeface(null, Typeface.NORMAL)
-                mTypeMime?.setTypeface(null, Typeface.NORMAL)
-                mVerticalSeparator?.setTypeface(null, Typeface.NORMAL)
-                mCurrentlyPlaying?.setTypeface(null, Typeface.NORMAL)
+                mItemGenericExploreListBinding.textTitle.setTypeface(null, Typeface.NORMAL)
+                mItemGenericExploreListBinding.textSubtitle.setTypeface(null, Typeface.NORMAL)
+                mItemGenericExploreListBinding.textDetails.setTypeface(null, Typeface.NORMAL)
+                mItemGenericExploreListBinding.textNowPlaying.setTypeface(null, Typeface.NORMAL)
 
-                val value = MaterialColors.getColor(mTitle as View, com.google.android.material.R.attr.colorOnBackground)
-                mTitle?.setTextColor(value)
-                mArtist?.setTextColor(value)
-                mDuration?.setTextColor(value)
-                mTypeMime?.setTextColor(value)
-                mVerticalSeparator?.setTextColor(value)
-                mCurrentlyPlaying?.setTextColor(value)
-                mCurrentlyPlaying?.visibility = INVISIBLE
+                val value = MaterialColors.getColor(mItemGenericExploreListBinding.textTitle as View, com.google.android.material.R.attr.colorOnBackground)
+                mItemGenericExploreListBinding.textTitle.setTextColor(value)
+                mItemGenericExploreListBinding.textSubtitle.setTextColor(value)
+                mItemGenericExploreListBinding.textDetails.setTextColor(value)
+                mItemGenericExploreListBinding.textNowPlaying.setTextColor(value)
+                mItemGenericExploreListBinding.textNowPlaying.visibility = INVISIBLE
             }
         }
         fun updateSelectedStateUI(selectableIsSelected: Boolean, animated: Boolean = true) {
-            if(mSelectedItemBackground == null)
-                return
-            if(selectableIsSelected && mSelectedItemBackground?.visibility != VISIBLE)
-                CustomAnimators.crossFadeUp(mSelectedItemBackground!!, animated)
-            else if(!selectableIsSelected && (mSelectedItemBackground?.alpha ?: 0.0f) == 1.0f)
-                CustomAnimators.crossFadeDown(mSelectedItemBackground!!, animated)
+            if(selectableIsSelected && mItemGenericExploreListBinding.songItemIsSelected.visibility != VISIBLE)
+                CustomAnimators.crossFadeUp(mItemGenericExploreListBinding.songItemIsSelected, animated)
+            else if(!selectableIsSelected && mItemGenericExploreListBinding.songItemIsSelected.alpha == 1.0f)
+                CustomAnimators.crossFadeDown(mItemGenericExploreListBinding.songItemIsSelected, animated)
         }
         fun bindListener(
-            holder: SongItemHolder,
             position: Int,
             mOnItemClickListener: OnItemClickListener,
-            mOnTouchListener: OnTouchListener
         ) {
-            mContainer?.setOnClickListener {
+            mItemGenericExploreListBinding.linearCoverArtContainer.setOnClickListener {
                 mOnItemClickListener.onSongItemClicked(position)
             }
-            mContainer?.setOnLongClickListener {
+            mItemGenericExploreListBinding.linearCoverArtContainer.setOnLongClickListener {
                 mOnItemClickListener.onSongItemLongClicked(position)
                 true
             }
-            mCovertArt?.setOnClickListener {
+            mItemGenericExploreListBinding.imageviewCoverArt.setOnClickListener {
                 mOnItemClickListener.onSongItemPlayClicked(position)
-            }
-            mDragHand?.setOnTouchListener { view, event ->
-                if (event?.action == MotionEvent.ACTION_DOWN) {
-                    mOnTouchListener.requestDrag(holder)
-                } else if (event?.action == MotionEvent.ACTION_UP) {
-                    view?.performClick();
-                }
-                false
             }
         }
     }
