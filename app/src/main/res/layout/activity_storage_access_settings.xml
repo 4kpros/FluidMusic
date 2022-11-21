@@ -12,14 +12,15 @@
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_settings_activity"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            tools:context=".ui.activities.settings.StorageAccessSettingsActivity"
             >
             <androidx.coordinatorlayout.widget.CoordinatorLayout
-                android:id="@+id/coordinator_settings_activity"
+                android:id="@+id/coordinator_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context=".ui.activities.settings.StorageAccessSettingsActivity"
                 >
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/app_bar_layout"
@@ -43,51 +44,37 @@
                 android:fillViewport="true"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 />
-            </androidx.coordinatorlayout.widget.CoordinatorLayout><androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/constraint_loading_content"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="@dimen/main_margin"
-            android:layout_marginBottom="50dp"
-            android:visibility="@{( foldersCounter != 0) ? View.GONE : View.VISIBLE, default=gone}"
-            >
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@drawable/folder_open"
-                app:srcCompat="@drawable/folder_open"
-                />
-            <com.google.android.material.textview.MaterialTextView
-                android:layout_width="wrap_content"
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/constraint_loading_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="No folder found !"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:layout_marginVertical="@dimen/main_medium_margin"
-                />
-        </androidx.appcompat.widget.LinearLayoutCompat>
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/text_loading_details"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                android:orientation="vertical"
                 android:gravity="center"
-                android:text="This app needs to request storage access in order to read songs, edit tags and cover art from your device. Note that we use Android Storage Access Framework for target folder permissions. Click on add folder button to begin."
-                android:maxLines="10"
-                android:ellipsize="end"
-                android:paddingHorizontal="@dimen/main_margin"
-                app:layout_constraintTop_toBottomOf="@+id/constraint_loading_content"
-                app:layout_constraintBottom_toTopOf="@+id/linear_buttons_container"
+                android:padding="@dimen/main_margin"
+                android:layout_marginBottom="50dp"
                 android:visibility="@{( foldersCounter != 0) ? View.GONE : View.VISIBLE, default=gone}"
-                />
+                >
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/folder_open"
+                    app:srcCompat="@drawable/folder_open"
+                    />
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="No folder found !"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:layout_marginVertical="@dimen/main_medium_margin"
+                    />
+            </androidx.appcompat.widget.LinearLayoutCompat>
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/linear_buttons_container"
                 android:layout_width="match_parent"
@@ -97,17 +84,6 @@
                 android:gravity="center"
                 android:layout_marginBottom="@dimen/main_margin"
                 >
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_save"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:text="Save"
-                    android:layout_marginHorizontal="@dimen/main_margin"
-                    />
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_add_folder"
                     android:layout_width="wrap_content"

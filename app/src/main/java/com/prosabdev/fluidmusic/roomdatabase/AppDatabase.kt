@@ -4,10 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.models.PlaylistItem
-import com.prosabdev.fluidmusic.models.PlaylistSongItem
-import com.prosabdev.fluidmusic.models.QueueMusicItem
+import com.prosabdev.fluidmusic.models.*
 import com.prosabdev.fluidmusic.models.explore.*
 import com.prosabdev.fluidmusic.roomdatabase.dao.FolderUriTreeDao
 import com.prosabdev.fluidmusic.roomdatabase.dao.QueueMusicItemDao
@@ -32,7 +29,7 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
         GenreItem::class,
         YearItem::class,
            ],
-    version = 6)
+    version = 8)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun songItemDao(): SongItemDao

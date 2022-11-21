@@ -15,11 +15,6 @@ class DatabaseUpdateEntriesWorker(
     params: WorkerParameters
 ) : CoroutineWorker (ctx, params){
 
-    private val dateFormatter = SimpleDateFormat(
-        "yyyy.MM.dd 'at' HH:mm:ss z",
-        Locale.getDefault()
-    )
-
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
             try {

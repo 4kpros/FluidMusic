@@ -7,14 +7,13 @@ import kotlinx.coroutines.flow.Flow
 
 class FolderUriTreeViewModel(private val mFolderUriTreeDao: FolderUriTreeDao) : ViewModel()  {
 
-    suspend fun insertFolderUriTree(it: FolderUriTree) = mFolderUriTreeDao.Insert(it)
+    suspend fun insertItem(folderUriTree: FolderUriTree) = mFolderUriTreeDao.Insert(folderUriTree)
+    suspend fun insertMultipleItems(folderUriTreeList: ArrayList<FolderUriTree?>?) = mFolderUriTreeDao.InsertMultiple(folderUriTreeList)
+
+    suspend fun deleteItem(folderUriTree : FolderUriTree?) = mFolderUriTreeDao.Delete(folderUriTree)
+    suspend fun deleteMultipleItems(folderUriTreeList: ArrayList<FolderUriTree?>?) = mFolderUriTreeDao.DeleteMultiple(folderUriTreeList)
+    suspend fun deleteAll() = mFolderUriTreeDao.deleteAll()
+
     suspend fun getAllFolderUriTrees(): Flow<List<FolderUriTree>> = mFolderUriTreeDao.getAllFolderUriTrees()
     suspend fun getAllFolderUriTreesDirectly(): List<FolderUriTree> = mFolderUriTreeDao.getAllFolderUriTreesDirectly()
-    suspend fun deleteAll() = mFolderUriTreeDao.deleteAll()
-    suspend fun deleteItemAtPosition(position : Int) = mFolderUriTreeDao.DeleteAtPosition(position)
-    suspend fun deleteItem(folderUriTree : FolderUriTree?) = mFolderUriTreeDao.Delete(folderUriTree)
-    suspend fun resetAllFolderUriTreesLastModified() = mFolderUriTreeDao.resetAllFolderUriTreesLastModified()
-    suspend fun updateItem(folderUriTree : FolderUriTree?) = mFolderUriTreeDao.Update(folderUriTree)
-
-
 }

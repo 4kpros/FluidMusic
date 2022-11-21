@@ -2,15 +2,14 @@ package com.prosabdev.fluidmusic.roomdatabase.dao
 
 import androidx.room.*
 import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.utils.ConstantValues
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FolderUriTreeDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     fun Insert(folderUriTree: FolderUriTree?)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun InsertMultiple(folderUriTree: ArrayList<FolderUriTree?>?)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
@@ -19,8 +18,11 @@ interface FolderUriTreeDao {
     @Delete
     fun Delete(folderUriTree: FolderUriTree?)
 
+    @Delete
+    fun DeleteMultiple(folderUriTree: ArrayList<FolderUriTree?>?)
+
     @Query("DELETE FROM FolderUriTree WHERE id = :position")
-    fun DeleteAtPosition(position: Int)
+    fun deleteAtPosition(position: Int)
 
     @Query("DELETE FROM FolderUriTree")
     fun deleteAll()

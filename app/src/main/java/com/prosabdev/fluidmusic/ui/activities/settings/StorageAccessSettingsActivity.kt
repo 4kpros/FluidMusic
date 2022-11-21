@@ -2,6 +2,7 @@ package com.prosabdev.fluidmusic.ui.activities.settings
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
@@ -11,7 +12,6 @@ import androidx.core.content.edit
 import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ConcatAdapter
@@ -25,16 +25,14 @@ import com.prosabdev.fluidmusic.databinding.ActivityStorageAccessSettingsBinding
 import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.StorageAccessDialog
+import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 import com.prosabdev.fluidmusic.utils.MediaFileExtractor
 import com.prosabdev.fluidmusic.viewmodels.FolderUriTreeViewModel
 import com.prosabdev.fluidmusic.viewmodels.FolderUriTreeViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.views.activities.StorageAccessActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.views.activities.StorageAccessActivityViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 @BuildCompat.PrereleaseSdkCheck class StorageAccessSettingsActivity : AppCompatActivity() {
 
@@ -69,21 +67,50 @@ import kotlinx.coroutines.launch
             onBackInvokedDispatcher.registerOnBackInvokedCallback(
                 OnBackInvokedDispatcher.PRIORITY_DEFAULT
             ) {
-                finish()
+                MainScope().launch {
+                    alertUriChangedBeforeExit()
+                }
             }
         } else {
             onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    finish()
+                    MainScope().launch {
+                        alertUriChangedBeforeExit()
+                    }
                 }
             })
         }
     }
 
+    private suspend fun alertUriChangedBeforeExit() {
+        withContext(Dispatchers.IO){
+            if(mFolderUriTreeViewModel.getAllFolderUriTreesDirectly().isNotEmpty()){
+                finish()
+            }else{
+                onShowBackWithoutSavingDialog()
+            }
+        }
+    }
+    private fun onShowBackWithoutSavingDialog() {
+        MainScope().launch {
+            MaterialAlertDialogBuilder(this@StorageAccessSettingsActivity)
+                .setTitle("Empty folder list ?")
+                .setMessage("You have 0 folder in our scanning list. Go back anyway ?")
+                .setNegativeButton("Stay") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .setPositiveButton("Ignore and quit") { dialog, _ ->
+                    dialog.dismiss()
+                    finish()
+                }
+                .show()
+        }
+    }
+
     private fun observeLiveData() {
-        lifecycle.coroutineScope.launch {
-            mFolderUriTreeViewModel.getAllFolderUriTrees().collect {
-                updateFolderUriTrees(it)
+        lifecycleScope.launch(Dispatchers.IO){
+            mFolderUriTreeViewModel.getAllFolderUriTrees().collect{
+                updateFolderUriTreesUI(it)
             }
         }
         mStorageAccessActivityViewModel.getRemoveAllFoldersCounter().observe(this){
@@ -94,18 +121,19 @@ import kotlinx.coroutines.launch
     }
 
     private fun removeAllFolders(i: Int) {
-        //Return if the value of delete all have not been incremented return
         if(i <= 0)
             return
-
-        CoroutineScope(Dispatchers.IO).launch {
+        mFolderUriTreeAdapter?.submitList(ArrayList())
+        lifecycleScope.launch(Dispatchers.IO){
             mFolderUriTreeViewModel.deleteAll()
         }
     }
 
-    private fun updateFolderUriTrees(folderUriTrees: List<FolderUriTree>) {
-        mFolderUriTreeAdapter?.submitList(folderUriTrees)
-        mActivityStorageAccessSettingsBinding.foldersCounter = folderUriTrees.size
+    private fun updateFolderUriTreesUI(folderUriTrees: List<FolderUriTree>) {
+        MainScope().launch {
+            mFolderUriTreeAdapter?.submitList(folderUriTrees)
+            mActivityStorageAccessSettingsBinding.foldersCounter = folderUriTrees.size
+        }
     }
 
     private fun checkInteractions() {
@@ -160,8 +188,11 @@ import kotlinx.coroutines.launch
             .setNegativeButton(resources.getString(R.string.decline)) { dialog, _ ->
                 dialog.dismiss()
             }
-            .setPositiveButton("Remove") { _, _ ->
-                removeFolderUriTree(mFolderUriTreeAdapter?.currentList?.get(position))
+            .setPositiveButton("Remove") { dialog, _ ->
+                lifecycleScope.launch(Dispatchers.Default){
+                    removeFolderUriTree(mFolderUriTreeAdapter?.currentList?.get(position))
+                }
+                dialog.dismiss()
             }
             .show()
     }
@@ -172,7 +203,7 @@ import kotlinx.coroutines.launch
         ).create(FolderUriTreeViewModel::class.java)
         mStorageAccessActivityViewModel = StorageAccessActivityViewModelFactory().create(StorageAccessActivityViewModel::class.java)
 
-        CustomViewModifiers.updateTopViewInsets(mActivityStorageAccessSettingsBinding.coordinatorSettingsActivity)
+        CustomViewModifiers.updateTopViewInsets(mActivityStorageAccessSettingsBinding.coordinatorLayout)
         CustomViewModifiers.updateBottomViewInsets(mActivityStorageAccessSettingsBinding.linearButtonsContainer)
     }
 
@@ -190,7 +221,7 @@ import kotlinx.coroutines.launch
                 Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             this.contentResolver.takePersistableUriPermission(uri, takeFlags)
 
-            lifecycleScope.launch(context = Dispatchers.Default) {
+            MainScope().launch {
                 addToFolderList(MediaFileExtractor.formatAndReturnFolderUriSAF(this@StorageAccessSettingsActivity, uri))
             }
         }
@@ -198,8 +229,8 @@ import kotlinx.coroutines.launch
     private suspend fun addToFolderList(it: FolderUriTree?) {
         if(!isFolderSAFExist(it)){
             if(it != null){
-                lifecycleScope.launch(context = Dispatchers.IO){
-                    mFolderUriTreeViewModel.insertFolderUriTree(it)
+                lifecycleScope.launch(Dispatchers.IO){
+                    mFolderUriTreeViewModel.insertItem(it)
                 }
             }
         }else{
@@ -208,37 +239,38 @@ import kotlinx.coroutines.launch
             }
         }
     }
-    private suspend fun isFolderSAFExist(folderUriTree : FolderUriTree?): Boolean {
-        if((mFolderUriTreeAdapter?.itemCount ?: 0) > 0 && folderUriTree != null){
-            var returnFalse = 0
-            for(i in ((mFolderUriTreeAdapter?.itemCount ?: 0) - 1) downTo  0){
-                val tempData : FolderUriTree = mFolderUriTreeAdapter?.currentList?.get(i) ?: return false
-                if(
-                    tempData.normalizeScheme.toString() == folderUriTree.normalizeScheme.toString() ||
-                    (
-                            (
-                                    tempData.normalizeScheme.toString().contains(folderUriTree.normalizeScheme.toString()) ||
-                                            folderUriTree.normalizeScheme.toString().contains(tempData.normalizeScheme.toString())
-                                    )
-                                    &&
-                                    tempData.pathTree.toString() != folderUriTree.pathTree.toString()
-                            )
-                ) {
-                    if(tempData.normalizeScheme.toString() > folderUriTree.normalizeScheme.toString()){
-                        removeFolderUriTree(mFolderUriTreeAdapter?.currentList?.get(i))
-                    }else{
-                        returnFalse++
+
+    private fun isFolderSAFExist(folderUriTree : FolderUriTree?): Boolean {
+        if((mFolderUriTreeAdapter?.currentList?.size ?: 0) > 0 && folderUriTree != null){
+            val listSize : Int = mFolderUriTreeAdapter?.currentList?.size ?: 0
+            for(i in listSize - 1 downTo  0){
+                val tempData : FolderUriTree? = mFolderUriTreeAdapter?.currentList?.get(i)
+                if(tempData != null){
+                    if(
+                        tempData.normalizeScheme.toString() == folderUriTree.normalizeScheme.toString() ||
+                        (
+                                (
+                                        tempData.normalizeScheme.toString().contains(folderUriTree.normalizeScheme.toString()) ||
+                                                folderUriTree.normalizeScheme.toString().contains(tempData.normalizeScheme.toString())
+                                        )
+                                        &&
+                                        tempData.pathTree.toString() != folderUriTree.pathTree.toString()
+                                )
+                    ) {
+                        if(tempData.normalizeScheme.toString().length > folderUriTree.normalizeScheme.toString().length){
+                            removeFolderUriTree(tempData)
+                        }else{
+                            return true
+                        }
                     }
                 }
             }
-            if(returnFalse > 0)
-                return true
         }
         return false
     }
-    private fun removeFolderUriTree(i: FolderUriTree?) {
-        CoroutineScope(Dispatchers.IO).launch {
-            mFolderUriTreeViewModel.deleteItem(i)
+    private fun removeFolderUriTree(folderUriTree: FolderUriTree?) {
+        lifecycleScope.launch(Dispatchers.IO){
+            mFolderUriTreeViewModel.deleteItem(folderUriTree)
         }
     }
 }

@@ -2,6 +2,8 @@ package com.prosabdev.fluidmusic.adapters
 
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -14,8 +16,13 @@ class EmptyBottomAdapter(
     private val mEmptyList: ArrayList<String>
 ) : RecyclerView.Adapter<EmptyBottomAdapter.EmptyBottomHolder>() {
 
+    private var mTextVisible: Boolean = false
     private var mScrollState: Int = -1
 
+    fun setTextVisible(value : Boolean){
+        mTextVisible = value
+        notifyItemChanged(0)
+    }
     fun onSetScrollState(value : Int){
         mScrollState = value
         notifyItemChanged(0)
@@ -30,7 +37,7 @@ class EmptyBottomAdapter(
     }
 
     override fun onBindViewHolder(holder: EmptyBottomHolder, position: Int) {
-        holder.updateBottomSpaceUI(mScrollState)
+        holder.updateBottomSpaceUI(mScrollState, mTextVisible)
     }
 
     override fun getItemCount(): Int {
@@ -40,7 +47,13 @@ class EmptyBottomAdapter(
 
     class EmptyBottomHolder(private val mItemEmptyBottomSpaceBinding : ItemEmptyBottomSpaceBinding) : RecyclerView.ViewHolder(mItemEmptyBottomSpaceBinding.root) {
 
-        fun updateBottomSpaceUI(scrollState : Int) {
+        fun updateBottomSpaceUI(scrollState : Int, textVisible: Boolean) {
+            if(textVisible){
+                mItemEmptyBottomSpaceBinding.constraintContainer.visibility = VISIBLE
+            }else{
+                mItemEmptyBottomSpaceBinding.constraintContainer.visibility = INVISIBLE
+            }
+
             if(scrollState == 2) {
                 CustomAnimators.crossFadeUp(mItemEmptyBottomSpaceBinding.textEnd, true, 500)
             }

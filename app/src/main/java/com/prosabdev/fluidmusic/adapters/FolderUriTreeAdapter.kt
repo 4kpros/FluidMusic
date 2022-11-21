@@ -32,10 +32,6 @@ class FolderUriTreeAdapter(
         holder.bindData(getItem(position), mListener, position)
     }
 
-    override fun getItemCount(): Int {
-        return super.getItemCount()
-    }
-
     class FolderSelectionHolder(private val mItemStorageAccessFolderBinding: ItemStorageAccessFolderBinding) : RecyclerView.ViewHolder(mItemStorageAccessFolderBinding.root) {
 
         fun bindData(folderUriTree: FolderUriTree, mListener: OnItemClickListener, position: Int) {
@@ -54,7 +50,6 @@ class FolderUriTreeAdapter(
                 return oldItem.id == newItem.id
             }
 
-            @SuppressLint("DiffUtilEquals")
             override fun areContentsTheSame(oldItem: FolderUriTree, newItem: FolderUriTree): Boolean {
                 return oldItem == newItem
             }

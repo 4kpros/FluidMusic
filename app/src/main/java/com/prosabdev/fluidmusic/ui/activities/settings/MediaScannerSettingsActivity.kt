@@ -273,14 +273,17 @@ import kotlinx.coroutines.launch
 
     private fun updatePlaylistCounterUI(it: Int?) {
         mActivityMediaScannerSettingsBinding.playlistCounter = it
+        Log.i(ConstantValues.TAG, "Device scan playlists : $it")
     }
 
     private fun updateSongsCounterUI(it: Int?) {
         mActivityMediaScannerSettingsBinding.songsCounter = it
+        Log.i(ConstantValues.TAG, "Device scan songs : $it")
     }
 
     private fun updateFoldersCounterUI(it: Int) {
         mActivityMediaScannerSettingsBinding.folderCounter = it
+        Log.i(ConstantValues.TAG, "Device scan folders : $it")
     }
 
     private fun updateLoadingUI(it: Boolean?) {
