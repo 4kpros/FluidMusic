@@ -16,7 +16,7 @@ import com.prosabdev.fluidmusic.models.explore.SongItem
     primaryKeys = ["id", "playlistId"]
 )
 class PlaylistSongItem {
-    var id: Long = 0
+    var id: Long = -1
     var playlistId: Int = -1
     var songId: Int = -1
 }

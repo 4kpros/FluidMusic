@@ -11,7 +11,6 @@ import com.prosabdev.fluidmusic.roomdatabase.dao.QueueMusicItemDao
 import com.prosabdev.fluidmusic.roomdatabase.dao.explore.SongItemDao
 import com.prosabdev.fluidmusic.utils.ConstantValues
 
-
 @Database(
     entities = [
         SongItem::class,
@@ -29,7 +28,8 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
         GenreItem::class,
         YearItem::class,
            ],
-    version = 8)
+    version = 13)
+
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun songItemDao(): SongItemDao

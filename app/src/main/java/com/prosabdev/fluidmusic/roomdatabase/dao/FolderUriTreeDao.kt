@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FolderUriTreeDao {
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun Insert(folderUriTree: FolderUriTree?)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -22,7 +22,7 @@ interface FolderUriTreeDao {
     fun DeleteMultiple(folderUriTree: ArrayList<FolderUriTree?>?)
 
     @Query("DELETE FROM FolderUriTree WHERE id = :position")
-    fun deleteAtPosition(position: Int)
+    fun deleteAtPosition(position: Long)
 
     @Query("DELETE FROM FolderUriTree")
     fun deleteAll()

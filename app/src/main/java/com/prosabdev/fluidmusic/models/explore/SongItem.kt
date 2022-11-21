@@ -13,19 +13,21 @@ import org.jaudiotagger.tag.images.Artwork
 )
 open class SongItem() {
     var id : Long = -1
-    var uriTreeId: Long = -1
+    var uriTreeId: Long? = null
     var uri: String? = null
     var fileName: String? = null
     var title: String? = null
     var artist: String? = null
-    var composer: String? = null
     var albumArtist: String? = null
+    var composer: String? = null
     var album: String? = null
     var genre: String? = null
     var relativePath: String? = null
     var folder: String? = null
+    var folderUri: String? = null
     var year: String? = null
     var duration: Long = 0
+    var language: String? = null
 
     //
     var typeMime: String? = null
@@ -35,10 +37,6 @@ open class SongItem() {
     //
     var lastUpdateDate: String? = null
     var lastAddedDateToLibrary: String? = null
-
-    //
-    var storageName: String? = null
-
 
     //
     @Ignore

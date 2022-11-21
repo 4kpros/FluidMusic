@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 )
 class FolderUriTree {
     @PrimaryKey(autoGenerate = true)
-    var id: Int? = null
+    var id: Long = -1
     var uriTree: String? = null
     var path: String? = null
     var pathTree: String? = null
