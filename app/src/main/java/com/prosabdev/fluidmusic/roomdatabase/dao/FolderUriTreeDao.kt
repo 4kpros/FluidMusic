@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface FolderUriTreeDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun Insert(folderUriTree: FolderUriTree?)
+    fun Insert(folderUriTree: FolderUriTree?) : Long
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun InsertMultiple(folderUriTree: ArrayList<FolderUriTree?>?)
+    fun InsertMultiple(folderUriTree: ArrayList<FolderUriTree?>?) : List<Long>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun Update(folderUriTree: FolderUriTree?)

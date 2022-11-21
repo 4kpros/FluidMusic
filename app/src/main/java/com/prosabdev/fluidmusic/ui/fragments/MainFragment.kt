@@ -2,6 +2,7 @@ package com.prosabdev.fluidmusic.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentMainBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
+import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
@@ -111,6 +113,7 @@ class MainFragment : Fragment() {
     private var mIsAnimatingScroll1: Boolean = false
     private var mIsAnimatingScroll2: Boolean = false
     private fun animateScrollStateUI(i: Int, animate : Boolean = true) {
+        Log.i(ConstantValues.TAG, "IS SCROLLING : ${i}")
         if(i >= 1){
             if(mIsAnimatingScroll2){
                 mFragmentMainBinding.constraintMiniPlayerContainer.apply {

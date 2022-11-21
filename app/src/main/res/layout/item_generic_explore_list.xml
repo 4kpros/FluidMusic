@@ -21,6 +21,8 @@
             style="@style/Widget.Material3.CardView.Filled"
             app:cardElevation="0dp"
             app:cardBackgroundColor="@color/transparent"
+            android:clickable="true"
+            android:focusable="true"
             >
             <View
                 android:id="@+id/song_item_is_selected"
@@ -28,6 +30,7 @@
                 android:layout_height="match_parent"
                 style="@style/SongSelectedBackground"
                 android:alpha=".35"
+                android:visibility="invisible"
                 />
         </com.google.android.material.card.MaterialCardView>
         <androidx.appcompat.widget.LinearLayoutCompat

@@ -18,13 +18,13 @@ class DatabaseUpdateEntriesWorker(
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
             try {
-                AppDatabase.getDatabase(applicationContext).songItemDao().getSongsList().collect {
-                    for (i in it.indices) {
-                        val uriExist: Boolean = checkIfUriExist(it[i].uri)
-                        if (!uriExist)
-                            deleteSongFromDatabase(it[i])
-                    }
-                }
+//                AppDatabase.getDatabase(applicationContext).songItemDao().getSongsList().collect {
+//                    for (i in it.indices) {
+//                        val uriExist: Boolean = checkIfUriExist(it[i].uri)
+//                        if (!uriExist)
+//                            deleteSongFromDatabase(it[i])
+//                    }
+//                }
                 Result.success()
             } catch (error: Throwable) {
                 Result.failure()

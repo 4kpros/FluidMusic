@@ -14,7 +14,9 @@ import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.prosabdev.fluidmusic.R
 import jp.wasabeef.blurry.Blurry
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 
 abstract class CustomUILoaders {
@@ -57,67 +59,75 @@ abstract class CustomUILoaders {
                 }
             }
             val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-            Glide.with(context)
-                .asBitmap()
-                .load(binaryData)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .transition(withCrossFade(factory))
-                .centerCrop()
-                .apply(RequestOptions().override(widthHeight, widthHeight))
-                .into(customTarget)
+            MainScope().launch {
+                Glide.with(context)
+                    .asBitmap()
+                    .load(binaryData)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .transition(withCrossFade(factory))
+                    .centerCrop()
+                    .apply(RequestOptions().override(widthHeight, widthHeight))
+                    .into(customTarget)
+            }
         }
-        suspend fun loadWithBinaryDataWithCrossFade(
+        fun loadWithBinaryDataWithCrossFade(
             context : Context,
             imageView : ImageView?,
             binaryData: ByteArray?,
             widthHeight: Int
-        ) = coroutineScope {
+        ){
             if(imageView == null)
-                return@coroutineScope
-            Glide.with(context)
-                .load(binaryData)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .transition(DrawableTransitionOptions.withCrossFade(200))
-                .placeholder(R.drawable.ic_fluid_music_icon_with_padding)
-                .centerCrop()
-                .apply(RequestOptions().override(widthHeight, widthHeight))
-                .into(imageView)
+                return
+            MainScope().launch {
+                Glide.with(context)
+                    .load(binaryData)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .transition(DrawableTransitionOptions.withCrossFade(200))
+                    .placeholder(R.drawable.ic_fluid_music_icon_with_padding)
+                    .centerCrop()
+                    .apply(RequestOptions().override(widthHeight, widthHeight))
+                    .into(imageView)
+            }
         }
-        private suspend fun loadWithBinaryData(
+        private fun loadWithBinaryData(
             context : Context,
             imageView : ImageView?,
             binaryData: ByteArray?,
             widthHeight: Int,
             transparent : Boolean = false
-        ) = coroutineScope {
+        ){
             if(imageView == null)
-                return@coroutineScope
+                return
             var placeHolderImage : Int = R.drawable.ic_fluid_music_icon_with_padding
             if(transparent)
                 placeHolderImage = android.R.color.transparent
-            Glide.with(context)
-                .load(binaryData)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .centerCrop()
-                .placeholder(placeHolderImage)
-                .apply(RequestOptions().override(widthHeight, widthHeight))
-                .into(imageView)
+            MainScope().launch {
+                Glide.with(context)
+                    .load(binaryData)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .centerCrop()
+                    .placeholder(placeHolderImage)
+                    .apply(RequestOptions().override(widthHeight, widthHeight))
+                    .into(imageView)
+            }
         }
-        suspend fun loadWithResourceID(
+        fun loadWithResourceID(
             context : Context,
             imageView : ImageView?,
             resourceId: Int?,
             widthHeight: Int
-        ) = coroutineScope {
+        ){
             if(imageView == null)
-                return@coroutineScope
-            Glide.with(context)
-                .load(0)
-                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .centerCrop()
-                .placeholder(R.drawable.ic_fluid_music_icon_with_padding)
-                .apply(RequestOptions().override(widthHeight, widthHeight))
-                .into(imageView)
+                return
+            MainScope().launch {
+                Glide.with(context)
+                    .load(0)
+                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                    .centerCrop()
+                    .placeholder(R.drawable.ic_fluid_music_icon_with_padding)
+                    .apply(RequestOptions().override(widthHeight, widthHeight))
+                    .into(imageView)
+            }
         }
     }
 }

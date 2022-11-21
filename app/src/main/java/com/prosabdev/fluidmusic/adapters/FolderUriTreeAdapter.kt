@@ -47,7 +47,7 @@ class FolderUriTreeAdapter(
     companion object {
         private val DiffCallback = object : DiffUtil.ItemCallback<FolderUriTree>() {
             override fun areItemsTheSame(oldItem: FolderUriTree, newItem: FolderUriTree): Boolean {
-                return oldItem.uriTree == newItem.uriTree
+                return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(oldItem: FolderUriTree, newItem: FolderUriTree): Boolean {

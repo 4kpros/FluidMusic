@@ -5,10 +5,9 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    indices = [Index(value = ["id", "playlist"], unique = true) ],
 )
 class PlaylistItem {
     @PrimaryKey(autoGenerate = true)
-    var id: Long = -1
+    var id: Long = 0
     var playlist: String = ""
 }

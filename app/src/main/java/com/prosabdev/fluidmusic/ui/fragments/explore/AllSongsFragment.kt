@@ -81,7 +81,12 @@ class AllSongsFragment : Fragment() {
         }
     }
 
-    private fun observeLiveData() {
+    private suspend fun observeLiveData() {
+        mSongItemViewModel.getAllSongs().collect{
+            MainScope().launch {
+                addSongsToAdapter(it as ArrayList<SongItem>)
+            }
+        }
         mMainFragmentViewModel.getSelectMode().observe(mActivity as LifecycleOwner
         ) { onSelectionModeChanged(it) }
         mMainFragmentViewModel.getTotalSelected().observe(mActivity as LifecycleOwner

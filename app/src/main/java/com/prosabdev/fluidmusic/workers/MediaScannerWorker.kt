@@ -13,8 +13,10 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.models.explore.SongItem
+import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.utils.SharedPreferenceManager
 import kotlinx.coroutines.*
 
 class MediaScannerWorker(
@@ -23,6 +25,7 @@ class MediaScannerWorker(
 ) : CoroutineWorker(ctx, params) {
 
     private val mScanCounter : Array<Int> = Array(3) { 0 }
+    private val mSongList : ArrayList<SongItem> = ArrayList()
     override suspend fun doWork(): Result {
         val updateMethod = inputData.getString(ConstantValues.MEDIA_SCANNER_WORKER_SCAN_METHOD)
         return withContext(Dispatchers.IO) {
@@ -31,7 +34,33 @@ class MediaScannerWorker(
                 mScanCounter[1] = 0
                 mScanCounter[2] = 0
                 scanDeviceFolderUriTrees(applicationContext, updateMethod)
-
+                var currentPlayingSong : CurrentPlayingSongItem? = SharedPreferenceManager.loadCurrentPlayingSong(applicationContext)
+                mScanCounter[1] = mSongList.size
+                if(mSongList.size > 0){
+                    launch {
+                        for(i in 0 until (mSongList.size)){
+                            mSongList[i].id = 0
+                            AppDatabase.getDatabase(applicationContext).songItemDao().Insert(mSongList[i])
+                            if(currentPlayingSong == null || currentPlayingSong?.uri == null){
+                                currentPlayingSong = CurrentPlayingSongItem()
+                                currentPlayingSong?.position = i.toLong()
+                                currentPlayingSong?.uriTreeId = mSongList[i].uriTreeId
+                                currentPlayingSong?.uri = mSongList[i].uri
+                                currentPlayingSong?.fileName = mSongList[i].fileName
+                                currentPlayingSong?.title = mSongList[i].title
+                                currentPlayingSong?.artist = mSongList[i].artist
+                                currentPlayingSong?.duration = mSongList[i].duration
+                                currentPlayingSong?.currentSeekDuration = 0
+                                currentPlayingSong?.typeMime = mSongList[i].typeMime
+                                SharedPreferenceManager.saveCurrentPlayingSong(applicationContext, currentPlayingSong!!)
+                                SharedPreferenceManager.saveQueueListSize(applicationContext, mSongList.size)
+                                SharedPreferenceManager.saveQueueListSource(applicationContext, ConstantValues.EXPLORE_ALL_SONGS)
+                            }
+                            delay(50)
+                        }
+                    }
+                }
+                Log.i(ConstantValues.TAG, "Load finished ${mSongList.size}")
                 Result.success(workDataOf(ConstantValues.MEDIA_SCANNER_WORKER_OUTPUT to mScanCounter))
             } catch (error: Throwable) {
                 Result.failure()
@@ -65,13 +94,11 @@ class MediaScannerWorker(
         for (i in 0 until tempFolderSelected.size) {
             val tempDocFile: DocumentFile? =
                 DocumentFile.fromTreeUri(context, Uri.parse(tempFolderSelected[i].uriTree))
-            launch {
-                scanDocumentUriContent(
-                    context,
-                    tempDocFile?.uri,
-                    tempFolderSelected[i].id
-                )
-            }
+            scanDocumentUriContent(
+                context,
+                tempDocFile?.uri,
+                tempFolderSelected[i].id
+            )
         }
     }
     private suspend fun scanDocumentUriContent(
@@ -88,7 +115,6 @@ class MediaScannerWorker(
                     if (tempDocFile.listFiles()[i].isDirectory) {
                         launch {
                             val tempRecursiveUri = tempDocFile.listFiles()[i].uri
-                            mScanCounter[0]++
                             scanDocumentUriContent(context, tempRecursiveUri, folderUriTreeId)
                         }
                     } else {
@@ -105,7 +131,7 @@ class MediaScannerWorker(
                                         val mdr = MediaMetadataRetriever()
                                         mdr.setDataSource(it?.fileDescriptor)
                                         tempSong.uri = tempFFF.uri.toString()
-                                        tempSong.uriTreeId = folderUriTreeId
+                                        tempSong.uriTreeId = folderUriTreeId ?: -1
                                         tempSong.fileName = tempFFF.name
                                         tempSong.title = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
                                         tempSong.artist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
@@ -140,10 +166,9 @@ class MediaScannerWorker(
                                     }finally {
                                         Log.i(
                                             ConstantValues.TAG,
-                                            "MEDIA SCANNER WORKER ---> : ${tempSong.fileName}"
+                                            "MEDIA SCANNER WORKER ---> : ${tempSong.uriTreeId}"
                                         )
-                                        AppDatabase.getDatabase(applicationContext).songItemDao().Insert(tempSong)
-                                        mScanCounter[1]++
+                                        mSongList.add(tempSong)
                                     }
                                 }
                             } else if (tempMimeType.contains("x-mpegurl")) {

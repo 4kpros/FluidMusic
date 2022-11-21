@@ -198,7 +198,7 @@ class SongItemAdapter(
 
             val diffCallback = object : DiffUtil.ItemCallback<SongItem>() {
                 override fun areItemsTheSame(oldItem: SongItem, newItem: SongItem): Boolean {
-                    return oldItem.uri == newItem.uri
+                    return oldItem.id == newItem.id
                 }
 
                 @SuppressLint("DiffUtilEquals")

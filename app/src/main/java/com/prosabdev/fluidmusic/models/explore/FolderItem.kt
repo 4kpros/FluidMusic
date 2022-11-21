@@ -11,7 +11,7 @@ import androidx.room.DatabaseView
         "GROUP BY SongItem.folder, SongItem.uriTreeId ORDER BY SongItem.folder ASC")
 class FolderItem {
     var folder: String? = null
-    var uriTreeId: Long = -1
+    var uriTreeId: Long = 0
     var lastAddedDateToLibrary: String? = null
     var numberTracks: Int = 0
     var totalDuration: Long = 0

@@ -14,11 +14,11 @@ import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
 abstract class SharedPreferenceManager {
     companion object {
         //Current song value
-        fun loadCurrentPlayingSong(context: Context, sharedPreferences: SharedPreferences? = null): CurrentPlayingSongItem {
+        fun loadCurrentPlayingSong(context: Context, sharedPreferences: SharedPreferences? = null): CurrentPlayingSongItem? {
             if(sharedPreferences != null){
                 val tempGson: Gson = Gson()
                 val tempItemListJsonString: String? = sharedPreferences.getString(ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG, null)
-                val tempItemType = object : TypeToken<List<CurrentPlayingSongItem>>() {}.type
+                val tempItemType = object : TypeToken<CurrentPlayingSongItem>() {}.type
                 Log.i(ConstantValues.TAG, "CurrentPlayingSong loaded !")
                 return tempGson.fromJson<CurrentPlayingSongItem>(tempItemListJsonString, tempItemType)
             }
@@ -28,7 +28,7 @@ abstract class SharedPreferenceManager {
                 AppCompatActivity.MODE_PRIVATE
             )
             val tempItemListJsonString: String? = tempSP.getString(ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG, null)
-            val tempItemType = object : TypeToken<List<CurrentPlayingSongItem>>() {}.type
+            val tempItemType = object : TypeToken<CurrentPlayingSongItem>() {}.type
             Log.i(ConstantValues.TAG, "Current playing song loaded !")
             return tempGson.fromJson<CurrentPlayingSongItem>(tempItemListJsonString, tempItemType)
         }
@@ -43,35 +43,6 @@ abstract class SharedPreferenceManager {
             tempEditor.putString(ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG, tempJson)
             tempEditor.apply()
             Log.i(ConstantValues.TAG, "Current playing song saved !")
-        }
-
-        //Current playing song seek
-        fun loadCurrentPlayingSongSeekPosition(context: Context, sharedPreferences: SharedPreferences? = null): Long {
-            if(sharedPreferences != null) {
-                Log.i(ConstantValues.TAG, "Current playing  seek position loaded !")
-                return sharedPreferences.getLong(
-                    ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG_LAST_POSITION,
-                    0
-                )
-            }
-            val tempSP: SharedPreferences = context.getSharedPreferences(
-                context.getString(R.string.preference_file_key), Context.MODE_PRIVATE
-            )
-            Log.i(ConstantValues.TAG, "Current playing song seek position loaded !")
-            return tempSP.getLong(
-                ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG_LAST_POSITION,
-                0
-            )
-        }
-        fun saveCurrentPlayingSongSeekPosition(context: Context, value: Long) {
-            val sharedPref: SharedPreferences = context.getSharedPreferences(
-                context.getString(R.string.preference_file_key),
-                Context.MODE_PRIVATE
-            )
-            val tempEditor: SharedPreferences.Editor = sharedPref.edit()
-            tempEditor.putLong(ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SOURCE_VALUE, value)
-            tempEditor.apply()
-            Log.i(ConstantValues.TAG, "Current playing song seek position saved !")
         }
 
         //Repeat
@@ -153,6 +124,35 @@ abstract class SharedPreferenceManager {
             tempEditor.putString(ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SOURCE, value)
             tempEditor.apply()
             Log.i(ConstantValues.TAG, "Queue list source saved !")
+        }
+
+        //Queue list size
+        fun loadQueueListSize(context: Context, sharedPreferences: SharedPreferences? = null): Int {
+            if(sharedPreferences != null) {
+                Log.i(ConstantValues.TAG, "Queue list size loaded !")
+                return sharedPreferences.getInt(
+                    ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SIZE,
+                    0
+                )
+            }
+            val tempSP: SharedPreferences = context.getSharedPreferences(
+                context.getString(R.string.preference_file_key), Context.MODE_PRIVATE
+            )
+            Log.i(ConstantValues.TAG, "Queue list size loaded !")
+            return tempSP.getInt(
+                ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SIZE,
+                0
+            )
+        }
+        fun saveQueueListSize(context: Context, value: Int) {
+            val sharedPref: SharedPreferences = context.getSharedPreferences(
+                context.getString(R.string.preference_file_key),
+                Context.MODE_PRIVATE
+            )
+            val tempEditor: SharedPreferences.Editor = sharedPref.edit()
+            tempEditor.putInt(ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SIZE, value)
+            tempEditor.apply()
+            Log.i(ConstantValues.TAG, "Queue list size saved !")
         }
 
         //Queue list source value

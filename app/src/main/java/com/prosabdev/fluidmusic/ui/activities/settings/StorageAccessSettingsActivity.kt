@@ -131,6 +131,7 @@ import kotlinx.coroutines.*
 
     private fun updateFolderUriTreesUI(folderUriTrees: List<FolderUriTree>) {
         MainScope().launch {
+            Log.i(ConstantValues.TAG, "Add URI : ${folderUriTrees.size}")
             mFolderUriTreeAdapter?.submitList(folderUriTrees)
             mActivityStorageAccessSettingsBinding.foldersCounter = folderUriTrees.size
         }
@@ -229,8 +230,10 @@ import kotlinx.coroutines.*
     private suspend fun addToFolderList(it: FolderUriTree?) {
         if(!isFolderSAFExist(it)){
             if(it != null){
-                lifecycleScope.launch(Dispatchers.IO){
-                    mFolderUriTreeViewModel.insertItem(it)
+                withContext(Dispatchers.IO){
+                    val result : Long = mFolderUriTreeViewModel.insertItem(it)
+                    Log.i(ConstantValues.TAG, "INSERTION RESULT = ${result.toString()}")
+                    Log.i(ConstantValues.TAG, "INSERTION RESULT FOR ID ${it.id} = ${it.uriTree}")
                 }
             }
         }else{

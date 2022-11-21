@@ -11,12 +11,11 @@ import com.prosabdev.fluidmusic.models.explore.SongItem
     foreignKeys = [
         ForeignKey(entity = PlaylistItem::class, parentColumns = ["id"], childColumns = ["playlistId"], onDelete = CASCADE, onUpdate = CASCADE),
         ForeignKey(entity = SongItem::class, parentColumns = ["id"], childColumns = ["songId"], onDelete = CASCADE, onUpdate = CASCADE)
-    ],
-    indices = [Index(value = ["id"], unique = true) ],
-    primaryKeys = ["id", "playlistId"]
+    ]
 )
 class PlaylistSongItem {
-    var id: Long = -1
-    var playlistId: Int = -1
-    var songId: Int = -1
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0
+    var playlistId: Int = 0
+    var songId: Int = 0
 }

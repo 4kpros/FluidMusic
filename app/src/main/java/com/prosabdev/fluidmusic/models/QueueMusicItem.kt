@@ -10,11 +10,10 @@ import com.prosabdev.fluidmusic.models.explore.SongItem
 @Entity(
     foreignKeys = [
         ForeignKey(entity = SongItem::class, parentColumns = ["id"], childColumns = ["songId"], onDelete = CASCADE, onUpdate = CASCADE)
-    ],
-    indices = [Index(value = ["id"], unique = true) ],
-    primaryKeys = ["id"]
+    ]
 )
 class QueueMusicItem {
-    var id: Long = -1
-    var songId: Long = -1
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0
+    var songId: Long = 0
 }

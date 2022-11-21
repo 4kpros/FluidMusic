@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.Flow
 
 class FolderUriTreeViewModel(private val mFolderUriTreeDao: FolderUriTreeDao) : ViewModel()  {
 
-    suspend fun insertItem(folderUriTree: FolderUriTree) = mFolderUriTreeDao.Insert(folderUriTree)
-    suspend fun insertMultipleItems(folderUriTreeList: ArrayList<FolderUriTree?>?) = mFolderUriTreeDao.InsertMultiple(folderUriTreeList)
+    suspend fun insertItem(folderUriTree: FolderUriTree) : Long = mFolderUriTreeDao.Insert(folderUriTree)
+    suspend fun insertMultipleItems(folderUriTreeList: ArrayList<FolderUriTree?>?) : List<Long> = mFolderUriTreeDao.InsertMultiple(folderUriTreeList)
 
     suspend fun deleteItem(folderUriTree : FolderUriTree?) = mFolderUriTreeDao.Delete(folderUriTree)
     suspend fun deleteMultipleItems(folderUriTreeList: ArrayList<FolderUriTree?>?) = mFolderUriTreeDao.DeleteMultiple(folderUriTreeList)

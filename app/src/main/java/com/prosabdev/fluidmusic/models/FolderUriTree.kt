@@ -1,15 +1,16 @@
 package com.prosabdev.fluidmusic.models
 
+import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    indices = [Index(value = ["id", "uriTree"], unique = true)]
+    indices = [Index(value = ["uriTree"], unique = true)]
 )
 class FolderUriTree {
     @PrimaryKey(autoGenerate = true)
-    var id: Long = -1
+    var id: Long = 0
     var uriTree: String? = null
     var path: String? = null
     var pathTree: String? = null
@@ -17,7 +18,5 @@ class FolderUriTree {
     var normalizeScheme: String? = null
     var deviceName: String? = null
 
-    var lastModified: Long = -1
-
-    var statusAdded: Int = 1
+    var lastModified: Long = 0
 }
