@@ -2,6 +2,7 @@ package com.prosabdev.fluidmusic
 
 import android.content.ComponentName
 import android.content.Intent
+import android.graphics.Bitmap
 import android.media.AudioManager
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
@@ -11,6 +12,7 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.collection.LruCache
 import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
@@ -21,6 +23,8 @@ import com.prosabdev.fluidmusic.services.MediaPlaybackService
 import com.prosabdev.fluidmusic.ui.activities.SettingsActivity
 import com.prosabdev.fluidmusic.ui.fragments.*
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.utils.CustomBitmapCacheOptimizations
+import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -36,6 +40,11 @@ import kotlinx.coroutines.launch
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
+
+        MainScope().launch {
+            CustomBitmapCacheOptimizations.initBitmapMemoryCachingSystem()
+            CustomBitmapCacheOptimizations.initBitmapDiskCachingSystem(this@MainActivity.applicationContext)
+        }
 
         mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 

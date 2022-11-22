@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.widget.ImageView
+import androidx.collection.LruCache
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade
@@ -36,7 +37,7 @@ abstract class CustomUILoaders {
                 return@coroutineScope
 
             if (uri == null || uri.toString().isEmpty()) {
-                loadWithResourceID(context, imageView, null, crossFadeDuration)
+                loadWithResourceID(context, imageView, 0, crossFadeDuration)
                 return@coroutineScope
             }
 
@@ -44,7 +45,7 @@ abstract class CustomUILoaders {
                 CustomAudioInfoExtractor.extractImageBinaryDataFromAudioUri(context, uri)
 
             if (byteArray == null) {
-                loadWithResourceID(context, imageView, null, crossFadeDuration)
+                loadWithResourceID(context, imageView, 0, crossFadeDuration)
                 return@coroutineScope
             }
 
@@ -52,14 +53,17 @@ abstract class CustomUILoaders {
                 MainScope().launch {
                     Glide.with(context)
                         .load(byteArray)
+                        .centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true)
+//                        .signature(ObjectKey(byteArray.decodeToString()))
+                        .transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
                         .placeholder(
                             if(showPlaceHolder)
                                 R.drawable.ic_fluid_music_icon_with_padding
                             else
                                 R.color.transparent
                         )
-                        .transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
                         .apply(RequestOptions().override(widthHeight, widthHeight))
                         .into(imageView)
                 }
@@ -67,7 +71,10 @@ abstract class CustomUILoaders {
                 MainScope().launch {
                     Glide.with(context)
                         .load(byteArray)
+                        .centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true)
+//                        .signature(ObjectKey(byteArray.decodeToString()))
                         .transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
                         .placeholder(
                             if(showPlaceHolder)
@@ -79,13 +86,14 @@ abstract class CustomUILoaders {
                 }
             }
         }
+
         suspend fun loadBlurredCovertArtFromSongUri(
             context : Context,
             imageView : ImageView?,
             uri: Uri?,
             widthHeight: Int = 100
         ) = coroutineScope {
-            if(imageView == null)
+            if (imageView == null)
                 return@coroutineScope
             if (uri == null || uri.toString().isEmpty())
                 return@coroutineScope
@@ -94,9 +102,9 @@ abstract class CustomUILoaders {
                 CustomAudioInfoExtractor.extractImageBinaryDataFromAudioUri(context, uri)
 
             if (byteArray == null) {
-                Glide.with(context).clear(imageView)
                 MainScope().launch {
                     imageView.setImageBitmap(null)
+                    Glide.with(context).clear(imageView)
                 }
                 return@coroutineScope
             }
@@ -105,12 +113,15 @@ abstract class CustomUILoaders {
                     resource: Bitmap,
                     transition: Transition<in Bitmap?>?
                 ) {
-                    Blurry.with(context)
-                        .radius(15)
-                        .sampling(2)
-                        .from(resource)
-                        .into(imageView)
+                    MainScope().launch {
+                        Blurry.with(context)
+                            .radius(15)
+                            .sampling(2)
+                            .from(resource)
+                            .into(imageView)
+                    }
                 }
+
                 override fun onLoadCleared(placeholder: Drawable?) {
                 }
             }
@@ -121,17 +132,19 @@ abstract class CustomUILoaders {
                     .asBitmap()
                     .load(byteArray)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .signature(ObjectKey(uri.toString()))
+                    .skipMemoryCache(true)
+                    .signature(ObjectKey(byteArray.decodeToString()))
                     .override(widthHeight, widthHeight)
                     .transition(withCrossFade(factory))
                     .into(customTarget)
             }
+
         }
 
         fun loadWithResourceID(
             context : Context,
             imageView : ImageView?,
-            resourceId: Int?,
+            resourceId: Int = 0,
             crossFadeDuration : Int = 0
         ){
             if(imageView == null)
@@ -140,7 +153,9 @@ abstract class CustomUILoaders {
             MainScope().launch {
                 Glide.with(context)
                     .load(resourceId)
-                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .signature(ObjectKey(resourceId))
                     .centerCrop()
                     .transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
                     .placeholder(R.drawable.ic_fluid_music_icon_with_padding)

@@ -2,6 +2,8 @@ package com.prosabdev.fluidmusic.workers
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.media.AudioFormat
+import android.media.AudioMetadata
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
@@ -10,6 +12,7 @@ import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
+import androidx.media.AudioAttributesCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
