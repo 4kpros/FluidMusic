@@ -4,7 +4,7 @@ import androidx.room.DatabaseView
 
 @DatabaseView("SELECT SongItem.composer as composer, " +
         "MAX(SongItem.lastAddedDateToLibrary) as lastAddedDateToLibrary, " +
-        "COUNT(SongItem.composer) as numberTracks, " +
+        "COUNT(SongItem.id) as numberTracks, " +
         "SUM(SongItem.duration) as totalDuration " +
         "FROM SongItem " +
         "GROUP BY SongItem.composer ORDER BY SongItem.composer")

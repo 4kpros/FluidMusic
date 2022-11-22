@@ -18,6 +18,9 @@ class SongItemViewModel(private val mSongItemDao: SongItemDao) : ViewModel() {
         else
             mSongItemDao.getDirectlyAllSongsFromWithWhereClause(whereColumn, columnValue, orderBy, ascDescMode)
     }
+    suspend fun getFirstSong(): SongItem? = mSongItemDao.getFirstSong()
+    suspend fun getSongInfoWithUri(uri : String): SongItem? = mSongItemDao.getSongInfoWithUri(uri)
+    suspend fun getSongInfoWithId(id : Long): SongItem? = mSongItemDao.getSongInfoWithId(id)
     suspend fun getAllSongs(orderBy: String = "title", ascDescMode : String = "ASC"): Flow<List<SongItem>> = mSongItemDao.getSongsList(orderBy, ascDescMode)
     suspend fun insertSongIntoDatabase(songItem : SongItem){
         mSongItemDao.Insert(songItem)

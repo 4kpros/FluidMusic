@@ -157,7 +157,7 @@ class SongItemAdapter(
 
             MainScope().launch {
                 val tempUri: Uri? = Uri.parse(songItem.uri)
-                CustomUILoaders.loadCovertArtFromSongUri(context, mItemGenericExploreListBinding.imageviewCoverArt, tempUri, 100)
+                CustomUILoaders.loadCovertArtFromSongUri(context, mItemGenericExploreListBinding.imageviewCoverArt, tempUri, 100, 50, true)
             }
         }
         fun updateIsPlayingStateUI(playing: Boolean) {

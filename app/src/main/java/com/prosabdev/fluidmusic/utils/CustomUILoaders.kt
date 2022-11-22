@@ -28,13 +28,15 @@ abstract class CustomUILoaders {
             context : Context,
             imageView : ImageView?,
             uri: Uri?,
-            widthHeight: Int? = null
+            widthHeight: Int? = null,
+            crossFadeDuration : Int = 0,
+            showPlaceHolder : Boolean = false
         ) = coroutineScope {
             if(imageView == null)
                 return@coroutineScope
 
             if (uri == null || uri.toString().isEmpty()) {
-                loadWithResourceID(context, imageView, null)
+                loadWithResourceID(context, imageView, null, crossFadeDuration)
                 return@coroutineScope
             }
 
@@ -42,7 +44,7 @@ abstract class CustomUILoaders {
                 CustomAudioInfoExtractor.extractImageBinaryDataFromAudioUri(context, uri)
 
             if (byteArray == null) {
-                loadWithResourceID(context, imageView, null)
+                loadWithResourceID(context, imageView, null, crossFadeDuration)
                 return@coroutineScope
             }
 
@@ -51,7 +53,13 @@ abstract class CustomUILoaders {
                     Glide.with(context)
                         .load(byteArray)
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .centerCrop()
+                        .placeholder(
+                            if(showPlaceHolder)
+                                R.drawable.ic_fluid_music_icon_with_padding
+                            else
+                                R.color.transparent
+                        )
+                        .transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
                         .apply(RequestOptions().override(widthHeight, widthHeight))
                         .into(imageView)
                 }
@@ -60,7 +68,13 @@ abstract class CustomUILoaders {
                     Glide.with(context)
                         .load(byteArray)
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .centerCrop()
+                        .transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
+                        .placeholder(
+                            if(showPlaceHolder)
+                                R.drawable.ic_fluid_music_icon_with_padding
+                            else
+                                R.color.transparent
+                        )
                         .into(imageView)
                 }
             }
@@ -69,7 +83,7 @@ abstract class CustomUILoaders {
             context : Context,
             imageView : ImageView?,
             uri: Uri?,
-            widthHeight: Int? = null
+            widthHeight: Int = 100
         ) = coroutineScope {
             if(imageView == null)
                 return@coroutineScope
@@ -92,7 +106,7 @@ abstract class CustomUILoaders {
                     transition: Transition<in Bitmap?>?
                 ) {
                     Blurry.with(context)
-                        .radius(25)
+                        .radius(15)
                         .sampling(2)
                         .from(resource)
                         .into(imageView)
@@ -103,31 +117,22 @@ abstract class CustomUILoaders {
             val factory =
                 DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
             MainScope().launch {
-                if(widthHeight != null){
-                    Glide.with(context)
-                        .asBitmap()
-                        .load(byteArray)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .signature(ObjectKey(uri.toString()))
-                        .override(widthHeight, widthHeight)
-                        .transition(withCrossFade(factory))
-                        .into(customTarget)
-                }else{
-                    Glide.with(context)
-                        .asBitmap()
-                        .load(byteArray)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .signature(ObjectKey(uri.toString()))
-                        .transition(withCrossFade(factory))
-                        .into(customTarget)
-                }
+                Glide.with(context)
+                    .asBitmap()
+                    .load(byteArray)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .signature(ObjectKey(uri.toString()))
+                    .override(widthHeight, widthHeight)
+                    .transition(withCrossFade(factory))
+                    .into(customTarget)
             }
         }
 
         fun loadWithResourceID(
             context : Context,
             imageView : ImageView?,
-            resourceId: Int?
+            resourceId: Int?,
+            crossFadeDuration : Int = 0
         ){
             if(imageView == null)
                 return
@@ -137,6 +142,7 @@ abstract class CustomUILoaders {
                     .load(resourceId)
                     .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                     .centerCrop()
+                    .transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
                     .placeholder(R.drawable.ic_fluid_music_icon_with_padding)
                     .into(imageView)
             }

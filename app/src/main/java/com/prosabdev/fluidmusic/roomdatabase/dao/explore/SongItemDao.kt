@@ -21,6 +21,15 @@ interface SongItemDao {
     @Query("DELETE FROM SongItem")
     fun deleteAllFromSongs()
 
+    @Query("SELECT * FROM SongItem LIMIT 1")
+    fun getFirstSong(): SongItem?
+
+    @Query("SELECT * FROM SongItem WHERE uri = :uri LIMIT 1")
+    fun getSongInfoWithUri(uri: String): SongItem?
+
+    @Query("SELECT * FROM SongItem WHERE id = :id LIMIT 1")
+    fun getSongInfoWithId(id: Long): SongItem?
+
     @Query("SELECT * FROM SongItem ORDER BY :order_name, :asc_desc_mode")
     fun getSongsList(order_name: String = "title", asc_desc_mode: String = "ASC"): Flow<List<SongItem>>
 

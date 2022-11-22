@@ -60,7 +60,6 @@ class MediaScannerWorker(
                                 SharedPreferenceManager.saveQueueListSize(applicationContext, mSongList.size)
                                 SharedPreferenceManager.saveQueueListSource(applicationContext, ConstantValues.EXPLORE_ALL_SONGS)
                             }
-                            delay(50)
                         }
                     }
                 }

@@ -96,7 +96,10 @@ class PlayerPageAdapter(
                 CustomUILoaders.loadCovertArtFromSongUri(
                     context,
                     mItemPlayerCardViewBinding.playerViewpagerImageview,
-                    tempUri
+                    tempUri,
+                    300,
+                    200,
+                    false
                 )
             }
         }

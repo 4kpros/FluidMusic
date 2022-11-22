@@ -10,8 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/player_viewpager_container"
-        style="@style/Widget.Material3.CardView.Elevated"
-        app:cardElevation="2dp"
+        style="@style/Widget.Material3.CardView.Filled"
+        android:backgroundTint="@color/transparent"
+        app:cardElevation="0dp"
         android:layout_margin="@dimen/main_margin">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,7 +23,8 @@
                 android:id="@+id/player_viewpager_imageview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_lyrics"
