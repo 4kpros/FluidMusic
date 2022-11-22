@@ -3,6 +3,7 @@ package com.prosabdev.fluidmusic.adapters
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -174,9 +175,9 @@ class QueueMusicItemListAdapter(
                 R.string.unknown_artist)
             mItemQueueMusicBinding.textDetails.text = context.getString(R.string.item_song_card_text_details, songItem.duration, songItem.typeMime)
 
-            val tempBinary: ByteArray? = songItem.covertArt?.binaryData
             MainScope().launch {
-                CustomUILoaders.loadCovertArtFromBinaryData(context, mItemQueueMusicBinding.imageviewCoverArt, tempBinary, 100)
+                val tempUri: Uri? = Uri.parse(songItem.uri)
+                CustomUILoaders.loadCovertArtFromSongUri(context, mItemQueueMusicBinding.imageviewCoverArt, tempUri, 100)
             }
         }
         fun updateIsPlayingStateUI(playing: Boolean) {

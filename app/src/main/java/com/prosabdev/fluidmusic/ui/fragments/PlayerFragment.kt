@@ -3,6 +3,7 @@ package com.prosabdev.fluidmusic.ui.fragments
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
@@ -58,7 +59,7 @@ import kotlin.math.abs
 
     private var mPlayerPagerAdapter: PlayerPageAdapter? = null
 
-    private var mPlayerMoreDialog: PlayerMoreDialog? = null
+    private var mPlayerMoreDialog: PlayerMoreDialog = PlayerMoreDialog()
     private var mQueueMusicDialog: QueueMusicDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,13 +94,23 @@ import kotlin.math.abs
         }
     }
 
+    override fun onResume() {
+        MainScope().launch {
+            loadPlayingLastSession()
+        }
+        super.onResume()
+    }
+
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         Log.i(ConstantValues.TAG, "On shared preferences save !!")
         when (key) {
             ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG -> {
                 val currentPlayingSongItem: CurrentPlayingSongItem? = SharedPreferenceManager.loadCurrentPlayingSong(mContext, sharedPreferences)
                 MainScope().launch {
-                    updateCurrentPlayingSongUI(currentPlayingSongItem)
+                    val position : Int = currentPlayingSongItem?.position?.toInt() ?: 0
+                    updateTextTitleSubtitleUI(position)
+                    updateSeekBarDurationUI(position)
+                    updateBlurredBackgroundUI(position)
                 }
             }
             ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SOURCE,
@@ -121,7 +132,6 @@ import kotlin.math.abs
             }
         }
     }
-
     private fun loadSongsForQueueListSource(
         queueListSource: String,
         queueListSourceValue: String,
@@ -144,70 +154,115 @@ import kotlin.math.abs
             val repeat: Int = SharedPreferenceManager.loadRepeat(mContext, sharedPreferences)
             val shuffle: Int = SharedPreferenceManager.loadShuffle(mContext, sharedPreferences)
 
-            updateCurrentPlayingSongUI(currentPlayingSongItem)
-            preloadEmptySongsForViewPager(queueListSize, currentPlayingSongItem)
-            updateRepeatUI(repeat)
-            updateShuffleUI(shuffle)
-            loadSongsFromQueueListSource(queueListSource, queueListSourceValue)
-        }
-    }
-
-    private fun preloadEmptySongsForViewPager(queueListSize: Int, currentPlayingSongItem: CurrentPlayingSongItem?) {
-        if(queueListSize <= 0 || currentPlayingSongItem == null || currentPlayingSongItem.position == null)
-            return
-        CoroutineScope(Dispatchers.Default).launch {
-            val queueList : ArrayList<SongItem> = ArrayList()
-            for (i in 0 until queueListSize){
-                queueList.add(SongItem())
-            }
             MainScope().launch {
-                mPlayerPagerAdapter?.submitList(queueList)
-                mFragmentPlayerBinding.viewPagerPlayer.currentItem = currentPlayingSongItem.position.toInt()
+                if(!checkIfHaveSongsLoaded(currentPlayingSongItem))
+                    return@launch
+
+                val position : Int = currentPlayingSongItem?.position?.toInt() ?: 0
+                val seekTo : Long = currentPlayingSongItem?.currentSeekDuration ?: 0
+
+                loadSongsFromQueueListSource(queueListSource, queueListSourceValue, currentPlayingSongItem)
+
+                updateTextTitleSubtitleUI(position)
+                updateBlurredBackgroundUI(position)
+                updateSeekBarDurationUI(position, seekTo)
+                updateRepeatUI(repeat)
+                updateShuffleUI(shuffle)
             }
         }
     }
-
-    private fun loadSongsFromQueueListSource(queueListSource: String?, queueListSourceValue: String?) {
-        if(queueListSource == ConstantValues.EXPLORE_ALL_SONGS) {
-            lifecycleScope.launch(Dispatchers.IO){
-                mSongItemViewModel.getAllSongs().collect(){
-
-                }
-            }
-        }else if(queueListSource == ConstantValues.EXPLORE_ALL_SONGS) {
-            lifecycleScope.launch(Dispatchers.IO){
-//                mQueueMusicItemViewModel.getAllQueueMusicList()
-            }
-        }
-    }
-    private fun updateCurrentPlayingSongUI(
-        currentPlayingSongItem: CurrentPlayingSongItem?
-    ) {
-        toggleNoSongFoundUI(currentPlayingSongItem)
-        if (currentPlayingSongItem != null && currentPlayingSongItem.position != null){
-            mFragmentPlayerBinding.textTitle.text =
-                if(currentPlayingSongItem.title != null )
-                    currentPlayingSongItem.title
-                else
-                    currentPlayingSongItem.fileName
-            mFragmentPlayerBinding.textArtist.text =
-                if(currentPlayingSongItem.artist != null )
-                    currentPlayingSongItem.artist
-                else
-                    mContext.getString(R.string.unknown_artist)
-
-            mFragmentPlayerBinding.textDuration.text = CustomFormatters.formatSongDurationToString(currentPlayingSongItem.duration)
-            mFragmentPlayerBinding.textDurationCurrent.text = CustomFormatters.formatSongDurationToString(currentPlayingSongItem.currentSeekDuration)
-        }
-    }
-
-    private fun toggleNoSongFoundUI(currentPlayingSongItem: CurrentPlayingSongItem?) {
-        MainScope().launch {
-            if(currentPlayingSongItem != null && currentPlayingSongItem.position != null){
+    private fun checkIfHaveSongsLoaded(currentPlayingSongItem: CurrentPlayingSongItem?): Boolean {
+        if(currentPlayingSongItem != null && currentPlayingSongItem.position != null){
+            MainScope().launch {
                 mFragmentPlayerBinding.linearRescanDeviceContainer.visibility = GONE
-            }else{
+            }
+
+            return true
+        }else{
+            MainScope().launch {
                 mFragmentPlayerBinding.linearRescanDeviceContainer.visibility = VISIBLE
             }
+        }
+        return false
+    }
+
+    private suspend fun loadSongsFromQueueListSource(
+        queueListSource: String?,
+        queueListSourceValue: String?,
+        currentPlayingSongItem: CurrentPlayingSongItem?
+    ) {
+        if(queueListSource == ConstantValues.EXPLORE_ALL_SONGS) {
+            withContext(Dispatchers.IO){
+                val result = mSongItemViewModel.getDirectlyAllSongsFromSource()
+                MainScope().launch {
+                    mPlayerPagerAdapter?.submitList(result)
+                }
+            }
+        }
+        mFragmentPlayerBinding.viewPagerPlayer.currentItem = currentPlayingSongItem?.position?.toInt() ?: 0
+    }
+    private fun updateRepeatUI(repeat: Int?) {
+        MainScope().launch {
+            when (repeat) {
+                PlaybackStateCompat.REPEAT_MODE_ALL -> {
+                    mFragmentPlayerBinding.buttonRepeat.alpha = 1.0f
+                    mFragmentPlayerBinding.buttonRepeat.icon = ContextCompat.getDrawable(mContext, R.drawable.repeat)
+                }
+                PlaybackStateCompat.REPEAT_MODE_ONE -> {
+                    mFragmentPlayerBinding.buttonRepeat.alpha = 1.0f
+                    mFragmentPlayerBinding.buttonRepeat.icon = ContextCompat.getDrawable(mContext, R.drawable.repeat_one)
+                }
+                else -> {
+                    mFragmentPlayerBinding.buttonRepeat.alpha = 0.4f
+                    mFragmentPlayerBinding.buttonRepeat.icon = ContextCompat.getDrawable(mContext, R.drawable.repeat)
+                }
+            }
+        }
+    }
+    private fun updateShuffleUI(shuffle: Int?) {
+        MainScope().launch {
+            when (shuffle) {
+                PlaybackStateCompat.SHUFFLE_MODE_ALL -> {
+                    mFragmentPlayerBinding.buttonShuffle.alpha = 1.0f
+                    mFragmentPlayerBinding.buttonShuffle.icon = ContextCompat.getDrawable(mContext, R.drawable.shuffle)
+                }
+                else -> {
+                    mFragmentPlayerBinding.buttonShuffle.alpha = 0.4f
+                    mFragmentPlayerBinding.buttonShuffle.icon = ContextCompat.getDrawable(mContext, R.drawable.shuffle)
+                }
+            }
+        }
+    }
+    private fun updateSeekBarDurationUI(position : Int, seekTo: Long = 0) {
+        MainScope().launch {
+            mFragmentPlayerBinding.textDurationCurrent.text = CustomFormatters.formatSongDurationToString(seekTo).toString()
+            mFragmentPlayerBinding.textDuration.text = CustomFormatters.formatSongDurationToString(mPlayerPagerAdapter?.currentList?.get(position)?.duration ?: 0).toString()
+        }
+    }
+    private fun updateTextTitleSubtitleUI(i: Int) {
+        MainScope().launch {
+            mFragmentPlayerBinding.textTitle.text =
+                if(mPlayerPagerAdapter?.currentList?.get(i)?.title != null )
+                    mPlayerPagerAdapter?.currentList?.get(i)?.title
+                else
+                    mPlayerPagerAdapter?.currentList?.get(i)?.fileName
+
+            mFragmentPlayerBinding.textArtist.text =
+                if(mPlayerPagerAdapter?.currentList?.get(i)?.artist != null )
+                    mPlayerPagerAdapter?.currentList?.get(i)?.artist
+                else
+                    mContext.getString(R.string.unknown_artist)
+        }
+    }
+    private suspend fun updateBlurredBackgroundUI(i: Int) {
+        withContext(Dispatchers.Default){
+            val tempUri = Uri.parse(mPlayerPagerAdapter?.currentList?.get(i)?.uri ?: "")
+            CustomUILoaders.loadBlurredCovertArtFromSongUri(
+                mContext,
+                mFragmentPlayerBinding.blurredImageview,
+                tempUri,
+                10
+            )
         }
     }
 
@@ -258,70 +313,6 @@ import kotlin.math.abs
     }
 
     private fun observeLiveData() {
-        mPlayerFragmentViewModel.getIsPlaying().observe(mActivity as LifecycleOwner
-        ) { updatePlayerButtonsUI() }
-        mPlayerFragmentViewModel.getPlayingProgressValue().observe(mActivity as LifecycleOwner
-        ) { progressValue -> updateProgress(progressValue) }
-    }
-    private fun updateProgress(progressValue: Long?) {
-//        mFragmentPlayerBinding.linearProgressBarContainer
-    }
-    private fun updateRepeatUI(repeat: Int?) {
-        when (repeat) {
-            PlaybackStateCompat.REPEAT_MODE_ALL -> {
-                mFragmentPlayerBinding.buttonRepeat.alpha = 1.0f
-                mFragmentPlayerBinding.buttonRepeat.icon = ContextCompat.getDrawable(mContext, R.drawable.repeat)
-            }
-            PlaybackStateCompat.REPEAT_MODE_ONE -> {
-                mFragmentPlayerBinding.buttonRepeat.alpha = 1.0f
-                mFragmentPlayerBinding.buttonRepeat.icon = ContextCompat.getDrawable(mContext, R.drawable.repeat_one)
-            }
-            else -> {
-                mFragmentPlayerBinding.buttonRepeat.alpha = 0.5f
-                mFragmentPlayerBinding.buttonRepeat.icon = ContextCompat.getDrawable(mContext, R.drawable.repeat)
-            }
-        }
-    }
-    private fun updateShuffleUI(shuffle: Int?) {
-        when (shuffle) {
-            PlaybackStateCompat.SHUFFLE_MODE_ALL -> {
-                mFragmentPlayerBinding.buttonShuffle.alpha = 1.0f
-                mFragmentPlayerBinding.buttonShuffle.icon = ContextCompat.getDrawable(mContext, R.drawable.shuffle)
-            }
-            else -> {
-                mFragmentPlayerBinding.buttonShuffle.alpha = 0.5f
-                mFragmentPlayerBinding.buttonShuffle.icon = ContextCompat.getDrawable(mContext, R.drawable.shuffle)
-            }
-        }
-    }
-    private fun updatePlayerButtonsUI() {
-        if(mPlayerFragmentViewModel.getIsPlaying().value == true){
-            mFragmentPlayerBinding.buttonPlayPause.icon = ContextCompat.getDrawable(mContext, R.drawable.pause_circle)
-        }else{
-            mFragmentPlayerBinding.buttonPlayPause.icon = ContextCompat.getDrawable(mContext, R.drawable.play_circle)
-        }
-    }
-    private suspend fun updatePlayerUI(position: Int) {
-        if(position == mFragmentPlayerBinding.viewPagerPlayer.currentItem)
-            return
-        val  tempCurrentItem : SongItem? = mPlayerPagerAdapter?.currentList?.get(position)
-        MainScope().launch {
-            if(tempCurrentItem != null){
-                mFragmentPlayerBinding.textTitle.text = if(tempCurrentItem.title!!.isNotEmpty()) tempCurrentItem.title else tempCurrentItem.fileName //Set song title
-
-                mFragmentPlayerBinding.textArtist.text = if(tempCurrentItem.artist!!.isNotEmpty()) tempCurrentItem.artist else mContext.getString(R.string.unknown_artist)
-
-                mFragmentPlayerBinding.textDurationCurrent.text = CustomFormatters.formatSongDurationToString(0)
-
-                mFragmentPlayerBinding.textDuration.text = CustomFormatters.formatSongDurationToString(tempCurrentItem.duration)
-
-                mFragmentPlayerBinding.slider.value = 0.0f
-            }
-        }
-        withContext(Dispatchers.IO){
-            val tempBinary : ByteArray? = if(tempCurrentItem != null ) tempCurrentItem.covertArt?.binaryData else null
-            CustomUILoaders.loadCovertArtFromBinaryData(mContext, mFragmentPlayerBinding.blurredImageview, tempBinary, 500)
-        }
     }
 
     private fun checkInteractions() {
@@ -329,7 +320,7 @@ import kotlin.math.abs
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 MainScope().launch {
-                    updatePlayerUI(position)
+                    onCurrentSongChangeFromViewpagerSwipe(position)
                 }
             }
         })
@@ -349,9 +340,7 @@ import kotlin.math.abs
             onRepeat()
         }
         mFragmentPlayerBinding.buttonMore.setOnClickListener {
-            if (mPlayerMoreDialog == null)
-                mPlayerMoreDialog = PlayerMoreDialog()
-            mPlayerMoreDialog?.show(childFragmentManager, PlayerMoreDialog.TAG)
+            mPlayerMoreDialog.show(childFragmentManager, PlayerMoreDialog.TAG)
         }
         mFragmentPlayerBinding.buttonQueueMusic.setOnClickListener {
             mQueueMusicDialog = QueueMusicDialog()
@@ -374,30 +363,44 @@ import kotlin.math.abs
     private fun openMediaScannerActivity() {
         startActivity(Intent(mContext, MediaScannerSettingsActivity::class.java).apply {})
     }
-
+    private fun onRepeat(){
+    }
+    private fun onShuffle(){
+    }
+    private fun onPrevPage(){
+        if((mPlayerPagerAdapter?.itemCount ?: 0) <= 0)
+            return
+        val currentPosition :Int = mFragmentPlayerBinding.viewPagerPlayer.currentItem
+        if(currentPosition > 0)
+            onCurrentSongChangeFromButtonsNextPrev(currentPosition - 1)
+    }
+    private fun onNextPage(){
+        if((mPlayerPagerAdapter?.itemCount ?: 0) <= 0)
+            return
+        val currentPosition :Int = mFragmentPlayerBinding.viewPagerPlayer.currentItem
+        if((mPlayerPagerAdapter?.itemCount ?: 0) > 0 && currentPosition < (mPlayerPagerAdapter?.itemCount ?: 0) - 1)
+            onCurrentSongChangeFromButtonsNextPrev(currentPosition + 1)
+    }
+    private fun onCurrentSongChangeFromButtonsNextPrev(i: Int) {
+        MainScope().launch {
+            mFragmentPlayerBinding.viewPagerPlayer.setCurrentItem(i, true)
+            updateTextTitleSubtitleUI(i)
+            updateSeekBarDurationUI(i)
+            updateBlurredBackgroundUI(i)
+        }
+    }
     private fun onPlayPause(){
         if((mPlayerPagerAdapter?.itemCount ?: 0) <= 0)
             return
         val tempPP : Boolean = !(mPlayerFragmentViewModel.getIsPlaying().value ?: false)
         mPlayerFragmentViewModel.setIsPlaying(tempPP)
     }
-    private fun onNextPage(){
-//        if((mPlayerPagerAdapter?.itemCount ?: 0) <= 0)
-//            return
-//        val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
-//        if((mPlayerPagerAdapter?.itemCount ?: 0) > 0 && tempCS < (mPlayerPagerAdapter?.itemCount ?: 0) - 1)
-//            mPlayerFragmentViewModel.setCurrentSong(tempCS + 1)
-    }
-    private fun onPrevPage(){
-//        if((mPlayerPagerAdapter?.itemCount ?: 0) <= 0)
-//            return
-//        val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
-//        if(tempCS > 0)
-//            mPlayerFragmentViewModel.setCurrentSong(tempCS - 1)
-    }
-    private fun onShuffle(){
-    }
-    private fun onRepeat(){
+    private fun onCurrentSongChangeFromViewpagerSwipe(i: Int) {
+        MainScope().launch {
+            updateTextTitleSubtitleUI(i)
+            updateSeekBarDurationUI(i)
+            updateBlurredBackgroundUI(i)
+        }
     }
 
     private fun initViews() {

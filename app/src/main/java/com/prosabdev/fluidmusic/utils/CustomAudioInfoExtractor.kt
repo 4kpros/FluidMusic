@@ -1,9 +1,14 @@
 package com.prosabdev.fluidmusic.utils
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.util.Log
 import com.prosabdev.fluidmusic.models.explore.SongItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.audio.exceptions.CannotReadException
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
@@ -13,11 +18,53 @@ import org.jaudiotagger.tag.Tag
 import org.jaudiotagger.tag.TagException
 import org.jaudiotagger.tag.images.Artwork
 import java.io.File
+import java.io.FileDescriptor
 import java.io.IOException
 
 
-abstract class AudioFileInfoExtractor {
+abstract class CustomAudioInfoExtractor {
     companion object {
+
+        suspend fun extractImageBitmapFromAudioUri(ctx: Context, uri : Uri?): Bitmap? {
+            return withContext(Dispatchers.IO) {
+                var result : Bitmap? = null
+                if (uri != null && uri.toString().isNotEmpty()){
+                    try {
+                        ctx.contentResolver.openAssetFileDescriptor(uri, "r").use { afd ->
+                            if (afd != null) {
+                                val fd: FileDescriptor = afd.fileDescriptor
+                                result = BitmapFactory.decodeFileDescriptor(fd)
+                            }
+                        }
+
+                    }finally {
+
+                    }
+                }
+                return@withContext result
+            }
+        }
+        suspend fun extractImageBinaryDataFromAudioUri(ctx: Context, uri : Uri?): ByteArray? {
+            return withContext(Dispatchers.IO) {
+                var result : ByteArray? = null
+                if (uri != null && uri.toString().isNotEmpty()){
+                    try {
+                        ctx.contentResolver.openAssetFileDescriptor(uri, "r").use { afd ->
+                            if (afd != null) {
+                                val mdr = MediaMetadataRetriever()
+                                mdr.setDataSource(afd.fileDescriptor)
+                                result = mdr.embeddedPicture
+                            }
+                        }
+
+                    }finally {
+
+                    }
+
+                }
+                return@withContext result
+            }
+        }
 
         fun getAudioInfo(absolutePath: String?): SongItem {
             val songItem = SongItem()
@@ -42,8 +89,8 @@ abstract class AudioFileInfoExtractor {
                     val album: String = tag.getFirst(FieldKey.ALBUM)
                     val genre: String = tag.getFirst(FieldKey.GENRE)
                     val year: String = tag.getFirst(FieldKey.YEAR)
-                    songItem.covertArt = artwork
-                    songItem.covertArtUrl = artwork?.imageUrl
+//                    songItem.covertArt = artwork
+//                    songItem.covertArtUrl = artwork?.imageUrl
                     songItem.title = title
                     songItem.artist = artist
                     songItem.album = album

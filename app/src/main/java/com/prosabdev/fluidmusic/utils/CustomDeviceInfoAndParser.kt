@@ -22,7 +22,7 @@ import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit
 
 
-abstract class MediaFileExtractor {
+abstract class CustomDeviceInfoAndParser {
     companion object {
         private const val STORAGE_ID_PRIMARY = "primary"
         private const val STORAGE_ID_DATA = "data"

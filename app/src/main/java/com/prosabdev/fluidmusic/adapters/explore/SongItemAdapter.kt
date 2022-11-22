@@ -3,6 +3,7 @@ package com.prosabdev.fluidmusic.adapters.explore
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.material.color.MaterialColors
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
@@ -22,6 +24,7 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapter
+import com.prosabdev.fluidmusic.utils.CustomFormatters
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -120,7 +123,7 @@ class SongItemAdapter(
 
     override fun onViewRecycled(holder: SongItemViewHolder) {
         super.onViewRecycled(holder)
-        holder.recycleItem()
+        holder.recycleItem(mContext)
     }
 
     class SongItemViewHolder(private val mItemGenericExploreListBinding: ItemGenericExploreListBinding) : RecyclerView.ViewHolder(mItemGenericExploreListBinding.root) {
@@ -129,18 +132,32 @@ class SongItemAdapter(
             updateIsPlayingStateUI(isPlaying)
             updateCovertArtAndTitleUI(context, songItem)
         }
-        fun recycleItem(){
-            mItemGenericExploreListBinding.imageviewCoverArt.setImageDrawable(null)
+        fun recycleItem(ctx : Context){
+            Glide.with(ctx).clear(mItemGenericExploreListBinding.imageviewCoverArt)
         }
         fun updateCovertArtAndTitleUI(context: Context, songItem: SongItem) {
-            mItemGenericExploreListBinding.textTitle.text = if(songItem.title != null && songItem.title!!.isNotEmpty()) songItem.title else songItem.fileName
-            mItemGenericExploreListBinding.textSubtitle.text = if(songItem.artist!!.isNotEmpty()) songItem.artist else context.getString(
-                R.string.unknown_artist)
-            mItemGenericExploreListBinding.textDetails.text = context.getString(R.string.item_song_card_text_details, songItem.duration, songItem.typeMime)
+            mItemGenericExploreListBinding.textTitle.text =
+                if(songItem.title != null && songItem.title!!.isNotEmpty())
+                    songItem.title
+                else
+                    songItem.fileName
 
-            val tempBinary: ByteArray? = songItem.covertArt?.binaryData
+            mItemGenericExploreListBinding.textSubtitle.text =
+                if(songItem.artist != null && songItem.artist!!.isNotEmpty())
+                    songItem.artist
+                else
+                    context.getString(R.string.unknown_artist)
+
+            mItemGenericExploreListBinding.textDetails.text =
+                context.getString(
+                    R.string.item_song_card_text_details,
+                    CustomFormatters.formatSongDurationToString(songItem.duration),
+                    songItem.typeMime
+                )
+
             MainScope().launch {
-                CustomUILoaders.loadCovertArtFromBinaryData(context, mItemGenericExploreListBinding.imageviewCoverArt, tempBinary, 100)
+                val tempUri: Uri? = Uri.parse(songItem.uri)
+                CustomUILoaders.loadCovertArtFromSongUri(context, mItemGenericExploreListBinding.imageviewCoverArt, tempUri, 100)
             }
         }
         fun updateIsPlayingStateUI(playing: Boolean) {

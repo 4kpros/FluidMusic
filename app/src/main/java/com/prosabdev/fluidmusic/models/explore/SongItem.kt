@@ -33,15 +33,14 @@ class SongItem {
     var typeMime: String? = null
     var sampleRate: Int = 0
     var bitrate: Double = 0.0
+    var bitPerSample: String? = null
 
     //
     var lastUpdateDate: String? = null
-    var lastAddedDateToLibrary: String? = null
+    var lastAddedDateToLibrary: Long = 0
 
-    //
-    @Ignore
-    var covertArt: Artwork? = null
-
-    @Ignore
-    var covertArtUrl: String? = null
+    var author: String? = null
+    var writer: String? = null
+    var cdTrackNumber: String? = null
+    var numberTracks: String? = null
 }

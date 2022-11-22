@@ -1,10 +1,12 @@
 package com.prosabdev.fluidmusic.workers
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
@@ -19,6 +21,7 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.SharedPreferenceManager
 import kotlinx.coroutines.*
 
+
 class MediaScannerWorker(
     ctx: Context,
     params: WorkerParameters
@@ -26,6 +29,7 @@ class MediaScannerWorker(
 
     private val mScanCounter : Array<Int> = Array(3) { 0 }
     private val mSongList : ArrayList<SongItem> = ArrayList()
+
     override suspend fun doWork(): Result {
         val updateMethod = inputData.getString(ConstantValues.MEDIA_SCANNER_WORKER_SCAN_METHOD)
         return withContext(Dispatchers.IO) {
@@ -146,8 +150,16 @@ class MediaScannerWorker(
                                         tempSong.duration = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0
                                         tempSong.typeMime = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
                                         tempSong.bitrate = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)?.toDouble() ?: 0.0
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                            tempSong.bitPerSample = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITS_PER_SAMPLE)
+                                        }
+                                        tempSong.author = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR)
+                                        tempSong.cdTrackNumber = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER)
+                                        tempSong.writer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_WRITER)
+                                        tempSong.numberTracks = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS)
+
                                         tempSong.lastUpdateDate = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
-                                        tempSong.lastAddedDateToLibrary = ""
+                                        tempSong.lastAddedDateToLibrary = System.currentTimeMillis() / 1000
 
                                         val extractor : MediaExtractor = MediaExtractor()
                                         extractor.setDataSource(it?.fileDescriptor!!)

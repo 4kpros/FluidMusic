@@ -2,6 +2,7 @@ package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -82,9 +83,9 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
 
         mBottomSheetPlayerMoreBinding.textDescription.text = mContext.getString(R.string.item_song_card_text_details, songItem.duration, songItem.typeMime)
 
-        val tempBinary : ByteArray? = songItem.covertArt?.binaryData
         MainScope().launch {
-            CustomUILoaders.loadCovertArtFromBinaryData(mContext, mBottomSheetPlayerMoreBinding.covertArt, tempBinary, 100)
+            val tempUri: Uri? = Uri.parse(songItem.uri)
+            CustomUILoaders.loadCovertArtFromSongUri(mContext, mBottomSheetPlayerMoreBinding.covertArt, tempUri, 100)
         }
     }
 

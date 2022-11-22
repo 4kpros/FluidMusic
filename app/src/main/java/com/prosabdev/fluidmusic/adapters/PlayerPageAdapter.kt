@@ -2,6 +2,7 @@ package com.prosabdev.fluidmusic.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemPlayerCardViewBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
@@ -45,18 +47,17 @@ class PlayerPageAdapter(
         position: Int
     ) {
         holder.bindListener(position, mListener)
-        holder.loadCovertArt(mContext, getItem(position).covertArt?.binaryData)
+        holder.loadCovertArt(mContext, getItem(position))
     }
 
     override fun onViewRecycled(holder: PlayerPageHolder) {
         super.onViewRecycled(holder)
-        holder.recycleItem()
+        holder.recycleItem(mContext)
     }
 
     class PlayerPageHolder(private val mItemPlayerCardViewBinding: ItemPlayerCardViewBinding) : RecyclerView.ViewHolder(mItemPlayerCardViewBinding.root) {
-        fun recycleItem(){
-            mItemPlayerCardViewBinding.playerViewpagerImageview.layout(0,0,0,0)
-            mItemPlayerCardViewBinding.playerViewpagerImageview.setImageDrawable(null)
+        fun recycleItem(ctx : Context){
+            Glide.with(ctx).clear(mItemPlayerCardViewBinding.playerViewpagerImageview)
         }
 
         var job : Job? = null
@@ -88,14 +89,15 @@ class PlayerPageAdapter(
             CustomAnimators.crossFadeDown(mItemPlayerCardViewBinding.buttonFullscreen as View, true)
         }
 
-        fun loadCovertArt(context: Context, tempBinary: ByteArray?) {
+        fun loadCovertArt(context: Context, songItem: SongItem) {
             mItemPlayerCardViewBinding.playerViewpagerImageview.layout(0,0,0,0)
-            MainScope().launch{
-                CustomUILoaders.loadCovertArtFromBinaryData(
+            val tempUri : Uri? = Uri.parse(songItem.uri ?: "")
+            MainScope().launch {
+                CustomUILoaders.loadCovertArtFromSongUri(
                     context,
                     mItemPlayerCardViewBinding.playerViewpagerImageview,
-                    tempBinary,
-                    450)
+                    tempUri
+                )
             }
         }
     }
@@ -108,7 +110,9 @@ class PlayerPageAdapter(
 
             @SuppressLint("DiffUtilEquals")
             override fun areContentsTheSame(oldItem: SongItem, newItem: SongItem): Boolean {
-                return oldItem == newItem
+                return (oldItem.id == newItem.id) &&
+                        (oldItem.uri == newItem.uri) &&
+                        (oldItem.uriTreeId == newItem.uriTreeId)
             }
         }
     }

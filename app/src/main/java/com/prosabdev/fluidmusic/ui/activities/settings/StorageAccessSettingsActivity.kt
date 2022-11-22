@@ -27,7 +27,7 @@ import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.StorageAccessDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
-import com.prosabdev.fluidmusic.utils.MediaFileExtractor
+import com.prosabdev.fluidmusic.utils.CustomDeviceInfoAndParser
 import com.prosabdev.fluidmusic.viewmodels.FolderUriTreeViewModel
 import com.prosabdev.fluidmusic.viewmodels.FolderUriTreeViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.views.activities.StorageAccessActivityViewModel
@@ -223,7 +223,7 @@ import kotlinx.coroutines.*
             this.contentResolver.takePersistableUriPermission(uri, takeFlags)
 
             MainScope().launch {
-                addToFolderList(MediaFileExtractor.formatAndReturnFolderUriSAF(this@StorageAccessSettingsActivity, uri))
+                addToFolderList(CustomDeviceInfoAndParser.formatAndReturnFolderUriSAF(this@StorageAccessSettingsActivity, uri))
             }
         }
     }
