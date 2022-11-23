@@ -30,11 +30,11 @@ import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentPlayerBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
-import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreDialog
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicDialog
 import com.prosabdev.fluidmusic.utils.*
+import com.prosabdev.fluidmusic.viewmodels.fragments.FragmentViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.models.QueueMusicItemViewModel
@@ -97,9 +97,9 @@ import kotlin.math.roundToLong
         Log.i(ConstantValues.TAG, "On shared preferences save !!")
         when (key) {
             ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG -> {
-                val currentPlayingSongItem: CurrentPlayingSongItem? = SharedPreferenceManager.loadCurrentPlayingSong(this@PlayerFragment.requireContext(), sharedPreferences)
+//                val currentPlayingSongItem: CurrentPlayingSongItem? = SharedPreferenceManager.loadCurrentPlayingSong(this@PlayerFragment.requireContext(), sharedPreferences)
                 MainScope().launch {
-                    val position : Int = currentPlayingSongItem?.position?.toInt() ?: 0
+//                    val position : Int = currentPlayingSongItem?.position?.toInt() ?: 0
 //                    updateTextTitleSubtitleDurationUI(position)
 //                    updateTextCurrentDurationUI(0)
 //                    updateSliderCurrentDurationUI(0)
@@ -139,7 +139,7 @@ import kotlin.math.roundToLong
             if(currentPlayingSongItem?.uri == null){
                 tryToGetFirstSong()
             }else{
-                tempSongItem = mSongItemViewModel.getSongInfoWithUri(currentPlayingSongItem.uri ?: "")
+                tempSongItem = mSongItemViewModel.getAtUri(currentPlayingSongItem.uri ?: "")
                 if(tempSongItem?.uri == null){
                     tryToGetFirstSong()
                 }else{
@@ -230,7 +230,7 @@ import kotlin.math.roundToLong
     ) {
         if(queueListSource == ConstantValues.EXPLORE_ALL_SONGS){
             lifecycleScope.launch(Dispatchers.IO){
-                val tempSongList = mSongItemViewModel.getDirectlyAllSongsFromSource()
+                val tempSongList = mSongItemViewModel.getAll()?.value
                 mPlayerPagerAdapter?.submitList(tempSongList)
             }
         }
@@ -244,10 +244,10 @@ import kotlin.math.roundToLong
     ) {
         if(queueListSource == ConstantValues.EXPLORE_ALL_SONGS) {
             withContext(Dispatchers.IO){
-                val result = mSongItemViewModel.getDirectlyAllSongsFromSource()
+                val result = mSongItemViewModel.getAll()?.value
                 MainScope().launch {
                     mPlayerPagerAdapter?.submitList(result)
-                    updateEmptyListUI(result.size)
+                    updateEmptyListUI(result?.size ?: 0)
                     if(updateCurrentItem)
                         mFragmentPlayerBinding.viewPagerPlayer.setCurrentItem(position.toInt(), false)
                 }
@@ -527,11 +527,8 @@ import kotlin.math.roundToLong
     }
 
     private fun initViews() {
-        mPlayerFragmentViewModel = PlayerFragmentViewModelFactory().create(PlayerFragmentViewModel::class.java)
-        mSongItemViewModel = ModelsViewModelFactory(
-            AppDatabase.getDatabase(this.requireContext()).songItemDao()
-//            (activity?.application as DatabaseAccessApplication).database.songItemDao()
-        ).create(SongItemViewModel::class.java)
+        mPlayerFragmentViewModel = FragmentViewModelFactory().create(PlayerFragmentViewModel::class.java)
+        mSongItemViewModel = ModelsViewModelFactory(this.requireContext()).create(SongItemViewModel::class.java)
 
         mFragmentPlayerBinding.blurredImageview.layout(0,0,0,0)
         mFragmentPlayerBinding.textTitle.isSelected = true

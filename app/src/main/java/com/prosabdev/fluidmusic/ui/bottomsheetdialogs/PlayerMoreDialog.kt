@@ -10,7 +10,6 @@ import androidx.databinding.DataBindingUtil
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetPlayerMoreBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
-import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomFormatters
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
@@ -142,9 +141,7 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
     private fun initViews() {
         mBottomSheetPlayerMoreBinding.covertArt.layout(0,0,0,0)
 
-        mSongItemViewModel = ModelsViewModelFactory(
-            (activity?.application as DatabaseAccessApplication).database.songItemDao()
-        ).create(SongItemViewModel::class.java)
+        mSongItemViewModel = ModelsViewModelFactory(this.requireContext()).create(SongItemViewModel::class.java)
     }
 
     companion object {

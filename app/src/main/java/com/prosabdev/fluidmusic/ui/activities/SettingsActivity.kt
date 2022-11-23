@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.color.DynamicColors
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivitySettingsBinding
@@ -41,7 +42,7 @@ import com.prosabdev.fluidmusic.utils.CustomViewModifiers
                 finish()
             }
         } else {
-            onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            onBackPressedDispatcher.addCallback(this.baseContext as LifecycleOwner, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     finish()
                 }

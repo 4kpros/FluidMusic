@@ -24,9 +24,9 @@ import com.google.android.material.slider.Slider
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityMediaScannerSettingsBinding
 import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
+import com.prosabdev.fluidmusic.viewmodels.activities.ActivityViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.activities.MediaScannerActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
@@ -76,14 +76,11 @@ import kotlinx.coroutines.launch
     }
 
     private fun initViewsModels() {
-        mSongItemViewModel = ModelsViewModelFactory(
-            (this.application as DatabaseAccessApplication).database.songItemDao()
-        ).create(SongItemViewModel::class.java)
-        mMediaScannerActivityViewModel = MediaScannerActivityViewModelFactory(this.application).create(
+        mSongItemViewModel = ModelsViewModelFactory(this.baseContext).create(SongItemViewModel::class.java)
+        mFolderUriTreeViewModel = ModelsViewModelFactory(this.baseContext).create(FolderUriTreeViewModel::class.java)
+
+        mMediaScannerActivityViewModel = ActivityViewModelFactory(this.application).create(
             MediaScannerActivityViewModel::class.java)
-        mFolderUriTreeViewModel = FolderUriTreeViewModelFactory(
-            (this.application as DatabaseAccessApplication).database.folderUriTreeDao()
-        ).create(FolderUriTreeViewModel::class.java)
     }
 
     private fun checkInteractions() {
@@ -173,7 +170,7 @@ import kotlinx.coroutines.launch
 
     private fun observeLiveData() {
         lifecycle.coroutineScope.launch {
-            mFolderUriTreeViewModel.getAllFolderUriTrees().collect {
+            mFolderUriTreeViewModel.getAll()?.observe(this@MediaScannerSettingsActivity.baseContext as LifecycleOwner){
                 updateFolderUriTrees(it)
             }
         }

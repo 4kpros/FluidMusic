@@ -12,6 +12,7 @@ import androidx.core.content.edit
 import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ConcatAdapter
@@ -23,13 +24,14 @@ import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.FolderUriTreeAdapter
 import com.prosabdev.fluidmusic.databinding.ActivityStorageAccessSettingsBinding
 import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.StorageAccessDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomDeviceInfoAndParser
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
+import com.prosabdev.fluidmusic.viewmodels.activities.ActivityViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.activities.StorageAccessActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -85,7 +87,7 @@ import kotlinx.coroutines.withContext
 
     private suspend fun alertUriChangedBeforeExit() {
         withContext(Dispatchers.IO){
-            if(mFolderUriTreeViewModel.getAllFolderUriTreesDirectly().isNotEmpty()){
+            if(mFolderUriTreeViewModel.getAll()?.value?.isNotEmpty() == true){
                 finish()
             }else{
                 onShowBackWithoutSavingDialog()
@@ -110,7 +112,7 @@ import kotlinx.coroutines.withContext
 
     private fun observeLiveData() {
         lifecycleScope.launch(Dispatchers.IO){
-            mFolderUriTreeViewModel.getAllFolderUriTrees().collect{
+            mFolderUriTreeViewModel.getAll()?.observe(this@StorageAccessSettingsActivity.baseContext as LifecycleOwner){
                 updateFolderUriTreesUI(it)
             }
         }
@@ -200,10 +202,8 @@ import kotlinx.coroutines.withContext
     }
 
     private fun initViews() {
-        mFolderUriTreeViewModel = FolderUriTreeViewModelFactory(
-            (this.application as DatabaseAccessApplication).database.folderUriTreeDao()
-        ).create(FolderUriTreeViewModel::class.java)
-        mStorageAccessActivityViewModel = StorageAccessActivityViewModelFactory().create(
+        mFolderUriTreeViewModel = ModelsViewModelFactory(this.baseContext).create(FolderUriTreeViewModel::class.java)
+        mStorageAccessActivityViewModel = ActivityViewModelFactory().create(
             StorageAccessActivityViewModel::class.java)
 
         CustomViewModifiers.updateTopViewInsets(mActivityStorageAccessSettingsBinding.coordinatorLayout)
@@ -233,9 +233,7 @@ import kotlinx.coroutines.withContext
         if(!isFolderSAFExist(it)){
             if(it != null){
                 withContext(Dispatchers.IO){
-                    val result : Long = mFolderUriTreeViewModel.insertItem(it)
-                    Log.i(ConstantValues.TAG, "INSERTION RESULT = ${result.toString()}")
-                    Log.i(ConstantValues.TAG, "INSERTION RESULT FOR ID ${it.id} = ${it.uriTree}")
+                    mFolderUriTreeViewModel.insert(it)
                 }
             }
         }else{
@@ -275,7 +273,7 @@ import kotlinx.coroutines.withContext
     }
     private fun removeFolderUriTree(folderUriTree: FolderUriTree?) {
         lifecycleScope.launch(Dispatchers.IO){
-            mFolderUriTreeViewModel.deleteItem(folderUriTree)
+            mFolderUriTreeViewModel.delete(folderUriTree)
         }
     }
 }

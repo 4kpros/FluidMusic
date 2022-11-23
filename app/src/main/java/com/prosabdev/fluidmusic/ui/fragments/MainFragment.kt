@@ -17,6 +17,7 @@ import com.prosabdev.fluidmusic.databinding.FragmentMainBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
+import com.prosabdev.fluidmusic.viewmodels.fragments.FragmentViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
@@ -60,43 +61,43 @@ class MainFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-        mPlayerFragmentViewModel.getCurrentSong().observe(this as LifecycleOwner
+        mPlayerFragmentViewModel.getCurrentSong().observe(this.requireContext() as LifecycleOwner
         ) {
             MainScope().launch {
                 updateMiniPlayerUI()
             }
         }
-        mPlayerFragmentViewModel.getSourceOfQueueList().observe(this as LifecycleOwner
+        mPlayerFragmentViewModel.getSourceOfQueueList().observe(this.requireContext() as LifecycleOwner
         ) {
             MainScope().launch {
                 updateMiniPlayerUI()
             }
         }
-        mPlayerFragmentViewModel.getIsPlaying().observe(this as LifecycleOwner
+        mPlayerFragmentViewModel.getIsPlaying().observe(this.requireContext() as LifecycleOwner
         ) {
             MainScope().launch {
                 updatePlayerButtonsUI()
             }
         }
-        mPlayerFragmentViewModel.getPlayingProgressValue().observe(this as LifecycleOwner
+        mPlayerFragmentViewModel.getPlayingProgressValue().observe(this.requireContext() as LifecycleOwner
         ) {
             MainScope().launch {
                 updatePlayerButtonsUI()
             }
         }
-        mMainFragmentViewModel.getSelectMode().observe(this as LifecycleOwner
+        mMainFragmentViewModel.getSelectMode().observe(this.requireContext() as LifecycleOwner
         ) { selectMode ->
             MainScope().launch {
                 updateSelectModeUI(selectMode ?: false)
             }
         }
-        mMainFragmentViewModel.getTotalSelected().observe(this as LifecycleOwner
+        mMainFragmentViewModel.getTotalSelected().observe(this.requireContext() as LifecycleOwner
         ){
             MainScope().launch {
                 updateTotalSelectedUI(it ?: 0)
             }
         }
-        mMainFragmentViewModel.getScrollingState().observe(this as LifecycleOwner
+        mMainFragmentViewModel.getScrollingState().observe(this.requireContext() as LifecycleOwner
         ){ animateScrollStateUI(it ?: 0) }
     }
     private var mIsAnimatingScroll1: Boolean = false
@@ -281,8 +282,8 @@ class MainFragment : Fragment() {
     }
 
     private fun initViews() {
-        mPlayerFragmentViewModel = PlayerFragmentViewModelFactory().create(PlayerFragmentViewModel::class.java)
-        mMainFragmentViewModel = MainFragmentViewModelFactory().create(MainFragmentViewModel::class.java)
+        mPlayerFragmentViewModel = FragmentViewModelFactory().create(PlayerFragmentViewModel::class.java)
+        mMainFragmentViewModel = FragmentViewModelFactory().create(MainFragmentViewModel::class.java)
 
         mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer.layout(0,0,0,0)
         mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer.layout(0,0,0,0)

@@ -19,9 +19,9 @@ import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentAllSongsBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
-import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.SortOrganizeItemsBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.viewmodels.fragments.FragmentViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
@@ -79,7 +79,7 @@ class AllSongsFragment : Fragment() {
     }
 
     private suspend fun observeLiveData() {
-        mSongItemViewModel.getAllSongs().observe(this as LifecycleOwner){
+        mSongItemViewModel.getAll()?.observe(this as LifecycleOwner){
             MainScope().launch {
                 addSongsToAdapter(it as ArrayList<SongItem>)
             }
@@ -255,12 +255,9 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun initViews() {
-        mSongItemViewModel = ModelsViewModelFactory(
-            AppDatabase.getDatabase(this.requireContext()).songItemDao()
-//            (activity?.application as DatabaseAccessApplication).database.songItemDao()
-        ).create(SongItemViewModel::class.java)
+        mSongItemViewModel = ModelsViewModelFactory(this.requireContext()).create(SongItemViewModel::class.java)
 
-        mMainFragmentViewModel = MainFragmentViewModelFactory().create(MainFragmentViewModel::class.java)
+        mMainFragmentViewModel = FragmentViewModelFactory().create(MainFragmentViewModel::class.java)
     }
 
     companion object {
