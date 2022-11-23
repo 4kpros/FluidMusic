@@ -1,7 +1,6 @@
 package com.prosabdev.fluidmusic.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
@@ -9,7 +8,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemEmptyBottomSpaceBinding
-import com.prosabdev.fluidmusic.databinding.ItemStorageAccessFolderBinding
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 
 class EmptyBottomAdapter(

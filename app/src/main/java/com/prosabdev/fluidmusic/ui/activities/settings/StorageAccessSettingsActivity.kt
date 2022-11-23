@@ -26,13 +26,14 @@ import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.StorageAccessDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 import com.prosabdev.fluidmusic.utils.CustomDeviceInfoAndParser
-import com.prosabdev.fluidmusic.viewmodels.FolderUriTreeViewModel
-import com.prosabdev.fluidmusic.viewmodels.FolderUriTreeViewModelFactory
-import com.prosabdev.fluidmusic.viewmodels.views.activities.StorageAccessActivityViewModel
-import com.prosabdev.fluidmusic.viewmodels.views.activities.StorageAccessActivityViewModelFactory
-import kotlinx.coroutines.*
+import com.prosabdev.fluidmusic.utils.CustomViewModifiers
+import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
+import com.prosabdev.fluidmusic.viewmodels.activities.StorageAccessActivityViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @BuildCompat.PrereleaseSdkCheck class StorageAccessSettingsActivity : AppCompatActivity() {
 
@@ -202,7 +203,8 @@ import kotlinx.coroutines.*
         mFolderUriTreeViewModel = FolderUriTreeViewModelFactory(
             (this.application as DatabaseAccessApplication).database.folderUriTreeDao()
         ).create(FolderUriTreeViewModel::class.java)
-        mStorageAccessActivityViewModel = StorageAccessActivityViewModelFactory().create(StorageAccessActivityViewModel::class.java)
+        mStorageAccessActivityViewModel = StorageAccessActivityViewModelFactory().create(
+            StorageAccessActivityViewModel::class.java)
 
         CustomViewModifiers.updateTopViewInsets(mActivityStorageAccessSettingsBinding.coordinatorLayout)
         CustomViewModifiers.updateBottomViewInsets(mActivityStorageAccessSettingsBinding.linearButtonsContainer)

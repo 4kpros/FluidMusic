@@ -8,9 +8,7 @@ import androidx.collection.LruCache
 import com.bumptech.glide.disklrucache.DiskLruCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.OutputStream
 import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock

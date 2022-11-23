@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
 
 abstract class SharedPreferenceManager {

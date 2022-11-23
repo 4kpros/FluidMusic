@@ -8,9 +8,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.models.QueueMusicItem
-import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 
 abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallback: DiffUtil.ItemCallback<Any>) : ListAdapter<Any, VH>(

@@ -1,9 +1,6 @@
 package com.prosabdev.fluidmusic.workers
 
 import android.content.Context
-import android.graphics.BitmapFactory
-import android.media.AudioFormat
-import android.media.AudioMetadata
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
@@ -12,7 +9,6 @@ import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
-import androidx.media.AudioAttributesCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -47,7 +43,7 @@ class MediaScannerWorker(
                     launch {
                         for(i in 0 until (mSongList.size)){
                             mSongList[i].id = 0
-                            AppDatabase.getDatabase(applicationContext).songItemDao().Insert(mSongList[i])
+                            AppDatabase.getDatabase(applicationContext).songItemDao().insert(mSongList[i])
                             if(currentPlayingSong == null || currentPlayingSong?.uri == null){
                                 currentPlayingSong = CurrentPlayingSongItem()
                                 currentPlayingSong?.position = i.toLong()
@@ -93,7 +89,7 @@ class MediaScannerWorker(
                 ConstantValues.TAG,
                 "MEDIA SCANNER WORKER ---> Cleaning up old songs from database..."
             )
-            AppDatabase.getDatabase(applicationContext).songItemDao().deleteAllFromSongs()
+            AppDatabase.getDatabase(applicationContext).songItemDao().deleteAll()
             AppDatabase.getDatabase(applicationContext).folderUriTreeDao()
                 .resetAllFolderUriTreesLastModified()
         }

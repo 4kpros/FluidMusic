@@ -1,6 +1,5 @@
 package com.prosabdev.fluidmusic.adapters
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil

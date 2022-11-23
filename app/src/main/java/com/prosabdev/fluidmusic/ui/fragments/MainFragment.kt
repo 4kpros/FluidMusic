@@ -1,6 +1,5 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,22 +8,17 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentMainBinding
-import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
-import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
 import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModelFactory
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -34,9 +28,6 @@ class MainFragment : Fragment() {
 
     private lateinit var mFragmentMainBinding: FragmentMainBinding
 
-    private lateinit var mContext: Context
-    private lateinit var mActivity: FragmentActivity
-
     private lateinit var mPlayerFragmentViewModel: PlayerFragmentViewModel
     private lateinit var mMainFragmentViewModel: MainFragmentViewModel
 
@@ -44,8 +35,6 @@ class MainFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
         }
-        mContext = requireContext()
-        mActivity = requireActivity()
     }
 
     override fun onCreateView(
@@ -71,43 +60,43 @@ class MainFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-        mPlayerFragmentViewModel.getCurrentSong().observe(mActivity as LifecycleOwner
+        mPlayerFragmentViewModel.getCurrentSong().observe(this as LifecycleOwner
         ) {
             MainScope().launch {
                 updateMiniPlayerUI()
             }
         }
-        mPlayerFragmentViewModel.getSourceOfQueueList().observe(mActivity as LifecycleOwner
+        mPlayerFragmentViewModel.getSourceOfQueueList().observe(this as LifecycleOwner
         ) {
             MainScope().launch {
                 updateMiniPlayerUI()
             }
         }
-        mPlayerFragmentViewModel.getIsPlaying().observe(mActivity as LifecycleOwner
+        mPlayerFragmentViewModel.getIsPlaying().observe(this as LifecycleOwner
         ) {
             MainScope().launch {
                 updatePlayerButtonsUI()
             }
         }
-        mPlayerFragmentViewModel.getPlayingProgressValue().observe(mActivity as LifecycleOwner
+        mPlayerFragmentViewModel.getPlayingProgressValue().observe(this as LifecycleOwner
         ) {
             MainScope().launch {
                 updatePlayerButtonsUI()
             }
         }
-        mMainFragmentViewModel.getSelectMode().observe(mActivity as LifecycleOwner
+        mMainFragmentViewModel.getSelectMode().observe(this as LifecycleOwner
         ) { selectMode ->
             MainScope().launch {
                 updateSelectModeUI(selectMode ?: false)
             }
         }
-        mMainFragmentViewModel.getTotalSelected().observe(mActivity as LifecycleOwner
+        mMainFragmentViewModel.getTotalSelected().observe(this as LifecycleOwner
         ){
             MainScope().launch {
                 updateTotalSelectedUI(it ?: 0)
             }
         }
-        mMainFragmentViewModel.getScrollingState().observe(mActivity as LifecycleOwner
+        mMainFragmentViewModel.getScrollingState().observe(this as LifecycleOwner
         ){ animateScrollStateUI(it ?: 0) }
     }
     private var mIsAnimatingScroll1: Boolean = false
@@ -144,13 +133,19 @@ class MainFragment : Fragment() {
     ) = lifecycleScope.launch(context = Dispatchers.Default) {
         if(totalSelected > 0 && totalSelected >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
             MainScope().launch {
-                mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box)
+                mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = ContextCompat.getDrawable(
+                    this@MainFragment.requireContext(),
+                    R.drawable.check_box
+                )
             }
 
             CustomAnimators.crossFadeUp(mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover, false, 200, 0.8f)
         }else{
             MainScope().launch {
-                mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = ContextCompat.getDrawable(mContext, R.drawable.check_box_outline_blank)
+                mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = ContextCompat.getDrawable(
+                    this@MainFragment.requireContext(),
+                    R.drawable.check_box_outline_blank
+                )
             }
 
             if (totalSelected >= 2 && mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover.visibility != GONE)
@@ -181,9 +176,9 @@ class MainFragment : Fragment() {
     private fun updatePlayerButtonsUI() {
         MainScope().launch {
             if(mPlayerFragmentViewModel.getIsPlaying().value == true){
-                mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = ContextCompat.getDrawable(mContext, R.drawable.pause)
+                mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = ContextCompat.getDrawable(this@MainFragment.requireContext(), R.drawable.pause)
             }else{
-                mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = ContextCompat.getDrawable(mContext, R.drawable.play_arrow)
+                mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = ContextCompat.getDrawable(this@MainFragment.requireContext(), R.drawable.play_arrow)
             }
         }
     }
@@ -195,7 +190,7 @@ class MainFragment : Fragment() {
 //            var tempArtist = ""
 //            tempTitle = if(tempQL[tempPositionInQL].title != null && tempQL[tempPositionInQL].title!!.isNotEmpty()) tempQL[tempPositionInQL].title.toString() else tempQL[tempPositionInQL].fileName.toString() //Set song title
 //
-//            tempArtist = if(tempQL[tempPositionInQL].artist != null && tempQL[tempPositionInQL].artist!!.isNotEmpty()) tempQL[tempPositionInQL].artist.toString() else mContext.getString(R.string.unknown_artist)
+//            tempArtist = if(tempQL[tempPositionInQL].artist != null && tempQL[tempPositionInQL].artist!!.isNotEmpty()) tempQL[tempPositionInQL].artist.toString() else this.requireContext().getString(R.string.unknown_artist)
 //
 //            val tempBinary : ByteArray? = if(tempQL.size > 0) tempQL[tempPositionInQL].covertArt?.binaryData else null
 //
@@ -203,8 +198,8 @@ class MainFragment : Fragment() {
 //                mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.text = tempTitle
 //                mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text = tempArtist
 //            }
-//            CustomUILoaders.loadWithBinaryDataWithCrossFade(mContext, mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer, tempBinary, 60)
-//            CustomUILoaders.loadBlurredWithImageLoader(mContext, mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer, tempBinary, 10)
+//            CustomUILoaders.loadWithBinaryDataWithCrossFade(this.requireContext(), mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer, tempBinary, 60)
+//            CustomUILoaders.loadBlurredWithImageLoader(this.requireContext(), mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer, tempBinary, 10)
 //        }
     }
 
@@ -275,11 +270,11 @@ class MainFragment : Fragment() {
 
 
     private fun setupFragments() {
-        mActivity.supportFragmentManager.commit {
+        activity?.supportFragmentManager?.commit {
             setReorderingAllowed(true)
             add<MusicLibraryFragment>(R.id.main_fragment_container)
         }
-        mActivity.supportFragmentManager.commit {
+        activity?.supportFragmentManager?.commit {
             setReorderingAllowed(true)
             add<PlayerFragment>(R.id.player_fragment_container)
         }

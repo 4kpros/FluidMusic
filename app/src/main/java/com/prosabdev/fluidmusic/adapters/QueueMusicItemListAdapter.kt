@@ -18,12 +18,12 @@ import com.google.android.material.color.MaterialColors
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.callbacks.QueueMusicItemCallback
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
+import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapter
 import com.prosabdev.fluidmusic.databinding.ItemQueueMusicBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
-import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapter
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.*

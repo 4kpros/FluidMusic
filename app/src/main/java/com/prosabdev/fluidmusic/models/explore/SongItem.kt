@@ -1,8 +1,10 @@
 package com.prosabdev.fluidmusic.models.explore
 
-import androidx.room.*
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.prosabdev.fluidmusic.models.FolderUriTree
-import org.jaudiotagger.tag.images.Artwork
 
 @Entity(
     foreignKeys = [

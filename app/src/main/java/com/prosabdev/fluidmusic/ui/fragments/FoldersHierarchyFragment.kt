@@ -1,13 +1,11 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentFoldersHierarchyBinding
 import kotlinx.coroutines.MainScope
@@ -17,15 +15,10 @@ class FoldersHierarchyFragment : Fragment() {
 
     private lateinit var mFragmentFoldersHierarchyBinding: FragmentFoldersHierarchyBinding
 
-    private var mContext: Context? = null
-    private var mActivity: FragmentActivity? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
         }
-        mContext = requireContext()
-        mActivity = requireActivity()
     }
 
     override fun onCreateView(

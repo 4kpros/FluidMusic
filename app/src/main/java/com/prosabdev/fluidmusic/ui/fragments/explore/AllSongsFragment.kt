@@ -1,6 +1,5 @@
 package com.prosabdev.fluidmusic.ui.fragments.explore
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
@@ -18,16 +16,15 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
+import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentAllSongsBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
-import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
+import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.SortOrganizeItemsBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
-import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModelFactory
+import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.GenericViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.coroutineScope
@@ -38,9 +35,6 @@ class AllSongsFragment : Fragment() {
     private var mPageIndex: Int? = -1
 
     private lateinit var mFragmentAllSongsBinding: FragmentAllSongsBinding
-
-    private var mContext: Context? = null
-    private var mActivity: FragmentActivity? = null
 
     private lateinit var mSongItemViewModel: SongItemViewModel
     private lateinit var mMainFragmentViewModel: MainFragmentViewModel
@@ -55,8 +49,6 @@ class AllSongsFragment : Fragment() {
         arguments?.let {
             mPageIndex = it.getInt(ConstantValues.EXPLORE_ALL_SONGS)
         }
-        mContext = requireContext()
-        mActivity = requireActivity()
     }
 
     override fun onCreateView(
@@ -81,19 +73,24 @@ class AllSongsFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        mSongItemViewModel
+        super.onDestroyView()
+    }
+
     private suspend fun observeLiveData() {
-        mSongItemViewModel.getAllSongs().collect{
+        mSongItemViewModel.getAllSongs().observe(this as LifecycleOwner){
             MainScope().launch {
                 addSongsToAdapter(it as ArrayList<SongItem>)
             }
         }
-        mMainFragmentViewModel.getSelectMode().observe(mActivity as LifecycleOwner
+        mMainFragmentViewModel.getSelectMode().observe(this as LifecycleOwner
         ) { onSelectionModeChanged(it) }
-        mMainFragmentViewModel.getTotalSelected().observe(mActivity as LifecycleOwner
+        mMainFragmentViewModel.getTotalSelected().observe(this as LifecycleOwner
         ){ onTotalSelectedItemsChanged(it) }
-        mMainFragmentViewModel.getToggleRange().observe(mActivity as LifecycleOwner
+        mMainFragmentViewModel.getToggleRange().observe(this as LifecycleOwner
         ){ onToggleRangeChanged() }
-        mMainFragmentViewModel.getScrollingState().observe(mActivity as LifecycleOwner
+        mMainFragmentViewModel.getScrollingState().observe(this as LifecycleOwner
         ){ updateOnScrollingStateUI(it) }
     }
     private fun updateOnScrollingStateUI(i: Int) {
@@ -167,7 +164,7 @@ class AllSongsFragment : Fragment() {
         //Setup song adapter
         mSongItemAdapter?.submitList(null)
         mSongItemAdapter = SongItemAdapter(
-            mContext!!,
+            this@AllSongsFragment.requireContext(),
             object : SongItemAdapter.OnItemClickListener{
                 override fun onSongItemClicked(position: Int) {
                     if(mSongItemAdapter?.selectableGetSelectionMode() == true){
@@ -204,7 +201,7 @@ class AllSongsFragment : Fragment() {
         concatAdapter.addAdapter(mEmptyBottomAdapter!!)
 
         //Add Layout manager
-        mLayoutManager = GridLayoutManager(mContext, spanCount, GridLayoutManager.VERTICAL, false)
+        mLayoutManager = GridLayoutManager(this@AllSongsFragment.requireContext(), spanCount, GridLayoutManager.VERTICAL, false)
         MainScope().launch {
             mFragmentAllSongsBinding.recyclerView.adapter = concatAdapter
             mFragmentAllSongsBinding.recyclerView.layoutManager = mLayoutManager
@@ -212,8 +209,6 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun onShowFilterDialog() {
-        if(mContext == null)
-            return
         SortOrganizeItemsBottomSheetDialog().show(childFragmentManager, SortOrganizeItemsBottomSheetDialog.TAG)
     }
 
@@ -260,8 +255,9 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun initViews() {
-        mSongItemViewModel = SongItemViewModelFactory(
-            (activity?.application as DatabaseAccessApplication).database.songItemDao()
+        mSongItemViewModel = GenericViewModelFactory(
+            AppDatabase.getDatabase(this.requireContext()).songItemDao()
+//            (activity?.application as DatabaseAccessApplication).database.songItemDao()
         ).create(SongItemViewModel::class.java)
 
         mMainFragmentViewModel = MainFragmentViewModelFactory().create(MainFragmentViewModel::class.java)

@@ -17,7 +17,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.coroutineScope
-import androidx.work.*
+import androidx.work.WorkInfo
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
@@ -27,12 +27,10 @@ import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
-import com.prosabdev.fluidmusic.viewmodels.FolderUriTreeViewModel
-import com.prosabdev.fluidmusic.viewmodels.FolderUriTreeViewModelFactory
-import com.prosabdev.fluidmusic.viewmodels.views.activities.MediaScannerActivityViewModel
-import com.prosabdev.fluidmusic.viewmodels.views.activities.MediaScannerActivityViewModelFactory
-import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModelFactory
+import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
+import com.prosabdev.fluidmusic.viewmodels.activities.MediaScannerActivityViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.GenericViewModelFactory
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -78,7 +76,7 @@ import kotlinx.coroutines.launch
     }
 
     private fun initViewsModels() {
-        mSongItemViewModel = SongItemViewModelFactory(
+        mSongItemViewModel = GenericViewModelFactory(
             (this.application as DatabaseAccessApplication).database.songItemDao()
         ).create(SongItemViewModel::class.java)
         mMediaScannerActivityViewModel = MediaScannerActivityViewModelFactory(this.application).create(

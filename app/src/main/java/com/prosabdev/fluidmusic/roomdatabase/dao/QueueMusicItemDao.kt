@@ -1,27 +1,35 @@
 package com.prosabdev.fluidmusic.roomdatabase.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.prosabdev.fluidmusic.models.QueueMusicItem
-import com.prosabdev.fluidmusic.models.explore.SongItem
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface QueueMusicItemDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun Insert(queueMusicItem: QueueMusicItem?)
+    fun insert(queueMusicItem: QueueMusicItem?) : Long
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun InsertMultiple(queueMusicItem: ArrayList<QueueMusicItem?>?)
+    fun insertMultiple(queueMusicItems: ArrayList<QueueMusicItem>?) : List<Long>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun Update(queueMusicItem: QueueMusicItem?)
+    fun update(queueMusicItem: QueueMusicItem?)
 
     @Delete
-    fun Delete(queueMusicItem: QueueMusicItem?)
+    fun delete(queueMusicItem: QueueMusicItem?)
+
+    @Delete
+    fun deleteMultiple(queueMusicItem: ArrayList<QueueMusicItem>?)
 
     @Query("DELETE FROM QueueMusicItem")
-    fun DeleteAllFromQueueMusic()
+    fun deleteAll()
 
-    @Query("SELECT * FROM QueueMusicItem")
-    fun getQueueMusicList(): Flow<List<QueueMusicItem>>
+    @Query("DELETE FROM QueueMusicItem WHERE id = :id")
+    fun deleteAtId(id: Long)
+
+    @Query("SELECT * FROM QueueMusicItem WHERE id = :id LIMIT 1")
+    fun getAtId(id: Long): QueueMusicItem?
+
+    @Query("SELECT * FROM QueueMusicItem ORDER BY :order_name, :asc_desc_mode")
+    fun getAll(order_name: String = "id", asc_desc_mode: String = "ASC"): LiveData<List<QueueMusicItem>>?
 }

@@ -12,7 +12,6 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.collection.LruCache
 import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
@@ -23,8 +22,6 @@ import com.prosabdev.fluidmusic.services.MediaPlaybackService
 import com.prosabdev.fluidmusic.ui.activities.SettingsActivity
 import com.prosabdev.fluidmusic.ui.fragments.*
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomBitmapCacheOptimizations
-import com.prosabdev.fluidmusic.utils.CustomUILoaders
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -40,11 +37,6 @@ import kotlinx.coroutines.launch
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
-
-        MainScope().launch {
-            CustomBitmapCacheOptimizations.initBitmapMemoryCachingSystem()
-            CustomBitmapCacheOptimizations.initBitmapDiskCachingSystem(this@MainActivity.applicationContext)
-        }
 
         mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
@@ -109,7 +101,7 @@ import kotlinx.coroutines.launch
             }
             when (menuItem.itemId) {
                 R.id.settings -> {
-                    startActivity(Intent(this, SettingsActivity::class.java).apply {})
+                    startActivity(Intent(this.applicationContext, SettingsActivity::class.java).apply {})
                 }
             }
             menuItem.isChecked = true
@@ -145,7 +137,7 @@ import kotlinx.coroutines.launch
             Log.i(ConstantValues.TAG, "ConnectionCallback onConnected")
             mMediaBrowser?.sessionToken.also { token ->
                 val mediaController = MediaControllerCompat(
-                    this@MainActivity, // Context
+                    this@MainActivity.applicationContext, // Context
                     token!!
                 )
                 MediaControllerCompat.setMediaController(this@MainActivity, mediaController)
@@ -174,51 +166,34 @@ import kotlinx.coroutines.launch
         val mediaController = MediaControllerCompat.getMediaController(this)
         mediaController.transportControls.prepare()
 
-//        val metadata = mediaController.metadata
-//        val pbState = mediaController.playbackState
+        val metadata = mediaController.metadata
+        val pbState = mediaController.playbackState
 
         mediaController.registerCallback(mControllerCallback)
     }
 
-//    private fun createQueueListBundle(currentSong: Int): Bundle {
-//        val bundle = Bundle()
-//        //Get queue list
-//        val queueList : ArrayList<String> = ArrayList()
-//        for (i in 0 until (mPlayerFragmentViewModel.getSongList().value?.size ?: 0)){
-//            val tempSong : String? = mPlayerFragmentViewModel.getSongList().value?.get(i)?.absolutePath
-//            if(tempSong != null && tempSong.isNotEmpty())
-//                queueList.add(tempSong)
-//        }
-//        //Setup song title
-//        val tempTitle = if(mPlayerFragmentViewModel.getSongList().value?.get(currentSong)?.title.isNullOrBlank())
-//            mPlayerFragmentViewModel.getSongList().value?.get(currentSong)?.fileName
-//        else
-//            mPlayerFragmentViewModel.getSongList().value?.get(currentSong)?.title
-//        //Get bitmap image from binary data
-//        val temBitmap : Bitmap? = AudioFileInfoExtractor.getBitmapAudioArtwork(
-//            mPlayerFragmentViewModel.getSongList().value?.get(currentSong)?.covertArt?.binaryData,
-//            100,
-//            100
-//            )
-//        //Create new media meta data for current playing song
-//        val tempMediaMetadataCompat = MediaMetadataCompat.Builder()
-//            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, temBitmap)
-//            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, mPlayerFragmentViewModel.getSongList().value?.get(currentSong)!!.artist)
-//            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, mPlayerFragmentViewModel.getSongList().value?.get(currentSong)!!.album)
-//            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, tempTitle)
-//            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayerFragmentViewModel.getSongList().value?.get(currentSong)!!.duration)
-//            .build()
-//
-//        //Setup bundle
-//        bundle.putParcelable(ConstantValues.BUNDLE_CURRENT_SONG_META_DATA, tempMediaMetadataCompat)
-//        bundle.putStringArrayList(ConstantValues.BUNDLE_QUEUE_LIST, queueList)
-//        bundle.putString(ConstantValues.BUNDLE_SOURCE_FROM, mPlayerFragmentViewModel.getSourceOfQueueList().value)
-//        bundle.putString(ConstantValues.BUNDLE_SOURCE_FROM_VALUE, mPlayerFragmentViewModel.getSourceOfQueueListValue().value)
-//        bundle.putInt(ConstantValues.BUNDLE_SHUFFLE_VALUE, mPlayerFragmentViewModel.getShuffle().value ?: 0)
-//        bundle.putInt(ConstantValues.BUNDLE_REPEAT_VALUE, mPlayerFragmentViewModel.getRepeat().value ?: 0)
-//        bundle.putInt(ConstantValues.BUNDLE_CURRENT_SONG_ID, currentSong)
-//        return bundle
-//    }
+    private fun createQueueListBundle(currentSong: Int): Bundle {
+        val bundle = Bundle()
+        val temBitmap : Bitmap? = null
+        //Create new media meta data for current playing song
+        val tempMediaMetadataCompat = MediaMetadataCompat.Builder()
+            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, temBitmap)
+            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, "title")
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "artist")
+            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, "album")
+            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 0)
+            .build()
+
+        //Setup bundle
+        bundle.putParcelable(ConstantValues.BUNDLE_CURRENT_SONG_META_DATA, tempMediaMetadataCompat)
+        bundle.putStringArrayList(ConstantValues.BUNDLE_QUEUE_LIST, null)
+        bundle.putString(ConstantValues.BUNDLE_SOURCE_FROM, "")
+        bundle.putString(ConstantValues.BUNDLE_SOURCE_FROM_VALUE, "")
+        bundle.putInt(ConstantValues.BUNDLE_SHUFFLE_VALUE, 0)
+        bundle.putInt(ConstantValues.BUNDLE_REPEAT_VALUE, 0)
+        bundle.putInt(ConstantValues.BUNDLE_CURRENT_SONG_ID, currentSong)
+        return bundle
+    }
 
     public override fun onStart() {
         super.onStart()

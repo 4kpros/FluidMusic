@@ -1,30 +1,21 @@
 package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LifecycleOwner
-import com.google.android.material.button.MaterialButton
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetPlayerMoreBinding
-import com.prosabdev.fluidmusic.databinding.DialogQueueMusicBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomFormatters
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
-import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.views.explore.SongItemViewModelFactory
-import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.GenericViewModelFactory
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -33,9 +24,6 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
 
     private lateinit var mBottomSheetPlayerMoreBinding: BottomSheetPlayerMoreBinding
 
-    private lateinit var mContext: Context
-    private var mActivity: FragmentActivity? = null
-
     private lateinit var mSongItemViewModel: SongItemViewModel
 
     override fun onCreateView(
@@ -43,8 +31,6 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mContext = requireContext()
-        mActivity = requireActivity()
 
         mBottomSheetPlayerMoreBinding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_player_more, container, false)
         val view = mBottomSheetPlayerMoreBinding.root
@@ -79,13 +65,18 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
             if(songItem.artist != null && songItem.artist!!.isNotEmpty())
                 songItem.artist
             else
-                mContext.getString(R.string.unknown_artist)
+                this.getString(R.string.unknown_artist)
 
-        mBottomSheetPlayerMoreBinding.textDescription.text = mContext.getString(R.string.item_song_card_text_details, songItem.duration, songItem.typeMime)
+        mBottomSheetPlayerMoreBinding.textDescription.text =
+            this.getString(
+                R.string.item_song_card_text_details,
+                CustomFormatters.formatSongDurationToString(songItem.duration),
+                songItem.typeMime
+            )
 
         MainScope().launch {
             val tempUri: Uri? = Uri.parse(songItem.uri)
-            CustomUILoaders.loadCovertArtFromSongUri(mContext, mBottomSheetPlayerMoreBinding.covertArt, tempUri, 100)
+            CustomUILoaders.loadCovertArtFromSongUri(this@PlayerMoreDialog.requireContext(), mBottomSheetPlayerMoreBinding.covertArt, tempUri, 100)
         }
     }
 
@@ -151,7 +142,7 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
     private fun initViews() {
         mBottomSheetPlayerMoreBinding.covertArt.layout(0,0,0,0)
 
-        mSongItemViewModel = SongItemViewModelFactory(
+        mSongItemViewModel = GenericViewModelFactory(
             (activity?.application as DatabaseAccessApplication).database.songItemDao()
         ).create(SongItemViewModel::class.java)
     }

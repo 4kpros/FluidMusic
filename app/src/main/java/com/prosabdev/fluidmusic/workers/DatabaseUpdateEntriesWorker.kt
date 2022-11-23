@@ -7,8 +7,6 @@ import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class DatabaseUpdateEntriesWorker(
     ctx: Context,
@@ -33,7 +31,7 @@ class DatabaseUpdateEntriesWorker(
     }
 
     private fun deleteSongFromDatabase(songItem: SongItem) {
-        AppDatabase.getDatabase(applicationContext).songItemDao().Delete(songItem)
+        AppDatabase.getDatabase(applicationContext).songItemDao().delete(songItem)
     }
 
     private fun checkIfUriExist(uri: String?): Boolean {

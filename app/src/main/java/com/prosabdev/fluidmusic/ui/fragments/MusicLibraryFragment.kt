@@ -1,6 +1,5 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -22,15 +20,11 @@ import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModelFactory
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class MusicLibraryFragment : Fragment() {
     private lateinit var mFragmentMusicLibraryBinding: FragmentMusicLibraryBinding
-
-    private lateinit var mContext: Context
-    private lateinit var mActivity: FragmentActivity
 
     private lateinit var mMainFragmentViewModel: MainFragmentViewModel
 
@@ -40,8 +34,6 @@ class MusicLibraryFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
         }
-        mContext = requireContext()
-        mActivity = requireActivity()
     }
 
     override fun onCreateView(
@@ -97,9 +89,9 @@ class MusicLibraryFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-        mMainFragmentViewModel.getSelectMode().observe(mActivity as LifecycleOwner
+        mMainFragmentViewModel.getSelectMode().observe(this as LifecycleOwner
         ) { selectMode -> updateSelectModeUI(selectMode ?: false) }
-        mMainFragmentViewModel.getTotalSelected().observe(mActivity as LifecycleOwner
+        mMainFragmentViewModel.getTotalSelected().observe(this as LifecycleOwner
         ) { totalSelected -> updateTotalSelectedItemsUI(totalSelected ?: 0) }
     }
     private  fun updateTotalSelectedItemsUI(totalSelected : Int, animate : Boolean = true){
@@ -149,16 +141,16 @@ class MusicLibraryFragment : Fragment() {
         }
     }
     private fun onShareSelectionDialog() {
-        Toast.makeText(mContext, "On share selection", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this.requireContext(), "On share selection", Toast.LENGTH_SHORT).show()
     }
     private fun onShowAddSelectionToPlaylistDialog() {
-        Toast.makeText(mContext, "On add selection to playlist", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this.requireContext(), "On add selection to playlist", Toast.LENGTH_SHORT).show()
     }
     private fun onAddSelectionToQueueMusicDialog() {
-        Toast.makeText(mContext, "On add selection to queue music", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this.requireContext(), "On add selection to queue music", Toast.LENGTH_SHORT).show()
     }
     private fun onShowDeleteSelectionDialog() {
-        MaterialAlertDialogBuilder(mContext)
+        MaterialAlertDialogBuilder(this.requireContext())
             .setTitle(resources.getString(R.string.dialog_delete_selection_title))
             .setMessage(resources.getString(R.string.dialog_delete_selection_description))
             .setNeutralButton(resources.getString(R.string.delete_files)) { dialog, which ->
@@ -173,15 +165,15 @@ class MusicLibraryFragment : Fragment() {
             .show()
     }
     private fun onAddToPlayAfter() {
-        Toast.makeText(mContext, "On add to play after selection", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this.requireContext(), "On add to play after selection", Toast.LENGTH_SHORT).show()
     }
 
     private fun onDeleteForeverFilesSelection() {
-        Toast.makeText(mContext, "On delete forever files selection", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this.requireContext(), "On delete forever files selection", Toast.LENGTH_SHORT).show()
     }
 
     private fun onDeleteSelection() {
-        Toast.makeText(mContext, "On delete selection", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this.requireContext(), "On delete selection", Toast.LENGTH_SHORT).show()
     }
 
     private fun applyAppBarTitle(position: Int) {

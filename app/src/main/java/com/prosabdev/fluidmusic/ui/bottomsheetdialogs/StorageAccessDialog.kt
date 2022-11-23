@@ -1,22 +1,17 @@
 package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 
-import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.FragmentActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetStorageAccessBinding
-import com.prosabdev.fluidmusic.viewmodels.views.activities.StorageAccessActivityViewModel
+import com.prosabdev.fluidmusic.viewmodels.activities.StorageAccessActivityViewModel
 
 class StorageAccessDialog(private val mStorageAccessActivityViewModel: StorageAccessActivityViewModel) : GenericBottomSheetDialogFragment() {
-
-    private lateinit var mContext: Context
-    private lateinit var mActivity: FragmentActivity
 
     private lateinit var mBottomSheetStorageAccessBinding : BottomSheetStorageAccessBinding
 
@@ -25,9 +20,6 @@ class StorageAccessDialog(private val mStorageAccessActivityViewModel: StorageAc
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-        mContext = requireContext()
-        mActivity = requireActivity()
 
         mBottomSheetStorageAccessBinding = DataBindingUtil.inflate(inflater,R.layout.bottom_sheet_storage_access,container,false)
         val view = mBottomSheetStorageAccessBinding.root
@@ -48,7 +40,7 @@ class StorageAccessDialog(private val mStorageAccessActivityViewModel: StorageAc
         }
     }
     private fun showRemoveAllDialog() {
-        MaterialAlertDialogBuilder(mContext)
+        MaterialAlertDialogBuilder(this.requireContext())
             .setTitle("Remove all folders ?")
             .setMessage("All folders with songs(on your database, not on device) will be removed from your accessible files. Do you want to remove all anyway ?")
             .setNegativeButton(resources.getString(R.string.decline)) { dialog, which ->

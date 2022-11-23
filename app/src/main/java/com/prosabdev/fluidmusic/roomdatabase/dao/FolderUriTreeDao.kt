@@ -1,38 +1,44 @@
 package com.prosabdev.fluidmusic.roomdatabase.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.prosabdev.fluidmusic.models.FolderUriTree
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FolderUriTreeDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun Insert(folderUriTree: FolderUriTree?) : Long
+    fun insert(folderUriTree: FolderUriTree?) : Long
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun InsertMultiple(folderUriTree: ArrayList<FolderUriTree?>?) : List<Long>
+    fun insertMultiple(folderUriTrees: ArrayList<FolderUriTree>?) : List<Long>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun Update(folderUriTree: FolderUriTree?)
+    fun update(folderUriTree: FolderUriTree?)
 
     @Delete
-    fun Delete(folderUriTree: FolderUriTree?)
+    fun delete(folderUriTree: FolderUriTree?)
 
     @Delete
-    fun DeleteMultiple(folderUriTree: ArrayList<FolderUriTree?>?)
-
-    @Query("DELETE FROM FolderUriTree WHERE id = :position")
-    fun deleteAtPosition(position: Long)
+    fun deleteMultiple(folderUriTree: ArrayList<FolderUriTree>?)
 
     @Query("DELETE FROM FolderUriTree")
     fun deleteAll()
 
+    @Query("DELETE FROM FolderUriTree WHERE id = :id")
+    fun deleteAtId(id: Long)
+
+    @Query("DELETE FROM FolderUriTree WHERE uriTree = :uriTree")
+    fun deleteAtUriTree(uriTree: String)
+
+    @Query("SELECT * FROM FolderUriTree WHERE id = :id LIMIT 1")
+    fun getAtId(id: Long): FolderUriTree?
+
+    @Query("SELECT * FROM FolderUriTree WHERE uriTree = :uriTree LIMIT 1")
+    fun getAtUriTree(uriTree: String): FolderUriTree?
+
+    @Query("SELECT * FROM FolderUriTree ORDER BY :order_name, :asc_desc_mode")
+    fun getAll(order_name: String = "id", asc_desc_mode: String = "ASC"): LiveData<List<FolderUriTree>>
+
     @Query("UPDATE FolderUriTree SET lastModified = -1")
     fun resetAllFolderUriTreesLastModified()
-
-    @Query("SELECT * FROM FolderUriTree")
-    fun getAllFolderUriTrees(): Flow<List<FolderUriTree>>
-
-    @Query("SELECT * FROM FolderUriTree")
-    fun getAllFolderUriTreesDirectly(): List<FolderUriTree>
 }
