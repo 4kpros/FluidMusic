@@ -11,7 +11,6 @@ class SongItemViewModel(ctx : Context) : ViewModel() {
 
     private var repository: SongItemRepository? = SongItemRepository(ctx)
 
-    //
     suspend fun insert(songItem: SongItem?) : Long? {
         return repository?.insert(songItem)
     }
