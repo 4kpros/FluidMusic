@@ -19,7 +19,7 @@ import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
-import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 

@@ -53,9 +53,14 @@ class SongItemRepository(ctx : Context) {
             mDao?.getAll(order_name, asc_desc_mode)
         }
     }
-    suspend fun getAllWithWhereClause(whereColumn: String?, columnValue: String?, order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<SongItem>>? {
+    suspend fun getAllWhereEqual(whereColumn: String, columnValue: String?, order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<SongItem>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAllWithWhereClause(whereColumn, columnValue, order_name, asc_desc_mode)
+            mDao?.getAllWhereEqual(whereColumn, columnValue, order_name, asc_desc_mode)
+        }
+    }
+    suspend fun getAllWhereLike(whereColumn: String, columnValue: String?, order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<SongItem>>? {
+        return withContext(Dispatchers.IO){
+            mDao?.getAllWhereLike(whereColumn, columnValue, order_name, asc_desc_mode)
         }
     }
 }

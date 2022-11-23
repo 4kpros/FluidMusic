@@ -1,4 +1,4 @@
-package com.prosabdev.fluidmusic.viewmodels.views.fragments
+package com.prosabdev.fluidmusic.viewmodels.fragments
 
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.LiveData

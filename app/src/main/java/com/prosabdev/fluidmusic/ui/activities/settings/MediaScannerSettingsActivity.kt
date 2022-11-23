@@ -27,10 +27,10 @@ import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
-import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
 import com.prosabdev.fluidmusic.viewmodels.activities.MediaScannerActivityViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.GenericViewModelFactory
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -76,7 +76,7 @@ import kotlinx.coroutines.launch
     }
 
     private fun initViewsModels() {
-        mSongItemViewModel = GenericViewModelFactory(
+        mSongItemViewModel = ModelsViewModelFactory(
             (this.application as DatabaseAccessApplication).database.songItemDao()
         ).create(SongItemViewModel::class.java)
         mMediaScannerActivityViewModel = MediaScannerActivityViewModelFactory(this.application).create(

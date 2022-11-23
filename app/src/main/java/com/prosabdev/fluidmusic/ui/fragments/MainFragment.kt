@@ -17,8 +17,8 @@ import com.prosabdev.fluidmusic.databinding.FragmentMainBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
 import com.prosabdev.fluidmusic.utils.CustomViewModifiers
-import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope

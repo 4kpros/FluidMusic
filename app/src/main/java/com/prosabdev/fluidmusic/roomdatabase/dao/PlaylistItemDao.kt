@@ -3,7 +3,6 @@ package com.prosabdev.fluidmusic.roomdatabase.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.prosabdev.fluidmusic.models.PlaylistItem
-import com.prosabdev.fluidmusic.models.explore.SongItem
 
 @Dao
 interface PlaylistItemDao {

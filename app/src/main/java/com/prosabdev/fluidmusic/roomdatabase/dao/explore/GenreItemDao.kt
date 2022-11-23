@@ -1,16 +1,15 @@
 package com.prosabdev.fluidmusic.roomdatabase.dao.explore
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
 import com.prosabdev.fluidmusic.models.explore.GenreItem
-import com.prosabdev.fluidmusic.models.explore.SongItem
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GenreItemDao {
-    @Query("SELECT * FROM GenreItem ORDER BY :order_name, :asc_desc_mode")
-    fun getAllGenres(order_name: String = "genre", asc_desc_mode: String = "ASC"): Flow<List<GenreItem>>
+    @Query("SELECT * FROM GenreItem WHERE genre = :name LIMIT 1")
+    fun getAtName(name : String): GenreItem?
 
-    @Query("SELECT * FROM SongItem WHERE genre = :genre ORDER BY :order_name, :asc_desc_mode")
-    fun getAllSongsForGenre(genre: String, order_name: String = "genre", asc_desc_mode: String = "ASC"): Flow<List<SongItem>>
+    @Query("SELECT * FROM GenreItem ORDER BY :order_name, :asc_desc_mode")
+    fun getAll(order_name: String = "genre", asc_desc_mode: String = "ASC"): LiveData<List<GenreItem>>?
 }

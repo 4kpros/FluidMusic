@@ -75,7 +75,7 @@ class MediaScannerWorker(
     ) = coroutineScope{
         val tempFolderSelected: ArrayList<FolderUriTree> =
             AppDatabase.getDatabase(applicationContext).folderUriTreeDao()
-                .getAllFolderUriTreesDirectly() as ArrayList<FolderUriTree>
+                .getAll().value as ArrayList<FolderUriTree>
 
         if (tempFolderSelected.isEmpty()) {
             MainScope().launch {

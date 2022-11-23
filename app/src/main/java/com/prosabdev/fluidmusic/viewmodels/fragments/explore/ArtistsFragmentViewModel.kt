@@ -1,4 +1,4 @@
-package com.prosabdev.fluidmusic.viewmodels.views.fragments.explore
+package com.prosabdev.fluidmusic.viewmodels.fragments.explore
 
 import androidx.lifecycle.ViewModel
 

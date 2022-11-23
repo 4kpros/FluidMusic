@@ -12,7 +12,7 @@ import com.prosabdev.fluidmusic.models.explore.*
 import com.prosabdev.fluidmusic.roomdatabase.dao.FolderUriTreeDao
 import com.prosabdev.fluidmusic.roomdatabase.dao.PlaylistItemDao
 import com.prosabdev.fluidmusic.roomdatabase.dao.QueueMusicItemDao
-import com.prosabdev.fluidmusic.roomdatabase.dao.explore.SongItemDao
+import com.prosabdev.fluidmusic.roomdatabase.dao.explore.*
 import com.prosabdev.fluidmusic.utils.ConstantValues
 
 @Database(
@@ -39,7 +39,15 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun folderUriTreeDao(): FolderUriTreeDao
     abstract fun playlistItemDao(): PlaylistItemDao
     abstract fun queueMusicItemDao(): QueueMusicItemDao
+
+    abstract fun albumArtistItemDao(): AlbumArtistItemDao
+    abstract fun albumItemDao(): AlbumItemDao
+    abstract fun artistItemDao(): ArtistItemDao
+    abstract fun composerItemDao(): ComposerItemDao
+    abstract fun folderItemDao(): FolderItemDao
+    abstract fun genreItemDao(): GenreItemDao
     abstract fun songItemDao(): SongItemDao
+    abstract fun yearItemDao(): YearItemDao
 
     companion object {
         @Volatile

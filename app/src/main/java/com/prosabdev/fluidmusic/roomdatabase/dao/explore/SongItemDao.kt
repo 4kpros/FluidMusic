@@ -2,7 +2,6 @@ package com.prosabdev.fluidmusic.roomdatabase.dao.explore
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.models.explore.SongItem
 
 @Dao
@@ -38,5 +37,8 @@ interface SongItemDao {
     fun getAll(order_name: String = "title", asc_desc_mode: String = "ASC"): LiveData<List<SongItem>>?
 
     @Query("SELECT * FROM SongItem WHERE :whereColumn = :columnValue ORDER BY :order_name, :asc_desc_mode")
-    fun getAllWithWhereClause(whereColumn: String?, columnValue: String?, order_name: String = "title", asc_desc_mode: String = "ASC"): LiveData<List<SongItem>>?
+    fun getAllWhereEqual(whereColumn: String, columnValue: String?, order_name: String = "title", asc_desc_mode: String = "ASC"): LiveData<List<SongItem>>?
+
+    @Query("SELECT * FROM SongItem WHERE :whereColumn LIKE :columnValue ORDER BY :order_name, :asc_desc_mode")
+    fun getAllWhereLike(whereColumn: String, columnValue: String?, order_name: String = "title", asc_desc_mode: String = "ASC"): LiveData<List<SongItem>>?
 }

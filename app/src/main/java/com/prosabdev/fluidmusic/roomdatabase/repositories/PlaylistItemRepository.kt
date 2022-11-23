@@ -2,9 +2,7 @@ package com.prosabdev.fluidmusic.roomdatabase.repositories
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.models.PlaylistItem
-import com.prosabdev.fluidmusic.models.QueueMusicItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.roomdatabase.dao.PlaylistItemDao
 import kotlinx.coroutines.Dispatchers

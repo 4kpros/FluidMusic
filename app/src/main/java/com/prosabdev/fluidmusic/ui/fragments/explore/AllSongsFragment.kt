@@ -22,9 +22,9 @@ import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.SortOrganizeItemsBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.GenericViewModelFactory
-import com.prosabdev.fluidmusic.viewmodels.views.fragments.MainFragmentViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.coroutineScope
@@ -255,7 +255,7 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun initViews() {
-        mSongItemViewModel = GenericViewModelFactory(
+        mSongItemViewModel = ModelsViewModelFactory(
             AppDatabase.getDatabase(this.requireContext()).songItemDao()
 //            (activity?.application as DatabaseAccessApplication).database.songItemDao()
         ).create(SongItemViewModel::class.java)

@@ -1,4 +1,4 @@
-package com.prosabdev.fluidmusic.viewmodels.views.fragments
+package com.prosabdev.fluidmusic.viewmodels.fragments
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

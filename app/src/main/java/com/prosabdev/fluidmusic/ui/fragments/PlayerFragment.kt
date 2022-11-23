@@ -35,10 +35,10 @@ import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActiv
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreDialog
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicDialog
 import com.prosabdev.fluidmusic.utils.*
+import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.models.QueueMusicItemViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.GenericViewModelFactory
-import com.prosabdev.fluidmusic.viewmodels.views.fragments.PlayerFragmentViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -528,7 +528,7 @@ import kotlin.math.roundToLong
 
     private fun initViews() {
         mPlayerFragmentViewModel = PlayerFragmentViewModelFactory().create(PlayerFragmentViewModel::class.java)
-        mSongItemViewModel = GenericViewModelFactory(
+        mSongItemViewModel = ModelsViewModelFactory(
             AppDatabase.getDatabase(this.requireContext()).songItemDao()
 //            (activity?.application as DatabaseAccessApplication).database.songItemDao()
         ).create(SongItemViewModel::class.java)
