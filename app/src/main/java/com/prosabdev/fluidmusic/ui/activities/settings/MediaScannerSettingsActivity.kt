@@ -168,11 +168,9 @@ import kotlinx.coroutines.launch
         mMediaScannerActivityViewModel.scanDevice(ConstantValues.MEDIA_SCANNER_WORKER_METHOD_ADD_NEW)
     }
 
-    private fun observeLiveData() {
-        lifecycle.coroutineScope.launch {
-            mFolderUriTreeViewModel.getAll()?.observe(this@MediaScannerSettingsActivity.baseContext as LifecycleOwner){
-                updateFolderUriTrees(it)
-            }
+    private suspend fun observeLiveData() {
+        mFolderUriTreeViewModel.getAll()?.observe(this as LifecycleOwner){
+            updateFolderUriTrees(it)
         }
         mMediaScannerActivityViewModel.getIsLoadingInBackground().observe(this as LifecycleOwner){
             updateLoadingUI(it)

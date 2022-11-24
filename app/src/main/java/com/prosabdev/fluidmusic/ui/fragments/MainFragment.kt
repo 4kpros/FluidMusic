@@ -1,41 +1,44 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
+import android.content.Context
+import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.add
-import androidx.fragment.app.commit
+import androidx.fragment.app.*
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentMainBinding
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomAnimators
-import com.prosabdev.fluidmusic.utils.CustomViewModifiers
-import com.prosabdev.fluidmusic.viewmodels.fragments.FragmentViewModelFactory
+import com.prosabdev.fluidmusic.models.explore.SongItem
+import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
+import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class MainFragment : Fragment() {
+class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private lateinit var mFragmentMainBinding: FragmentMainBinding
+    private lateinit var mContext: Context
 
-    private lateinit var mPlayerFragmentViewModel: PlayerFragmentViewModel
-    private lateinit var mMainFragmentViewModel: MainFragmentViewModel
+    private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
+    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
         }
+        mContext = requireContext()
     }
 
     override fun onCreateView(
@@ -64,25 +67,13 @@ class MainFragment : Fragment() {
         mPlayerFragmentViewModel.getCurrentSong().observe(this.requireContext() as LifecycleOwner
         ) {
             MainScope().launch {
-                updateMiniPlayerUI()
-            }
-        }
-        mPlayerFragmentViewModel.getSourceOfQueueList().observe(this.requireContext() as LifecycleOwner
-        ) {
-            MainScope().launch {
-                updateMiniPlayerUI()
-            }
-        }
-        mPlayerFragmentViewModel.getIsPlaying().observe(this.requireContext() as LifecycleOwner
-        ) {
-            MainScope().launch {
-                updatePlayerButtonsUI()
+                updateMiniPlayerUI(it)
             }
         }
         mPlayerFragmentViewModel.getPlayingProgressValue().observe(this.requireContext() as LifecycleOwner
         ) {
             MainScope().launch {
-                updatePlayerButtonsUI()
+                updateSliderUI(it)
             }
         }
         mMainFragmentViewModel.getSelectMode().observe(this.requireContext() as LifecycleOwner
@@ -100,10 +91,14 @@ class MainFragment : Fragment() {
         mMainFragmentViewModel.getScrollingState().observe(this.requireContext() as LifecycleOwner
         ){ animateScrollStateUI(it ?: 0) }
     }
+
+    private fun updateSliderUI(it: Long?) {
+        mFragmentMainBinding.constraintMiniPlayerInclude.progressMiniPlayerIndicator.progress = it?.toInt() ?: 0
+    }
+
     private var mIsAnimatingScroll1: Boolean = false
     private var mIsAnimatingScroll2: Boolean = false
     private fun animateScrollStateUI(i: Int, animate : Boolean = true) {
-        Log.i(ConstantValues.TAG, "IS SCROLLING : ${i}")
         if(i >= 1){
             if(mIsAnimatingScroll2){
                 mFragmentMainBinding.constraintMiniPlayerContainer.apply {
@@ -131,11 +126,12 @@ class MainFragment : Fragment() {
     private fun updateTotalSelectedUI(
         totalSelected: Int,
         animate : Boolean = true
-    ) = lifecycleScope.launch(context = Dispatchers.Default) {
+    ) {
+        val ctx : Context = this.context ?: return
         if(totalSelected > 0 && totalSelected >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
             MainScope().launch {
                 mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = ContextCompat.getDrawable(
-                    this@MainFragment.requireContext(),
+                    ctx,
                     R.drawable.check_box
                 )
             }
@@ -144,7 +140,7 @@ class MainFragment : Fragment() {
         }else{
             MainScope().launch {
                 mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = ContextCompat.getDrawable(
-                    this@MainFragment.requireContext(),
+                    ctx,
                     R.drawable.check_box_outline_blank
                 )
             }
@@ -174,34 +170,53 @@ class MainFragment : Fragment() {
                 CustomAnimators.crossTranslateOutFromVertical(mFragmentMainBinding.constraintTopSelectionContainer as View, -1, animate, 300)
         }
     }
-    private fun updatePlayerButtonsUI() {
+    private fun updatePlayerButtonsUI(playing : Boolean) {
         MainScope().launch {
-            if(mPlayerFragmentViewModel.getIsPlaying().value == true){
-                mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = ContextCompat.getDrawable(this@MainFragment.requireContext(), R.drawable.pause)
+            if(playing){
+                mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = AppCompatResources.getDrawable(mContext, R.drawable.pause)
             }else{
-                mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = ContextCompat.getDrawable(this@MainFragment.requireContext(), R.drawable.play_arrow)
+                mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = AppCompatResources.getDrawable(mContext, R.drawable.play_arrow)
             }
         }
     }
-    private suspend fun updateMiniPlayerUI(animate : Boolean = true) = lifecycleScope.launch(context = Dispatchers.Default) {
-//        val tempQL : ArrayList<SongItem>? = null
-//        val tempPositionInQL : Int = mPlayerFragmentViewModel.getCurrentSong().value ?: -1
-//        if(tempQL!= null && tempQL.size > 0 && tempPositionInQL >= 0){
-//            var tempTitle = ""
-//            var tempArtist = ""
-//            tempTitle = if(tempQL[tempPositionInQL].title != null && tempQL[tempPositionInQL].title!!.isNotEmpty()) tempQL[tempPositionInQL].title.toString() else tempQL[tempPositionInQL].fileName.toString() //Set song title
-//
-//            tempArtist = if(tempQL[tempPositionInQL].artist != null && tempQL[tempPositionInQL].artist!!.isNotEmpty()) tempQL[tempPositionInQL].artist.toString() else this.requireContext().getString(R.string.unknown_artist)
-//
-//            val tempBinary : ByteArray? = if(tempQL.size > 0) tempQL[tempPositionInQL].covertArt?.binaryData else null
-//
-//            MainScope().launch {
-//                mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.text = tempTitle
-//                mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text = tempArtist
-//            }
-//            CustomUILoaders.loadWithBinaryDataWithCrossFade(this.requireContext(), mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer, tempBinary, 60)
-//            CustomUILoaders.loadBlurredWithImageLoader(this.requireContext(), mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer, tempBinary, 10)
-//        }
+    private var mOldPlayingSong : CurrentPlayingSongItem? = null
+    private suspend fun updateMiniPlayerUI(currentSong : CurrentPlayingSongItem?) {
+        withContext(Dispatchers.IO){
+            val ctx : Context = this@MainFragment.context ?: return@withContext
+            if(currentSong != null) {
+                if (currentSong.uri != mOldPlayingSong?.uri) {
+                    mOldPlayingSong = currentSong
+                    val tempUri = Uri.parse(currentSong.uri)
+                    MainScope().launch {
+
+                        mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.text =
+                            if(currentSong.title != null )
+                                currentSong.title
+                            else
+                                currentSong.fileName
+
+                        mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text =
+                            if(currentSong.artist != null )
+                                currentSong.artist
+                            else
+                                ctx.getString(R.string.unknown_artist)
+                    }
+                    CustomUILoaders.loadCovertArtFromSongUri(
+                        ctx,
+                        mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer,
+                        tempUri,
+                        60,
+                        100
+                    )
+                    CustomUILoaders.loadBlurredCovertArtFromSongUri(
+                        ctx,
+                        mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer,
+                        tempUri,
+                        25
+                    )
+                }
+            }
+        }
     }
 
     private suspend fun checkInteractions() {
@@ -282,8 +297,8 @@ class MainFragment : Fragment() {
     }
 
     private fun initViews() {
-        mPlayerFragmentViewModel = FragmentViewModelFactory().create(PlayerFragmentViewModel::class.java)
-        mMainFragmentViewModel = FragmentViewModelFactory().create(MainFragmentViewModel::class.java)
+//        mPlayerFragmentViewModel = FragmentViewModelFactory().create(PlayerFragmentViewModel::class.java)
+//        mMainFragmentViewModel = FragmentViewModelFactory().create(MainFragmentViewModel::class.java)
 
         mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer.layout(0,0,0,0)
         mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer.layout(0,0,0,0)
@@ -303,5 +318,37 @@ class MainFragment : Fragment() {
                 arguments = Bundle().apply {
                 }
             }
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        when (key) {
+            ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG -> {
+//                val currentPlayingSongItem: CurrentPlayingSongItem? = SharedPreferenceManager.loadCurrentPlayingSong(this@PlayerFragment.requireContext(), sharedPreferences)
+                MainScope().launch {
+//                    val position : Int = currentPlayingSongItem?.position?.toInt() ?: 0
+//                    updateTextTitleSubtitleDurationUI(position)
+//                    updateTextCurrentDurationUI(0)
+//                    updateSliderCurrentDurationUI(0)
+//                    updateBlurredBackgroundUI(position)
+                }
+            }
+            ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SOURCE,
+            ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SOURCE_VALUE,
+            ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SIZE -> {
+//                loadSongsForQueueListSource(
+//                    ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SOURCE,
+//                    ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SOURCE_VALUE,
+//                    ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SIZE
+//                )
+            }
+//            ConstantValues.SHARED_PREFERENCES_REPEAT -> {
+//                val repeatValue = SharedPreferenceManager.loadRepeat(this.requireContext(), sharedPreferences)
+//                updateRepeatUI(repeatValue)
+//            }
+//            ConstantValues.SHARED_PREFERENCES_SHUFFLE -> {
+//                val shuffleValue = SharedPreferenceManager.loadRepeat(this.requireContext(), sharedPreferences)
+//                updateShuffleUI(shuffleValue)
+//            }
+        }
     }
 }

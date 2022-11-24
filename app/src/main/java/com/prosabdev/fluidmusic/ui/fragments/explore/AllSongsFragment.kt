@@ -1,12 +1,15 @@
 package com.prosabdev.fluidmusic.ui.fragments.explore
 
+import android.content.Context
 import android.os.Bundle
+import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
@@ -19,16 +22,20 @@ import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentAllSongsBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
+import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.SortOrganizeItemsBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.viewmodels.fragments.FragmentViewModelFactory
+import com.prosabdev.fluidmusic.utils.CustomMathComputations
+import com.prosabdev.fluidmusic.utils.SharedPreferenceManager
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlin.math.roundToLong
 
 
 class AllSongsFragment : Fragment() {
@@ -36,8 +43,9 @@ class AllSongsFragment : Fragment() {
 
     private lateinit var mFragmentAllSongsBinding: FragmentAllSongsBinding
 
+    private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
+    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
     private lateinit var mSongItemViewModel: SongItemViewModel
-    private lateinit var mMainFragmentViewModel: MainFragmentViewModel
 
     private var mEmptyBottomAdapter: EmptyBottomAdapter? = null
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
@@ -84,6 +92,8 @@ class AllSongsFragment : Fragment() {
                 addSongsToAdapter(it as ArrayList<SongItem>)
             }
         }
+        mPlayerFragmentViewModel.getCurrentSong().observe(this as LifecycleOwner
+        ) { updateSelectedPlayingSong(it?.position?.toInt() ?: 0) }
         mMainFragmentViewModel.getSelectMode().observe(this as LifecycleOwner
         ) { onSelectionModeChanged(it) }
         mMainFragmentViewModel.getTotalSelected().observe(this as LifecycleOwner
@@ -93,6 +103,11 @@ class AllSongsFragment : Fragment() {
         mMainFragmentViewModel.getScrollingState().observe(this as LifecycleOwner
         ){ updateOnScrollingStateUI(it) }
     }
+
+    private fun updateSelectedPlayingSong(i: Int) {
+        //
+    }
+
     private fun updateOnScrollingStateUI(i: Int) {
         if(mMainFragmentViewModel.getActivePage().value == mPageIndex){
             if(i == 2)
@@ -114,8 +129,8 @@ class AllSongsFragment : Fragment() {
         mHeadlineTopPlayShuffleAdapter?.onSelectModeValue(it ?: false)
     }
     private fun onCurrentPlayingSongChanged(it: Int?) {
-//        if (mPlayerFragmentViewModel.getSourceOfQueueList().value == ConstantValues.EXPLORE_ALL_SONGS)
-//            mSongItemAdapter?.setCurrentPlayingSong(it ?: -1)
+        if (mPlayerFragmentViewModel.getSourceOfQueueList().value == ConstantValues.EXPLORE_ALL_SONGS)
+            mSongItemAdapter?.setCurrentPlayingSong(it ?: -1)
     }
     private suspend fun addSongsToAdapter(songList: ArrayList<SongItem>?) = coroutineScope{
         mSongItemAdapter?.submitList(songList as ArrayList<Any>)
@@ -144,6 +159,7 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun setupRecyclerViewAdapter() = lifecycleScope.launch(context = Dispatchers.Default){
+        val ctx : Context = this@AllSongsFragment.context ?: return@launch
         val spanCount = 1
 
         //Setup headline adapter
@@ -164,7 +180,7 @@ class AllSongsFragment : Fragment() {
         //Setup song adapter
         mSongItemAdapter?.submitList(null)
         mSongItemAdapter = SongItemAdapter(
-            this@AllSongsFragment.requireContext(),
+            ctx,
             object : SongItemAdapter.OnItemClickListener{
                 override fun onSongItemClicked(position: Int) {
                     if(mSongItemAdapter?.selectableGetSelectionMode() == true){
@@ -201,7 +217,7 @@ class AllSongsFragment : Fragment() {
         concatAdapter.addAdapter(mEmptyBottomAdapter!!)
 
         //Add Layout manager
-        mLayoutManager = GridLayoutManager(this@AllSongsFragment.requireContext(), spanCount, GridLayoutManager.VERTICAL, false)
+        mLayoutManager = GridLayoutManager(ctx, spanCount, GridLayoutManager.VERTICAL, false)
         MainScope().launch {
             mFragmentAllSongsBinding.recyclerView.adapter = concatAdapter
             mFragmentAllSongsBinding.recyclerView.layoutManager = mLayoutManager
@@ -224,40 +240,63 @@ class AllSongsFragment : Fragment() {
         }
     }
     private fun onPlayButton(position: Int) {
-//        mPlayerFragmentViewModel.setShuffle( PlaybackStateCompat.SHUFFLE_MODE_NONE)
-//        mPlayerFragmentViewModel.setRepeat( PlaybackStateCompat.REPEAT_MODE_NONE)
+        mPlayerFragmentViewModel.setShuffle( PlaybackStateCompat.SHUFFLE_MODE_NONE)
+        mPlayerFragmentViewModel.setRepeat( PlaybackStateCompat.REPEAT_MODE_NONE)
         updateCurrentPlayingSong(position)
         mMainFragmentViewModel.setScrollingState(-1)
     }
     private fun onShuffleButton() {
-//        mPlayerFragmentViewModel.setRepeat( PlaybackStateCompat.REPEAT_MODE_NONE)
-//        when (mPlayerFragmentViewModel.getShuffle().value) {
-//            PlaybackStateCompat.SHUFFLE_MODE_NONE -> {
-//                mPlayerFragmentViewModel.setShuffle(PlaybackStateCompat.SHUFFLE_MODE_ALL)
-//            }
-//            PlaybackStateCompat.SHUFFLE_MODE_ALL -> {
-//                mPlayerFragmentViewModel.setShuffle(PlaybackStateCompat.SHUFFLE_MODE_NONE)
-//            }
-//            else -> {
-//                mPlayerFragmentViewModel.setShuffle(PlaybackStateCompat.SHUFFLE_MODE_NONE)
-//            }
-//        }
-//        updateCurrentPlayingSong(CustomMathComputations.randomExcluded(mPlayerFragmentViewModel.getCurrentSong().value ?: 0, mSongList.size-1))
+        mPlayerFragmentViewModel.setRepeat( PlaybackStateCompat.REPEAT_MODE_NONE)
+        when (mPlayerFragmentViewModel.getShuffle().value) {
+            PlaybackStateCompat.SHUFFLE_MODE_NONE -> {
+                mPlayerFragmentViewModel.setShuffle(PlaybackStateCompat.SHUFFLE_MODE_ALL)
+            }
+            PlaybackStateCompat.SHUFFLE_MODE_ALL -> {
+                mPlayerFragmentViewModel.setShuffle(PlaybackStateCompat.SHUFFLE_MODE_NONE)
+            }
+            else -> {
+                mPlayerFragmentViewModel.setShuffle(PlaybackStateCompat.SHUFFLE_MODE_NONE)
+            }
+        }
+        updateCurrentPlayingSong(
+            CustomMathComputations.randomExcluded(
+                mSongItemAdapter?.getCurrentPlayingSong() ?: -1,
+            (
+                    mSongItemAdapter?.currentList?.size ?: 0) -1
+            )
+        )
         mMainFragmentViewModel.setScrollingState(-1)
     }
     private fun updateCurrentPlayingSong(position: Int) {
-//        if(mPlayerFragmentViewModel.getSourceOfQueueList().value != ConstantValues.EXPLORE_ALL_SONGS){
-//            mPlayerFragmentViewModel.setSongList(mSongList)
-//            mPlayerFragmentViewModel.setSourceOfQueueList(ConstantValues.EXPLORE_ALL_SONGS)
-//        }
-//        mPlayerFragmentViewModel.setCurrentSong(position)
-//        mPlayerFragmentViewModel.setIsPlaying(true)
+        if(position >= 0 && position < (mSongItemAdapter?.currentList?.size ?: 0)) {
+            if (mPlayerFragmentViewModel.getSourceOfQueueList().value != ConstantValues.EXPLORE_ALL_SONGS) {
+                mPlayerFragmentViewModel.setSourceOfQueueList(ConstantValues.EXPLORE_ALL_SONGS)
+            }
+            castAndSetCurrentIem(mSongItemAdapter?.currentList?.get(position) as SongItem?)
+        }
+    }
+
+    private fun castAndSetCurrentIem(songItem: SongItem?) {
+        val currentPlayingSong = CurrentPlayingSongItem()
+        if(songItem == null){
+            return
+        }
+        currentPlayingSong.id = songItem.id
+        currentPlayingSong.position = mSongItemAdapter?.getCurrentPlayingSong()?.toLong() ?: 0
+        currentPlayingSong.fileName = songItem.fileName
+        currentPlayingSong.fileName = songItem.fileName
+        currentPlayingSong.uri = songItem.uri
+        currentPlayingSong.artist = songItem.artist
+        currentPlayingSong.duration = songItem.duration
+        currentPlayingSong.title = songItem.title
+        currentPlayingSong.typeMime = songItem.typeMime
+        currentPlayingSong.uriTreeId = songItem.uriTreeId
+        mPlayerFragmentViewModel.setCurrentSong(currentPlayingSong)
+        mPlayerFragmentViewModel.setIsPlaying(true)
     }
 
     private fun initViews() {
         mSongItemViewModel = ModelsViewModelFactory(this.requireContext()).create(SongItemViewModel::class.java)
-
-        mMainFragmentViewModel = FragmentViewModelFactory().create(MainFragmentViewModel::class.java)
     }
 
     companion object {

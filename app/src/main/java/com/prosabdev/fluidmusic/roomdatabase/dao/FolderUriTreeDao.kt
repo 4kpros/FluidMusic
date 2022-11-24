@@ -3,6 +3,7 @@ package com.prosabdev.fluidmusic.roomdatabase.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.prosabdev.fluidmusic.models.FolderUriTree
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FolderUriTreeDao {
@@ -38,6 +39,8 @@ interface FolderUriTreeDao {
 
     @Query("SELECT * FROM FolderUriTree ORDER BY :order_name, :asc_desc_mode")
     fun getAll(order_name: String = "id", asc_desc_mode: String = "ASC"): LiveData<List<FolderUriTree>>
+    @Query("SELECT * FROM FolderUriTree ORDER BY :order_name, :asc_desc_mode")
+    fun getAllDirect(order_name: String = "id", asc_desc_mode: String = "ASC"): List<FolderUriTree>
 
     @Query("UPDATE FolderUriTree SET lastModified = -1")
     fun resetAllFolderUriTreesLastModified()

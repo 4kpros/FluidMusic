@@ -16,9 +16,11 @@ import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
+import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.SharedPreferenceManager
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 
 
 class MediaScannerWorker(
@@ -44,27 +46,29 @@ class MediaScannerWorker(
                         for(i in 0 until (mSongList.size)){
                             mSongList[i].id = 0
                             AppDatabase.getDatabase(applicationContext).songItemDao().insert(mSongList[i])
-                            if(currentPlayingSong == null || currentPlayingSong?.uri == null){
-                                currentPlayingSong = CurrentPlayingSongItem()
-                                currentPlayingSong?.position = i.toLong()
-                                currentPlayingSong?.uriTreeId = mSongList[i].uriTreeId
-                                currentPlayingSong?.uri = mSongList[i].uri
-                                currentPlayingSong?.fileName = mSongList[i].fileName
-                                currentPlayingSong?.title = mSongList[i].title
-                                currentPlayingSong?.artist = mSongList[i].artist
-                                currentPlayingSong?.duration = mSongList[i].duration
-                                currentPlayingSong?.currentSeekDuration = 0
-                                currentPlayingSong?.typeMime = mSongList[i].typeMime
-                                SharedPreferenceManager.saveCurrentPlayingSong(applicationContext, currentPlayingSong!!)
-                                SharedPreferenceManager.saveQueueListSize(applicationContext, mSongList.size)
-                                SharedPreferenceManager.saveQueueListSource(applicationContext, ConstantValues.EXPLORE_ALL_SONGS)
-                            }
+//                            if(currentPlayingSong == null || currentPlayingSong?.uri == null){
+//                                currentPlayingSong = CurrentPlayingSongItem()
+//                                currentPlayingSong?.position = i.toLong()
+//                                currentPlayingSong?.uriTreeId = mSongList[i].uriTreeId
+//                                currentPlayingSong?.uri = mSongList[i].uri
+//                                currentPlayingSong?.fileName = mSongList[i].fileName
+//                                currentPlayingSong?.title = mSongList[i].title
+//                                currentPlayingSong?.artist = mSongList[i].artist
+//                                currentPlayingSong?.duration = mSongList[i].duration
+//                                currentPlayingSong?.currentSeekDuration = 0
+//                                currentPlayingSong?.typeMime = mSongList[i].typeMime
+//                                SharedPreferenceManager.saveCurrentPlayingSong(applicationContext, currentPlayingSong!!)
+//                                SharedPreferenceManager.saveQueueListSize(applicationContext, mSongList.size)
+//                                SharedPreferenceManager.saveQueueListSource(applicationContext, ConstantValues.EXPLORE_ALL_SONGS)
+//                            }
                         }
                     }
                 }
                 Log.i(ConstantValues.TAG, "Load finished ${mSongList.size}")
                 Result.success(workDataOf(ConstantValues.MEDIA_SCANNER_WORKER_OUTPUT to mScanCounter))
             } catch (error: Throwable) {
+                Log.i(ConstantValues.TAG, "Error loading... ${error.stackTrace}")
+                Log.i(ConstantValues.TAG, "Error loading... ${error.message}")
                 Result.failure()
             }
         }
@@ -72,17 +76,15 @@ class MediaScannerWorker(
     private suspend fun scanDeviceFolderUriTrees(
         context: Context,
         updateMethod : String?
-    ) = coroutineScope{
-        val tempFolderSelected: ArrayList<FolderUriTree> =
-            AppDatabase.getDatabase(applicationContext).folderUriTreeDao()
-                .getAll().value as ArrayList<FolderUriTree>
-
+    ) = withContext(Dispatchers.IO){
+        var tempFolderSelected: List<FolderUriTree> = ArrayList()
+        tempFolderSelected = AppDatabase.getDatabase(applicationContext).folderUriTreeDao().getAllDirect()
         if (tempFolderSelected.isEmpty()) {
             MainScope().launch {
                 Toast.makeText(context, "Please select folders to scan !", Toast.LENGTH_LONG)
                     .show()
             }
-            return@coroutineScope
+            return@withContext
         }
         if (updateMethod != null && updateMethod == ConstantValues.MEDIA_SCANNER_WORKER_METHOD_CLEAR_ALL) {
             Log.i(

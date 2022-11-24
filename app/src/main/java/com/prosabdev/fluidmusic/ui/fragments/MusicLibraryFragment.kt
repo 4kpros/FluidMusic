@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -19,15 +20,15 @@ import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAnimators
-import com.prosabdev.fluidmusic.viewmodels.fragments.FragmentViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class MusicLibraryFragment : Fragment() {
     private lateinit var mFragmentMusicLibraryBinding: FragmentMusicLibraryBinding
 
-    private lateinit var mMainFragmentViewModel: MainFragmentViewModel
+    private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
 
     private var mTabLayoutAdapter: TabLayoutAdapter? = null
 
@@ -198,7 +199,6 @@ class MusicLibraryFragment : Fragment() {
     }
 
     private fun initViews() {
-        mMainFragmentViewModel = FragmentViewModelFactory().create(MainFragmentViewModel::class.java)
     }
 
     companion object {

@@ -42,7 +42,7 @@ import com.prosabdev.fluidmusic.utils.CustomViewModifiers
                 finish()
             }
         } else {
-            onBackPressedDispatcher.addCallback(this.baseContext as LifecycleOwner, object : OnBackPressedCallback(true) {
+            onBackPressedDispatcher.addCallback(this as LifecycleOwner, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     finish()
                 }

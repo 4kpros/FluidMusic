@@ -87,7 +87,7 @@ import kotlinx.coroutines.withContext
 
     private suspend fun alertUriChangedBeforeExit() {
         withContext(Dispatchers.IO){
-            if(mFolderUriTreeViewModel.getAll()?.value?.isNotEmpty() == true){
+            if((mEmptyBottomAdapter?.itemCount ?: 0) > 0){
                 finish()
             }else{
                 onShowBackWithoutSavingDialog()
@@ -110,11 +110,9 @@ import kotlinx.coroutines.withContext
         }
     }
 
-    private fun observeLiveData() {
-        lifecycleScope.launch(Dispatchers.IO){
-            mFolderUriTreeViewModel.getAll()?.observe(this@StorageAccessSettingsActivity.baseContext as LifecycleOwner){
-                updateFolderUriTreesUI(it)
-            }
+    private suspend fun observeLiveData() {
+        mFolderUriTreeViewModel.getAll()?.observe(this as LifecycleOwner){
+            updateFolderUriTreesUI(it)
         }
         mStorageAccessActivityViewModel.getRemoveAllFoldersCounter().observe(this){
             MainScope().launch {

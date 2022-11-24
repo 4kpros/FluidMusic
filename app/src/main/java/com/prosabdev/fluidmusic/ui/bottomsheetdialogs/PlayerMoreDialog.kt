@@ -1,5 +1,6 @@
 package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
@@ -10,20 +11,24 @@ import androidx.databinding.DataBindingUtil
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetPlayerMoreBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
+import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomFormatters
 import com.prosabdev.fluidmusic.utils.CustomUILoaders
+import com.prosabdev.fluidmusic.utils.SharedPreferenceManager
 import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     private lateinit var mBottomSheetPlayerMoreBinding: BottomSheetPlayerMoreBinding
 
-    private lateinit var mSongItemViewModel: SongItemViewModel
+    private var mCurrentPlayingSongItem: CurrentPlayingSongItem? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,41 +47,56 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        checkInteractions()
+        observeLiveData()
         MainScope().launch {
-            checkInteractions()
-            observeLiveData()
+            loadSharedPreferencesData()
+        }
+    }
+
+    private suspend fun loadSharedPreferencesData() {
+        val ctx : Context = this@PlayerMoreDialog.context ?: return
+
+        withContext(Dispatchers.IO){
+            mCurrentPlayingSongItem = SharedPreferenceManager.loadCurrentPlayingSong(ctx)
+            updateCurrentPlayingSongUI()
+        }
+    }
+
+    private suspend fun updateCurrentPlayingSongUI() {
+        if(mCurrentPlayingSongItem == null)
+            return
+
+        val ctx : Context = this@PlayerMoreDialog.context ?: return
+
+        MainScope().launch {
+            mBottomSheetPlayerMoreBinding.textTitle.text =
+                if(
+                    mCurrentPlayingSongItem?.title != null && mCurrentPlayingSongItem?.title!!.isNotEmpty()
+                )
+                    mCurrentPlayingSongItem?.title
+                else
+                    mCurrentPlayingSongItem?.fileName
+
+            mBottomSheetPlayerMoreBinding.textArtist.text =
+                if(mCurrentPlayingSongItem?.artist != null && mCurrentPlayingSongItem?.artist!!.isNotEmpty())
+                    mCurrentPlayingSongItem?.artist
+                else
+                    ctx.getString(R.string.unknown_artist)
+
+            mBottomSheetPlayerMoreBinding.textDescription.text =
+                ctx.getString(
+                    R.string.item_song_card_text_details,
+                    CustomFormatters.formatSongDurationToString(mCurrentPlayingSongItem?.duration ?: 0),
+                    mCurrentPlayingSongItem?.typeMime
+                )
+
+            val tempUri: Uri? = Uri.parse(mCurrentPlayingSongItem?.uri ?: "")
+            CustomUILoaders.loadCovertArtFromSongUri(ctx, mBottomSheetPlayerMoreBinding.covertArt, tempUri, 100)
         }
     }
 
     private fun observeLiveData() {
-    }
-
-    private fun updatePlayerUI(songItem: SongItem) {
-        mBottomSheetPlayerMoreBinding.textTitle.text =
-            if(
-                songItem.title != null && songItem.title!!.isNotEmpty()
-            )
-                songItem.title
-            else
-                songItem.fileName
-
-        mBottomSheetPlayerMoreBinding.textArtist.text =
-            if(songItem.artist != null && songItem.artist!!.isNotEmpty())
-                songItem.artist
-            else
-                this.getString(R.string.unknown_artist)
-
-        mBottomSheetPlayerMoreBinding.textDescription.text =
-            this.getString(
-                R.string.item_song_card_text_details,
-                CustomFormatters.formatSongDurationToString(songItem.duration),
-                songItem.typeMime
-            )
-
-        MainScope().launch {
-            val tempUri: Uri? = Uri.parse(songItem.uri)
-            CustomUILoaders.loadCovertArtFromSongUri(this@PlayerMoreDialog.requireContext(), mBottomSheetPlayerMoreBinding.covertArt, tempUri, 100)
-        }
     }
 
     private fun checkInteractions() {
@@ -140,8 +160,8 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
 
     private fun initViews() {
         mBottomSheetPlayerMoreBinding.covertArt.layout(0,0,0,0)
-
-        mSongItemViewModel = ModelsViewModelFactory(this.requireContext()).create(SongItemViewModel::class.java)
+        mBottomSheetPlayerMoreBinding.textTitle.isSelected = true
+        mBottomSheetPlayerMoreBinding.textDescription.isSelected = true
     }
 
     companion object {
@@ -149,11 +169,16 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        if(key == ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG)
-            decodeSharedPrefsChanged(sharedPreferences)
-    }
-
-    private fun decodeSharedPrefsChanged(sharedPreferences: SharedPreferences?) {
-//        updatePlayerUI()
+        val ctx : Context? = this@PlayerMoreDialog.context
+        when (key) {
+            ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG -> {
+                if(ctx != null){
+                    mCurrentPlayingSongItem = SharedPreferenceManager.loadCurrentPlayingSong(ctx, sharedPreferences)
+                    MainScope().launch {
+                        updateCurrentPlayingSongUI()
+                    }
+                }
+            }
+        }
     }
 }

@@ -46,9 +46,6 @@ class MediaScannerActivityViewModel(application: Application) : AndroidViewModel
                 ConstantValues.MEDIA_SCANNER_WORKER_NAME,
                 ExistingWorkPolicy.REPLACE,
                 scanDeviceWorkRequest
-            )
-            .then(
-                updateDatabaseEntriesWorkRequest
             ).enqueue()
     }
 
