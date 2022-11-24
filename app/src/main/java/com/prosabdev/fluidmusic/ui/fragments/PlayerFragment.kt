@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -20,7 +19,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
@@ -31,7 +29,7 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentPlayerBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
-import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
+import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreDialog
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicDialog
@@ -58,7 +56,7 @@ import kotlin.math.roundToLong
 
     private var mPlayerPagerAdapter: PlayerPageAdapter? = null
 
-    private var mPlayerMoreDialog: PlayerMoreDialog? = null
+    private var mPlayerMoreDialog: PlayerMoreDialog = PlayerMoreDialog()
     private var mQueueMusicDialog: QueueMusicDialog? = null
 
     private var mOldViewpagerPosition: Int = 0
@@ -69,7 +67,6 @@ import kotlin.math.roundToLong
         super.onCreate(savedInstanceState)
         arguments?.let {
         }
-        mPlayerMoreDialog = PlayerMoreDialog()
     }
 
     override fun onCreateView(
@@ -102,7 +99,8 @@ import kotlin.math.roundToLong
         val ctx : Context = this@PlayerFragment.context ?: return
         when (key) {
             ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG -> {
-//                val currentPlayingSongItem: CurrentPlayingSongItem? = SharedPreferenceManager.loadCurrentPlayingSong(ctx, sharedPreferences)
+//                val currentPlayingSongItem: CurrentPlayingSongItem? = SharedPreferenceManager.Player.loadCurrentPlayingSong(ctx, sharedPreferences)
+
                 MainScope().launch {
 //                    val position : Int = currentPlayingSongItem?.position?.toInt() ?: 0
 //                    updateTextTitleSubtitleDurationUI(position)
@@ -121,11 +119,11 @@ import kotlin.math.roundToLong
 //                )
             }
             ConstantValues.SHARED_PREFERENCES_REPEAT -> {
-                val repeatValue = SharedPreferenceManager.loadRepeat(ctx, sharedPreferences)
+                val repeatValue = SharedPreferenceManager.Player.loadRepeat(ctx, sharedPreferences)
 //                updateRepeatUI(repeatValue)
             }
             ConstantValues.SHARED_PREFERENCES_SHUFFLE -> {
-                val shuffleValue = SharedPreferenceManager.loadRepeat(ctx, sharedPreferences)
+                val shuffleValue = SharedPreferenceManager.Player.loadRepeat(ctx, sharedPreferences)
 //                updateShuffleUI(shuffleValue)
             }
         }
@@ -134,45 +132,45 @@ import kotlin.math.roundToLong
     private suspend fun preloadWithEmptyItems() {
         withContext(Dispatchers.IO){
             val ctx : Context = this@PlayerFragment.context ?: return@withContext
-            val currentPlayingSongItem: CurrentPlayingSongItem? = SharedPreferenceManager.loadCurrentPlayingSong(ctx)
-            val queueListSource: String? = SharedPreferenceManager.loadQueueListSource(ctx)
-            val queueListSourceValue: String? = SharedPreferenceManager.loadQueueListSourceValue(ctx)
-            val queueListSize: Int = SharedPreferenceManager.loadQueueListSize(ctx)
-            val repeat: Int = SharedPreferenceManager.loadRepeat(ctx)
-            val shuffle: Int = SharedPreferenceManager.loadShuffle(ctx)
+            val currentPlayingSongSP: CurrentPlayingSongSP? = SharedPreferenceManager.Player.loadCurrentPlayingSong(ctx)
+            val queueListSource: String? = SharedPreferenceManager.Player.loadQueueListSource(ctx)
+            val queueListSourceValue: String? = SharedPreferenceManager.Player.loadQueueListSourceValue(ctx)
+            val queueListSize: Int = SharedPreferenceManager.Player.loadQueueListSize(ctx)
+            val repeat: Int = SharedPreferenceManager.Player.loadRepeat(ctx)
+            val shuffle: Int = SharedPreferenceManager.Player.loadShuffle(ctx)
 
             updateRepeatUI(repeat)
             updateShuffleUI(shuffle)
 
             var tempSongItem : SongItem? = null
-            if(currentPlayingSongItem?.uri == null){
+            if(currentPlayingSongSP?.uri == null){
                 tryToGetFirstSong()
             }else{
-                tempSongItem = mSongItemViewModel.getAtUri(currentPlayingSongItem.uri ?: "")
+                tempSongItem = mSongItemViewModel.getAtUri(currentPlayingSongSP.uri ?: "")
                 if(tempSongItem?.uri == null){
                     tryToGetFirstSong()
                 }else{
-                    mCurrentDuration = currentPlayingSongItem.currentSeekDuration
-                    mDuration = currentPlayingSongItem.duration
+                    mCurrentDuration = currentPlayingSongSP.currentSeekDuration
+                    mDuration = currentPlayingSongSP.duration
                     updateEmptyListUI(queueListSize)
                     updateBlurredBackgroundUIFromUri(tempSongItem.uri)
 
                     if(queueListSize > 0){
                         val tempQueueList: ArrayList<SongItem> = ArrayList()
                         for (i in 0 until queueListSize){
-                            if(currentPlayingSongItem.position.toInt() == i){
+                            if(currentPlayingSongSP.position.toInt() == i){
                                 val si : SongItem = SongItem()
-                                si.id = currentPlayingSongItem.id
-                                si.uri = currentPlayingSongItem.uri
-                                si.title = currentPlayingSongItem.title
-                                si.artist = currentPlayingSongItem.artist
-                                si.fileName = currentPlayingSongItem.fileName
-                                si.duration = currentPlayingSongItem.duration
-                                si.uriTreeId = currentPlayingSongItem.uriTreeId
-                                si.typeMime = currentPlayingSongItem.typeMime
+                                si.id = currentPlayingSongSP.id
+                                si.uri = currentPlayingSongSP.uri
+                                si.title = currentPlayingSongSP.title
+                                si.artist = currentPlayingSongSP.artist
+                                si.fileName = currentPlayingSongSP.fileName
+                                si.duration = currentPlayingSongSP.duration
+                                si.uriTreeId = currentPlayingSongSP.uriTreeId
+                                si.typeMime = currentPlayingSongSP.typeMime
                                 tempQueueList.add(si)
                                 MainScope().launch {
-                                    mOldViewpagerPosition = currentPlayingSongItem.position.toInt()
+                                    mOldViewpagerPosition = currentPlayingSongSP.position.toInt()
                                     mPlayerPagerAdapter?.submitList(tempQueueList)
                                     mFragmentPlayerBinding.viewPagerPlayer.setCurrentItem(mOldViewpagerPosition, false)
                                 }
@@ -212,10 +210,10 @@ import kotlin.math.roundToLong
                 if(this?.uri == null){
                     updateEmptyListUI(0)
                     updateBlurredBackgroundUIFromUri(null)
-                    SharedPreferenceManager.saveCurrentPlayingSong(ctx, CurrentPlayingSongItem())
-                    SharedPreferenceManager.saveQueueListSource(ctx, ConstantValues.EXPLORE_ALL_SONGS)
-                    SharedPreferenceManager.saveQueueListSourceValue(ctx, "")
-                    SharedPreferenceManager.saveQueueListSize(ctx, 0)
+                    SharedPreferenceManager.Player.saveCurrentPlayingSong(ctx, CurrentPlayingSongSP())
+                    SharedPreferenceManager.Player.saveQueueListSource(ctx, ConstantValues.EXPLORE_ALL_SONGS)
+                    SharedPreferenceManager.Player.saveQueueListSourceValue(ctx, "")
+                    SharedPreferenceManager.Player.saveQueueListSize(ctx, 0)
                 }else{
                     updateEmptyListUI(1)
                     updateBlurredBackgroundUIFromUri(this.uri)
@@ -231,8 +229,8 @@ import kotlin.math.roundToLong
                         ConstantValues.EXPLORE_ALL_SONGS,
                         ""
                     )
-                    SharedPreferenceManager.saveQueueListSource(ctx, ConstantValues.EXPLORE_ALL_SONGS)
-                    SharedPreferenceManager.saveQueueListSourceValue(ctx, "")
+                    SharedPreferenceManager.Player.saveQueueListSource(ctx, ConstantValues.EXPLORE_ALL_SONGS)
+                    SharedPreferenceManager.Player.saveQueueListSourceValue(ctx, "")
                 }
             }
         }
@@ -423,7 +421,7 @@ import kotlin.math.roundToLong
             onRepeat()
         }
         mFragmentPlayerBinding.buttonMore.setOnClickListener {
-            mPlayerMoreDialog?.show(childFragmentManager, PlayerMoreDialog.TAG)
+            showMoreOptionsBottomSheetDialog()
         }
         mFragmentPlayerBinding.buttonQueueMusic.setOnClickListener {
             mQueueMusicDialog = QueueMusicDialog()
@@ -444,6 +442,10 @@ import kotlin.math.roundToLong
         }
     }
 
+    private fun showMoreOptionsBottomSheetDialog() {
+        mPlayerMoreDialog.show(childFragmentManager, PlayerMoreDialog.TAG)
+    }
+
     private suspend fun updateOnStopTrackingTouch(value: Float) {
         val ctx : Context = this@PlayerFragment.context ?: return
         val tempCurrentDuration : Long =
@@ -452,10 +454,10 @@ import kotlin.math.roundToLong
         mCurrentDuration = tempCurrentDuration
         updateTextCurrentDurationUI()
         withContext(Dispatchers.IO){
-            val currentPlaying : CurrentPlayingSongItem = SharedPreferenceManager.loadCurrentPlayingSong(ctx) ?: CurrentPlayingSongItem()
+            val currentPlaying : CurrentPlayingSongSP = SharedPreferenceManager.Player.loadCurrentPlayingSong(ctx) ?: CurrentPlayingSongSP()
             currentPlaying.currentSeekDuration = tempCurrentDuration
             if(currentPlaying.uri != null)
-                SharedPreferenceManager.saveCurrentPlayingSong(ctx, currentPlaying)
+                SharedPreferenceManager.Player.saveCurrentPlayingSong(ctx, currentPlaying)
         }
     }
 
@@ -511,9 +513,9 @@ import kotlin.math.roundToLong
         }
     }
     private fun castAndSaveCurrentIem(songItem: SongItem?, position: Int) {
-        val currentPlayingSong = CurrentPlayingSongItem()
+        val currentPlayingSong = CurrentPlayingSongSP()
         if(songItem == null){
-            SharedPreferenceManager.saveCurrentPlayingSong(this.requireContext(), currentPlayingSong)
+            SharedPreferenceManager.Player.saveCurrentPlayingSong(this.requireContext(), currentPlayingSong)
             return
         }
         currentPlayingSong.id = songItem.id
@@ -527,8 +529,8 @@ import kotlin.math.roundToLong
         currentPlayingSong.title = songItem.title
         currentPlayingSong.typeMime = songItem.typeMime
         currentPlayingSong.uriTreeId = songItem.uriTreeId
-        SharedPreferenceManager.saveCurrentPlayingSong(this.requireContext(), currentPlayingSong)
-        SharedPreferenceManager.saveQueueListSize(this.requireContext(), mPlayerPagerAdapter?.itemCount ?: 0)
+        SharedPreferenceManager.Player.saveCurrentPlayingSong(this.requireContext(), currentPlayingSong)
+        SharedPreferenceManager.Player.saveQueueListSize(this.requireContext(), mPlayerPagerAdapter?.itemCount ?: 0)
     }
 
     private fun initViews() {

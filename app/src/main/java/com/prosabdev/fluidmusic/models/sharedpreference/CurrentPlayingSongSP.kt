@@ -1,6 +1,6 @@
 package com.prosabdev.fluidmusic.models.sharedpreference
 
-class CurrentPlayingSongItem {
+class CurrentPlayingSongSP {
     var position : Long = -1
     var uriTreeId: Long = -1
     var id : Long = -1

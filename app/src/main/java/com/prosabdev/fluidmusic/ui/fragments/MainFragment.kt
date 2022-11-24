@@ -15,8 +15,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentMainBinding
-import com.prosabdev.fluidmusic.models.explore.SongItem
-import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
+import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
@@ -179,8 +178,8 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
             }
         }
     }
-    private var mOldPlayingSong : CurrentPlayingSongItem? = null
-    private suspend fun updateMiniPlayerUI(currentSong : CurrentPlayingSongItem?) {
+    private var mOldPlayingSong : CurrentPlayingSongSP? = null
+    private suspend fun updateMiniPlayerUI(currentSong : CurrentPlayingSongSP?) {
         withContext(Dispatchers.IO){
             val ctx : Context = this@MainFragment.context ?: return@withContext
             if(currentSong != null) {

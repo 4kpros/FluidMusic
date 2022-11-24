@@ -1,11 +1,7 @@
 package com.prosabdev.fluidmusic.workers
 
 import android.content.Context
-import android.media.MediaExtractor
-import android.media.MediaFormat
-import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
@@ -14,14 +10,10 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.models.explore.SongItem
-import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
-import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomAudioInfoExtractor
-import com.prosabdev.fluidmusic.utils.SharedPreferenceManager
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 
 
 class MediaScannerWorker(

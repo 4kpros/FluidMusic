@@ -117,7 +117,11 @@
     <string name="edit">Edit</string>
     <string name="song_info_tags">Song info/Tags</string>
     //
-    <string name="_song_details_tags">%1$s, %2$.2fHz, %3$.2fkbps</string>
-    <string name="_song_duration_tags">%1$smin = %2$dsec</string>
-    <string name="_song_size_tags">%1$.2fMb = %2$dKb</string>
+    <string name="_song_details_tags">%1$s, %2$.2f Hz, %3$.2f kbps</string>
+    <string name="_song_duration_tags">%1$s min = %2$d sec</string>
+    <string name="_song_size_tags">%1$.2f Mb = %2$d Kb</string>
+    <string name="ok">OK</string>
+    //
+    <string name="_timer_range_value">%1$d min</string>
+    <string name="disabled">Disabled</string>
 </resources>

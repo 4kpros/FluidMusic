@@ -2,32 +2,21 @@ package com.prosabdev.fluidmusic.ui.dialogs
 
 import android.content.Context
 import android.content.res.Resources
-import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.UnderlineSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.StringRes
-import androidx.core.content.res.TypedArrayUtils.getText
-import androidx.core.text.parseAsHtml
-import androidx.core.text.toHtml
-import androidx.core.text.toSpanned
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.DialogSongInfoBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
-import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.GenericBottomSheetDialogFragment
-import com.prosabdev.fluidmusic.utils.CustomAudioInfoExtractor
 import com.prosabdev.fluidmusic.utils.CustomFormatters
-import com.prosabdev.fluidmusic.utils.SharedPreferenceManager
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class SongInfoDialog(private val mSongItem : SongItem?) : GenericBottomSheetDialogFragment() {

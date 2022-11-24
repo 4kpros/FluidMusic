@@ -22,11 +22,10 @@ import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentAllSongsBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
-import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
+import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.SortOrganizeItemsBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.CustomMathComputations
-import com.prosabdev.fluidmusic.utils.SharedPreferenceManager
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
@@ -35,7 +34,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlin.math.roundToLong
 
 
 class AllSongsFragment : Fragment() {
@@ -277,7 +275,7 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun castAndSetCurrentIem(songItem: SongItem?) {
-        val currentPlayingSong = CurrentPlayingSongItem()
+        val currentPlayingSong = CurrentPlayingSongSP()
         if(songItem == null){
             return
         }

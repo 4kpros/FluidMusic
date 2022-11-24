@@ -8,10 +8,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.slider.Slider
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetPlayerMoreBinding
+import com.prosabdev.fluidmusic.databinding.DialogSetTimerBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
-import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
+import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
+import com.prosabdev.fluidmusic.models.sharedpreference.SleepTimerSP
 import com.prosabdev.fluidmusic.ui.dialogs.SongInfoDialog
 import com.prosabdev.fluidmusic.utils.*
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +29,7 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
     private lateinit var mBottomSheetPlayerMoreBinding: BottomSheetPlayerMoreBinding
 
     private var mSongItem: SongItem? = null
+    private var mSleepTimerSP: SleepTimerSP? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,13 +59,14 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
         val ctx : Context = this@PlayerMoreDialog.context ?: return
 
         withContext(Dispatchers.IO){
-            val currentSong : CurrentPlayingSongItem? = SharedPreferenceManager.loadCurrentPlayingSong(ctx)
+            mSleepTimerSP = SharedPreferenceManager.Player.loadSleepTimer(ctx)
+            val currentSong : CurrentPlayingSongSP? = SharedPreferenceManager.Player.loadCurrentPlayingSong(ctx)
             updateCurrentPlayingSongUI(currentSong)
             mSongItem = CustomAudioInfoExtractor.extractAudioInfoFromUri(ctx, Uri.parse(currentSong?.uri))
         }
     }
 
-    private suspend fun updateCurrentPlayingSongUI(currentSong: CurrentPlayingSongItem?) {
+    private suspend fun updateCurrentPlayingSongUI(currentSong: CurrentPlayingSongSP?) {
         if(currentSong == null)
             return
 
@@ -136,7 +142,57 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
     }
 
     private fun onSetTimer() {
-        //On delete song
+        showTimerDialog()
+    }
+
+    private fun showTimerDialog() {
+        val ctx : Context = this.context ?: return
+        val dialogSetTimerBinding : DialogSetTimerBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_set_timer, null, false)
+
+        dialogSetTimerBinding.slider.value = mSleepTimerSP?.sliderValue ?: 0.0f
+        dialogSetTimerBinding.textRangeValue.text =
+            if((mSleepTimerSP?.sliderValue ?: 0.0f) <= 0)
+                ctx.getString(R.string.disabled)
+            else
+                ctx.getString(R.string._timer_range_value, (mSleepTimerSP?.sliderValue ?: 0.0f).toInt())
+        dialogSetTimerBinding.checkboxPlayLastSong.isChecked = mSleepTimerSP?.playLastSong ?: false
+
+        dialogSetTimerBinding.slider.addOnChangeListener(object : Slider.OnChangeListener{
+            override fun onValueChange(slider: Slider, value: Float, fromUser: Boolean) {
+                dialogSetTimerBinding.textRangeValue.text =
+                    if(value <= 0)
+                        ctx.getString(R.string.disabled)
+                    else
+                        ctx.getString(R.string._timer_range_value, value.toInt())
+            }
+
+        })
+
+        MaterialAlertDialogBuilder(ctx)
+            .setTitle("Sleep timer")
+            .setView(dialogSetTimerBinding.root)
+            .setNegativeButton(resources.getString(R.string.cancel)) { dialog, which ->
+                dialog.dismiss()
+            }
+            .setPositiveButton(resources.getString(R.string.ok)) { dialog, which ->
+                saveNewTimer(ctx, dialogSetTimerBinding.slider.value, dialogSetTimerBinding.checkboxPlayLastSong.isChecked)
+            }
+            .show()
+        dismiss()
+    }
+
+    private fun saveNewTimer(ctx: Context, value: Float, playLastSong: Boolean = false) {
+        val tempSleepTimerSP : SleepTimerSP = SleepTimerSP()
+        tempSleepTimerSP.sliderValue = value
+        tempSleepTimerSP.playLastSong = playLastSong
+        SharedPreferenceManager.Player.saveSleepTimer(ctx, tempSleepTimerSP)
+    }
+
+    private fun updateTimerRangeChangedUI(value: Float) {
+        //
+    }
+
+    private fun checkTimerDialogInteractions() {
     }
 
     private fun onShareSong() {
@@ -152,18 +208,13 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
     }
 
     private fun onGetSongDetails() {
-        showDialog()
+        showSongInfoDialog()
     }
 
-    fun showDialog() {
+    private fun showSongInfoDialog() {
         val songInfoDialog = SongInfoDialog(mSongItem)
         songInfoDialog.show(activity ?.supportFragmentManager!!, SongInfoDialog.TAG)
         dismiss()
-//        activity ?.supportFragmentManager?.commit {
-//            this.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-//            .add(android.R.id.content, SongInfoDialog())
-//            .addToBackStack(null)
-//        }
     }
     private fun initViews() {
         mBottomSheetPlayerMoreBinding.covertArt.layout(0,0,0,0)
@@ -176,15 +227,17 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        val ctx : Context? = this@PlayerMoreDialog.context
+        val ctx : Context = this.context ?: return
         when (key) {
             ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG -> {
-                if(ctx != null){
-                    val currentPlayingSong = SharedPreferenceManager.loadCurrentPlayingSong(ctx, sharedPreferences)
-                    MainScope().launch {
-                        updateCurrentPlayingSongUI(currentPlayingSong)
-                    }
+
+                val currentPlayingSong = SharedPreferenceManager.Player.loadCurrentPlayingSong(ctx, sharedPreferences)
+                MainScope().launch {
+                    updateCurrentPlayingSongUI(currentPlayingSong)
                 }
+            }
+            ConstantValues.SHARED_PREFERENCES_SLEEP_TIMER -> {
+                mSleepTimerSP = SharedPreferenceManager.Player.loadSleepTimer(ctx, sharedPreferences)
             }
         }
     }
