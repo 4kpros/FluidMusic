@@ -24,7 +24,7 @@ class SongItem {
     var composer: String? = null
     var album: String? = null
     var genre: String? = null
-    var relativePath: String? = null
+    var uriPath: String? = null
     var folder: String? = null
     var folderUri: String? = null
     var year: String? = null
@@ -37,11 +37,14 @@ class SongItem {
     var bitrate: Double = 0.0
     var bitPerSample: String? = null
 
+    var size: Long = 0
+
     //
     var lastUpdateDate: String? = null
     var lastAddedDateToLibrary: Long = 0
 
     var author: String? = null
+    var diskNumber: String? = null
     var writer: String? = null
     var cdTrackNumber: String? = null
     var numberTracks: String? = null

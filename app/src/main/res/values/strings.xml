@@ -106,4 +106,18 @@
 
     ///
     <string name="item_song_card_text_details">%1$s | %2$s</string>
+    //
+    <string name="file_size">File size</string>
+    <string name="track">Track</string>
+    <string name="disc">Disc</string>
+    <string name="album_artist">Album artist</string>
+    <string name="composer">Composer</string>
+    <string name="details">Details</string>
+    <string name="file_path">File path</string>
+    <string name="edit">Edit</string>
+    <string name="song_info_tags">Song info/Tags</string>
+    //
+    <string name="_song_details_tags">%1$s, %2$.2fHz, %3$.2fkbps</string>
+    <string name="_song_duration_tags">%1$smin = %2$dsec</string>
+    <string name="_song_size_tags">%1$.2fMb = %2$dKb</string>
 </resources>

@@ -87,26 +87,7 @@ import kotlinx.coroutines.withContext
 
     private suspend fun alertUriChangedBeforeExit() {
         withContext(Dispatchers.IO){
-            if((mEmptyBottomAdapter?.itemCount ?: 0) > 0){
-                finish()
-            }else{
-                onShowBackWithoutSavingDialog()
-            }
-        }
-    }
-    private fun onShowBackWithoutSavingDialog() {
-        MainScope().launch {
-            MaterialAlertDialogBuilder(this@StorageAccessSettingsActivity)
-                .setTitle("Empty folder list ?")
-                .setMessage("You have 0 folder in our scanning list. Go back anyway ?")
-                .setNegativeButton("Stay") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .setPositiveButton("Ignore and quit") { dialog, _ ->
-                    dialog.dismiss()
-                    finish()
-                }
-                .show()
+            finish()
         }
     }
 

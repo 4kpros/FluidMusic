@@ -1,25 +1,21 @@
 package com.prosabdev.fluidmusic.utils
 
+import android.R.attr.path
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.MediaExtractor
+import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Build
+import android.os.Environment
 import android.util.Log
+import androidx.documentfile.provider.DocumentFile
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.jaudiotagger.audio.AudioFileIO
-import org.jaudiotagger.audio.exceptions.CannotReadException
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException
-import org.jaudiotagger.tag.FieldKey
-import org.jaudiotagger.tag.Tag
-import org.jaudiotagger.tag.TagException
-import org.jaudiotagger.tag.images.Artwork
-import java.io.File
 import java.io.FileDescriptor
-import java.io.IOException
 
 
 abstract class CustomAudioInfoExtractor {
@@ -66,153 +62,111 @@ abstract class CustomAudioInfoExtractor {
             }
         }
 
-        fun getAudioInfo(absolutePath: String?): SongItem {
-            val songItem = SongItem()
-            if (absolutePath != null && absolutePath.isNotEmpty()) {
-                val tempFile = File(absolutePath)
-                try {
-                    val audioFile = AudioFileIO.read(tempFile)!!
+        suspend fun extractAudioInfoFromUri(ctx : Context, uri : Uri?): SongItem? {
+            if(uri == null)
+                return null
 
-                    // First get audio header tagger
-                    val audioHeader = audioFile.audioHeader
-                    val format = audioHeader.format
-                    val bitrate = audioHeader.bitRateAsNumber.toDouble()
-                    val sampleRate = audioHeader.sampleRateAsNumber / 1000
+            val tempSong : SongItem = SongItem()
 
-                    // After get audio content tagger
-                    val tag: Tag = audioFile.tagOrCreateAndSetDefault
+            withContext(Dispatchers.IO){
+                ctx.contentResolver.openAssetFileDescriptor(
+                    uri,
+                    "r"
+                ).use {
+                    try {
+                        val mdr = MediaMetadataRetriever()
+                        mdr.setDataSource(it?.fileDescriptor)
 
-                    //Retrieve covert art
-                    val artwork: Artwork? = tag.firstArtwork
-                    val title: String = tag.getFirst(FieldKey.TITLE)
-                    val artist: String = tag.getFirst(FieldKey.ARTIST)
-                    val album: String = tag.getFirst(FieldKey.ALBUM)
-                    val genre: String = tag.getFirst(FieldKey.GENRE)
-                    val year: String = tag.getFirst(FieldKey.YEAR)
-//                    songItem.covertArt = artwork
-//                    songItem.covertArtUrl = artwork?.imageUrl
-                    songItem.title = title
-                    songItem.artist = artist
-                    songItem.album = album
-                    songItem.genre = genre
-                    songItem.year = year
-                    songItem.sampleRate = sampleRate
-                    songItem.typeMime = format
-                    songItem.bitrate = bitrate
-                    Log.i(ConstantValues.TAG, "file title = $title")
-                    Log.i(ConstantValues.TAG, "file artist = $artist")
-                } catch (e: CannotReadException) {
-                    e.printStackTrace()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                } catch (e: TagException) {
-                    e.printStackTrace()
-                } catch (e: ReadOnlyFileException) {
-                    e.printStackTrace()
-                } catch (e: InvalidAudioFrameException) {
-                    e.printStackTrace()
+                        val tempDocFile: DocumentFile? =
+                            DocumentFile.fromTreeUri(ctx, uri)
+
+                        tempSong.uri = uri.toString()
+                        if (tempDocFile != null) {
+                            tempSong.fileName = tempDocFile.name
+                        }
+                        tempSong.size = tempDocFile?.length() ?: 0
+                        tempSong.title = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+                        tempSong.artist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+                        tempSong.composer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER)
+                        tempSong.album = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
+                        tempSong.albumArtist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST)
+                        tempSong.genre = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
+
+                        if (tempDocFile != null) {
+                            tempSong.folder = tempDocFile.parentFile?.name
+                            tempSong.folderUri = tempDocFile.parentFile?.uri.toString()
+                            tempSong.uriPath = tempDocFile.uri.lastPathSegment
+                        }
+
+                        tempSong.year = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
+                        tempSong.duration = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0
+                        tempSong.typeMime = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
+                        tempSong.bitrate = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)?.toDouble() ?: 0.0
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            tempSong.bitPerSample = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITS_PER_SAMPLE)
+                        }
+                        tempSong.author = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR)
+                        tempSong.diskNumber = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DISC_NUMBER)
+                        tempSong.cdTrackNumber = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER)
+                        tempSong.writer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_WRITER)
+                        tempSong.numberTracks = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS)
+
+                        tempSong.lastUpdateDate = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
+                        tempSong.lastAddedDateToLibrary = System.currentTimeMillis() / 1000
+
+                        val extractor : MediaExtractor = MediaExtractor()
+                        extractor.setDataSource(it?.fileDescriptor!!)
+                        val numTracks : Int = extractor.trackCount
+                        for (i in 0 until numTracks) {
+                            val format : MediaFormat = extractor.getTrackFormat(i)
+                            tempSong.sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
+                            tempSong.language = format.getString(MediaFormat.KEY_LANGUAGE)
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                                try {
+                                    tempSong.bitPerSample = "${format.getInteger("bits-per-sample")}bit"
+                                }finally {
+                                    //
+                                }
+                            }
+                        }
+                        extractor.release()
+                    } catch (error: Throwable) {
+                        //
+                    }finally {
+                        //
+                    }
                 }
             }
-            return songItem
+
+            return tempSong
         }
 
-        //Extract bitmap audio artwork from path
-        fun getBitmapAudioArtwork(binaryDataImage: ByteArray?, width: Int = 100, height: Int = 100): Bitmap? {
-            if (binaryDataImage != null && binaryDataImage.isNotEmpty()) {
-                var bitmap: Bitmap? = null
-                val options: BitmapFactory.Options = BitmapFactory.Options()
-                options.inJustDecodeBounds = true
-                BitmapFactory.decodeByteArray(binaryDataImage, 0, binaryDataImage.size, options)
-
-                // Calculate inSampleSize
-                options.inSampleSize = calculateInSampleSize(options, width, height)
-
-                // Decode bitmap with inSampleSize set
-                options.inJustDecodeBounds = false
-                try {
-                    bitmap = BitmapFactory.decodeByteArray(
-                        binaryDataImage,
-                        0,
-                        binaryDataImage.size,
-                        options
-                    )
-                } catch (e: Exception) {
-                    e.printStackTrace()
+        private fun getAbsolutePathFromUri(context: Context, uri: Uri): String {
+            val basePath: String = (uri.lastPathSegment ?: "").substringAfter(":")
+            val storageId: String = (uri.lastPathSegment ?: "").substringBefore(":")
+            val result = if (storageId.isEmpty())
+                ""
+            else
+                when (storageId) {
+                    CustomDeviceInfoAndParser.STORAGE_ID_PRIMARY -> {
+                        "${Environment.getExternalStorageDirectory().absolutePath}/$basePath".trimEnd(
+                            '/'
+                        )
+                    }
+                    CustomDeviceInfoAndParser.STORAGE_ID_DATA -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            "${context.dataDir.path}/$basePath".trimEnd('/')
+                        } else {
+                            "${
+                                (context.filesDir.path).toString().substringBeforeLast('/')
+                            }/$basePath".trimEnd('/')
+                        }
+                    }
+                    else -> {
+                        "/storage/$storageId/$basePath".trimEnd('/')
+                    }
                 }
-
-                if (bitmap != null)
-                    return bitmap
-            }
-//            BitmapFactory.decodeResource(
-//                context.resources,
-//                R.drawable.fluid_music_image
-//            )
-            return null
-        }
-
-        private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
-            // Raw height and width of image
-            val height: Int = options.outHeight
-            val width: Int = options.outWidth
-            var inSampleSize = 1
-            if (height > reqHeight || width > reqWidth) {
-                val halfHeight = height / 2
-                val halfWidth = width / 2
-                while (halfHeight / inSampleSize >= reqHeight
-                    && halfWidth / inSampleSize >= reqWidth
-                ) {
-                    inSampleSize *= 2
-                }
-            }
-            return inSampleSize
-        }
-
-        private fun getAudioBinaryDataArtwork(absolutePath: String?): ByteArray {
-            var binaryDataArtwork = ByteArray(0)
-            if (absolutePath != null && absolutePath.isNotEmpty()) {
-                val tempFile = File(absolutePath)
-                try {
-                    val audioFile = AudioFileIO.read(tempFile)!!
-                    // After get audio content tagger
-                    val tag: Tag = audioFile.tagOrCreateAndSetDefault!!
-                    binaryDataArtwork = tag.firstArtwork.binaryData
-                } catch (e: CannotReadException) {
-                    e.printStackTrace()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                } catch (e: TagException) {
-                    e.printStackTrace()
-                } catch (e: ReadOnlyFileException) {
-                    e.printStackTrace()
-                } catch (e: InvalidAudioFrameException) {
-                    e.printStackTrace()
-                }
-            }
-            return binaryDataArtwork
-        }
-
-        fun getAudioArtwork(absolutePath: String?): Artwork? {
-            var artwork: Artwork? = null
-            if (absolutePath != null && absolutePath.isNotEmpty()) {
-                val tempFile = File(absolutePath)
-                try {
-                    val audioFile = AudioFileIO.read(tempFile)!!
-                    // After get audio content tagger
-                    val tag: Tag = audioFile.tagOrCreateAndSetDefault!!
-                    artwork = tag.firstArtwork
-                } catch (e: CannotReadException) {
-                    e.printStackTrace()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                } catch (e: TagException) {
-                    e.printStackTrace()
-                } catch (e: ReadOnlyFileException) {
-                    e.printStackTrace()
-                } catch (e: InvalidAudioFrameException) {
-                    e.printStackTrace()
-                }
-            }
-            return artwork
+            return result
         }
     }
 }

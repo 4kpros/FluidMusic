@@ -12,12 +12,8 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetPlayerMoreBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomFormatters
-import com.prosabdev.fluidmusic.utils.CustomUILoaders
-import com.prosabdev.fluidmusic.utils.SharedPreferenceManager
-import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
-import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
+import com.prosabdev.fluidmusic.ui.dialogs.SongInfoDialog
+import com.prosabdev.fluidmusic.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -28,7 +24,7 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
 
     private lateinit var mBottomSheetPlayerMoreBinding: BottomSheetPlayerMoreBinding
 
-    private var mCurrentPlayingSongItem: CurrentPlayingSongItem? = null
+    private var mSongItem: SongItem? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,13 +54,14 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
         val ctx : Context = this@PlayerMoreDialog.context ?: return
 
         withContext(Dispatchers.IO){
-            mCurrentPlayingSongItem = SharedPreferenceManager.loadCurrentPlayingSong(ctx)
-            updateCurrentPlayingSongUI()
+            val currentSong : CurrentPlayingSongItem? = SharedPreferenceManager.loadCurrentPlayingSong(ctx)
+            updateCurrentPlayingSongUI(currentSong)
+            mSongItem = CustomAudioInfoExtractor.extractAudioInfoFromUri(ctx, Uri.parse(currentSong?.uri))
         }
     }
 
-    private suspend fun updateCurrentPlayingSongUI() {
-        if(mCurrentPlayingSongItem == null)
+    private suspend fun updateCurrentPlayingSongUI(currentSong: CurrentPlayingSongItem?) {
+        if(currentSong == null)
             return
 
         val ctx : Context = this@PlayerMoreDialog.context ?: return
@@ -72,26 +69,26 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
         MainScope().launch {
             mBottomSheetPlayerMoreBinding.textTitle.text =
                 if(
-                    mCurrentPlayingSongItem?.title != null && mCurrentPlayingSongItem?.title!!.isNotEmpty()
+                    currentSong.title != null && currentSong.title!!.isNotEmpty()
                 )
-                    mCurrentPlayingSongItem?.title
+                    currentSong.title
                 else
-                    mCurrentPlayingSongItem?.fileName
+                    currentSong.fileName
 
             mBottomSheetPlayerMoreBinding.textArtist.text =
-                if(mCurrentPlayingSongItem?.artist != null && mCurrentPlayingSongItem?.artist!!.isNotEmpty())
-                    mCurrentPlayingSongItem?.artist
+                if(currentSong.artist != null && currentSong.artist!!.isNotEmpty())
+                    currentSong.artist
                 else
                     ctx.getString(R.string.unknown_artist)
 
             mBottomSheetPlayerMoreBinding.textDescription.text =
                 ctx.getString(
                     R.string.item_song_card_text_details,
-                    CustomFormatters.formatSongDurationToString(mCurrentPlayingSongItem?.duration ?: 0),
-                    mCurrentPlayingSongItem?.typeMime
+                    CustomFormatters.formatSongDurationToString(currentSong.duration ?: 0),
+                    currentSong.typeMime
                 )
 
-            val tempUri: Uri? = Uri.parse(mCurrentPlayingSongItem?.uri ?: "")
+            val tempUri: Uri? = Uri.parse(currentSong.uri ?: "")
             CustomUILoaders.loadCovertArtFromSongUri(ctx, mBottomSheetPlayerMoreBinding.covertArt, tempUri, 100)
         }
     }
@@ -155,9 +152,19 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
     }
 
     private fun onGetSongDetails() {
-        //On delete song
+        showDialog()
     }
 
+    fun showDialog() {
+        val songInfoDialog = SongInfoDialog(mSongItem)
+        songInfoDialog.show(activity ?.supportFragmentManager!!, SongInfoDialog.TAG)
+        dismiss()
+//        activity ?.supportFragmentManager?.commit {
+//            this.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+//            .add(android.R.id.content, SongInfoDialog())
+//            .addToBackStack(null)
+//        }
+    }
     private fun initViews() {
         mBottomSheetPlayerMoreBinding.covertArt.layout(0,0,0,0)
         mBottomSheetPlayerMoreBinding.textTitle.isSelected = true
@@ -173,9 +180,9 @@ class PlayerMoreDialog : GenericBottomSheetDialogFragment() ,
         when (key) {
             ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG -> {
                 if(ctx != null){
-                    mCurrentPlayingSongItem = SharedPreferenceManager.loadCurrentPlayingSong(ctx, sharedPreferences)
+                    val currentPlayingSong = SharedPreferenceManager.loadCurrentPlayingSong(ctx, sharedPreferences)
                     MainScope().launch {
-                        updateCurrentPlayingSongUI()
+                        updateCurrentPlayingSongUI(currentPlayingSong)
                     }
                 }
             }

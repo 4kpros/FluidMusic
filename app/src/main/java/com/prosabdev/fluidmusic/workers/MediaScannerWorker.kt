@@ -18,6 +18,7 @@ import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.roomdatabase.bus.DatabaseAccessApplication
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.utils.CustomAudioInfoExtractor
 import com.prosabdev.fluidmusic.utils.SharedPreferenceManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -39,28 +40,11 @@ class MediaScannerWorker(
                 mScanCounter[1] = 0
                 mScanCounter[2] = 0
                 scanDeviceFolderUriTrees(applicationContext, updateMethod)
-                var currentPlayingSong : CurrentPlayingSongItem? = SharedPreferenceManager.loadCurrentPlayingSong(applicationContext)
-                mScanCounter[1] = mSongList.size
                 if(mSongList.size > 0){
                     launch {
                         for(i in 0 until (mSongList.size)){
-                            mSongList[i].id = 0
+                            mSongList[i].id = i.toLong()
                             AppDatabase.getDatabase(applicationContext).songItemDao().insert(mSongList[i])
-//                            if(currentPlayingSong == null || currentPlayingSong?.uri == null){
-//                                currentPlayingSong = CurrentPlayingSongItem()
-//                                currentPlayingSong?.position = i.toLong()
-//                                currentPlayingSong?.uriTreeId = mSongList[i].uriTreeId
-//                                currentPlayingSong?.uri = mSongList[i].uri
-//                                currentPlayingSong?.fileName = mSongList[i].fileName
-//                                currentPlayingSong?.title = mSongList[i].title
-//                                currentPlayingSong?.artist = mSongList[i].artist
-//                                currentPlayingSong?.duration = mSongList[i].duration
-//                                currentPlayingSong?.currentSeekDuration = 0
-//                                currentPlayingSong?.typeMime = mSongList[i].typeMime
-//                                SharedPreferenceManager.saveCurrentPlayingSong(applicationContext, currentPlayingSong!!)
-//                                SharedPreferenceManager.saveQueueListSize(applicationContext, mSongList.size)
-//                                SharedPreferenceManager.saveQueueListSource(applicationContext, ConstantValues.EXPLORE_ALL_SONGS)
-//                            }
                         }
                     }
                 }
@@ -95,7 +79,7 @@ class MediaScannerWorker(
             AppDatabase.getDatabase(applicationContext).folderUriTreeDao()
                 .resetAllFolderUriTreesLastModified()
         }
-        for (i in 0 until tempFolderSelected.size) {
+        for (i in tempFolderSelected.indices) {
             val tempDocFile: DocumentFile? =
                 DocumentFile.fromTreeUri(context, Uri.parse(tempFolderSelected[i].uriTree))
             scanDocumentUriContent(
@@ -130,57 +114,16 @@ class MediaScannerWorker(
                                     tempFFF.uri,
                                     "r"
                                 ).use {
-                                    val tempSong : SongItem = SongItem()
-                                    try {
-                                        val mdr = MediaMetadataRetriever()
-                                        mdr.setDataSource(it?.fileDescriptor)
-                                        tempSong.uri = tempFFF.uri.toString()
-                                        tempSong.uriTreeId = folderUriTreeId ?: -1
-                                        tempSong.fileName = tempFFF.name
-                                        tempSong.title = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
-                                        tempSong.artist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
-                                        tempSong.composer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER)
-                                        tempSong.album = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
-                                        tempSong.albumArtist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST)
-                                        tempSong.genre = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
-                                        tempSong.relativePath = "${tempFFF.parentFile?.name}/${tempFFF.name}"
-                                        tempSong.folder = tempFFF.parentFile?.name
-                                        tempSong.folderUri = tempFFF.parentFile?.uri.toString()
-                                        tempSong.year = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
-                                        tempSong.duration = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0
-                                        tempSong.typeMime = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
-                                        tempSong.bitrate = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)?.toDouble() ?: 0.0
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                                            tempSong.bitPerSample = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITS_PER_SAMPLE)
+                                    var tempSong : SongItem? = null
+                                    withContext(Dispatchers.IO){
+                                        tempSong = CustomAudioInfoExtractor.extractAudioInfoFromUri(applicationContext, tempFFF.uri)
+                                    }
+                                    withContext(Dispatchers.Default){
+                                        if(tempSong != null){
+                                            tempSong?.uriTreeId = folderUriTreeId ?: -1
+                                            mSongList.add(tempSong!!)
+                                            mScanCounter[1] = mSongList.size
                                         }
-                                        tempSong.author = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR)
-                                        tempSong.cdTrackNumber = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER)
-                                        tempSong.writer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_WRITER)
-                                        tempSong.numberTracks = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS)
-
-                                        tempSong.lastUpdateDate = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
-                                        tempSong.lastAddedDateToLibrary = System.currentTimeMillis() / 1000
-
-                                        val extractor : MediaExtractor = MediaExtractor()
-                                        extractor.setDataSource(it?.fileDescriptor!!)
-                                        val numTracks : Int = extractor.trackCount
-                                        for (i in 0 until numTracks) {
-                                            val format : MediaFormat = extractor.getTrackFormat(i)
-                                            tempSong.sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
-                                            tempSong.language = format.getString(MediaFormat.KEY_LANGUAGE)
-                                        }
-                                        extractor.release()
-                                    } catch (error: Throwable) {
-                                        Log.i(
-                                            ConstantValues.TAG,
-                                            "MEDIA SCANNER WORKER ---> error when retrieving file : ${error}"
-                                        )
-                                    }finally {
-                                        Log.i(
-                                            ConstantValues.TAG,
-                                            "MEDIA SCANNER WORKER ---> : ${tempSong.uriTreeId}"
-                                        )
-                                        mSongList.add(tempSong)
                                     }
                                 }
                             } else if (tempMimeType.contains("x-mpegurl")) {
