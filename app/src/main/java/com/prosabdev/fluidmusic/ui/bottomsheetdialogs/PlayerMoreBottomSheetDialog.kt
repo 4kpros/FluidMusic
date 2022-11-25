@@ -5,12 +5,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
@@ -20,7 +17,7 @@ import com.google.android.material.slider.Slider
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetPlayerMoreBinding
 import com.prosabdev.fluidmusic.databinding.DialogGotoSongBinding
-import com.prosabdev.fluidmusic.databinding.DialogSetTimerBinding
+import com.prosabdev.fluidmusic.databinding.DialogSetSleepTimerBinding
 import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
@@ -171,7 +168,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
             SystemSettingsUtils.setRingtone(ctx, tempUri, mSongItem?.fileName, true)
         }else{
             MaterialAlertDialogBuilder(this.requireContext())
-                .setTitle(ctx.getString(R.string.set_ringtone))
+                .setTitle(ctx.getString(R.string.set_as_ringtone))
                 .setIcon(R.drawable.ring_volume)
                 .setMessage(ctx.getString(R.string.Allow_Fluid_Music_to_modify_audio_settings))
                 .setNegativeButton(ctx.getString(R.string.cancel)) { dialog, _ ->
@@ -260,29 +257,29 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
 
     private fun showTimerDialog() {
         val ctx : Context = this.context ?: return
-        val dialogSetTimerBinding : DialogSetTimerBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_set_timer, null, false)
+        val mDialogSetSleepTimerBinding : DialogSetSleepTimerBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_set_sleep_timer, null, false)
 
         MaterialAlertDialogBuilder(ctx)
             .setTitle(ctx.getString(R.string.sleep_timer))
             .setIcon(R.drawable.timer)
-            .setView(dialogSetTimerBinding.root)
+            .setView(mDialogSetSleepTimerBinding.root)
             .setNegativeButton(ctx.getString(R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
             .setPositiveButton(ctx.getString(R.string.ok)) { _, _ ->
-                saveNewTimer(ctx, dialogSetTimerBinding.slider.value, dialogSetTimerBinding.checkboxPlayLastSong.isChecked)
+                saveNewTimer(ctx, mDialogSetSleepTimerBinding.slider.value, mDialogSetSleepTimerBinding.checkboxPlayLastSong.isChecked)
             }
             .show().apply {
-                dialogSetTimerBinding.slider.value = mSleepTimerSP?.sliderValue ?: 0.0f
-                dialogSetTimerBinding.textRangeValue.text =
+                mDialogSetSleepTimerBinding.slider.value = mSleepTimerSP?.sliderValue ?: 0.0f
+                mDialogSetSleepTimerBinding.textRangeValue.text =
                     if((mSleepTimerSP?.sliderValue ?: 0.0f) <= 0)
                         ctx.getString(R.string.disabled)
                     else
                         ctx.getString(R.string._timer_range_value, (mSleepTimerSP?.sliderValue ?: 0.0f).toInt())
-                dialogSetTimerBinding.checkboxPlayLastSong.isChecked = mSleepTimerSP?.playLastSong ?: false
+                mDialogSetSleepTimerBinding.checkboxPlayLastSong.isChecked = mSleepTimerSP?.playLastSong ?: false
 
-                dialogSetTimerBinding.slider.addOnChangeListener(Slider.OnChangeListener { _, value, _ ->
-                    dialogSetTimerBinding.textRangeValue.text =
+                mDialogSetSleepTimerBinding.slider.addOnChangeListener(Slider.OnChangeListener { _, value, _ ->
+                    mDialogSetSleepTimerBinding.textRangeValue.text =
                         if(value <= 0)
                             ctx.getString(R.string.disabled)
                         else

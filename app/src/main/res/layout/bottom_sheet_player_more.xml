@@ -122,7 +122,7 @@
                         android:layout_height="wrap_content"
                         app:icon="@drawable/timer"
                         app:iconPadding="2dp"
-                        android:text="@string/timer" />
+                        android:text="@string/sleep_timer" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -200,7 +200,7 @@
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ring_volume"
                         app:iconPadding="2dp"
-                        android:text="@string/set_ringtone" />
+                        android:text="@string/set_as_ringtone" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
             </androidx.appcompat.widget.LinearLayoutCompat>
 
