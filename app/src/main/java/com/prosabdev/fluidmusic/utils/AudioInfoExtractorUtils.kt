@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 import java.io.FileDescriptor
 
 
-abstract class CustomAudioInfoExtractor {
+abstract class AudioInfoExtractorUtils {
     companion object {
 
         suspend fun extractImageBitmapFromAudioUri(ctx: Context, uri : Uri?): Bitmap? {
@@ -150,12 +150,12 @@ abstract class CustomAudioInfoExtractor {
                 ""
             else
                 when (storageId) {
-                    CustomDeviceInfoAndParser.STORAGE_ID_PRIMARY -> {
+                    DeviceInfoAndParserUtils.STORAGE_ID_PRIMARY -> {
                         "${Environment.getExternalStorageDirectory().absolutePath}/$basePath".trimEnd(
                             '/'
                         )
                     }
-                    CustomDeviceInfoAndParser.STORAGE_ID_DATA -> {
+                    DeviceInfoAndParserUtils.STORAGE_ID_DATA -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             "${context.dataDir.path}/$basePath".trimEnd('/')
                         } else {

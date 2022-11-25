@@ -8,7 +8,7 @@ import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityInterfaceSettingsBinding
-import com.prosabdev.fluidmusic.utils.CustomViewModifiers
+import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
 
 @BuildCompat.PrereleaseSdkCheck class InterfaceSettingsActivity : AppCompatActivity() {
 
@@ -47,7 +47,7 @@ import com.prosabdev.fluidmusic.utils.CustomViewModifiers
     }
 
     private fun initViews() {
-        CustomViewModifiers.updateTopViewInsets(mActivityInterfaceSettingsBinding.coordinatorSettingsActivity)
-        CustomViewModifiers.updateBottomViewInsets(mActivityInterfaceSettingsBinding.emptyView)
+        ViewInsetModifiersUtils.updateTopViewInsets(mActivityInterfaceSettingsBinding.coordinatorSettingsActivity)
+        ViewInsetModifiersUtils.updateBottomViewInsets(mActivityInterfaceSettingsBinding.emptyView)
     }
 }

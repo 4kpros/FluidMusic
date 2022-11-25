@@ -12,7 +12,7 @@ import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomAudioInfoExtractor
+import com.prosabdev.fluidmusic.utils.AudioInfoExtractorUtils
 import kotlinx.coroutines.*
 
 
@@ -108,7 +108,7 @@ class MediaScannerWorker(
                                 ).use {
                                     var tempSong : SongItem? = null
                                     withContext(Dispatchers.IO){
-                                        tempSong = CustomAudioInfoExtractor.extractAudioInfoFromUri(applicationContext, tempFFF.uri)
+                                        tempSong = AudioInfoExtractorUtils.extractAudioInfoFromUri(applicationContext, tempFFF.uri)
                                     }
                                     withContext(Dispatchers.Default){
                                         if(tempSong != null){

@@ -14,8 +14,8 @@ import com.bumptech.glide.Glide
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemPlayerCardViewBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
-import com.prosabdev.fluidmusic.utils.CustomAnimators
-import com.prosabdev.fluidmusic.utils.CustomUILoaders
+import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
+import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -82,18 +82,18 @@ class PlayerPageAdapter(
         }
 
         private suspend fun animateButtons() {
-            CustomAnimators.crossFadeUp(mItemPlayerCardViewBinding.buttonLyrics as View, true)
-            CustomAnimators.crossFadeUp(mItemPlayerCardViewBinding.buttonFullscreen as View, true)
+            ViewAnimatorsUtils.crossFadeUp(mItemPlayerCardViewBinding.buttonLyrics as View, true)
+            ViewAnimatorsUtils.crossFadeUp(mItemPlayerCardViewBinding.buttonFullscreen as View, true)
             delay(2000)
-            CustomAnimators.crossFadeDown(mItemPlayerCardViewBinding.buttonLyrics as View, true)
-            CustomAnimators.crossFadeDown(mItemPlayerCardViewBinding.buttonFullscreen as View, true)
+            ViewAnimatorsUtils.crossFadeDown(mItemPlayerCardViewBinding.buttonLyrics as View, true)
+            ViewAnimatorsUtils.crossFadeDown(mItemPlayerCardViewBinding.buttonFullscreen as View, true)
         }
 
         fun loadCovertArt(context: Context, songItem: SongItem) {
             mItemPlayerCardViewBinding.playerViewpagerImageview.layout(0,0,0,0)
             val tempUri : Uri? = Uri.parse(songItem.uri ?: "")
             MainScope().launch {
-                CustomUILoaders.loadCovertArtFromSongUri(
+                ImageLoadersUtils.loadCovertArtFromSongUri(
                     context,
                     mItemPlayerCardViewBinding.playerViewpagerImageview,
                     tempUri,

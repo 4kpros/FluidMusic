@@ -9,7 +9,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 
-abstract class PermissionsManager {
+abstract class PermissionsManagerUtils {
 
     companion object {
         //Check if user have storage access

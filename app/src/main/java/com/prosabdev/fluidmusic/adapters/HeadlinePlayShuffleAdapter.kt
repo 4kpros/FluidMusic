@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemHeadlinePlayShuffleBinding
-import com.prosabdev.fluidmusic.utils.CustomAnimators
+import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
 
 class HeadlinePlayShuffleAdapter(
     private val mHeadLines: ArrayList<Int>,
@@ -62,10 +62,10 @@ class HeadlinePlayShuffleAdapter(
         fun updateOnSelectModeEnabledUI(isSelectMode: Boolean) {
             if(isSelectMode){
                 if(mItemHeadlinePlayShuffleBinding.hoverView.visibility != VISIBLE)
-                    CustomAnimators.crossFadeUp(mItemHeadlinePlayShuffleBinding.hoverView, true, 200, 0.8f)
+                    ViewAnimatorsUtils.crossFadeUp(mItemHeadlinePlayShuffleBinding.hoverView, true, 200, 0.8f)
             }else{
                 if (mItemHeadlinePlayShuffleBinding.hoverView.visibility != GONE)
-                    CustomAnimators.crossFadeDown(mItemHeadlinePlayShuffleBinding.hoverView, true, 200)
+                    ViewAnimatorsUtils.crossFadeDown(mItemHeadlinePlayShuffleBinding.hoverView, true, 200)
             }
         }
     }

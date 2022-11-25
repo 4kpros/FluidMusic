@@ -11,7 +11,7 @@ import kotlin.math.floor
 import kotlin.math.sin
 
 
-abstract class CustomMathComputations {
+abstract class MathComputaionsUtils {
     companion object {
 
         fun fadeWithPageOffset(vew : View?, positionOffset: Float){

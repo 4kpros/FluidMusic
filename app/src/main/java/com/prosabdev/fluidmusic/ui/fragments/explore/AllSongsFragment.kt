@@ -25,7 +25,7 @@ import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.SortOrganizeItemsBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomMathComputations
+import com.prosabdev.fluidmusic.utils.MathComputaionsUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
@@ -260,7 +260,7 @@ class AllSongsFragment : Fragment() {
             }
         }
         updateCurrentPlayingSong(
-            CustomMathComputations.randomExcluded(
+            MathComputaionsUtils.randomExcluded(
                 mSongItemAdapter?.getCurrentPlayingSong() ?: -1,
             (
                     mSongItemAdapter?.currentList?.size ?: 0) -1

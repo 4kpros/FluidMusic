@@ -13,7 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetDialogSongInfoBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
-import com.prosabdev.fluidmusic.utils.CustomFormatters
+import com.prosabdev.fluidmusic.utils.FormattersUtils
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -63,7 +63,7 @@ class SongInfoBottomSheetDialog(private val mSongItem : SongItem?) : GenericBott
             //3:27min = 207sec
             mBottomSheetDialogSongInfoBinding.textSongDuration.text = ctx.getString(
                 R.string._song_duration_tags,
-                CustomFormatters.formatSongDurationToString(songItem.duration),
+                FormattersUtils.formatSongDurationToString(songItem.duration),
                 songItem.duration/1000
             )
             //3.5mb = 3730kb

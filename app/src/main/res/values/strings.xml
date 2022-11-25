@@ -123,8 +123,23 @@
     <string name="ok">OK</string>
     //
     <string name="_timer_range_value">%1$d min</string>
+    //
+    <string name="_music_content_by">Music file : %1$s By %2$s</string>
+    //
     <string name="disabled">Disabled</string>
     <string name="folder">Folder</string>
     <string name="delete_file">Delete file</string>
     <string name="lets_go">Let\'s go</string>
+    <string name="file">File</string>
+    <string name="share_file">Share file</string>
+    <string name="share_screenshot">Share screenshot</string>
+    <string name="currently_listening_icon">Currently listening 🎵</string>
+    <string name="set_song_as_ringtone">Set song as ringtone</string>
+    <string name="Allow_Fluid_Music_to_modify_audio_settings">Allow Fluid Music to modify audio settings ?</string>
+    <string name="sleep_timer">Sleep timer</string>
+    <string name="go_to">Goto</string>
+    <string name="share_current_listening_song">Share current listening song</string>
+    <string name="info_tags">Info/tags</string>
+    <string name="set_ringtone">Set ringtone</string>
+    <string name="share_song">Share song</string>
 </resources>

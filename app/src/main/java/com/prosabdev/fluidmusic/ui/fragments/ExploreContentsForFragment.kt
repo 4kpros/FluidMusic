@@ -20,13 +20,12 @@ import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
-import com.prosabdev.fluidmusic.databinding.FragmentAllSongsBinding
 import com.prosabdev.fluidmusic.databinding.FragmentExploreContentsForBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.SortOrganizeItemsBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomMathComputations
+import com.prosabdev.fluidmusic.utils.MathComputaionsUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
@@ -259,7 +258,7 @@ class ExploreContentsForFragment : Fragment() {
             }
         }
         updateCurrentPlayingSong(
-            CustomMathComputations.randomExcluded(
+            MathComputaionsUtils.randomExcluded(
                 mSongItemAdapter?.getCurrentPlayingSong() ?: -1,
                 (
                         mSongItemAdapter?.currentList?.size ?: 0) -1

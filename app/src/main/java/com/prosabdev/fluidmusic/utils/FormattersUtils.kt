@@ -1,6 +1,6 @@
 package com.prosabdev.fluidmusic.utils
 
-abstract class CustomFormatters {
+abstract class FormattersUtils {
     companion object {
         //Return duration to formatted string
         fun formatSongDurationToString(durationTemp: Long): String? {

@@ -19,9 +19,8 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomAnimators
+import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -98,19 +97,19 @@ class MusicLibraryFragment : Fragment() {
     }
     private  fun updateTotalSelectedItemsUI(totalSelected : Int, animate : Boolean = true){
         if (totalSelected > 0 && mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover.visibility != GONE)
-            CustomAnimators.crossFadeDown(mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover, animate, 200)
+            ViewAnimatorsUtils.crossFadeDown(mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover, animate, 200)
         else if(totalSelected <= 0 && mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover.visibility != VISIBLE)
-            CustomAnimators.crossFadeUp(mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover, animate, 200, 0.8f)
+            ViewAnimatorsUtils.crossFadeUp(mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover, animate, 200, 0.8f)
     }
     private  fun updateSelectModeUI(selectMode : Boolean, animate : Boolean = true){
         if (selectMode) {
             mFragmentMusicLibraryBinding.viewPagerMainExplore.isUserInputEnabled = false
             if(mFragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != VISIBLE)
-                CustomAnimators.crossTranslateInFromHorizontal(mFragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View, 1, animate, 300)
+                ViewAnimatorsUtils.crossTranslateInFromHorizontal(mFragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View, 1, animate, 300)
         }else {
             mFragmentMusicLibraryBinding.viewPagerMainExplore.isUserInputEnabled = true
             if(mFragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != GONE)
-                CustomAnimators.crossTranslateOutFromHorizontal(mFragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View, 1, animate, 300)
+                ViewAnimatorsUtils.crossTranslateOutFromHorizontal(mFragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View, 1, animate, 300)
         }
     }
 

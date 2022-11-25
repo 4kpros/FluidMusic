@@ -11,7 +11,7 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
 import com.prosabdev.fluidmusic.models.sharedpreference.SleepTimerSP
 
-abstract class SharedPreferenceManager {
+abstract class SharedPreferenceManagerUtils {
     class Player {
         companion object {
             //Current song value

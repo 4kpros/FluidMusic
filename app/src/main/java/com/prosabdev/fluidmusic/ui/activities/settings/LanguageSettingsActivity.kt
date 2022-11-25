@@ -8,7 +8,7 @@ import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityLanguageSettingsBinding
-import com.prosabdev.fluidmusic.utils.CustomViewModifiers
+import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
 
 @BuildCompat.PrereleaseSdkCheck class LanguageSettingsActivity : AppCompatActivity() {
 
@@ -47,7 +47,7 @@ import com.prosabdev.fluidmusic.utils.CustomViewModifiers
     }
 
     private fun initViews() {
-        CustomViewModifiers.updateTopViewInsets(mActivityLanguageSettingsBinding.coordinatorSettingsActivity)
-        CustomViewModifiers.updateBottomViewInsets(mActivityLanguageSettingsBinding.emptyView)
+        ViewInsetModifiersUtils.updateTopViewInsets(mActivityLanguageSettingsBinding.coordinatorSettingsActivity)
+        ViewInsetModifiersUtils.updateBottomViewInsets(mActivityLanguageSettingsBinding.emptyView)
     }
 }

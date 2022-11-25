@@ -14,7 +14,7 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 
-abstract class CustomBitmapCacheOptimizations {
+abstract class BitmapCacheOptimizationsUtils {
 
     companion object{
         private const val APP_VERSION : Int = 1

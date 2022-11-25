@@ -21,7 +21,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 
-abstract class CustomUILoaders {
+abstract class ImageLoadersUtils {
     companion object{
 
         suspend fun loadCovertArtFromSongUri(
@@ -41,7 +41,7 @@ abstract class CustomUILoaders {
             }
 
             val byteArray: ByteArray? =
-                CustomAudioInfoExtractor.extractImageBinaryDataFromAudioUri(context, uri)
+                AudioInfoExtractorUtils.extractImageBinaryDataFromAudioUri(context, uri)
 
             if (byteArray == null) {
                 loadWithResourceID(context, imageView, 0, crossFadeDuration)
@@ -98,7 +98,7 @@ abstract class CustomUILoaders {
                 return@coroutineScope
 
             val byteArray: ByteArray? =
-                CustomAudioInfoExtractor.extractImageBinaryDataFromAudioUri(context, uri)
+                AudioInfoExtractorUtils.extractImageBinaryDataFromAudioUri(context, uri)
 
             if (byteArray == null) {
                 MainScope().launch {

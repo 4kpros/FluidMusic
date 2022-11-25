@@ -9,7 +9,7 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.utils.CustomViewModifiers
+import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
 
 class SortOrganizeItemsBottomSheetDialog : GenericBottomSheetDialogFragment() {
     private var mButtonClose: MaterialButton? = null
@@ -53,7 +53,7 @@ class SortOrganizeItemsBottomSheetDialog : GenericBottomSheetDialogFragment() {
         mMainContainer = view.findViewById<LinearLayoutCompat>(R.id.constraint_sort_organize_container)
 
         if(mMainContainer!= null)
-            CustomViewModifiers.updateBottomViewInsets(mMainContainer!!)
+            ViewInsetModifiersUtils.updateBottomViewInsets(mMainContainer!!)
     }
 
     companion object {

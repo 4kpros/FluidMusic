@@ -16,7 +16,6 @@ import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
-import androidx.lifecycle.coroutineScope
 import androidx.work.WorkInfo
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -25,7 +24,7 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityMediaScannerSettingsBinding
 import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomViewModifiers
+import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
 import com.prosabdev.fluidmusic.viewmodels.activities.ActivityViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.activities.MediaScannerActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
@@ -284,7 +283,7 @@ import kotlinx.coroutines.launch
     }
 
     private fun initializeUIs() {
-        CustomViewModifiers.updateTopViewInsets(mActivityMediaScannerSettingsBinding.coordinatorSettingsActivity)
-        CustomViewModifiers.updateBottomViewInsets(mActivityMediaScannerSettingsBinding.emptyView)
+        ViewInsetModifiersUtils.updateTopViewInsets(mActivityMediaScannerSettingsBinding.coordinatorSettingsActivity)
+        ViewInsetModifiersUtils.updateBottomViewInsets(mActivityMediaScannerSettingsBinding.emptyView)
     }
 }

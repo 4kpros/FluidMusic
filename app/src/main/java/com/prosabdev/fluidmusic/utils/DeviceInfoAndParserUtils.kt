@@ -1,28 +1,13 @@
 package com.prosabdev.fluidmusic.utils
 
-import android.content.ContentResolver
 import android.content.Context
-import android.content.res.AssetFileDescriptor
-import android.media.MediaExtractor
-import android.media.MediaFormat
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
-import android.provider.DocumentsContract
-import android.provider.MediaStore
-import android.util.Log
-import androidx.core.provider.DocumentsContractCompat
 import androidx.documentfile.provider.DocumentFile
 import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.models.explore.SongItem
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import java.nio.ByteBuffer
-import java.util.concurrent.TimeUnit
 
 
-abstract class CustomDeviceInfoAndParser {
+abstract class DeviceInfoAndParserUtils {
     companion object {
         const val STORAGE_ID_PRIMARY = "primary"
         const val STORAGE_ID_DATA = "data"

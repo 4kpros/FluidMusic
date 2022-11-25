@@ -22,8 +22,8 @@ import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapte
 import com.prosabdev.fluidmusic.databinding.ItemQueueMusicBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomAnimators
-import com.prosabdev.fluidmusic.utils.CustomUILoaders
+import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
+import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.*
@@ -177,7 +177,7 @@ class QueueMusicItemListAdapter(
 
             MainScope().launch {
                 val tempUri: Uri? = Uri.parse(songItem.uri)
-                CustomUILoaders.loadCovertArtFromSongUri(context, mItemQueueMusicBinding.imageviewCoverArt, tempUri, 100)
+                ImageLoadersUtils.loadCovertArtFromSongUri(context, mItemQueueMusicBinding.imageviewCoverArt, tempUri, 100)
             }
         }
         fun updateIsPlayingStateUI(playing: Boolean) {
@@ -209,9 +209,9 @@ class QueueMusicItemListAdapter(
         }
         fun updateSelectedStateUI(selectableIsSelected: Boolean, animated: Boolean = true) {
             if(selectableIsSelected && mItemQueueMusicBinding.songItemIsSelected.visibility != VISIBLE)
-                CustomAnimators.crossFadeUp(mItemQueueMusicBinding.songItemIsSelected, animated)
+                ViewAnimatorsUtils.crossFadeUp(mItemQueueMusicBinding.songItemIsSelected, animated)
             else if(!selectableIsSelected && mItemQueueMusicBinding.songItemIsSelected.alpha == 1.0f)
-                CustomAnimators.crossFadeDown(mItemQueueMusicBinding.songItemIsSelected, animated)
+                ViewAnimatorsUtils.crossFadeDown(mItemQueueMusicBinding.songItemIsSelected, animated)
         }
         fun bindListener(
             holder: QueueMusicItemViewHolder,

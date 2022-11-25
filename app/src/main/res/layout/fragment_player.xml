@@ -8,7 +8,7 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/player_motion_layout"
+        android:id="@+id/constraint_main_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         style="@style/DefaultBackground"
@@ -39,7 +39,6 @@
                 android:id="@+id/relative_player"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/linear_controls"
                     android:layout_width="match_parent"

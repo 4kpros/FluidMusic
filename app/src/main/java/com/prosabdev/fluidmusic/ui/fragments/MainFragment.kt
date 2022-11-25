@@ -4,13 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import android.view.DragEvent
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnClickListener
-import android.view.View.OnDragListener
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
@@ -24,9 +19,7 @@ import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
-import com.sothree.slidinguppanel.PanelSlideListener
 import com.sothree.slidinguppanel.PanelState
-import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -140,7 +133,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
             if(mIsAnimatingScroll1)
                 return
             mIsAnimatingScroll1 = true
-            CustomAnimators.crossTranslateOutFromVertical(mFragmentMainBinding.constraintMiniPlayerContainer,  1, animate, 150,300.0f)
+            ViewAnimatorsUtils.crossTranslateOutFromVertical(mFragmentMainBinding.constraintMiniPlayerContainer,  1, animate, 150,300.0f)
         }else{
             if(mIsAnimatingScroll1){
                 mFragmentMainBinding.constraintMiniPlayerContainer.apply {
@@ -151,7 +144,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
             if(mIsAnimatingScroll2)
                 return
             mIsAnimatingScroll2 = true
-            CustomAnimators.crossTranslateInFromVertical(mFragmentMainBinding.constraintMiniPlayerContainer,  1, animate, 150,300.0f)
+            ViewAnimatorsUtils.crossTranslateInFromVertical(mFragmentMainBinding.constraintMiniPlayerContainer,  1, animate, 150,300.0f)
         }
     }
     private fun updateTotalSelectedUI(
@@ -167,7 +160,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                 )
             }
 
-            CustomAnimators.crossFadeUp(mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover, false, 200, 0.8f)
+            ViewAnimatorsUtils.crossFadeUp(mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover, false, 200, 0.8f)
         }else{
             MainScope().launch {
                 mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = ContextCompat.getDrawable(
@@ -177,9 +170,9 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
             }
 
             if (totalSelected >= 2 && mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover.visibility != GONE)
-                CustomAnimators.crossFadeDown(mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover, animate, 200)
+                ViewAnimatorsUtils.crossFadeDown(mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover, animate, 200)
             else if(totalSelected < 2 && mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover.visibility != VISIBLE)
-                CustomAnimators.crossFadeUp(mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover, animate, 200, 0.8f)
+                ViewAnimatorsUtils.crossFadeUp(mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover, animate, 200, 0.8f)
         }
         MainScope().launch {
             mFragmentMainBinding.constraintTopSelectionInclude.textSelectedCount.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
@@ -191,14 +184,14 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
     ) = lifecycleScope.launch(context = Dispatchers.Default) {
         if (selectMode) {
             if(mFragmentMainBinding.constraintBottomSelectionContainer.visibility != VISIBLE)
-                CustomAnimators.crossTranslateInFromVertical(mFragmentMainBinding.constraintBottomSelectionContainer as View, 1, animate, 300)
+                ViewAnimatorsUtils.crossTranslateInFromVertical(mFragmentMainBinding.constraintBottomSelectionContainer as View, 1, animate, 300)
             if(mFragmentMainBinding.constraintTopSelectionContainer.visibility != VISIBLE)
-                CustomAnimators.crossTranslateInFromVertical(mFragmentMainBinding.constraintTopSelectionContainer as View, -1, animate, 300)
+                ViewAnimatorsUtils.crossTranslateInFromVertical(mFragmentMainBinding.constraintTopSelectionContainer as View, -1, animate, 300)
         }else {
             if(mFragmentMainBinding.constraintBottomSelectionContainer.visibility != GONE)
-                CustomAnimators.crossTranslateOutFromVertical(mFragmentMainBinding.constraintBottomSelectionContainer as View, 1, animate, 300)
+                ViewAnimatorsUtils.crossTranslateOutFromVertical(mFragmentMainBinding.constraintBottomSelectionContainer as View, 1, animate, 300)
             if(mFragmentMainBinding.constraintTopSelectionContainer.visibility != GONE)
-                CustomAnimators.crossTranslateOutFromVertical(mFragmentMainBinding.constraintTopSelectionContainer as View, -1, animate, 300)
+                ViewAnimatorsUtils.crossTranslateOutFromVertical(mFragmentMainBinding.constraintTopSelectionContainer as View, -1, animate, 300)
         }
     }
     private fun updatePlayerButtonsUI(playing : Boolean) {
@@ -232,14 +225,14 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                             else
                                 ctx.getString(R.string.unknown_artist)
                     }
-                    CustomUILoaders.loadCovertArtFromSongUri(
+                    ImageLoadersUtils.loadCovertArtFromSongUri(
                         ctx,
                         mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer,
                         tempUri,
                         60,
                         100
                     )
-                    CustomUILoaders.loadBlurredCovertArtFromSongUri(
+                    ImageLoadersUtils.loadBlurredCovertArtFromSongUri(
                         ctx,
                         mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer,
                         tempUri,
@@ -334,10 +327,10 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.isSelected = true
         mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.isSelected = true
 
-        CustomViewModifiers.updateTopViewInsets(mFragmentMainBinding.mainFragmentContainer)
-        CustomViewModifiers.updateBottomViewInsets(mFragmentMainBinding.constraintMiniPlayerInclude.constraintMiniPlayer)
-        CustomViewModifiers.updateBottomViewInsets(mFragmentMainBinding.constraintBottomSelectionInclude.constraintBottomSelectionMenu)
-        CustomViewModifiers.updateTopViewInsets(mFragmentMainBinding.constraintTopSelectionInclude.constraintTopSelectionMenu)
+        ViewInsetModifiersUtils.updateTopViewInsets(mFragmentMainBinding.mainFragmentContainer)
+        ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentMainBinding.constraintMiniPlayerInclude.constraintMiniPlayer)
+        ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentMainBinding.constraintBottomSelectionInclude.constraintBottomSelectionMenu)
+        ViewInsetModifiersUtils.updateTopViewInsets(mFragmentMainBinding.constraintTopSelectionInclude.constraintTopSelectionMenu)
     }
 
     companion object {

@@ -22,9 +22,9 @@ import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapte
 import com.prosabdev.fluidmusic.databinding.ItemGenericExploreListBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomAnimators
-import com.prosabdev.fluidmusic.utils.CustomFormatters
-import com.prosabdev.fluidmusic.utils.CustomUILoaders
+import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
+import com.prosabdev.fluidmusic.utils.FormattersUtils
+import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -150,13 +150,13 @@ class SongItemAdapter(
             mItemGenericExploreListBinding.textDetails.text =
                 context.getString(
                     R.string.item_song_card_text_details,
-                    CustomFormatters.formatSongDurationToString(songItem.duration),
+                    FormattersUtils.formatSongDurationToString(songItem.duration),
                     songItem.fileExtension
                 )
 
             MainScope().launch {
                 val tempUri: Uri? = Uri.parse(songItem.uri)
-                CustomUILoaders.loadCovertArtFromSongUri(context, mItemGenericExploreListBinding.imageviewCoverArt, tempUri, 100, 50, true)
+                ImageLoadersUtils.loadCovertArtFromSongUri(context, mItemGenericExploreListBinding.imageviewCoverArt, tempUri, 100, 50, true)
             }
         }
         fun updateIsPlayingStateUI(playing: Boolean) {
@@ -195,9 +195,9 @@ class SongItemAdapter(
 //                mItemGenericExploreListBinding.songItemIsSelected.alpha = 0.4f
 //            }
             if(selectableIsSelected && mItemGenericExploreListBinding.songItemIsSelected.visibility != VISIBLE)
-                CustomAnimators.crossFadeUp(mItemGenericExploreListBinding.songItemIsSelected, animated, 150)
+                ViewAnimatorsUtils.crossFadeUp(mItemGenericExploreListBinding.songItemIsSelected, animated, 150)
             else if(!selectableIsSelected && mItemGenericExploreListBinding.songItemIsSelected.alpha == 1.0f)
-                CustomAnimators.crossFadeDown(mItemGenericExploreListBinding.songItemIsSelected, animated, 150)
+                ViewAnimatorsUtils.crossFadeDown(mItemGenericExploreListBinding.songItemIsSelected, animated, 150)
         }
         fun bindListener(
             position: Int,

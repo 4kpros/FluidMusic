@@ -10,10 +10,9 @@ import android.view.View.VISIBLE
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-abstract class CustomAnimators {
+abstract class ViewAnimatorsUtils {
 
     companion object{
         var defaultTranslationPosition: Float = 500.0f

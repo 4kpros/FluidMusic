@@ -26,8 +26,8 @@ import com.prosabdev.fluidmusic.databinding.ActivityStorageAccessSettingsBinding
 import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.StorageAccessBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.CustomDeviceInfoAndParser
-import com.prosabdev.fluidmusic.utils.CustomViewModifiers
+import com.prosabdev.fluidmusic.utils.DeviceInfoAndParserUtils
+import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
 import com.prosabdev.fluidmusic.viewmodels.activities.ActivityViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.activities.StorageAccessActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
@@ -185,8 +185,8 @@ import kotlinx.coroutines.withContext
         mStorageAccessActivityViewModel = ActivityViewModelFactory().create(
             StorageAccessActivityViewModel::class.java)
 
-        CustomViewModifiers.updateTopViewInsets(mActivityStorageAccessSettingsBinding.coordinatorLayout)
-        CustomViewModifiers.updateBottomViewInsets(mActivityStorageAccessSettingsBinding.linearButtonsContainer)
+        ViewInsetModifiersUtils.updateTopViewInsets(mActivityStorageAccessSettingsBinding.coordinatorLayout)
+        ViewInsetModifiersUtils.updateBottomViewInsets(mActivityStorageAccessSettingsBinding.linearButtonsContainer)
     }
 
     private var treeUri: String?
@@ -204,7 +204,7 @@ import kotlinx.coroutines.withContext
             this.contentResolver.takePersistableUriPermission(uri, takeFlags)
 
             MainScope().launch {
-                addToFolderList(CustomDeviceInfoAndParser.formatAndReturnFolderUriSAF(this@StorageAccessSettingsActivity, uri))
+                addToFolderList(DeviceInfoAndParserUtils.formatAndReturnFolderUriSAF(this@StorageAccessSettingsActivity, uri))
             }
         }
     }
