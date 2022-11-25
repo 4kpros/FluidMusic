@@ -13,6 +13,9 @@ class MainFragmentViewModel : ViewModel() {
     private val mMutableActionBarState = MutableLiveData<Boolean>()
     private val mMutableScrollingState = MutableLiveData<Int>(-2)
 
+    private val mMutableShowSlidingUpPanel = MutableLiveData<Int>(0)
+    private val mMutableHideSlidingUpPanel = MutableLiveData<Int>(0)
+
     private val mSelectMode: LiveData<Boolean> get() = mMutableSelectMode
     private val mToggleOnRange: LiveData<Int> get() = mMutableToggleOnRange
     private val mTotalSelected: LiveData<Int> get() = mMutableTotalSelected
@@ -20,6 +23,24 @@ class MainFragmentViewModel : ViewModel() {
     private val mActivePage: LiveData<Int> get() = mMutableActivePage
     private val mActionBarState: LiveData<Boolean> get() = mMutableActionBarState
     private val mScrollingState: LiveData<Int> get() = mMutableScrollingState
+
+    private val mShowSlidingUpPanel: LiveData<Int> get() = mMutableShowSlidingUpPanel
+    private val mHideSlidingUpPanel: LiveData<Int> get() = mMutableHideSlidingUpPanel
+
+    fun setShowSlidingPanel() {
+        val tempValue : Int = (mShowSlidingUpPanel.value ?: 0)+1
+        mMutableShowSlidingUpPanel.value = tempValue
+    }
+    fun getShowSlidingPanel(): LiveData<Int> {
+        return mShowSlidingUpPanel
+    }
+    fun setHideSlidingPanel() {
+        val tempValue : Int = (mShowSlidingUpPanel.value ?: 0)+1
+        mMutableHideSlidingUpPanel.value = tempValue
+    }
+    fun getHideSlidingPanel(): LiveData<Int> {
+        return mHideSlidingUpPanel
+    }
 
     fun setScrollingState(value : Int) {
         mMutableScrollingState.value = value

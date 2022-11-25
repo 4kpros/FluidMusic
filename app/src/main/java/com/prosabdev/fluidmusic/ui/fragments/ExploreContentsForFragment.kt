@@ -1,14 +1,14 @@
-package com.prosabdev.fluidmusic.ui.fragments.explore
+package com.prosabdev.fluidmusic.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -21,6 +21,7 @@ import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentAllSongsBinding
+import com.prosabdev.fluidmusic.databinding.FragmentExploreContentsForBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.SortOrganizeItemsBottomSheetDialog
@@ -36,10 +37,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 
-class AllSongsFragment : Fragment() {
-    private var mPageIndex: Int? = -1
+class ExploreContentsForFragment : Fragment() {
+    private var mLoadSongFromSource: String? = null
+    private var mLoadSongFromSourceValue: String? = null
 
-    private lateinit var mFragmentAllSongsBinding: FragmentAllSongsBinding
+    private lateinit var mFragmentExploreContentsForBinding: FragmentExploreContentsForBinding
 
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
@@ -53,7 +55,8 @@ class AllSongsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            mPageIndex = it.getInt(ConstantValues.EXPLORE_ALL_SONGS)
+            mLoadSongFromSource = it.getString(ConstantValues.ARGS_EXPLORE_MUSIC_LIBRARY)
+            mLoadSongFromSourceValue = it.getString(ConstantValues.ARGS_EXPLORE_MUSIC_LIBRARY_VALUE)
         }
     }
 
@@ -61,8 +64,8 @@ class AllSongsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mFragmentAllSongsBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_all_songs,container,false)
-        val view = mFragmentAllSongsBinding.root
+        mFragmentExploreContentsForBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_explore_contents_for,container,false)
+        val view = mFragmentExploreContentsForBinding.root
 
         initViews()
 
@@ -74,7 +77,7 @@ class AllSongsFragment : Fragment() {
 
         MainScope().launch {
             setupRecyclerViewAdapter()
-            observeLiveData()
+//            observeLiveData()
             checkInteractions()
         }
     }
@@ -106,7 +109,7 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun updateOnScrollingStateUI(i: Int) {
-        if(mMainFragmentViewModel.getActivePage().value == mPageIndex){
+        if(mMainFragmentViewModel.getActivePage().value == 7){
             if(i == 2)
                 mEmptyBottomAdapter?.onSetScrollState(2)
         }
@@ -135,7 +138,7 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun checkInteractions() {
-        mFragmentAllSongsBinding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        mFragmentExploreContentsForBinding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if(dy < 0){
                     Log.i(ConstantValues.TAG, "Scrolling --> TOP")
@@ -156,7 +159,7 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun setupRecyclerViewAdapter() = lifecycleScope.launch(context = Dispatchers.Default){
-        val ctx : Context = this@AllSongsFragment.context ?: return@launch
+        val ctx : Context = this@ExploreContentsForFragment.context ?: return@launch
         val spanCount = 1
 
         //Setup headline adapter
@@ -216,8 +219,8 @@ class AllSongsFragment : Fragment() {
         //Add Layout manager
         mLayoutManager = GridLayoutManager(ctx, spanCount, GridLayoutManager.VERTICAL, false)
         MainScope().launch {
-            mFragmentAllSongsBinding.recyclerView.adapter = concatAdapter
-            mFragmentAllSongsBinding.recyclerView.layoutManager = mLayoutManager
+            mFragmentExploreContentsForBinding.recyclerView.adapter = concatAdapter
+            mFragmentExploreContentsForBinding.recyclerView.layoutManager = mLayoutManager
         }
     }
 
@@ -258,8 +261,8 @@ class AllSongsFragment : Fragment() {
         updateCurrentPlayingSong(
             CustomMathComputations.randomExcluded(
                 mSongItemAdapter?.getCurrentPlayingSong() ?: -1,
-            (
-                    mSongItemAdapter?.currentList?.size ?: 0) -1
+                (
+                        mSongItemAdapter?.currentList?.size ?: 0) -1
             )
         )
         mMainFragmentViewModel.setScrollingState(-1)
@@ -294,14 +297,40 @@ class AllSongsFragment : Fragment() {
 
     private fun initViews() {
         mSongItemViewModel = ModelsViewModelFactory(this.requireContext()).create(SongItemViewModel::class.java)
+
+        when (mLoadSongFromSource) {
+            ConstantValues.EXPLORE_ARTISTS -> {
+                mFragmentExploreContentsForBinding.topAppBar.title = "Artist : ${mLoadSongFromSourceValue}"
+            }
+            ConstantValues.EXPLORE_ALBUMS -> {
+                mFragmentExploreContentsForBinding.topAppBar.title = "Album : ${mLoadSongFromSourceValue}"
+            }
+            ConstantValues.EXPLORE_FOLDERS -> {
+                mFragmentExploreContentsForBinding.topAppBar.title = "Folder : ${mLoadSongFromSourceValue}"
+            }
+            ConstantValues.EXPLORE_ALBUM_ARTISTS -> {
+                mFragmentExploreContentsForBinding.topAppBar.title = "Album artist : ${mLoadSongFromSourceValue}"
+            }
+            ConstantValues.EXPLORE_GENRES -> {
+                mFragmentExploreContentsForBinding.topAppBar.title = "Genre : ${mLoadSongFromSourceValue}"
+            }
+            ConstantValues.EXPLORE_COMPOSERS -> {
+                mFragmentExploreContentsForBinding.topAppBar.title = "Composer : ${mLoadSongFromSourceValue}"
+            }
+            ConstantValues.EXPLORE_YEARS -> {
+                mFragmentExploreContentsForBinding.topAppBar.title = "Year : ${mLoadSongFromSourceValue}"
+            }
+        }
     }
+
 
     companion object {
         @JvmStatic
-        fun newInstance(pageIndex: Int) =
-            AllSongsFragment().apply {
+        fun newInstance(loadSongFromSource: String?, value : String?) =
+            ExploreContentsForFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(ConstantValues.EXPLORE_ALL_SONGS, pageIndex)
+                    putString(ConstantValues.ARGS_EXPLORE_MUSIC_LIBRARY, loadSongFromSource)
+                    putString(ConstantValues.ARGS_EXPLORE_MUSIC_LIBRARY_VALUE, value)
                 }
             }
     }

@@ -32,7 +32,7 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
         GenreItem::class,
         YearItem::class,
            ],
-    version = 35)
+    version = 39)
 
 abstract class AppDatabase : RoomDatabase() {
 

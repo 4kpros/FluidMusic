@@ -11,7 +11,7 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetStorageAccessBinding
 import com.prosabdev.fluidmusic.viewmodels.activities.StorageAccessActivityViewModel
 
-class StorageAccessDialog(private val mStorageAccessActivityViewModel: StorageAccessActivityViewModel) : GenericBottomSheetDialogFragment() {
+class StorageAccessBottomSheetDialog(private val mStorageAccessActivityViewModel: StorageAccessActivityViewModel) : GenericBottomSheetDialogFragment() {
 
     private lateinit var mBottomSheetStorageAccessBinding : BottomSheetStorageAccessBinding
 

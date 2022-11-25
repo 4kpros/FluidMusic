@@ -8,12 +8,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentAllSongsBinding
+import com.prosabdev.fluidmusic.databinding.FragmentPlayerBinding
+import com.prosabdev.fluidmusic.databinding.FragmentPlaylistsBinding
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class PlaylistsFragment : Fragment() {
 
-    private lateinit var mFragmentAllSongsBinding: FragmentAllSongsBinding
+    private lateinit var mFragmentPlaylistsBinding: FragmentPlaylistsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,8 +27,8 @@ class PlaylistsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mFragmentAllSongsBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_playlists, container,false)
-        val view = mFragmentAllSongsBinding.root
+        mFragmentPlaylistsBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_playlists, container,false)
+        val view = mFragmentPlaylistsBinding.root
 
         initViews()
 

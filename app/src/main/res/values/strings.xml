@@ -124,4 +124,5 @@
     //
     <string name="_timer_range_value">%1$d min</string>
     <string name="disabled">Disabled</string>
+    <string name="folder">Folder</string>
 </resources>

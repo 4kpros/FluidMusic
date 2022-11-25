@@ -7,18 +7,15 @@
 
     </data>
 
-    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+    <androidx.slidingpanelayout.widget.SlidingPaneLayout
         tools:context=".ui.fragments.MainFragment"
         android:id="@+id/sliding_up_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:umanoPanelHeight="0dp"
-        app:umanoScrollInterpolator="?attr/motionEasingEmphasizedDecelerateInterpolator"
-        app:umanoInitialState="expanded"
-        android:gravity="bottom"
-        app:umanoShadowHeight="0dp">
+        >
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_main_sliding_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -77,7 +74,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center|top"
-            android:visibility="visible"
-            android:alpha="1" />
-    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+            />
+    </androidx.slidingpanelayout.widget.SlidingPaneLayout>
 </layout>

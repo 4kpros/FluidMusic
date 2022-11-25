@@ -35,9 +35,12 @@ class SongItem {
     var typeMime: String? = null
     var sampleRate: Int = 0
     var bitrate: Double = 0.0
-    var bitPerSample: String? = null
 
     var size: Long = 0
+
+    var channelCount: Int = 0
+    var fileExtension: String? = null
+    var bitPerSample: String? = null
 
     //
     var lastUpdateDate: String? = null

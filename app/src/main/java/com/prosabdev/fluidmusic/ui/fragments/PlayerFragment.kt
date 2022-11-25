@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.lifecycle.LifecycleOwner
@@ -31,9 +32,10 @@ import com.prosabdev.fluidmusic.databinding.FragmentPlayerBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
-import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreDialog
+import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreBottomSheetDialog
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicDialog
 import com.prosabdev.fluidmusic.utils.*
+import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
 import kotlinx.coroutines.Dispatchers
@@ -49,6 +51,8 @@ import kotlin.math.roundToLong
 
     private lateinit var mFragmentPlayerBinding: FragmentPlayerBinding
 
+
+    private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
 //    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 //    private val mQueueMusicItemViewModel: QueueMusicItemViewModel by activityViewModels()
 
@@ -56,7 +60,7 @@ import kotlin.math.roundToLong
 
     private var mPlayerPagerAdapter: PlayerPageAdapter? = null
 
-    private var mPlayerMoreDialog: PlayerMoreDialog = PlayerMoreDialog()
+    private var mPlayerMoreBottomSheetDialog: PlayerMoreBottomSheetDialog? = null
     private var mQueueMusicDialog: QueueMusicDialog? = null
 
     private var mOldViewpagerPosition: Int = 0
@@ -443,7 +447,8 @@ import kotlin.math.roundToLong
     }
 
     private fun showMoreOptionsBottomSheetDialog() {
-        mPlayerMoreDialog.show(childFragmentManager, PlayerMoreDialog.TAG)
+        mPlayerMoreBottomSheetDialog = PlayerMoreBottomSheetDialog(mMainFragmentViewModel)
+        mPlayerMoreBottomSheetDialog?.show(childFragmentManager, PlayerMoreBottomSheetDialog.TAG)
     }
 
     private suspend fun updateOnStopTrackingTouch(value: Float) {

@@ -1,6 +1,5 @@
 package com.prosabdev.fluidmusic.utils
 
-import android.R.attr.path
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -10,7 +9,6 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import kotlinx.coroutines.Dispatchers
@@ -84,6 +82,9 @@ abstract class CustomAudioInfoExtractor {
                         if (tempDocFile != null) {
                             tempSong.fileName = tempDocFile.name
                         }
+                        val extension: String =
+                            uri.lastPathSegment.toString().substringAfterLast(".").uppercase()
+                        tempSong.fileExtension = extension
                         tempSong.size = tempDocFile?.length() ?: 0
                         tempSong.title = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
                         tempSong.artist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
@@ -121,6 +122,7 @@ abstract class CustomAudioInfoExtractor {
                             val format : MediaFormat = extractor.getTrackFormat(i)
                             tempSong.sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
                             tempSong.language = format.getString(MediaFormat.KEY_LANGUAGE)
+                            tempSong.channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                                 try {
                                     tempSong.bitPerSample = "${format.getInteger("bits-per-sample")}bit"

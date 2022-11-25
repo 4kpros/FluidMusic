@@ -151,7 +151,7 @@ class SongItemAdapter(
                 context.getString(
                     R.string.item_song_card_text_details,
                     CustomFormatters.formatSongDurationToString(songItem.duration),
-                    songItem.typeMime
+                    songItem.fileExtension
                 )
 
             MainScope().launch {

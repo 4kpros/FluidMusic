@@ -1,4 +1,4 @@
-package com.prosabdev.fluidmusic.ui.dialogs
+package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 
 import android.content.Context
 import android.content.res.Resources
@@ -11,25 +11,24 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.databinding.DialogSongInfoBinding
+import com.prosabdev.fluidmusic.databinding.BottomSheetDialogSongInfoBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
-import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.GenericBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.utils.CustomFormatters
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 
-class SongInfoDialog(private val mSongItem : SongItem?) : GenericBottomSheetDialogFragment() {
+class SongInfoBottomSheetDialog(private val mSongItem : SongItem?) : GenericBottomSheetDialogFragment() {
 
-    private lateinit var mDialogSongInfoBinding: DialogSongInfoBinding
+    private lateinit var mBottomSheetDialogSongInfoBinding: BottomSheetDialogSongInfoBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mDialogSongInfoBinding = DataBindingUtil.inflate(inflater, R.layout.dialog_song_info, container, false)
-        val view = mDialogSongInfoBinding.root
+        mBottomSheetDialogSongInfoBinding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_dialog_song_info, container, false)
+        val view = mBottomSheetDialogSongInfoBinding.root
 
         initViews()
         MainScope().launch {
@@ -50,19 +49,19 @@ class SongInfoDialog(private val mSongItem : SongItem?) : GenericBottomSheetDial
     private fun showSongDetailsUI(songItem: SongItem?) {
         if(songItem == null) return
         MainScope().launch {
-            val ctx : Context = this@SongInfoDialog.context ?: return@launch
+            val ctx : Context = this@SongInfoBottomSheetDialog.context ?: return@launch
 
-            mDialogSongInfoBinding.textSongFilePath.text = getUnderLinedWord(songItem.uriPath)
+            mBottomSheetDialogSongInfoBinding.textSongFilePath.text = getUnderLinedWord(songItem.uriPath)
 
             //MP3, 44100Hz, 320kbps
-            mDialogSongInfoBinding.textSongDetails.text = ctx.getString(
+            mBottomSheetDialogSongInfoBinding.textSongDetails.text = ctx.getString(
                 R.string._song_details_tags,
-                songItem.typeMime ?: "",
+                songItem.fileExtension ?: "",
                 (songItem.sampleRate/1000.0f),
                 (songItem.bitrate/1000.0f)
             )
             //3:27min = 207sec
-            mDialogSongInfoBinding.textSongDuration.text = ctx.getString(
+            mBottomSheetDialogSongInfoBinding.textSongDuration.text = ctx.getString(
                 R.string._song_duration_tags,
                 CustomFormatters.formatSongDurationToString(songItem.duration),
                 songItem.duration/1000
@@ -70,23 +69,23 @@ class SongInfoDialog(private val mSongItem : SongItem?) : GenericBottomSheetDial
             //3.5mb = 3730kb
             val fileSizeInKB: Long = songItem.size / 1024
             val fileSizeInMB = fileSizeInKB / 1024.0f
-            mDialogSongInfoBinding.textSongSize.text = ctx.getString(
+            mBottomSheetDialogSongInfoBinding.textSongSize.text = ctx.getString(
                 R.string._song_size_tags,
                 fileSizeInMB,
                 fileSizeInKB
             )
 
-            mDialogSongInfoBinding.textSongTrack.text = songItem.cdTrackNumber
-            mDialogSongInfoBinding.textSongDisc.text = songItem.diskNumber
-            mDialogSongInfoBinding.textSongYear.text = getUnderLinedWord(songItem.year)
+            mBottomSheetDialogSongInfoBinding.textSongTrack.text = songItem.cdTrackNumber
+            mBottomSheetDialogSongInfoBinding.textSongDisc.text = songItem.diskNumber
+            mBottomSheetDialogSongInfoBinding.textSongYear.text = getUnderLinedWord(songItem.year)
 
-            mDialogSongInfoBinding.textSongFileName.text = songItem.fileName
-            mDialogSongInfoBinding.textSongTitle.text = songItem.title
-            mDialogSongInfoBinding.textSongArtist.text = getUnderLinedWord(songItem.artist)
-            mDialogSongInfoBinding.textSongAlbum.text = getUnderLinedWord(songItem.album)
-            mDialogSongInfoBinding.textSongAlbumArtist.text = getUnderLinedWord(songItem.albumArtist)
-            mDialogSongInfoBinding.textSongGenre.text = getUnderLinedWord(songItem.genre)
-            mDialogSongInfoBinding.textSongComposer.text = getUnderLinedWord(songItem.composer)
+            mBottomSheetDialogSongInfoBinding.textSongFileName.text = songItem.fileName
+            mBottomSheetDialogSongInfoBinding.textSongTitle.text = songItem.title
+            mBottomSheetDialogSongInfoBinding.textSongArtist.text = getUnderLinedWord(songItem.artist)
+            mBottomSheetDialogSongInfoBinding.textSongAlbum.text = getUnderLinedWord(songItem.album)
+            mBottomSheetDialogSongInfoBinding.textSongAlbumArtist.text = getUnderLinedWord(songItem.albumArtist)
+            mBottomSheetDialogSongInfoBinding.textSongGenre.text = getUnderLinedWord(songItem.genre)
+            mBottomSheetDialogSongInfoBinding.textSongComposer.text = getUnderLinedWord(songItem.composer)
         }
     }
 
