@@ -127,55 +127,48 @@ class MusicLibraryFragment : Fragment() {
             }
         })
         mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter.setOnClickListener {
-            onAddToPlayAfter()
+            addToPlayAfter()
         }
         mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonQueueMusicAdd.setOnClickListener {
-            onAddSelectionToQueueMusicDialog()
+            addSelectionToQueueMusicDialog()
         }
         mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlaylistAdd.setOnClickListener {
-            onShowAddSelectionToPlaylistDialog()
+            showAddSelectionToPlaylistDialog()
         }
         mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonShare.setOnClickListener {
-            onShareSelectionDialog()
+            shareSelectionDialog()
         }
         mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonDelete.setOnClickListener {
-            onShowDeleteSelectionDialog()
+            showDeleteSelectionDialog()
         }
     }
-    private fun onShareSelectionDialog() {
+    private fun shareSelectionDialog() {
         Toast.makeText(this.requireContext(), "On share selection", Toast.LENGTH_SHORT).show()
     }
-    private fun onShowAddSelectionToPlaylistDialog() {
+    private fun showAddSelectionToPlaylistDialog() {
         Toast.makeText(this.requireContext(), "On add selection to playlist", Toast.LENGTH_SHORT).show()
     }
-    private fun onAddSelectionToQueueMusicDialog() {
+    private fun addSelectionToQueueMusicDialog() {
         Toast.makeText(this.requireContext(), "On add selection to queue music", Toast.LENGTH_SHORT).show()
     }
-    private fun onShowDeleteSelectionDialog() {
+    private fun showDeleteSelectionDialog() {
         MaterialAlertDialogBuilder(this.requireContext())
             .setTitle(resources.getString(R.string.dialog_delete_selection_title))
             .setMessage(resources.getString(R.string.dialog_delete_selection_description))
-            .setNeutralButton(resources.getString(R.string.delete_files)) { dialog, which ->
-                onDeleteForeverFilesSelection()
-            }
             .setNegativeButton(resources.getString(R.string.decline)) { dialog, which ->
                 dialog.dismiss()
             }
-            .setPositiveButton(resources.getString(R.string.delete)) { dialog, which ->
-                onDeleteSelection()
+            .setPositiveButton(resources.getString(R.string.delete_files)) { dialog, which ->
+                deleteSelection()
             }
             .show()
     }
-    private fun onAddToPlayAfter() {
-        Toast.makeText(this.requireContext(), "On add to play after selection", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun onDeleteForeverFilesSelection() {
-        Toast.makeText(this.requireContext(), "On delete forever files selection", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun onDeleteSelection() {
+    private fun deleteSelection() {
         Toast.makeText(this.requireContext(), "On delete selection", Toast.LENGTH_SHORT).show()
+    }
+    private fun addToPlayAfter() {
+        Toast.makeText(this.requireContext(), "On add to play after selection", Toast.LENGTH_SHORT)
+            .show()
     }
 
     private fun applyAppBarTitle(position: Int) {

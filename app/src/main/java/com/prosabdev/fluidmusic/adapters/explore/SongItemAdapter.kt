@@ -187,19 +187,26 @@ class SongItemAdapter(
             }
         }
         fun updateSelectedStateUI(selectableIsSelected: Boolean, animated: Boolean = true) {
+//            if(selectableIsSelected) {
+//                mItemGenericExploreListBinding.songItemIsSelected.visibility = VISIBLE
+//                mItemGenericExploreListBinding.songItemIsSelected.alpha = 1.0f
+//            }else{
+//                mItemGenericExploreListBinding.songItemIsSelected.visibility = INVISIBLE
+//                mItemGenericExploreListBinding.songItemIsSelected.alpha = 0.4f
+//            }
             if(selectableIsSelected && mItemGenericExploreListBinding.songItemIsSelected.visibility != VISIBLE)
-                CustomAnimators.crossFadeUp(mItemGenericExploreListBinding.songItemIsSelected, animated)
+                CustomAnimators.crossFadeUp(mItemGenericExploreListBinding.songItemIsSelected, animated, 150)
             else if(!selectableIsSelected && mItemGenericExploreListBinding.songItemIsSelected.alpha == 1.0f)
-                CustomAnimators.crossFadeDown(mItemGenericExploreListBinding.songItemIsSelected, animated)
+                CustomAnimators.crossFadeDown(mItemGenericExploreListBinding.songItemIsSelected, animated, 150)
         }
         fun bindListener(
             position: Int,
             mOnItemClickListener: OnItemClickListener,
         ) {
-            mItemGenericExploreListBinding.linearCoverArtContainer.setOnClickListener {
+            mItemGenericExploreListBinding.cardViewClickable.setOnClickListener {
                 mOnItemClickListener.onSongItemClicked(position)
             }
-            mItemGenericExploreListBinding.linearCoverArtContainer.setOnLongClickListener {
+            mItemGenericExploreListBinding.cardViewClickable.setOnLongClickListener {
                 mOnItemClickListener.onSongItemLongClicked(position)
                 true
             }

@@ -447,8 +447,10 @@ import kotlin.math.roundToLong
     }
 
     private fun showMoreOptionsBottomSheetDialog() {
-        mPlayerMoreBottomSheetDialog = PlayerMoreBottomSheetDialog(mMainFragmentViewModel)
-        mPlayerMoreBottomSheetDialog?.show(childFragmentManager, PlayerMoreBottomSheetDialog.TAG)
+        if(mPlayerMoreBottomSheetDialog == null)
+            mPlayerMoreBottomSheetDialog = PlayerMoreBottomSheetDialog(mMainFragmentViewModel)
+        if(mPlayerMoreBottomSheetDialog?.isVisible == false)
+            mPlayerMoreBottomSheetDialog?.show(childFragmentManager, PlayerMoreBottomSheetDialog.TAG)
     }
 
     private suspend fun updateOnStopTrackingTouch(value: Float) {

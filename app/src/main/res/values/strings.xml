@@ -79,7 +79,7 @@
     <string name="dialog_view_type_subtitle">This selection will be deleted. But the files will be conserved on device.</string>
     //Delete selection dialog
     <string name="dialog_delete_selection_title">Delete selection ?</string>
-    <string name="dialog_delete_selection_description">This selection will be deleted. But the files will be conserved on device.</string>
+    <string name="dialog_delete_selection_description">This selection will be deleted from your device. Do you really want to continue ?</string>
     //Add to playlist dialog
     <string name="dialog_add_to_playlist_title">Add on playlist</string>
     //Covert art details dialog
@@ -125,4 +125,6 @@
     <string name="_timer_range_value">%1$d min</string>
     <string name="disabled">Disabled</string>
     <string name="folder">Folder</string>
+    <string name="delete_file">Delete file</string>
+    <string name="lets_go">Let\'s go</string>
 </resources>

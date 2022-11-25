@@ -180,6 +180,7 @@ class AllSongsFragment : Fragment() {
             ctx,
             object : SongItemAdapter.OnItemClickListener{
                 override fun onSongItemClicked(position: Int) {
+                    Log.i(ConstantValues.TAG, "On clicked to song ${position}")
                     if(mSongItemAdapter?.selectableGetSelectionMode() == true){
                         mSongItemAdapter?.selectableToggleSelection(position, mLayoutManager)
                         mMainFragmentViewModel.setTotalSelected(mSongItemAdapter?.selectableGetSelectedItemCount() ?: 0)
@@ -188,15 +189,18 @@ class AllSongsFragment : Fragment() {
                     }
                 }
                 override fun onSongItemPlayClicked(position: Int) {
+                    Log.i(ConstantValues.TAG, "On clicked to play song ${position}")
                     updateCurrentPlayingSong(position)
                 }
                 override fun onSongItemLongClicked(position: Int) {
+                    Log.i(ConstantValues.TAG, "On long clicked to song ${position}")
                     onLongPressedToItemSong(position)
                 }
 
             },
             object : SelectableItemListAdapter.OnSelectSelectableItemListener {
                 override fun onTotalSelectedItemChange(totalSelected: Int) {
+                    Log.i(ConstantValues.TAG, "On total selected items change ${totalSelected}")
                     mMainFragmentViewModel.setTotalSelected(totalSelected)
                 }
             }

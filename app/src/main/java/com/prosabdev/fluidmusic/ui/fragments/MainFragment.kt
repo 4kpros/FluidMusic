@@ -4,9 +4,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.view.DragEvent
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
-import android.view.View.*
+import android.view.View.OnClickListener
+import android.view.View.OnDragListener
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
@@ -20,6 +24,10 @@ import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
+import com.sothree.slidinguppanel.PanelSlideListener
+import com.sothree.slidinguppanel.PanelState
+import com.sothree.slidinguppanel.SlidingUpPanelLayout
+import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -62,27 +70,6 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
-//    private var mBottomSheetBehavior: BottomSheetBehavior<View?>? = null
-//
-//    private fun configureBackdrop() {
-//        // Get the fragment reference
-//        val fragment = activity?.supportFragmentManager?.findFragmentById(R.id.filter_fragment)
-//
-//        fragment?.let {
-//            // Get the BottomSheetBehavior from the fragment view
-//            BottomSheetBehavior.from(it.view)?.let { bsb ->
-//                // Set the initial state of the BottomSheetBehavior to HIDDEN
-//                bsb.state = BottomSheetBehavior.STATE_HIDDEN
-//
-//                // Set the trigger that will expand your view
-//                fab_filter.setOnClickListener { bsb.state = BottomSheetBehavior.STATE_EXPANDED }
-//
-//                // Set the reference into class attribute (will be used latter)
-//                mBottomSheetBehavior = bsb
-//            }
-//        }
-//    }
-
     private fun observeLiveData() {
         mPlayerFragmentViewModel.getCurrentSong().observe(this.requireContext() as LifecycleOwner
         ) {
@@ -121,15 +108,19 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
     private fun hideSlidingUpPanelToState(it: Int?) {
         if(it == null || it <= 0)
             return
-        if(mFragmentMainBinding.slidingUpPanel.isOpen)
-            mFragmentMainBinding.slidingUpPanel.closePane()
+//        if(!mFragmentMainBinding.slidingUpPanel.isOpen)
+//            mFragmentMainBinding.slidingUpPanel.openPane()
+        if(mFragmentMainBinding.slidingUpPanel.panelState != PanelState.COLLAPSED)
+            mFragmentMainBinding.slidingUpPanel.panelState = PanelState.COLLAPSED
     }
 
     private fun showSlidingUpPanelToState(it: Int?) {
         if(it == null || it <= 0)
             return
-        if(!mFragmentMainBinding.slidingUpPanel.isOpen)
-            mFragmentMainBinding.slidingUpPanel.openPane()
+//        if(!mFragmentMainBinding.slidingUpPanel.isOpen)
+//            mFragmentMainBinding.slidingUpPanel.openPane()
+        if(mFragmentMainBinding.slidingUpPanel.panelState != PanelState.EXPANDED)
+            mFragmentMainBinding.slidingUpPanel.panelState = PanelState.EXPANDED
     }
 
     private fun updateSliderUI(it: Long?) {
@@ -276,8 +267,10 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
             onCloseSelectionMenu()
         }
         mFragmentMainBinding.constraintMiniPlayerInclude.constraintMiniPlayer.setOnClickListener{
-            if(!mFragmentMainBinding.slidingUpPanel.isOpen)
-                mFragmentMainBinding.slidingUpPanel.openPane()
+//            if(!mFragmentMainBinding.slidingUpPanel.isOpen)
+//                mFragmentMainBinding.slidingUpPanel.openPane()
+            if(mFragmentMainBinding.slidingUpPanel.panelState != PanelState.EXPANDED)
+                mFragmentMainBinding.slidingUpPanel.panelState = PanelState.EXPANDED
         }
 //        mFragmentMainBinding.slidingUpPanel.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
 //            override fun onPanelSlide(panel: View?, slideOffset: Float) {

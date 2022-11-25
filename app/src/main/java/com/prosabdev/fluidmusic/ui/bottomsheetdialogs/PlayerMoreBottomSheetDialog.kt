@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
@@ -25,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 
 class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragmentViewModel) : GenericBottomSheetDialogFragment() ,
     SharedPreferences.OnSharedPreferenceChangeListener {
@@ -112,13 +114,13 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
             showSongInfoDialog()
         }
         mBottomSheetPlayerMoreBinding.buttonCovertArt.setOnClickListener{
-            onFetchCovertArtSong()
+            showCovertArtSong()
         }
         mBottomSheetPlayerMoreBinding.buttonLyrics.setOnClickListener{
-            onFetchLyrics()
+            fetchLyrics()
         }
         mBottomSheetPlayerMoreBinding.buttonShare.setOnClickListener{
-            onShareSong()
+            shareSong()
         }
         mBottomSheetPlayerMoreBinding.buttonTimer.setOnClickListener{
             showTimerDialog()
@@ -127,19 +129,54 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
             showGoToSongDialog()
         }
         mBottomSheetPlayerMoreBinding.buttonSetAs.setOnClickListener{
-            onSetSongAsRingtone()
+            setSongAsRingtone()
         }
         mBottomSheetPlayerMoreBinding.buttonDelete.setOnClickListener{
-            onDeleteSong()
+            showDeleteSelectionDialog()
         }
     }
 
-    private fun onDeleteSong() {
-        //On delete song
+    private fun showDeleteSelectionDialog() {
+        MaterialAlertDialogBuilder(this.requireContext())
+            .setTitle(resources.getString(R.string.dialog_delete_selection_title))
+            .setMessage(resources.getString(R.string.dialog_delete_selection_description))
+            .setNegativeButton(resources.getString(R.string.decline)) { dialog, which ->
+                dialog.dismiss()
+            }
+            .setPositiveButton(resources.getString(R.string.delete_file)) { dialog, which ->
+                deleteSelectedSongs()
+            }
+            .show()
+        dismiss()
+    }
+    private fun deleteSelectedSongs(){
+        //
     }
 
-    private fun onSetSongAsRingtone() {
-        //On delete song
+    private fun setSongAsRingtone() {
+        if(haveSystemPermissions()){
+            //
+        }else{
+            MaterialAlertDialogBuilder(this.requireContext())
+                .setTitle("Set song as ringtone")
+                .setMessage("Allow Fluid Music to modify audio settings ?")
+                .setNegativeButton(resources.getString(R.string.cancel)) { dialog, which ->
+                    dialog.dismiss()
+                }
+                .setPositiveButton(resources.getString(R.string.lets_go)) { dialog, which ->
+                    openAudioSystemSettings()
+                    dialog.dismiss()
+                }
+                .show()
+            dismiss()
+        }
+    }
+    private fun openAudioSystemSettings() {
+        //
+    }
+
+    private fun haveSystemPermissions(): Boolean {
+        return false
     }
 
     private fun showGoToSongDialog() {
@@ -170,7 +207,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                     mMainFragmentViewModel.setHideSlidingPanel()
                     tempFM?.commit {
                         setReorderingAllowed(false)
-                        replace(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_ALBUMS, mSongItem?.album ?: ""))
+                        add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_ALBUMS, mSongItem?.album ?: ""))
                         addToBackStack(null)
                     }
                 }
@@ -179,7 +216,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                     mMainFragmentViewModel.setHideSlidingPanel()
                     tempFM?.commit {
                         setReorderingAllowed(false)
-                        replace(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_FOLDERS, mSongItem?.folder ?: ""))
+                        add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_FOLDERS, mSongItem?.folder ?: ""))
                         addToBackStack(null)
                     }
                 }
@@ -188,7 +225,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                     mMainFragmentViewModel.setHideSlidingPanel()
                     tempFM?.commit {
                         setReorderingAllowed(false)
-                        replace(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_COMPOSERS, mSongItem?.composer ?: ""))
+                        add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_COMPOSERS, mSongItem?.composer ?: ""))
                         addToBackStack(null)
                     }
                 }
@@ -197,7 +234,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                     mMainFragmentViewModel.setHideSlidingPanel()
                     tempFM?.commit {
                         setReorderingAllowed(false)
-                        replace(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_GENRES, mSongItem?.genre ?: ""))
+                        add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_GENRES, mSongItem?.genre ?: ""))
                         addToBackStack(null)
                     }
                 }
@@ -206,7 +243,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                     mMainFragmentViewModel.setHideSlidingPanel()
                     tempFM?.commit {
                         setReorderingAllowed(false)
-                        replace(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_ALBUM_ARTISTS, mSongItem?.albumArtist ?: ""))
+                        add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_ALBUM_ARTISTS, mSongItem?.albumArtist ?: ""))
                         addToBackStack(null)
                     }
                 }
@@ -253,15 +290,22 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
         SharedPreferenceManager.Player.saveSleepTimer(ctx, tempSleepTimerSP)
     }
 
-    private fun onShareSong() {
+    private fun shareSong() {
+        if(mSongItem == null || mSongItem?.uri == null)
+            return
+        val shareIntent = Intent()
+        shareIntent.action = Intent.ACTION_SEND
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "Currently listening : " + mSongItem?.fileName)
+        shareIntent.setDataAndType(Uri.parse(mSongItem?.uri), mSongItem?.typeMime)
+        startActivity(Intent.createChooser(shareIntent,"Share To :"))
+        dismiss()
+    }
+
+    private fun fetchLyrics() {
         //On delete song
     }
 
-    private fun onFetchLyrics() {
-        //On delete song
-    }
-
-    private fun onFetchCovertArtSong() {
+    private fun showCovertArtSong() {
         //On delete song
     }
 
