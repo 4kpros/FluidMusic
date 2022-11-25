@@ -13,7 +13,7 @@
         >
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/linear_container_1"
+            android:id="@+id/linear_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -28,36 +28,14 @@
                 android:text="@string/share_file"
                 app:icon="@drawable/audio_file"
                 />
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_share_screenshot"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                >
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_share_screenshot"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:text="@string/share_screenshot"
-                    app:icon="@drawable/screenshot"
-                    />
-                <View
-                    android:id="@+id/hover_button_share_screenshot"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    style="@style/DefaultBackground"
-                    android:alpha="0.6"
-                    app:layout_constraintTop_toTopOf="@+id/button_share_screenshot"
-                    app:layout_constraintBottom_toBottomOf="@+id/button_share_screenshot"
-                    app:layout_constraintStart_toStartOf="@+id/button_share_screenshot"
-                    app:layout_constraintEnd_toEndOf="@+id/button_share_screenshot"
-                    android:clickable="true"
-                    android:focusable="false"
-                    android:visibility="gone"
-                    />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                style="@style/Widget.Material3.Button.TextButton"
+                android:text="@string/share_screenshot"
+                app:icon="@drawable/screenshot"
+                />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

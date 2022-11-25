@@ -1,5 +1,6 @@
 package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
@@ -97,10 +98,10 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                 if(currentSong.artist != null && currentSong.artist!!.isNotEmpty())
                     currentSong.artist
                 else
-                    resources.getString(R.string.unknown_artist)
+                    ctx.getString(R.string.unknown_artist)
 
             mBottomSheetPlayerMoreBinding.textDescription.text =
-                resources.getString(
+                ctx.getString(
                     R.string.item_song_card_text_details,
                     FormattersUtils.formatSongDurationToString(currentSong.duration ),
                     currentSong.typeMime
@@ -142,14 +143,16 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
     }
 
     private fun showDeleteSelectionDialog() {
+        val ctx : Context = this@PlayerMoreBottomSheetDialog.context ?: return
+
         MaterialAlertDialogBuilder(this.requireContext())
-            .setTitle(resources.getString(R.string.dialog_delete_selection_title))
+            .setTitle(ctx.getString(R.string.dialog_delete_selection_title))
             .setIcon(R.drawable.delete)
-            .setMessage(resources.getString(R.string.dialog_delete_selection_description))
-            .setNegativeButton(resources.getString(R.string.cancel)) { dialog, _ ->
+            .setMessage(ctx.getString(R.string.dialog_delete_selection_description))
+            .setNegativeButton(ctx.getString(R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
-            .setPositiveButton(resources.getString(R.string.delete_file)) { _, _ ->
+            .setPositiveButton(ctx.getString(R.string.delete_file)) { _, _ ->
                 deleteSelectedSongs()
             }
             .show()
@@ -160,30 +163,27 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
     }
 
     private fun setSongAsRingtone() {
-        if(haveSystemPermissions()){
-            //
+        val ctx : Context = this@PlayerMoreBottomSheetDialog.context ?: return
+        val tempActivity : Activity = this@PlayerMoreBottomSheetDialog.activity ?: return
+
+        if(PermissionsManagerUtils.haveWriteSystemSettingsPermission(ctx)){
+            val tempUri : Uri = Uri.parse(mSongItem?.uri ?: return) ?: return
+            SystemSettingsUtils.setRingtone(ctx, tempUri, mSongItem?.fileName, true)
         }else{
             MaterialAlertDialogBuilder(this.requireContext())
-                .setTitle(getString(R.string.set_ringtone))
+                .setTitle(ctx.getString(R.string.set_ringtone))
                 .setIcon(R.drawable.ring_volume)
-                .setMessage(getString(R.string.Allow_Fluid_Music_to_modify_audio_settings))
-                .setNegativeButton(resources.getString(R.string.cancel)) { dialog, _ ->
+                .setMessage(ctx.getString(R.string.Allow_Fluid_Music_to_modify_audio_settings))
+                .setNegativeButton(ctx.getString(R.string.cancel)) { dialog, _ ->
                     dialog.dismiss()
                 }
-                .setPositiveButton(resources.getString(R.string.lets_go)) { dialog, _ ->
-                    openAudioSystemSettings()
+                .setPositiveButton(ctx.getString(R.string.lets_go)) { dialog, _ ->
+                    PermissionsManagerUtils.requestWriteSystemSettingsPermission(tempActivity)
                     dialog.dismiss()
                 }
                 .show()
-            dismiss()
         }
-    }
-    private fun openAudioSystemSettings() {
-        //
-    }
-
-    private fun haveSystemPermissions(): Boolean {
-        return false
+        dismiss()
     }
 
     private fun showGoToSongDialog() {
@@ -193,10 +193,10 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
 
         val tempFM = activity?.supportFragmentManager
         MaterialAlertDialogBuilder(ctx)
-            .setTitle(resources.getString(R.string.go_to))
+            .setTitle(ctx.getString(R.string.go_to))
             .setIcon(R.drawable.link)
             .setView(mDialogGotoSongBinding.root)
-            .setPositiveButton(resources.getString(R.string.close)) { dialog, _ ->
+            .setPositiveButton(ctx.getString(R.string.close)) { dialog, _ ->
                 dialog.dismiss()
             }
             .show().apply {
@@ -263,30 +263,30 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
         val dialogSetTimerBinding : DialogSetTimerBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_set_timer, null, false)
 
         MaterialAlertDialogBuilder(ctx)
-            .setTitle(resources.getString(R.string.sleep_timer))
+            .setTitle(ctx.getString(R.string.sleep_timer))
             .setIcon(R.drawable.timer)
             .setView(dialogSetTimerBinding.root)
-            .setNegativeButton(resources.getString(R.string.cancel)) { dialog, _ ->
+            .setNegativeButton(ctx.getString(R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
-            .setPositiveButton(resources.getString(R.string.ok)) { _, _ ->
+            .setPositiveButton(ctx.getString(R.string.ok)) { _, _ ->
                 saveNewTimer(ctx, dialogSetTimerBinding.slider.value, dialogSetTimerBinding.checkboxPlayLastSong.isChecked)
             }
             .show().apply {
                 dialogSetTimerBinding.slider.value = mSleepTimerSP?.sliderValue ?: 0.0f
                 dialogSetTimerBinding.textRangeValue.text =
                     if((mSleepTimerSP?.sliderValue ?: 0.0f) <= 0)
-                        resources.getString(R.string.disabled)
+                        ctx.getString(R.string.disabled)
                     else
-                        resources.getString(R.string._timer_range_value, (mSleepTimerSP?.sliderValue ?: 0.0f).toInt())
+                        ctx.getString(R.string._timer_range_value, (mSleepTimerSP?.sliderValue ?: 0.0f).toInt())
                 dialogSetTimerBinding.checkboxPlayLastSong.isChecked = mSleepTimerSP?.playLastSong ?: false
 
                 dialogSetTimerBinding.slider.addOnChangeListener(Slider.OnChangeListener { _, value, _ ->
                     dialogSetTimerBinding.textRangeValue.text =
                         if(value <= 0)
-                            resources.getString(R.string.disabled)
+                            ctx.getString(R.string.disabled)
                         else
-                            resources.getString(R.string._timer_range_value, value.toInt())
+                            ctx.getString(R.string._timer_range_value, value.toInt())
                 })
             }
         dismiss()
@@ -307,10 +307,10 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
 
         val dialogShareSongBinding : DialogShareSongBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_share_song, null, false)
         MaterialAlertDialogBuilder(this.requireContext())
-            .setTitle(getString(R.string.share_song))
+            .setTitle(ctx.getString(R.string.share_song))
             .setIcon(R.drawable.share)
             .setView(dialogShareSongBinding.root)
-            .setNegativeButton(resources.getString(R.string.close)) { dialog, _ ->
+            .setNegativeButton(ctx.getString(R.string.close)) { dialog, _ ->
                 dialog.dismiss()
             }
             .show().apply {
@@ -320,7 +320,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                             val tempUri = Uri.parse(mSongItem?.uri) ?: return@withContext
                             val tempDesc =
                                 if(mSongItem?.title != null)
-                                    resources.getString(R.string._music_content_by, mSongItem?.title, mSongItem?.artist ?: "")
+                                    ctx.getString(R.string._music_content_by, mSongItem?.title, mSongItem?.artist ?: "")
                                 else
                                     "${mSongItem?.fileName}"
                             IntentActionsUtils.shareSongFile(ctx, tempUri, tempDesc)
@@ -330,12 +330,18 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                 }
                 dialogShareSongBinding.buttonShareScreenshot.setOnClickListener{
                     MainScope().launch {
-                        dialogShareSongBinding.hoverButtonShareScreenshot.visibility = VISIBLE
+                        dialogShareSongBinding.buttonShareScreenshot.alpha = 0.4f
+                        dialogShareSongBinding.buttonShareScreenshot.isClickable = false
+                        dialogShareSongBinding.buttonShareScreenshot.isFocusable = false
                         withContext(Dispatchers.Default){
                             val tempBitmap = getScreenShotOfView(mScreeShotPlayerView)
-                            val tempDesc = getString(R.string.currently_listening_icon)
+                            val tempDesc = ctx.getString(R.string.currently_listening_icon)
                             IntentActionsUtils.shareBitmapImage(ctx, tempBitmap, tempDesc)
-                            dialogShareSongBinding.hoverButtonShareScreenshot.visibility = GONE
+                            MainScope().launch {
+                                dialogShareSongBinding.buttonShareScreenshot.alpha = 1.0f
+                                dialogShareSongBinding.buttonShareScreenshot.isClickable = true
+                                dialogShareSongBinding.buttonShareScreenshot.isFocusable = true
+                            }
                         }
                         this@apply.dismiss()
                     }

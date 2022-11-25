@@ -142,4 +142,11 @@
     <string name="info_tags">Info/tags</string>
     <string name="set_ringtone">Set ringtone</string>
     <string name="share_song">Share song</string>
+    <string name="phone_ringtone">Phone ringtone</string>
+    <string name="alarm_ringtone">Alarm ringtone</string>
+    <string name="lyrics">Lyrics</string>
+    <string name="covert_art">Covert art</string>
+    <string name="timer">Timer</string>
+    <string name="info">Info</string>
+    <string name="share">Share</string>
 </resources>
