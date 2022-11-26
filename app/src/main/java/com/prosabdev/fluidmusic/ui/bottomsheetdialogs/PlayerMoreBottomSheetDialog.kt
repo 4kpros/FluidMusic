@@ -55,10 +55,10 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        checkInteractions()
-        observeLiveData()
         MainScope().launch {
             loadSharedPreferencesData()
+            checkInteractions()
+            observeLiveData()
         }
     }
 
@@ -125,7 +125,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
             shareSong()
         }
         mBottomSheetPlayerMoreBinding.buttonTimer.setOnClickListener{
-            showTimerDialog()
+            showSleepTimerDialog()
         }
         mBottomSheetPlayerMoreBinding.buttonGoto.setOnClickListener{
             showGoToSongDialog()
@@ -254,7 +254,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
         dismiss()
     }
 
-    private fun showTimerDialog() {
+    private fun showSleepTimerDialog() {
         val ctx : Context = this.context ?: return
         val mDialogSetSleepTimerBinding : DialogSetSleepTimerBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_set_sleep_timer, null, false)
 
@@ -266,25 +266,29 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                 dialog.dismiss()
             }
             .setPositiveButton(ctx.getString(R.string.ok)) { _, _ ->
-                saveNewTimer(ctx, mDialogSetSleepTimerBinding.slider.value, mDialogSetSleepTimerBinding.checkboxPlayLastSong.isChecked)
+                saveNewTimer(
+                    ctx,
+                    mDialogSetSleepTimerBinding.slider.value,
+                    mDialogSetSleepTimerBinding.checkboxPlayLastSong.isChecked
+                )
             }
             .show().apply {
-                mDialogSetSleepTimerBinding.slider.value = mSleepTimerSP?.sliderValue ?: 0.0f
+            mDialogSetSleepTimerBinding.slider.value = mSleepTimerSP?.sliderValue ?: 0.0f
+            mDialogSetSleepTimerBinding.textRangeValue.text =
+                if((mSleepTimerSP?.sliderValue ?: 0.0f) <= 0)
+                    ctx.getString(R.string.disabled)
+                else
+                    ctx.getString(R.string._timer_range_value, (mSleepTimerSP?.sliderValue ?: 0.0f).toInt())
+            mDialogSetSleepTimerBinding.checkboxPlayLastSong.isChecked = mSleepTimerSP?.playLastSong ?: false
+
+            mDialogSetSleepTimerBinding.slider.addOnChangeListener(Slider.OnChangeListener { _, value, _ ->
                 mDialogSetSleepTimerBinding.textRangeValue.text =
-                    if((mSleepTimerSP?.sliderValue ?: 0.0f) <= 0)
+                    if(value <= 0)
                         ctx.getString(R.string.disabled)
                     else
-                        ctx.getString(R.string._timer_range_value, (mSleepTimerSP?.sliderValue ?: 0.0f).toInt())
-                mDialogSetSleepTimerBinding.checkboxPlayLastSong.isChecked = mSleepTimerSP?.playLastSong ?: false
-
-                mDialogSetSleepTimerBinding.slider.addOnChangeListener(Slider.OnChangeListener { _, value, _ ->
-                    mDialogSetSleepTimerBinding.textRangeValue.text =
-                        if(value <= 0)
-                            ctx.getString(R.string.disabled)
-                        else
-                            ctx.getString(R.string._timer_range_value, value.toInt())
-                })
-            }
+                        ctx.getString(R.string._timer_range_value, value.toInt())
+            })
+        }
         dismiss()
     }
 

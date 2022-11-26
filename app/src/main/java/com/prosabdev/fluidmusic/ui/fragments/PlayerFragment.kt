@@ -24,6 +24,8 @@ import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.slider.Slider
 import com.google.android.material.slider.Slider.OnSliderTouchListener
 import com.prosabdev.fluidmusic.R
@@ -528,6 +530,16 @@ import kotlin.math.roundToLong
         SharedPreferenceManagerUtils.Player.saveQueueListSize(this.requireContext(), mPlayerPagerAdapter?.itemCount ?: 0)
     }
 
+    private var mBottomSheetBehavior: BottomSheetBehavior<View?>? = null
+    open class FullScreenBottomSheetFragment() : BottomSheetDialogFragment() {
+
+    }
+    private fun configureBackdrop() {
+        mFragmentPlayerBinding.linearDragView.setOnClickListener {
+//            BottomSheetBehavior.from(mFragmentPlayerBinding.frameLayoutQueueMusic).state = BottomSheetBehavior.STATE_EXPANDED
+        }
+    }
+
     private fun initViews() {
         mSongItemViewModel = ModelsViewModelFactory(this.requireContext()).create(SongItemViewModel::class.java)
 
@@ -538,11 +550,13 @@ import kotlin.math.roundToLong
         ViewInsetModifiersUtils.updateTopViewInsets(mFragmentPlayerBinding.linearRescanDeviceContainer)
         ViewInsetModifiersUtils.updateTopViewInsets(mFragmentPlayerBinding.linearViewpager)
 
+        ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentPlayerBinding.linearDragView)
         ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentPlayerBinding.constraintBottomButtonsContainer)
-        ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentPlayerBinding.linearDragHandle)
 
         if(mPlayerMoreBottomSheetDialog == null)
             mPlayerMoreBottomSheetDialog = PlayerMoreBottomSheetDialog(mMainFragmentViewModel, mFragmentPlayerBinding.root)
+
+        configureBackdrop()
     }
 
     companion object {
