@@ -33,7 +33,6 @@ import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreBottomSheetDialog
-import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicDialog
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
@@ -51,7 +50,6 @@ import kotlin.math.roundToLong
 
     private lateinit var mFragmentPlayerBinding: FragmentPlayerBinding
 
-
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
 //    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 //    private val mQueueMusicItemViewModel: QueueMusicItemViewModel by activityViewModels()
@@ -61,7 +59,6 @@ import kotlin.math.roundToLong
     private var mPlayerPagerAdapter: PlayerPageAdapter? = null
 
     private var mPlayerMoreBottomSheetDialog: PlayerMoreBottomSheetDialog? = null
-    private var mQueueMusicDialog: QueueMusicDialog? = null
 
     private var mOldViewpagerPosition: Int = 0
     private var mCurrentDuration: Long = 0
@@ -427,19 +424,12 @@ import kotlin.math.roundToLong
         mFragmentPlayerBinding.buttonMore.setOnClickListener {
             showMoreOptionsDialog()
         }
-        mFragmentPlayerBinding.buttonQueueMusic.setOnClickListener {
-            mQueueMusicDialog = QueueMusicDialog()
-            mQueueMusicDialog?.show(childFragmentManager, QueueMusicDialog.TAG)
-        }
         mFragmentPlayerBinding.buttonEqualizer.setOnClickListener {
             requireActivity().supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 add<EqualizerFragment>(R.id.main_activity_fragment_container)
                 addToBackStack(null)
             }
-        }
-        mFragmentPlayerBinding.buttonArrowDown.setOnClickListener {
-            //
         }
         mFragmentPlayerBinding.buttonRescanDevice.setOnClickListener {
             openMediaScannerActivity()
@@ -547,7 +537,9 @@ import kotlin.math.roundToLong
 
         ViewInsetModifiersUtils.updateTopViewInsets(mFragmentPlayerBinding.linearRescanDeviceContainer)
         ViewInsetModifiersUtils.updateTopViewInsets(mFragmentPlayerBinding.linearViewpager)
-        ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentPlayerBinding.linearControls)
+
+        ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentPlayerBinding.constraintBottomButtonsContainer)
+        ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentPlayerBinding.linearDragHandle)
 
         if(mPlayerMoreBottomSheetDialog == null)
             mPlayerMoreBottomSheetDialog = PlayerMoreBottomSheetDialog(mMainFragmentViewModel, mFragmentPlayerBinding.root)

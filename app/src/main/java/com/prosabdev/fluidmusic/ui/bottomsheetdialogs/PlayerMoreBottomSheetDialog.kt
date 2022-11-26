@@ -30,7 +30,6 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
 class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragmentViewModel, private val mScreeShotPlayerView : View) : GenericBottomSheetDialogFragment() ,
     SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -116,8 +115,8 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
         mBottomSheetPlayerMoreBinding.buttonInfo.setOnClickListener{
             showSongInfoDialog()
         }
-        mBottomSheetPlayerMoreBinding.buttonCovertArt.setOnClickListener{
-            showCovertArtSong()
+        mBottomSheetPlayerMoreBinding.buttonPlaylistAdd.setOnClickListener{
+            showAddToPlaylistDialog()
         }
         mBottomSheetPlayerMoreBinding.buttonLyrics.setOnClickListener{
             fetchLyrics()
@@ -354,8 +353,8 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
         //On delete song
     }
 
-    private fun showCovertArtSong() {
-        //On delete song
+    private fun showAddToPlaylistDialog() {
+        //
     }
 
     private fun showSongInfoDialog() {

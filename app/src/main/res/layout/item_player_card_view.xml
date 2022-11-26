@@ -13,7 +13,9 @@
         style="@style/Widget.Material3.CardView.Filled"
         android:backgroundTint="@color/transparent"
         app:cardElevation="0dp"
-        android:layout_margin="@dimen/main_margin">
+        android:layout_marginHorizontal="@dimen/main_margin"
+        android:layout_marginTop="@dimen/main_margin"
+        >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-package com.prosabdev.fluidmusic.models
+package com.prosabdev.fluidmusic.models.playlist
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -17,4 +17,5 @@ class PlaylistSongItem {
     var id: Long = 0
     var playlistId: Int = 0
     var songId: Int = 0
+    var addedDate: Long = 0
 }

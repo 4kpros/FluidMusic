@@ -139,13 +139,13 @@
                     android:layout_gravity="center_vertical">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_covert_art"
+                        android:id="@+id/button_playlist_add"
                         style="@style/Widget.Material3.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:icon="@drawable/add_photo_alternate"
+                        app:icon="@drawable/playlist_add"
                         app:iconPadding="2dp"
-                        android:text="@string/covert_art" />
+                        android:text="@string/add_to_playlist" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat

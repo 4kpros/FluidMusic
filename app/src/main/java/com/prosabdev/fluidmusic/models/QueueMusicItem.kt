@@ -15,4 +15,5 @@ class QueueMusicItem {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
     var songId: Long = 0
+    var addedDate: Long = 0
 }

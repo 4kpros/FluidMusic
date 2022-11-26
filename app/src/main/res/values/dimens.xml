@@ -8,6 +8,9 @@
 
     <dimen name="image_player_dialog_sizer">65dp</dimen>
 
+    <dimen name="image_playlist_list_size">56dp</dimen>
+    <dimen name="image_playlist_grid_size">125dp</dimen>
+
     <dimen name="image_list_small_size">65dp</dimen>
     <dimen name="image_list_medium_size">95dp</dimen>
     <dimen name="image_list_big_size">125dp</dimen>

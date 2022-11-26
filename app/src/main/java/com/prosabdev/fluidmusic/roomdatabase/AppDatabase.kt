@@ -5,8 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.models.PlaylistItem
-import com.prosabdev.fluidmusic.models.PlaylistSongItem
+import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
+import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
 import com.prosabdev.fluidmusic.models.QueueMusicItem
 import com.prosabdev.fluidmusic.models.explore.*
 import com.prosabdev.fluidmusic.roomdatabase.dao.FolderUriTreeDao
@@ -24,15 +24,15 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
         PlaylistSongItem::class,
                ],
     views = [
-        AlbumArtistItem::class,
-        AlbumItem::class,
-        ArtistItem::class,
-        ComposerItem::class,
-        FolderItem::class,
-        GenreItem::class,
-        YearItem::class,
+        AlbumArtistItemView::class,
+        AlbumItemView::class,
+        ArtistItemView::class,
+        ComposerItemView::class,
+        FolderItemView::class,
+        GenreItemView::class,
+        YearItemView::class,
            ],
-    version = 39)
+    version = 40)
 
 abstract class AppDatabase : RoomDatabase() {
 

@@ -144,8 +144,9 @@
     <string name="phone_ringtone">Phone ringtone</string>
     <string name="alarm_ringtone">Alarm ringtone</string>
     <string name="lyrics">Lyrics</string>
-    <string name="covert_art">Covert art</string>
+    <string name="cover_art">Cover art</string>
     <string name="timer">Timer</string>
     <string name="info">Info</string>
     <string name="share">Share</string>
+    <string name="add_to_playlist">Add to playlist</string>
 </resources>

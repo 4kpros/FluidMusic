@@ -13,25 +13,25 @@ import com.prosabdev.fluidmusic.models.FolderUriTree
 
 class FolderUriTreeAdapter(
     private val mListener: OnItemClickListener
-) : ListAdapter<FolderUriTree, FolderUriTreeAdapter.FolderSelectionHolder>(DiffCallback) {
+) : ListAdapter<FolderUriTree, FolderUriTreeAdapter.FolderUriTreeHolder>(DiffCallback) {
 
     interface OnItemClickListener {
         fun onRemoveFolder(position: Int)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderSelectionHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderUriTreeHolder {
         val tempItemStorageAccessFolderBinding: ItemStorageAccessFolderBinding = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context),
             R.layout.item_storage_access_folder, parent, false
         )
-        return FolderSelectionHolder(tempItemStorageAccessFolderBinding)
+        return FolderUriTreeHolder(tempItemStorageAccessFolderBinding)
     }
 
-    override fun onBindViewHolder(holder: FolderSelectionHolder, position: Int) {
+    override fun onBindViewHolder(holder: FolderUriTreeHolder, position: Int) {
         holder.bindData(getItem(position), mListener, position)
     }
 
-    class FolderSelectionHolder(private val mItemStorageAccessFolderBinding: ItemStorageAccessFolderBinding) : RecyclerView.ViewHolder(mItemStorageAccessFolderBinding.root) {
+    class FolderUriTreeHolder(private val mItemStorageAccessFolderBinding: ItemStorageAccessFolderBinding) : RecyclerView.ViewHolder(mItemStorageAccessFolderBinding.root) {
 
         fun bindData(folderUriTree: FolderUriTree, mListener: OnItemClickListener, position: Int) {
             mItemStorageAccessFolderBinding.folderUriTree = folderUriTree
