@@ -20,12 +20,12 @@ abstract class SelectablePlayingItemListAdapter<VH : RecyclerView.ViewHolder>(
         val oldPlaying = mPlayingItem
         mPlayingItem = if(position >= 0) position else -1
         if(oldPlaying >= 0)
-            notifyItemChanged(oldPlaying, PAYLOAD_IS_PLAYING)
+            notifyItemChanged(oldPlaying, PAYLOAD_PLAYBACK_STATE)
         if(mPlayingItem >= 0)
-            notifyItemChanged(position, PAYLOAD_IS_PLAYING)
+            notifyItemChanged(position, PAYLOAD_PLAYBACK_STATE)
     }
 
     companion object {
-        const val PAYLOAD_IS_PLAYING = "PAYLOAD_IS_PLAYING"
+        const val PAYLOAD_PLAYBACK_STATE = "PAYLOAD_PLAYBACK_STATE"
     }
 }

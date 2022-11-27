@@ -113,7 +113,7 @@ abstract class AudioInfoExtractorUtils {
                         tempSong.numberTracks = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS)
 
                         tempSong.lastUpdateDate = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
-                        tempSong.lastAddedDateToLibrary = System.currentTimeMillis() / 1000
+                        tempSong.lastAddedDateToLibrary = SystemSettingsUtils.getCurrentDateInMilli()
 
                         val extractor : MediaExtractor = MediaExtractor()
                         extractor.setDataSource(it?.fileDescriptor!!)

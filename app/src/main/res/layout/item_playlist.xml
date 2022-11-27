@@ -9,6 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
         >
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_view_clickable"
@@ -27,29 +28,41 @@
         </com.google.android.material.card.MaterialCardView>
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/linear_cover_art_container"
-            android:layout_width="@dimen/image_playlist_list_size"
-            android:layout_height="@dimen/image_playlist_list_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginVertical="@dimen/main_small_margin"
+            android:gravity="center"
             android:layout_marginStart="@dimen/main_margin"
+            android:layout_marginVertical="@dimen/main_small_margin"
             >
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_view_cover_art"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                style="@style/Widget.Material3.CardView.Filled"
-                android:backgroundTint="@color/transparent"
+                android:layout_width="@dimen/image_playlist_list_size"
+                android:layout_height="@dimen/image_playlist_list_size"
+                style="@style/Widget.Material3.CardView.Elevated"
+                android:layout_margin="1dp"
                 >
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/imageview_cover_art"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/playlist_play"
-                    app:srcCompat="@drawable/playlist_play"
-                    />
+                    >
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/playlist_play"
+                        app:srcCompat="@drawable/playlist_play"
+                        android:layout_gravity="center"
+                        />
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/imageview_cover_art"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
         </androidx.appcompat.widget.LinearLayoutCompat>
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -60,9 +73,8 @@
             app:layout_constraintStart_toEndOf="@+id/linear_cover_art_container"
             app:layout_constraintEnd_toEndOf="parent"
             android:orientation="vertical"
-            android:layout_marginStart="@dimen/main_medium_margin"
-            android:layout_marginEnd="@dimen/main_margin"
             android:gravity="center"
+            android:layout_marginHorizontal="@dimen/main_margin"
             >
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/text_title"

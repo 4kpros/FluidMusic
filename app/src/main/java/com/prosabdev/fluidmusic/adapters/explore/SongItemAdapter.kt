@@ -1,6 +1,5 @@
 package com.prosabdev.fluidmusic.adapters.explore
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
 import android.net.Uri
@@ -17,14 +16,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.color.MaterialColors
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapter
 import com.prosabdev.fluidmusic.databinding.ItemGenericExploreListBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
 import com.prosabdev.fluidmusic.utils.FormattersUtils
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
+import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -33,7 +31,7 @@ class SongItemAdapter(
     private val mContext: Context,
     private val mOnItemClickListener: OnItemClickListener,
     private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener
-    ) : SelectablePlayingItemListAdapter<SongItemAdapter.SongItemViewHolder>(diffCallback as DiffUtil.ItemCallback<Any>)
+    ) : SelectablePlayingItemListAdapter<SongItemAdapter.SongItemViewHolder>(SongItem.diffCallback as DiffUtil.ItemCallback<Any>)
     {
     interface OnItemClickListener {
         fun onSongItemClicked(position: Int)
@@ -82,28 +80,28 @@ class SongItemAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongItemViewHolder {
-        val tempItemGenericExploreListBinding: ItemGenericExploreListBinding = DataBindingUtil.inflate(
+        val dataBinding: ItemGenericExploreListBinding = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context),
             R.layout.item_generic_explore_list, parent, false
         )
         return SongItemViewHolder(
-            tempItemGenericExploreListBinding
+            dataBinding,
+            mOnItemClickListener
         )
     }
     override fun onBindViewHolder(holder: SongItemViewHolder, position: Int) {
-        holder.bindListener(position, mOnItemClickListener)
-        holder.updateAllUI(mContext, getItem(position) as SongItem, isPlaying(position), selectableIsSelected(position))
+        onBindViewHolder(holder, position, mutableListOf())
     }
     override fun onBindViewHolder(holder: SongItemViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.isNotEmpty()) {
             for (payload in payloads) {
                 when (payload) {
-                    SelectableItemListAdapter.PAYLOAD_IS_SELECTED -> {
+                    PAYLOAD_IS_SELECTED -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_SELECTED")
                         holder.updateSelectedStateUI(selectableIsSelected(position))
                     }
-                    PAYLOAD_IS_PLAYING -> {
-                        Log.i(ConstantValues.TAG, "PAYLOAD_IS_PLAYING")
+                    PAYLOAD_PLAYBACK_STATE -> {
+                        Log.i(ConstantValues.TAG, "PAYLOAD_PLAYBACK_STATE")
                         holder.updateIsPlayingStateUI(isPlaying(position))
                     }
                     PAYLOAD_IS_COVERT_ART_TEXT -> {
@@ -116,7 +114,10 @@ class SongItemAdapter(
                 }
             }
         } else {
-            super.onBindViewHolder(holder, position, payloads)
+            //If the is no payload specified on notify adapter, refresh all UI to be safe
+            holder.updateSelectedStateUI(selectableIsSelected(position))
+            holder.updateIsPlayingStateUI(isPlaying(position))
+            holder.updateCovertArtAndTitleUI(mContext, getItem(position) as SongItem)
         }
     }
 
@@ -125,15 +126,28 @@ class SongItemAdapter(
         holder.recycleItem(mContext)
     }
 
-    class SongItemViewHolder(private val mItemGenericExploreListBinding: ItemGenericExploreListBinding) : RecyclerView.ViewHolder(mItemGenericExploreListBinding.root) {
-        fun updateAllUI(context: Context, songItem: SongItem, isPlaying: Boolean, selected: Boolean){
-            updateSelectedStateUI(selected, false)
-            updateIsPlayingStateUI(isPlaying)
-            updateCovertArtAndTitleUI(context, songItem)
+    class SongItemViewHolder(
+        private val mItemGenericExploreListBinding: ItemGenericExploreListBinding,
+        mOnItemClickListener: OnItemClickListener
+    ) : RecyclerView.ViewHolder(mItemGenericExploreListBinding.root) {
+        init {
+            mItemGenericExploreListBinding.cardViewClickable.setOnClickListener {
+                mOnItemClickListener.onSongItemClicked(bindingAdapterPosition)
+            }
+            mItemGenericExploreListBinding.cardViewClickable.setOnLongClickListener {
+                mOnItemClickListener.onSongItemLongClicked(bindingAdapterPosition)
+                true
+            }
+            mItemGenericExploreListBinding.imageviewCoverArt.setOnClickListener {
+                mOnItemClickListener.onSongItemPlayClicked(bindingAdapterPosition)
+            }
         }
+
+        //When item is is recycled(not visible), clear image view to save memory
         fun recycleItem(ctx : Context){
             Glide.with(ctx).clear(mItemGenericExploreListBinding.imageviewCoverArt)
         }
+
         fun updateCovertArtAndTitleUI(context: Context, songItem: SongItem) {
             mItemGenericExploreListBinding.textTitle.text =
                 if(songItem.title != null && songItem.title!!.isNotEmpty())
@@ -159,6 +173,7 @@ class SongItemAdapter(
                 ImageLoadersUtils.loadCovertArtFromSongUri(context, mItemGenericExploreListBinding.imageviewCoverArt, tempUri, 100, 50, true)
             }
         }
+
         fun updateIsPlayingStateUI(playing: Boolean) {
             if(playing){
                 mItemGenericExploreListBinding.textTitle.setTypeface(null, Typeface.BOLD)
@@ -186,48 +201,16 @@ class SongItemAdapter(
                 mItemGenericExploreListBinding.textNowPlaying.visibility = INVISIBLE
             }
         }
+
         fun updateSelectedStateUI(selectableIsSelected: Boolean, animated: Boolean = true) {
-//            if(selectableIsSelected) {
-//                mItemGenericExploreListBinding.songItemIsSelected.visibility = VISIBLE
-//                mItemGenericExploreListBinding.songItemIsSelected.alpha = 1.0f
-//            }else{
-//                mItemGenericExploreListBinding.songItemIsSelected.visibility = INVISIBLE
-//                mItemGenericExploreListBinding.songItemIsSelected.alpha = 0.4f
-//            }
             if(selectableIsSelected && mItemGenericExploreListBinding.songItemIsSelected.visibility != VISIBLE)
                 ViewAnimatorsUtils.crossFadeUp(mItemGenericExploreListBinding.songItemIsSelected, animated, 150)
             else if(!selectableIsSelected && mItemGenericExploreListBinding.songItemIsSelected.alpha == 1.0f)
                 ViewAnimatorsUtils.crossFadeDown(mItemGenericExploreListBinding.songItemIsSelected, animated, 150)
         }
-        fun bindListener(
-            position: Int,
-            mOnItemClickListener: OnItemClickListener,
-        ) {
-            mItemGenericExploreListBinding.cardViewClickable.setOnClickListener {
-                mOnItemClickListener.onSongItemClicked(position)
-            }
-            mItemGenericExploreListBinding.cardViewClickable.setOnLongClickListener {
-                mOnItemClickListener.onSongItemLongClicked(position)
-                true
-            }
-            mItemGenericExploreListBinding.imageviewCoverArt.setOnClickListener {
-                mOnItemClickListener.onSongItemPlayClicked(position)
-            }
-        }
     }
 
-        companion object {
-            const val PAYLOAD_IS_COVERT_ART_TEXT = "PAYLOAD_IS_COVERT_ART_TEXT"
-
-            val diffCallback = object : DiffUtil.ItemCallback<SongItem>() {
-                override fun areItemsTheSame(oldItem: SongItem, newItem: SongItem): Boolean {
-                    return oldItem.id == newItem.id
-                }
-
-                @SuppressLint("DiffUtilEquals")
-                override fun areContentsTheSame(oldItem: SongItem, newItem: SongItem): Boolean {
-                    return oldItem == newItem
-                }
-            }
-        }
+    companion object {
+        const val PAYLOAD_IS_COVERT_ART_TEXT = "PAYLOAD_IS_COVERT_ART_TEXT"
+    }
 }

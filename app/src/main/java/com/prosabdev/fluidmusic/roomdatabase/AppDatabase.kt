@@ -5,14 +5,15 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
-import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
 import com.prosabdev.fluidmusic.models.QueueMusicItem
 import com.prosabdev.fluidmusic.models.explore.*
+import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
+import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
 import com.prosabdev.fluidmusic.roomdatabase.dao.FolderUriTreeDao
-import com.prosabdev.fluidmusic.roomdatabase.dao.PlaylistItemDao
+import com.prosabdev.fluidmusic.roomdatabase.dao.playlist.PlaylistItemDao
 import com.prosabdev.fluidmusic.roomdatabase.dao.QueueMusicItemDao
 import com.prosabdev.fluidmusic.roomdatabase.dao.explore.*
+import com.prosabdev.fluidmusic.roomdatabase.dao.playlist.PlaylistSongItemDao
 import com.prosabdev.fluidmusic.utils.ConstantValues
 
 @Database(
@@ -32,12 +33,13 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
         GenreItemView::class,
         YearItemView::class,
            ],
-    version = 40)
+    version = 47)
 
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun folderUriTreeDao(): FolderUriTreeDao
     abstract fun playlistItemDao(): PlaylistItemDao
+    abstract fun playlistSongItemDao(): PlaylistSongItemDao
     abstract fun queueMusicItemDao(): QueueMusicItemDao
 
     abstract fun albumArtistItemDao(): AlbumArtistItemDao

@@ -24,8 +24,6 @@ import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.slider.Slider
 import com.google.android.material.slider.Slider.OnSliderTouchListener
 import com.prosabdev.fluidmusic.R
@@ -35,14 +33,14 @@ import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreBottomSheetDialog
+import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
+import com.prosabdev.fluidmusic.viewmodels.models.QueueMusicItemViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlin.math.abs
 import kotlin.math.roundToLong
 
@@ -50,13 +48,14 @@ import kotlin.math.roundToLong
 @BuildCompat.PrereleaseSdkCheck class PlayerFragment : Fragment(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private var mQueueMusicBottomSheetDialog: QueueMusicBottomSheetDialog? = null
     private lateinit var mFragmentPlayerBinding: FragmentPlayerBinding
 
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
-//    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
-//    private val mQueueMusicItemViewModel: QueueMusicItemViewModel by activityViewModels()
+    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 
     private lateinit var mSongItemViewModel: SongItemViewModel
+    private val mQueueMusicItemViewModel: QueueMusicItemViewModel by activityViewModels()
 
     private var mPlayerPagerAdapter: PlayerPageAdapter? = null
 
@@ -381,6 +380,29 @@ import kotlin.math.roundToLong
     }
 
     private fun observeLiveData() {
+        mPlayerFragmentViewModel.getCurrentSong().observe(this as LifecycleOwner){
+            updateCurrentPlayingSong(it)
+        }
+        mPlayerFragmentViewModel.getShuffle().observe(this as LifecycleOwner){
+            updateShuffleUI(it)
+        }
+        mPlayerFragmentViewModel.getRepeat().observe(this as LifecycleOwner){
+            updateRepeatUI(it)
+        }
+        mPlayerFragmentViewModel.getSourceOfQueueList().observe(this as LifecycleOwner){
+            //
+        }
+        mPlayerFragmentViewModel.getPlayingProgressValue().observe(this as LifecycleOwner){
+            //
+        }
+    }
+
+    private fun updateCurrentPlayingSong(it: CurrentPlayingSongSP?) {
+        //
+        if(it == null)
+            return
+
+//        if(it.uri == mPlayerPagerAdapter.)
     }
 
     private fun checkInteractions() {
@@ -436,6 +458,9 @@ import kotlin.math.roundToLong
         mFragmentPlayerBinding.buttonRescanDevice.setOnClickListener {
             openMediaScannerActivity()
         }
+        mFragmentPlayerBinding.dragHandleViewContainer.setOnClickListener{
+            mQueueMusicBottomSheetDialog?.show(childFragmentManager, QueueMusicBottomSheetDialog.TAG)
+        }
     }
 
     private fun showMoreOptionsDialog() {
@@ -474,6 +499,7 @@ import kotlin.math.roundToLong
             mCurrentDuration = 0
             changeCurrentSongTo(currentPosition - 1)
         }
+        activity?.mediaController?.transportControls?.skipToPrevious()
     }
     private fun onNextPage(){
         if((mPlayerPagerAdapter?.itemCount ?: 0) <= 0)
@@ -483,10 +509,36 @@ import kotlin.math.roundToLong
             mCurrentDuration = 0
             changeCurrentSongTo(currentPosition + 1)
         }
+        activity?.mediaController?.transportControls?.skipToNext()
     }
     private fun onPlayPause(){
         if((mPlayerPagerAdapter?.itemCount ?: 0) <= 0)
             return
+    }
+    private suspend fun updateCurrentPlayingSong(currentSong: Int?)  = coroutineScope{
+        val bundle = createQueueListBundle(currentSong ?: 0)
+        activity?.mediaController?.transportControls?.play()
+    }
+    private fun createQueueListBundle(currentSong: Int): Bundle {
+        val bundle = Bundle()
+        //Create new media meta data for current playing song
+//        val tempMediaMetadataCompat = MediaMetadataCompat.Builder()
+//            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, temBitmap)
+//            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, mPlayerFragmentViewModel.getSongList().value?.get(currentSong)!!.artist)
+//            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, mPlayerFragmentViewModel.getSongList().value?.get(currentSong)!!.album)
+//            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, tempTitle)
+//            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayerFragmentViewModel.getSongList().value?.get(currentSong)!!.duration)
+//            .build()
+//
+//        //Setup bundle
+//        bundle.putParcelable(ConstantValues.BUNDLE_CURRENT_SONG_META_DATA, tempMediaMetadataCompat)
+//        bundle.putStringArrayList(ConstantValues.BUNDLE_QUEUE_LIST, queueList)
+//        bundle.putString(ConstantValues.BUNDLE_SOURCE_FROM, mPlayerFragmentViewModel.getSourceOfQueueList().value)
+//        bundle.putString(ConstantValues.BUNDLE_SOURCE_FROM_VALUE, mPlayerFragmentViewModel.getSourceOfQueueListValue().value)
+//        bundle.putInt(ConstantValues.BUNDLE_SHUFFLE_VALUE, mPlayerFragmentViewModel.getShuffle().value ?: 0)
+//        bundle.putInt(ConstantValues.BUNDLE_REPEAT_VALUE, mPlayerFragmentViewModel.getRepeat().value ?: 0)
+//        bundle.putInt(ConstantValues.BUNDLE_CURRENT_SONG_ID, currentSong)
+        return bundle
     }
     private fun onViewpagerPageChanged(position: Int) {
         if(mOldViewpagerPosition != position) {
@@ -530,16 +582,6 @@ import kotlin.math.roundToLong
         SharedPreferenceManagerUtils.Player.saveQueueListSize(this.requireContext(), mPlayerPagerAdapter?.itemCount ?: 0)
     }
 
-    private var mBottomSheetBehavior: BottomSheetBehavior<View?>? = null
-    open class FullScreenBottomSheetFragment() : BottomSheetDialogFragment() {
-
-    }
-    private fun configureBackdrop() {
-        mFragmentPlayerBinding.linearDragView.setOnClickListener {
-//            BottomSheetBehavior.from(mFragmentPlayerBinding.frameLayoutQueueMusic).state = BottomSheetBehavior.STATE_EXPANDED
-        }
-    }
-
     private fun initViews() {
         mSongItemViewModel = ModelsViewModelFactory(this.requireContext()).create(SongItemViewModel::class.java)
 
@@ -550,13 +592,13 @@ import kotlin.math.roundToLong
         ViewInsetModifiersUtils.updateTopViewInsets(mFragmentPlayerBinding.linearRescanDeviceContainer)
         ViewInsetModifiersUtils.updateTopViewInsets(mFragmentPlayerBinding.linearViewpager)
 
-        ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentPlayerBinding.linearDragView)
+        ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentPlayerBinding.dragHandleViewContainer)
         ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentPlayerBinding.constraintBottomButtonsContainer)
 
         if(mPlayerMoreBottomSheetDialog == null)
             mPlayerMoreBottomSheetDialog = PlayerMoreBottomSheetDialog(mMainFragmentViewModel, mFragmentPlayerBinding.root)
-
-        configureBackdrop()
+        if(mQueueMusicBottomSheetDialog == null)
+            mQueueMusicBottomSheetDialog = QueueMusicBottomSheetDialog(mPlayerFragmentViewModel)
     }
 
     companion object {

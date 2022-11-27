@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
@@ -20,6 +21,7 @@ import com.prosabdev.fluidmusic.databinding.DialogGotoSongBinding
 import com.prosabdev.fluidmusic.databinding.DialogSetSleepTimerBinding
 import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
+import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
 import com.prosabdev.fluidmusic.models.sharedpreference.SleepTimerSP
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
@@ -58,7 +60,6 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
         MainScope().launch {
             loadSharedPreferencesData()
             checkInteractions()
-            observeLiveData()
         }
     }
 
@@ -72,6 +73,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
             updateCurrentPlayingSongUI(currentSong)
             if(currentSong.uri == null) return@withContext
             mSongItem = AudioInfoExtractorUtils.extractAudioInfoFromUri(ctx, Uri.parse(currentSong.uri))
+            mSongItem?.id = currentSong.id
         }
     }
 
@@ -104,11 +106,8 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                 )
 
             val tempUri: Uri? = Uri.parse(currentSong.uri ?: "")
-            ImageLoadersUtils.loadCovertArtFromSongUri(ctx, mBottomSheetPlayerMoreBinding.covertArt, tempUri, 100)
+            ImageLoadersUtils.loadCovertArtFromSongUri(ctx, mBottomSheetPlayerMoreBinding.covertArt, tempUri, 100, 200, true)
         }
-    }
-
-    private fun observeLiveData() {
     }
 
     private fun checkInteractions() {
@@ -187,7 +186,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
 
         val mDialogGotoSongBinding : DialogGotoSongBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_goto_song, null, false)
 
-        val tempFM = activity?.supportFragmentManager
+        val tempFragmentManager = activity?.supportFragmentManager ?: return
         MaterialAlertDialogBuilder(ctx)
             .setTitle(ctx.getString(R.string.go_to))
             .setIcon(R.drawable.link)
@@ -199,7 +198,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                 mDialogGotoSongBinding.buttonArtist.setOnClickListener{
                     this.dismiss()
                     mMainFragmentViewModel.setHideSlidingPanel()
-                    tempFM?.commit {
+                    tempFragmentManager.commit {
                         setReorderingAllowed(false)
                         add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_ARTISTS, mSongItem?.artist ?: ""))
                         addToBackStack(null)
@@ -208,7 +207,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                 mDialogGotoSongBinding.buttonAlbum.setOnClickListener{
                     this.dismiss()
                     mMainFragmentViewModel.setHideSlidingPanel()
-                    tempFM?.commit {
+                    tempFragmentManager.commit {
                         setReorderingAllowed(false)
                         add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_ALBUMS, mSongItem?.album ?: ""))
                         addToBackStack(null)
@@ -217,7 +216,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                 mDialogGotoSongBinding.buttonFolder.setOnClickListener{
                     this.dismiss()
                     mMainFragmentViewModel.setHideSlidingPanel()
-                    tempFM?.commit {
+                    tempFragmentManager.commit {
                         setReorderingAllowed(false)
                         add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_FOLDERS, mSongItem?.folder ?: ""))
                         addToBackStack(null)
@@ -226,7 +225,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                 mDialogGotoSongBinding.buttonComposer.setOnClickListener{
                     this.dismiss()
                     mMainFragmentViewModel.setHideSlidingPanel()
-                    tempFM?.commit {
+                    tempFragmentManager.commit {
                         setReorderingAllowed(false)
                         add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_COMPOSERS, mSongItem?.composer ?: ""))
                         addToBackStack(null)
@@ -235,7 +234,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                 mDialogGotoSongBinding.buttonGenre.setOnClickListener{
                     this.dismiss()
                     mMainFragmentViewModel.setHideSlidingPanel()
-                    tempFM?.commit {
+                    tempFragmentManager.commit {
                         setReorderingAllowed(false)
                         add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_GENRES, mSongItem?.genre ?: ""))
                         addToBackStack(null)
@@ -244,7 +243,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                 mDialogGotoSongBinding.buttonAlbumArtist.setOnClickListener{
                     this.dismiss()
                     mMainFragmentViewModel.setHideSlidingPanel()
-                    tempFM?.commit {
+                    tempFragmentManager.commit {
                         setReorderingAllowed(false)
                         add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_ALBUM_ARTISTS, mSongItem?.albumArtist ?: ""))
                         addToBackStack(null)
@@ -358,22 +357,33 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
     }
 
     private fun showAddToPlaylistDialog() {
-        //
+        if(mSongItem?.uri.isNullOrEmpty() || (mSongItem?.size ?: 0) <= 0){
+            MainScope().launch {
+                Toast.makeText(requireContext(), "Please select valid song !", Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+
+        val songIdList : ArrayList<PlaylistSongItem> = ArrayList()
+        val psI = PlaylistSongItem()
+        psI.songId = mSongItem?.id ?: -1
+        psI.addedDate = SystemSettingsUtils.getCurrentDateInMilli()
+        songIdList.add(psI)
+
+        val playlistAddBottomSheetDialog = PlaylistAddBottomSheetDialog(songIdList)
+        activity ?.supportFragmentManager?.let { playlistAddBottomSheetDialog.show(it, PlaylistAddBottomSheetDialog.TAG) }
+        dismiss()
     }
 
     private fun showSongInfoDialog() {
         val songInfoBottomSheetDialog = SongInfoBottomSheetDialog(mSongItem)
-        songInfoBottomSheetDialog.show(activity ?.supportFragmentManager!!, SongInfoBottomSheetDialog.TAG)
+        activity ?.supportFragmentManager?.let { songInfoBottomSheetDialog.show(it, SongInfoBottomSheetDialog.TAG) }
         dismiss()
     }
     private fun initViews() {
         mBottomSheetPlayerMoreBinding.covertArt.layout(0,0,0,0)
         mBottomSheetPlayerMoreBinding.textTitle.isSelected = true
         mBottomSheetPlayerMoreBinding.textDescription.isSelected = true
-    }
-
-    companion object {
-        const val TAG = "PlayerMoreDialog"
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -390,5 +400,9 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
                 mSleepTimerSP = SharedPreferenceManagerUtils.Player.loadSleepTimer(ctx, sharedPreferences)
             }
         }
+    }
+
+    companion object {
+        const val TAG = "PlayerMoreDialog"
     }
 }

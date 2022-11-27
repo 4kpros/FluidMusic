@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.prosabdev.fluidmusic.viewmodels.models.explore.*
+import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistSongItemViewModel
 
 class ModelsViewModelFactory(val ctx : Context) : ViewModelProvider.Factory {
 
@@ -14,6 +16,9 @@ class ModelsViewModelFactory(val ctx : Context) : ViewModelProvider.Factory {
         }else if(modelClass.isAssignableFrom(PlaylistItemViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return PlaylistItemViewModel(ctx) as T
+        }else if(modelClass.isAssignableFrom(PlaylistSongItemViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return PlaylistSongItemViewModel(ctx) as T
         }else if(modelClass.isAssignableFrom(QueueMusicItemViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return QueueMusicItemViewModel(ctx) as T

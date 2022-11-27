@@ -50,11 +50,9 @@ class QueueMusicItemCallback(adapter : QueueMusicItemListAdapter) : ItemTouchHel
         if(!mDragStarted){
             mDragStarted = true
             mFromPosition = viewHolder.bindingAdapterPosition
-            mFromValue = mAdapter.selectableIsSelected(viewHolder.bindingAdapterPosition)
             Log.i(ConstantValues.TAG, "From position : $mFromPosition = $mFromValue")
         }
         mToPosition = target.bindingAdapterPosition
-        mToValue = mAdapter.selectableIsSelected(target.bindingAdapterPosition)
         Log.i(ConstantValues.TAG, "To position : $mToPosition = $mToValue")
 
         mAdapter.onRowMoved(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
@@ -81,16 +79,6 @@ class QueueMusicItemCallback(adapter : QueueMusicItemListAdapter) : ItemTouchHel
 
             mDragStarted = false
             Log.i(ConstantValues.TAG, "Finally : from = $mFromPosition = $mToValue and to = $mToPosition = $mFromValue")
-            mAdapter.selectableUpdateSelection(mToPosition, mFromValue)
-//            if (mFromPosition < mToPosition) {
-//                for (i in mFromPosition until mToPosition) {
-//                    mAdapter.notifyItemChanged(1)
-//                }
-//            } else {
-//                for (i in mFromPosition downTo mToPosition + 1) {
-//                    mAdapter.notifyItemChanged(1)
-//                }
-//            }
             mDragStarted = false
             if (mFromPosition < mToPosition) {
                 mAdapter.notifyItemRangeChanged(mFromPosition, mToPosition+1)

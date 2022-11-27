@@ -1,9 +1,8 @@
-package com.prosabdev.fluidmusic.adapters
+package com.prosabdev.fluidmusic.adapters.playlist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
@@ -11,9 +10,9 @@ import com.prosabdev.fluidmusic.databinding.ItemPlaylistBinding
 import com.prosabdev.fluidmusic.models.playlist.PlaylistItemView
 import com.prosabdev.fluidmusic.utils.FormattersUtils
 
-class PlaylistItemViewViewAdapter(
+class PlaylistItemViewAdapter(
     private val mListener: OnItemClickListener
-) : ListAdapter<PlaylistItemView, PlaylistItemViewViewAdapter.PlaylistItemViewHolder>(DiffCallback){
+) : ListAdapter<PlaylistItemView, PlaylistItemViewAdapter.PlaylistItemViewHolder>(PlaylistItemView.diffCallback){
 
     interface OnItemClickListener {
         fun onClickListener(position: Int)
@@ -29,21 +28,23 @@ class PlaylistItemViewViewAdapter(
             parent,
             false
         )
-        return PlaylistItemViewHolder(tempItemPlaylistBinding)
+        return PlaylistItemViewHolder(tempItemPlaylistBinding, mListener)
     }
 
     override fun onBindViewHolder(
         holder: PlaylistItemViewHolder,
         position: Int
     ) {
-        holder.bindData(mListener, position)
         holder.updateUI(getItem(position))
     }
 
-    class PlaylistItemViewHolder(private val mItemPlaylistBinding: ItemPlaylistBinding): RecyclerView.ViewHolder(mItemPlaylistBinding.root) {
-        fun bindData(mListener: OnItemClickListener, position: Int) {
+    class PlaylistItemViewHolder(
+        private val mItemPlaylistBinding: ItemPlaylistBinding,
+        listener: OnItemClickListener
+    ): RecyclerView.ViewHolder(mItemPlaylistBinding.root) {
+        init {
             mItemPlaylistBinding.cardViewClickable.setOnClickListener{
-                mListener.onClickListener(position)
+                listener.onClickListener(bindingAdapterPosition)
             }
         }
 
@@ -51,18 +52,6 @@ class PlaylistItemViewViewAdapter(
             mItemPlaylistBinding.textTitle.text = playlistItemView.playlistName
             mItemPlaylistBinding.textSubtitle.text = "${playlistItemView.numberTracks} songs | ${FormattersUtils.formatSongDurationToString(playlistItemView.totalDuration)} min"
 
-        }
-    }
-
-    companion object {
-        private val DiffCallback = object : DiffUtil.ItemCallback<PlaylistItemView>() {
-            override fun areItemsTheSame(oldItem: PlaylistItemView, newItem: PlaylistItemView): Boolean {
-                return oldItem.playlistId == newItem.playlistId
-            }
-
-            override fun areContentsTheSame(oldItem: PlaylistItemView, newItem: PlaylistItemView): Boolean {
-                return oldItem == newItem
-            }
         }
     }
 }

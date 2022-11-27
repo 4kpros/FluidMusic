@@ -2,7 +2,6 @@ package com.prosabdev.fluidmusic
 
 import android.content.ComponentName
 import android.content.Intent
-import android.graphics.Bitmap
 import android.media.AudioManager
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
@@ -18,7 +17,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
 import com.google.android.material.color.DynamicColors
 import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
-import com.prosabdev.fluidmusic.services.MediaPlaybackService
+import com.prosabdev.fluidmusic.service.MediaPlaybackService
 import com.prosabdev.fluidmusic.ui.activities.SettingsActivity
 import com.prosabdev.fluidmusic.ui.fragments.*
 import com.prosabdev.fluidmusic.utils.ConstantValues
@@ -27,8 +26,6 @@ import kotlinx.coroutines.launch
 
 
 @BuildCompat.PrereleaseSdkCheck class MainActivity : AppCompatActivity(){
-
-    private val TAG = MainActivity::class.java.name
 
     private lateinit var mActivityMainBinding: ActivityMainBinding
 
@@ -40,6 +37,7 @@ import kotlinx.coroutines.launch
 
         mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
+        setupAudioSettings()
         initViews()
 
         MainScope().launch {
@@ -126,6 +124,11 @@ import kotlinx.coroutines.launch
         }
     }
 
+
+    private fun setupAudioSettings() {
+        volumeControlStream = AudioManager.STREAM_MUSIC
+    }
+
     private fun initViews(){
         mActivityMainBinding.navigationView.setCheckedItem(R.id.music_library)
     }
@@ -172,36 +175,13 @@ import kotlinx.coroutines.launch
         mediaController.registerCallback(mControllerCallback)
     }
 
-    private fun createQueueListBundle(currentSong: Int): Bundle {
-        val bundle = Bundle()
-        val temBitmap : Bitmap? = null
-        //Create new media meta data for current playing song
-        val tempMediaMetadataCompat = MediaMetadataCompat.Builder()
-            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, temBitmap)
-            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, "title")
-            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "artist")
-            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, "album")
-            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 0)
-            .build()
-
-        //Setup bundle
-        bundle.putParcelable(ConstantValues.BUNDLE_CURRENT_SONG_META_DATA, tempMediaMetadataCompat)
-        bundle.putStringArrayList(ConstantValues.BUNDLE_QUEUE_LIST, null)
-        bundle.putString(ConstantValues.BUNDLE_SOURCE_FROM, "")
-        bundle.putString(ConstantValues.BUNDLE_SOURCE_FROM_VALUE, "")
-        bundle.putInt(ConstantValues.BUNDLE_SHUFFLE_VALUE, 0)
-        bundle.putInt(ConstantValues.BUNDLE_REPEAT_VALUE, 0)
-        bundle.putInt(ConstantValues.BUNDLE_CURRENT_SONG_ID, currentSong)
-        return bundle
-    }
-
     public override fun onStart() {
         super.onStart()
         mMediaBrowser?.connect()
     }
     public override fun onResume() {
         super.onResume()
-        volumeControlStream = AudioManager.STREAM_MUSIC
+        setupAudioSettings()
         updateDrawerMenu()
     }
 

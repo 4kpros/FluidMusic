@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.databinding.FragmentAllSongsBinding
-import com.prosabdev.fluidmusic.databinding.FragmentPlayerBinding
 import com.prosabdev.fluidmusic.databinding.FragmentPlaylistsBinding
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch

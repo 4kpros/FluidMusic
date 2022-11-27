@@ -1,6 +1,5 @@
 package com.prosabdev.fluidmusic.adapters.generic
 
-import android.util.Log
 import android.util.SparseBooleanArray
 import androidx.core.util.contains
 import androidx.core.util.size
@@ -8,7 +7,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.prosabdev.fluidmusic.utils.ConstantValues
 
 abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallback: DiffUtil.ItemCallback<Any>) : ListAdapter<Any, VH>(
     diffCallback
@@ -26,9 +24,9 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
     private fun onNotifyItemChanged(position : Int, layoutManager : GridLayoutManager?){
         if(layoutManager != null){
             if(isItemPositionVisible(position, layoutManager))
-                notifyItemChanged(position, Companion.PAYLOAD_IS_SELECTED)
+                notifyItemChanged(position, PAYLOAD_IS_SELECTED)
         }else{
-            notifyItemChanged(position, Companion.PAYLOAD_IS_SELECTED)
+            notifyItemChanged(position, PAYLOAD_IS_SELECTED)
         }
     }
     private fun isItemPositionVisible(position : Int, layoutManager : GridLayoutManager?): Boolean {
@@ -37,7 +35,6 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
         val tempLastVisiblePosition = (layoutManager?.findLastVisibleItemPosition() ?: 0) + 2
         if(position in tempFirstVisiblePosition ..  tempLastVisiblePosition)
             tempResult = true
-        Log.i(ConstantValues.TAG, "View visibility at $position : $tempResult")
         return tempResult ?: true
     }
 

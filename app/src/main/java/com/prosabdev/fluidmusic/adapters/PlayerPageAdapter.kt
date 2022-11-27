@@ -1,21 +1,19 @@
 package com.prosabdev.fluidmusic.adapters
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemPlayerCardViewBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
-import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
+import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -25,7 +23,7 @@ import kotlinx.coroutines.launch
 class PlayerPageAdapter(
     private val mContext: Context,
     private val mListener: OnItemClickListener
-) : ListAdapter<SongItem,PlayerPageAdapter.PlayerPageHolder>(DiffCallback) {
+) : ListAdapter<SongItem, PlayerPageAdapter.PlayerPageHolder>(SongItem.diffCallback) {
 
     interface OnItemClickListener {
         fun onButtonLyricsClicked(position: Int)
@@ -38,7 +36,8 @@ class PlayerPageAdapter(
             R.layout.item_player_card_view, parent, false
         )
         return PlayerPageHolder(
-            tempItemPlayerCardViewBinding
+            tempItemPlayerCardViewBinding,
+            mListener
         )
     }
 
@@ -46,7 +45,6 @@ class PlayerPageAdapter(
         holder: PlayerPageHolder,
         position: Int
     ) {
-        holder.bindListener(position, mListener)
         holder.loadCovertArt(mContext, getItem(position))
     }
 
@@ -55,30 +53,34 @@ class PlayerPageAdapter(
         holder.recycleItem(mContext)
     }
 
-    class PlayerPageHolder(private val mItemPlayerCardViewBinding: ItemPlayerCardViewBinding) : RecyclerView.ViewHolder(mItemPlayerCardViewBinding.root) {
-        fun recycleItem(ctx : Context){
-            Glide.with(ctx).clear(mItemPlayerCardViewBinding.playerViewpagerImageview)
-        }
+    class PlayerPageHolder(
+        private val mItemPlayerCardViewBinding: ItemPlayerCardViewBinding,
+        listener: OnItemClickListener
+    ) : RecyclerView.ViewHolder(mItemPlayerCardViewBinding.root) {
 
-        var job : Job? = null
-        fun bindListener(position: Int, listener: OnItemClickListener) {
+        var mAnimateButtonsJob : Job? = null
+        init {
             mItemPlayerCardViewBinding.playerViewpagerContainer.setOnClickListener(View.OnClickListener {
-                if(job != null)
-                    job?.cancel()
-                job = MainScope().launch {
+                if(mAnimateButtonsJob != null)
+                    mAnimateButtonsJob?.cancel()
+                mAnimateButtonsJob = MainScope().launch {
                     animateButtons()
                 }
             })
             mItemPlayerCardViewBinding.buttonLyrics.setOnClickListener(View.OnClickListener {
                 listener.onButtonLyricsClicked(
-                    position
+                    bindingAdapterPosition
                 )
             })
             mItemPlayerCardViewBinding.buttonFullscreen.setOnClickListener(View.OnClickListener {
                 listener.onButtonFullscreenClicked(
-                    position
+                    bindingAdapterPosition
                 )
             })
+        }
+
+        fun recycleItem(ctx : Context){
+            Glide.with(ctx).clear(mItemPlayerCardViewBinding.playerViewpagerImageview)
         }
 
         private suspend fun animateButtons() {
@@ -101,21 +103,6 @@ class PlayerPageAdapter(
                     200,
                     false
                 )
-            }
-        }
-    }
-
-    companion object {
-        private val DiffCallback = object : DiffUtil.ItemCallback<SongItem>() {
-            override fun areItemsTheSame(oldItem: SongItem, newItem: SongItem): Boolean {
-                return oldItem.id == newItem.id
-            }
-
-            @SuppressLint("DiffUtilEquals")
-            override fun areContentsTheSame(oldItem: SongItem, newItem: SongItem): Boolean {
-                return (oldItem.id == newItem.id) &&
-                        (oldItem.uri == newItem.uri) &&
-                        (oldItem.uriTreeId == newItem.uriTreeId)
             }
         }
     }

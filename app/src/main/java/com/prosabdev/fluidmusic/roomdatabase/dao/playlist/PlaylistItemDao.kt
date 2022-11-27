@@ -1,4 +1,4 @@
-package com.prosabdev.fluidmusic.roomdatabase.dao
+package com.prosabdev.fluidmusic.roomdatabase.dao.playlist
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
@@ -27,8 +27,14 @@ interface PlaylistItemDao {
     @Query("DELETE FROM PlaylistItem WHERE id = :id")
     fun deleteAtId(id: Long)
 
+    @Query("SELECT COUNT(id) FROM PlaylistItem WHERE name LIKE '%' || :playlistName || '%'")
+    fun getLikeName(playlistName: String): Long
+
     @Query("SELECT * FROM PlaylistItem WHERE id = :id LIMIT 1")
     fun getAtId(id: Long): PlaylistItem?
+
+    @Query("SELECT * FROM PlaylistItem WHERE name = :name LIMIT 1")
+    fun getWithName(name: String): PlaylistItem?
 
     @Query("SELECT * FROM PlaylistItem ORDER BY :order_name, :asc_desc_mode")
     fun getAll(order_name: String = "id", asc_desc_mode: String = "ASC"): LiveData<List<PlaylistItem>>

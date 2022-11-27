@@ -73,7 +73,7 @@
         </activity>
 
         <service
-            android:name=".services.MediaPlaybackService"
+            android:name=".service.MediaPlaybackService"
             android:description="@string/app_name"
             android:enabled="true"
             android:exported="true"

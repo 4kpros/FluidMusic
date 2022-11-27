@@ -1,4 +1,4 @@
-package com.prosabdev.fluidmusic.services
+package com.prosabdev.fluidmusic.service
 
 import android.media.AudioManager
 import android.os.Handler
