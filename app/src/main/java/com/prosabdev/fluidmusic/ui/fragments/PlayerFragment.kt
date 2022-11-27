@@ -32,7 +32,7 @@ import com.prosabdev.fluidmusic.databinding.FragmentPlayerBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
-import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreBottomSheetDialog
+import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreFullBottomSheetDialog
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
@@ -59,7 +59,7 @@ import kotlin.math.roundToLong
 
     private var mPlayerPagerAdapter: PlayerPageAdapter? = null
 
-    private var mPlayerMoreBottomSheetDialog: PlayerMoreBottomSheetDialog? = null
+    private var mPlayerMoreBottomSheetDialog: PlayerMoreFullBottomSheetDialog? = null
 
     private var mOldViewpagerPosition: Int = 0
     private var mCurrentDuration: Long = 0
@@ -465,7 +465,7 @@ import kotlin.math.roundToLong
 
     private fun showMoreOptionsDialog() {
         if(mPlayerMoreBottomSheetDialog?.isVisible == false)
-            mPlayerMoreBottomSheetDialog?.show(childFragmentManager, PlayerMoreBottomSheetDialog.TAG)
+            mPlayerMoreBottomSheetDialog?.show(childFragmentManager, PlayerMoreFullBottomSheetDialog.TAG)
     }
 
     private suspend fun updateOnStopTrackingTouch(value: Float) {
@@ -596,7 +596,7 @@ import kotlin.math.roundToLong
         ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentPlayerBinding.constraintBottomButtonsContainer)
 
         if(mPlayerMoreBottomSheetDialog == null)
-            mPlayerMoreBottomSheetDialog = PlayerMoreBottomSheetDialog(mMainFragmentViewModel, mFragmentPlayerBinding.root)
+            mPlayerMoreBottomSheetDialog = PlayerMoreFullBottomSheetDialog(mMainFragmentViewModel, mFragmentPlayerBinding.root)
         if(mQueueMusicBottomSheetDialog == null)
             mQueueMusicBottomSheetDialog = QueueMusicBottomSheetDialog(mPlayerFragmentViewModel)
     }

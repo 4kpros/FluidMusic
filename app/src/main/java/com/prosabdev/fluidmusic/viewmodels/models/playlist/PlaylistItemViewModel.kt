@@ -24,7 +24,7 @@ class PlaylistItemViewModel(ctx : Context) : ViewModel() {
     }
 
     //Getters
-    suspend fun getLikeName(playlistName: String) : Long? = repository?.getLikeName(playlistName)
+    suspend fun getMaxIdLikeName(playlistName: String) : Long? = repository?.getMaxIdLikeName(playlistName)
 
     suspend fun getAtId(id: Long) : PlaylistItem? = repository?.getAtId(id)
 

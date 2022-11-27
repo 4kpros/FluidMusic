@@ -23,7 +23,7 @@ import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentAllSongsBinding
 import com.prosabdev.fluidmusic.models.explore.SongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
-import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.SortOrganizeItemsBottomSheetDialog
+import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.SortOrganizeItemsFullBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.MathComputaionsUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
@@ -226,7 +226,7 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun onShowFilterDialog() {
-        SortOrganizeItemsBottomSheetDialog().show(childFragmentManager, SortOrganizeItemsBottomSheetDialog.TAG)
+        SortOrganizeItemsFullBottomSheetDialogFragment().show(childFragmentManager, SortOrganizeItemsFullBottomSheetDialogFragment.TAG)
     }
 
     private fun onLongPressedToItemSong(position: Int) {

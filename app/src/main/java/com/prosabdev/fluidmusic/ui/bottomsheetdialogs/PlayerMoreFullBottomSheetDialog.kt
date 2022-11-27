@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
 import com.prosabdev.fluidmusic.R
@@ -32,7 +33,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragmentViewModel, private val mScreeShotPlayerView : View) : GenericBottomSheetDialogFragment() ,
+class PlayerMoreFullBottomSheetDialog(private val mMainFragmentViewModel: MainFragmentViewModel, private val mScreeShotPlayerView : View) : BottomSheetDialogFragment() ,
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     private lateinit var mBottomSheetPlayerMoreBinding: BottomSheetPlayerMoreBinding
@@ -64,7 +65,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
     }
 
     private suspend fun loadSharedPreferencesData() {
-        val ctx : Context = this@PlayerMoreBottomSheetDialog.context ?: return
+        val ctx : Context = this@PlayerMoreFullBottomSheetDialog.context ?: return
 
         withContext(Dispatchers.IO){
             mSleepTimerSP = SharedPreferenceManagerUtils.Player.loadSleepTimer(ctx)
@@ -81,7 +82,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
         if(currentSong == null)
             return
 
-        val ctx : Context = this@PlayerMoreBottomSheetDialog.context ?: return
+        val ctx : Context = this@PlayerMoreFullBottomSheetDialog.context ?: return
 
         MainScope().launch {
             mBottomSheetPlayerMoreBinding.textTitle.text =
@@ -138,7 +139,7 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
     }
 
     private fun showDeleteSelectionDialog() {
-        val ctx : Context = this@PlayerMoreBottomSheetDialog.context ?: return
+        val ctx : Context = this@PlayerMoreFullBottomSheetDialog.context ?: return
 
         MaterialAlertDialogBuilder(this.requireContext())
             .setTitle(ctx.getString(R.string.dialog_delete_selection_title))
@@ -158,8 +159,8 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
     }
 
     private fun setSongAsRingtone() {
-        val ctx : Context = this@PlayerMoreBottomSheetDialog.context ?: return
-        val tempActivity : Activity = this@PlayerMoreBottomSheetDialog.activity ?: return
+        val ctx : Context = this@PlayerMoreFullBottomSheetDialog.context ?: return
+        val tempActivity : Activity = this@PlayerMoreFullBottomSheetDialog.activity ?: return
 
         if(PermissionsManagerUtils.haveWriteSystemSettingsPermission(ctx)){
             val tempUri : Uri = Uri.parse(mSongItem?.uri ?: return) ?: return
@@ -370,14 +371,14 @@ class PlayerMoreBottomSheetDialog(private val mMainFragmentViewModel: MainFragme
         psI.addedDate = SystemSettingsUtils.getCurrentDateInMilli()
         songIdList.add(psI)
 
-        val playlistAddBottomSheetDialog = PlaylistAddBottomSheetDialog(songIdList)
-        activity ?.supportFragmentManager?.let { playlistAddBottomSheetDialog.show(it, PlaylistAddBottomSheetDialog.TAG) }
+        val playlistAddBottomSheetDialog = PlaylistAddFullBottomSheetDialogFragment(songIdList)
+        activity ?.supportFragmentManager?.let { playlistAddBottomSheetDialog.show(it, PlaylistAddFullBottomSheetDialogFragment.TAG) }
         dismiss()
     }
 
     private fun showSongInfoDialog() {
-        val songInfoBottomSheetDialog = SongInfoBottomSheetDialog(mSongItem)
-        activity ?.supportFragmentManager?.let { songInfoBottomSheetDialog.show(it, SongInfoBottomSheetDialog.TAG) }
+        val songInfoBottomSheetDialog = SongInfoFullBottomSheetDialogFragment(mSongItem)
+        activity ?.supportFragmentManager?.let { songInfoBottomSheetDialog.show(it, SongInfoFullBottomSheetDialogFragment.TAG) }
         dismiss()
     }
     private fun initViews() {

@@ -18,7 +18,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 
-class SongInfoBottomSheetDialog(private val mSongItem : SongItem?) : GenericBottomSheetDialogFragment() {
+class SongInfoFullBottomSheetDialogFragment(private val mSongItem : SongItem?) : GenericFullBottomSheetDialogFragment() {
 
     private lateinit var mBottomSheetDialogSongInfoBinding: BottomSheetDialogSongInfoBinding
 
@@ -49,7 +49,7 @@ class SongInfoBottomSheetDialog(private val mSongItem : SongItem?) : GenericBott
     private fun showSongDetailsUI(songItem: SongItem?) {
         if(songItem == null) return
         MainScope().launch {
-            val ctx : Context = this@SongInfoBottomSheetDialog.context ?: return@launch
+            val ctx : Context = this@SongInfoFullBottomSheetDialogFragment.context ?: return@launch
 
             mBottomSheetDialogSongInfoBinding.textSongFilePath.text = getUnderLinedWord(songItem.uriPath)
 

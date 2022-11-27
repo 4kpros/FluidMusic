@@ -6,12 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetStorageAccessBinding
 import com.prosabdev.fluidmusic.viewmodels.activities.StorageAccessActivityViewModel
 
-class StorageAccessBottomSheetDialog(private val mStorageAccessActivityViewModel: StorageAccessActivityViewModel) : GenericBottomSheetDialogFragment() {
+class StorageAccessFullBottomSheetDialog(private val mStorageAccessActivityViewModel: StorageAccessActivityViewModel) : BottomSheetDialogFragment() {
 
     private lateinit var mBottomSheetStorageAccessBinding : BottomSheetStorageAccessBinding
 

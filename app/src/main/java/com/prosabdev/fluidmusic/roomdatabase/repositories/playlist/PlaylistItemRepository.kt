@@ -33,9 +33,9 @@ class PlaylistItemRepository(ctx : Context) {
         }
     }
     //Getters
-    suspend fun getLikeName(playlistName: String) : Long? {
+    suspend fun getMaxIdLikeName(playlistName: String) : Long? {
         return withContext(Dispatchers.IO){
-            return@withContext mDao?.getLikeName(playlistName)
+            return@withContext mDao?.getMaxIdLikeName(playlistName)
         }
     }
     suspend fun getWithName(name: String) : PlaylistItem? {

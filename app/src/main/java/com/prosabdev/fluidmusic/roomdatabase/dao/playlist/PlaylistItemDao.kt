@@ -27,8 +27,8 @@ interface PlaylistItemDao {
     @Query("DELETE FROM PlaylistItem WHERE id = :id")
     fun deleteAtId(id: Long)
 
-    @Query("SELECT COUNT(id) FROM PlaylistItem WHERE name LIKE '%' || :playlistName || '%'")
-    fun getLikeName(playlistName: String): Long
+    @Query("SELECT MAX(id) FROM PlaylistItem WHERE name LIKE '%' || :playlistName || '%'")
+    fun getMaxIdLikeName(playlistName: String): Long
 
     @Query("SELECT * FROM PlaylistItem WHERE id = :id LIMIT 1")
     fun getAtId(id: Long): PlaylistItem?

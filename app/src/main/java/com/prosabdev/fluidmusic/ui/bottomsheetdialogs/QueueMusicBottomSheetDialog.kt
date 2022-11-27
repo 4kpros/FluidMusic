@@ -20,7 +20,7 @@ import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class QueueMusicBottomSheetDialog(private val mPlayerFragmentViewModel: PlayerFragmentViewModel) : BottomSheetDialogFragment() {
+class QueueMusicBottomSheetDialog(private val mPlayerFragmentViewModel: PlayerFragmentViewModel) : GenericFullBottomSheetDialogFragment() {
 
     private lateinit var mBottomSheetQueueMusicBinding: BottomSheetQueueMusicBinding
 
@@ -47,11 +47,6 @@ class QueueMusicBottomSheetDialog(private val mPlayerFragmentViewModel: PlayerFr
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mBottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
-
-        mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-
-        mBottomSheetQueueMusicBinding.coordinatorLayout.minimumHeight = Resources.getSystem().displayMetrics.heightPixels
     }
 
     fun updateSongList(songList : ArrayList<SongItem>){

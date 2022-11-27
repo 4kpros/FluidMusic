@@ -48,12 +48,11 @@ class EmptyBottomAdapter(
         fun updateBottomSpaceUI(scrollState : Int, textVisible: Boolean) {
             if(textVisible){
                 mItemEmptyBottomSpaceBinding.constraintContainer.visibility = VISIBLE
+                if(scrollState == 2) {
+                    ViewAnimatorsUtils.crossFadeUp(mItemEmptyBottomSpaceBinding.textEnd, true, 500)
+                }
             }else{
                 mItemEmptyBottomSpaceBinding.constraintContainer.visibility = INVISIBLE
-            }
-
-            if(scrollState == 2) {
-                ViewAnimatorsUtils.crossFadeUp(mItemEmptyBottomSpaceBinding.textEnd, true, 500)
             }
         }
     }

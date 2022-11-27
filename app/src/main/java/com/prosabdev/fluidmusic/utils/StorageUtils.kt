@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.core.content.FileProvider
-import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreBottomSheetDialog
+import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreFullBottomSheetDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -34,7 +34,7 @@ abstract class StorageUtils {
                     stream.close()
                     uriResult = FileProvider.getUriForFile(ctx, AUTHORITY, file)
                 } catch (e: IOException) {
-                    Log.d(PlayerMoreBottomSheetDialog.TAG, "IOException while trying to write file for sharing: " + e.message)
+                    Log.d(PlayerMoreFullBottomSheetDialog.TAG, "IOException while trying to write file for sharing: " + e.message)
                 }
             }
             return uriResult

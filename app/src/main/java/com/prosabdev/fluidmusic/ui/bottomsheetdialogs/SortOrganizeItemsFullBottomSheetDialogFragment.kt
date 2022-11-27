@@ -7,11 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.LinearLayoutCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
 
-class SortOrganizeItemsBottomSheetDialog : GenericBottomSheetDialogFragment() {
+class SortOrganizeItemsFullBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private var mButtonClose: MaterialButton? = null
     private var mButtonMoreSettings: MaterialButton? = null
     private var mMainContainer: LinearLayoutCompat? = null
@@ -31,11 +32,7 @@ class SortOrganizeItemsBottomSheetDialog : GenericBottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        dialog?.setOnShowListener { dialog ->
-            val d = dialog as BottomSheetDialog
-            val bottomSheetInternal = d.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-            bottomSheetInternal?.minimumHeight = Resources.getSystem().displayMetrics.heightPixels
-        }
+        super.onViewCreated(view, savedInstanceState)
     }
 
     private fun checkInteractions() {
@@ -43,7 +40,7 @@ class SortOrganizeItemsBottomSheetDialog : GenericBottomSheetDialogFragment() {
             //Go to more settings
         }
         mButtonClose?.setOnClickListener(){
-            this@SortOrganizeItemsBottomSheetDialog.dismiss()
+            this@SortOrganizeItemsFullBottomSheetDialogFragment.dismiss()
         }
     }
 
