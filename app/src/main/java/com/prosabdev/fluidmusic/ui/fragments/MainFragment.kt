@@ -1,51 +1,53 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
+import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentMainBinding
-import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
-import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
-import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
+import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.ui.fragments.settings.SettingsFragment
+import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.sothree.slidinguppanel.PanelState
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.GONE
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.VISIBLE
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+@BuildCompat.PrereleaseSdkCheck class MainFragment : Fragment() {
 
     private lateinit var mFragmentMainBinding: FragmentMainBinding
-    private lateinit var mContext: Context
 
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 
+    private val mMusicLibraryFragment = MusicLibraryFragment.newInstance()
+    private val mFoldersHierarchyFragment = FoldersHierarchyFragment.newInstance()
+    private val mPlaylistsFragment = PlaylistsFragment.newInstance()
+    private val mStreamsFragment = StreamsFragment.newInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        exitTransition = MaterialFadeThrough()
+        reenterTransition = MaterialFadeThrough()
+
         arguments?.let {
         }
-        mContext = requireContext()
     }
 
     override fun onCreateView(
@@ -57,287 +59,438 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 
         initViews()
         setupFragments()
-
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        MainScope().launch {
-            checkInteractions()
-            observeLiveData()
+        checkInteractions()
+        observeLiveData()
+    }
+    private fun updateDrawerMenuUI(showCounter: Int) {
+        when (activity?.supportFragmentManager?.findFragmentById(R.id.main_fragment_container)) {
+            is MusicLibraryFragment -> {
+                mFragmentMainBinding.navigationView.setCheckedItem(R.id.music_library)
+            }
+            is FoldersHierarchyFragment -> {
+                mFragmentMainBinding.navigationView.setCheckedItem(R.id.folders_hierarchy)
+            }
+            is PlaylistsFragment -> {
+                mFragmentMainBinding.navigationView.setCheckedItem(R.id.playlists)
+            }
+            is StreamsFragment -> {
+                mFragmentMainBinding.navigationView.setCheckedItem(R.id.streams)
+            }
         }
     }
 
     private fun observeLiveData() {
-        mPlayerFragmentViewModel.getCurrentSong().observe(this.requireContext() as LifecycleOwner
-        ) {
-            MainScope().launch {
-                updateMiniPlayerUI(it)
-            }
+        //Observe live data from player fragment
+        mPlayerFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner){
+            updateMiniPlayerUI(it)
         }
-        mPlayerFragmentViewModel.getPlayingProgressValue().observe(this.requireContext() as LifecycleOwner
-        ) {
-            MainScope().launch {
-                updateSliderUI(it)
-            }
+        mPlayerFragmentViewModel.getPlayingProgressValue().observe(viewLifecycleOwner){
+            updateMiniPlayerSliderUI(it)
         }
-        mMainFragmentViewModel.getShowSlidingPanel().observe(this.requireContext() as LifecycleOwner){
-            showSlidingUpPanelToState(it)
+        mPlayerFragmentViewModel.getIsPlaying().observe(viewLifecycleOwner){
+            updateMiniPlayerPlayPauseStateUI(it)
         }
-        mMainFragmentViewModel.getHideSlidingPanel().observe(this.requireContext() as LifecycleOwner){
-            hideSlidingUpPanelToState(it)
+
+        //Observe live data from main fragment
+        mMainFragmentViewModel.getShowSlidingPanelCounter().observe(viewLifecycleOwner){
+            updateSlidingUpPanelStateUI(it, true)
         }
-        mMainFragmentViewModel.getSelectMode().observe(this.requireContext() as LifecycleOwner
-        ) { selectMode ->
-            MainScope().launch {
-                updateSelectModeUI(selectMode ?: false)
-            }
+        mMainFragmentViewModel.getHideSlidingPanelCounter().observe(viewLifecycleOwner){
+            updateSlidingUpPanelStateUI(it, false)
         }
-        mMainFragmentViewModel.getTotalSelected().observe(this.requireContext() as LifecycleOwner
-        ){
-            MainScope().launch {
-                updateTotalSelectedUI(it ?: 0)
-            }
+        mMainFragmentViewModel.getSelectMode().observe(viewLifecycleOwner){
+            updateSelectModeUI(it)
         }
-        mMainFragmentViewModel.getScrollingState().observe(this.requireContext() as LifecycleOwner
-        ){ animateScrollStateUI(it ?: 0) }
+        mMainFragmentViewModel.getTotalSelected().observe(viewLifecycleOwner){
+            updateTotalSelectedTracksUI(it)
+        }
+        mMainFragmentViewModel.getScrollingState().observe(viewLifecycleOwner){
+            updateMiniPlayerScrollingStateUI(it)
+        }
+        mMainFragmentViewModel.getShowDrawerMenuCounter().observe(viewLifecycleOwner){
+            openDrawerMenuUI(it)
+        }
     }
 
-    private fun hideSlidingUpPanelToState(it: Int?) {
-        if(it == null || it <= 0)
+    private fun openDrawerMenuUI(showCounter: Int?) {
+        if((showCounter ?: 0) <= 0) return
+        if(!mFragmentMainBinding.drawerLayout.isOpen)
+            mFragmentMainBinding.drawerLayout.open()
+    }
+    private var mIsAnimatingScroll1: Boolean = false
+    private var mIsAnimatingScroll2: Boolean = false
+    private fun updateMiniPlayerScrollingStateUI(scrollState: Int, animate: Boolean = true) {
+        MainScope().launch {
+            if(scrollState >= 1){
+                if(mIsAnimatingScroll2){
+                    mFragmentMainBinding.constraintMiniPlayerContainer.apply {
+                        mIsAnimatingScroll2 = false
+                        clearAnimation()
+                    }
+                }
+                if(mIsAnimatingScroll1)
+                    return@launch
+                mIsAnimatingScroll1 = true
+                ViewAnimatorsUtils.crossTranslateOutFromVertical(
+                    mFragmentMainBinding.constraintMiniPlayerContainer,
+                    1,
+                    animate,
+                    150,
+                    300.0f
+                )
+            }else{
+                if(mIsAnimatingScroll1){
+                    mFragmentMainBinding.constraintMiniPlayerContainer.apply {
+                        mIsAnimatingScroll1 = false
+                        clearAnimation()
+                    }
+                }
+                if(mIsAnimatingScroll2)
+                    return@launch
+                mIsAnimatingScroll2 = true
+                ViewAnimatorsUtils.crossTranslateInFromVertical(
+                    mFragmentMainBinding.constraintMiniPlayerContainer,
+                    1, animate,
+                    150,
+                    300.0f
+                )
+            }
+        }
+    }
+    private fun updateTotalSelectedTracksUI(totalSelected: Int, animate: Boolean = true) {
+        MainScope().launch {
+            if(totalSelected > 0 && totalSelected >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
+                mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = context?.let {
+                    ContextCompat.getDrawable(
+                        it,
+                        R.drawable.check_box
+                    )
+                }
+                ViewAnimatorsUtils.crossFadeUp(
+                    mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover,
+                    false,
+                    200,
+                    0.8f
+                )
+            }else{
+                mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = context?.let {
+                    ContextCompat.getDrawable(
+                        it,
+                        R.drawable.check_box_outline_blank
+                    )
+                }
+                if (totalSelected >= 2 && mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover.visibility != GONE)
+                    ViewAnimatorsUtils.crossFadeDown(
+                        mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover,
+                        animate,
+                        200
+                    )
+                else if(totalSelected < 2 && mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover.visibility != VISIBLE)
+                    ViewAnimatorsUtils.crossFadeUp(
+                        mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover,
+                        animate,
+                        200,
+                        0.8f
+                    )
+            }
+            mFragmentMainBinding.constraintTopSelectionInclude.textSelectedCount.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
+        }
+    }
+    private fun updateSelectModeUI(selectMode : Boolean, animate : Boolean = true) {
+        MainScope().launch {
+            if (selectMode) {
+                if(mFragmentMainBinding.constraintBottomSelectionContainer.visibility != VISIBLE)
+                    ViewAnimatorsUtils.crossTranslateInFromVertical(
+                        mFragmentMainBinding.constraintBottomSelectionContainer as View,
+                        1,
+                        animate,
+                        300
+                    )
+                if(mFragmentMainBinding.constraintTopSelectionContainer.visibility != VISIBLE)
+                    ViewAnimatorsUtils.crossTranslateInFromVertical(
+                        mFragmentMainBinding.constraintTopSelectionContainer as View,
+                        -1,
+                        animate,
+                        300
+                    )
+            }else {
+                if(mFragmentMainBinding.constraintBottomSelectionContainer.visibility != GONE)
+                    ViewAnimatorsUtils.crossTranslateOutFromVertical(
+                        mFragmentMainBinding.constraintBottomSelectionContainer as View,
+                        1,
+                        animate,
+                        300
+                    )
+                if(mFragmentMainBinding.constraintTopSelectionContainer.visibility != GONE)
+                    ViewAnimatorsUtils.crossTranslateOutFromVertical(
+                        mFragmentMainBinding.constraintTopSelectionContainer as View,
+                        -1,
+                        animate,
+                        300
+                    )
+            }
+        }
+    }
+    private fun updateSlidingUpPanelStateUI(counter: Int?, showPanel: Boolean) {
+        if(showPanel){
+            showSlidingUpPanel(counter)
+        }else{
+            hideSlidingUpPanel(counter)
+        }
+    }
+    private fun hideSlidingUpPanel(counter: Int?) {
+        if(counter == null || counter <= 0)
             return
-//        if(!mFragmentMainBinding.slidingUpPanel.isOpen)
-//            mFragmentMainBinding.slidingUpPanel.openPane()
-        if(mFragmentMainBinding.slidingUpPanel.panelState != PanelState.COLLAPSED)
-            mFragmentMainBinding.slidingUpPanel.panelState = PanelState.COLLAPSED
+        MainScope().launch {
+            if(mFragmentMainBinding.slidingUpPanel.panelState != PanelState.COLLAPSED)
+                mFragmentMainBinding.slidingUpPanel.panelState = PanelState.COLLAPSED
+        }
+    }
+    private fun showSlidingUpPanel(counter: Int?) {
+        if(counter == null || counter <= 0)
+            return
+        MainScope().launch {
+            if(mFragmentMainBinding.slidingUpPanel.panelState != PanelState.EXPANDED)
+                mFragmentMainBinding.slidingUpPanel.panelState = PanelState.EXPANDED
+        }
     }
 
-    private fun showSlidingUpPanelToState(it: Int?) {
-        if(it == null || it <= 0)
-            return
-//        if(!mFragmentMainBinding.slidingUpPanel.isOpen)
-//            mFragmentMainBinding.slidingUpPanel.openPane()
+    private fun updateMiniPlayerPlayPauseStateUI(isPlaying: Boolean?) {
+        MainScope().launch {
+            context?.let {
+                if(isPlaying == true){
+                    mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = AppCompatResources.getDrawable(it, R.drawable.pause)
+                }else{
+                    mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = AppCompatResources.getDrawable(it, R.drawable.play_arrow)
+                }
+            }
+
+        }
+    }
+    private fun updateMiniPlayerSliderUI(currentDuration: Long) {
+        MainScope().launch {
+            val totalDuration : Long = mPlayerFragmentViewModel.getCurrentPlayingSong().value?.duration ?: 0
+            mFragmentMainBinding.constraintMiniPlayerInclude.progressMiniPlayerIndicator.progress =
+                (FormattersUtils.formatSongDurationToSliderProgress(currentDuration, totalDuration)).toInt()
+        }
+    }
+    private fun updateMiniPlayerUI(songItem : SongItem?) {
+        MainScope().launch {
+            if(songItem == null){
+                mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.text =
+                    context?.getString(R.string.unknown_title)
+                mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text =
+                    context?.getString(R.string.unknown_artist)
+                context?.let {
+                    ImageLoadersUtils.loadWithResourceID(
+                        it,
+                        mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer,
+                        0,
+                        0
+                    )
+                    Glide.with(it).clear(
+                        mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer
+                    )
+                }
+                return@launch
+            }
+            mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.text =
+                if(songItem.title != null )
+                    songItem.title
+                else
+                    songItem.fileName
+
+            mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text =
+                if(songItem.artist != null )
+                    songItem.artist
+                else
+                    context?.getString(R.string.unknown_artist)
+
+            val tempUri = Uri.parse(songItem.uri)
+            context?.let {
+                ImageLoadersUtils.loadCovertArtFromSongUri(
+                    it,
+                    mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer,
+                    tempUri,
+                    100,
+                    100
+                )
+                ImageLoadersUtils.loadBlurredCovertArtFromSongUri(
+                    it,
+                    mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer,
+                    tempUri,
+                    25
+                )
+            }
+        }
+    }
+
+    private fun checkInteractions() {
+        mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.setOnClickListener{
+            onClickButtonPlayPause()
+        }
+        mFragmentMainBinding.constraintMiniPlayerInclude.buttonSkipNext.setOnClickListener{
+            onClickButtonSkipNextSong()
+        }
+        mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.setOnClickListener{
+            onToggleButtonSelectAll()
+        }
+        mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange.setOnClickListener {
+            onToggleButtonSelectRange()
+        }
+        mFragmentMainBinding.constraintBottomSelectionInclude.buttonClose.setOnClickListener {
+            onClickButtonCloseSelectionMenu()
+        }
+        mFragmentMainBinding.constraintMiniPlayerInclude.constraintMiniPlayer.setOnClickListener{
+            onClickMiniPlayerContainer()
+        }
+        mFragmentMainBinding.slidingUpPanel.addPanelSlideListener(object : com.sothree.slidinguppanel.PanelSlideListener {
+            override fun onPanelSlide(panel: View, slideOffset: Float) {
+                Log.i(ConstantValues.TAG, "On panel slide offset : $slideOffset")
+                if(slideOffset <= 0.21f){
+                    mFragmentMainBinding.slidingUpPanel.setDragView(mFragmentMainBinding.constraintMiniPlayerContainer)
+                }else {
+                    mFragmentMainBinding.slidingUpPanel.setDragView(mFragmentMainBinding.mainFragmentContainer)
+                }
+            }
+            override fun onPanelStateChanged(
+                panel: View,
+                previousState: PanelState,
+                newState: PanelState
+            ) {
+                Log.i(ConstantValues.TAG, "On panel state changed $newState")
+            }
+        })
+        mFragmentMainBinding.navigationView.setNavigationItemSelectedListener { menuItem ->
+            if(mFragmentMainBinding.navigationView.checkedItem?.itemId != menuItem.itemId){
+                when (menuItem.itemId) {
+                    R.id.music_library -> {
+                        showMusicLibraryFragment()
+                        mFragmentMainBinding.drawerLayout.close()
+                    }
+                    R.id.folders_hierarchy -> {
+                        showFolderHierarchyFragment()
+                        mFragmentMainBinding.drawerLayout.close()
+                    }
+                    R.id.playlists -> {
+                        showPlaylistsFragment()
+                        mFragmentMainBinding.drawerLayout.close()
+                    }
+                    R.id.streams -> {
+                        showStreamsFragment()
+                        mFragmentMainBinding.drawerLayout.close()
+                    }
+                }
+            }
+            when (menuItem.itemId) {
+                R.id.settings -> {
+                    activity?.supportFragmentManager?.commit {
+                        setReorderingAllowed(true)
+                        add(R.id.main_activity_fragment_container, SettingsFragment.newInstance())
+                        addToBackStack(null)
+                    }
+                }
+            }
+            true
+        }
+    }
+    private fun onClickMiniPlayerContainer() {
         if(mFragmentMainBinding.slidingUpPanel.panelState != PanelState.EXPANDED)
             mFragmentMainBinding.slidingUpPanel.panelState = PanelState.EXPANDED
     }
 
-    private fun updateSliderUI(it: Long?) {
-        mFragmentMainBinding.constraintMiniPlayerInclude.progressMiniPlayerIndicator.progress = it?.toInt() ?: 0
-    }
-
-    private var mIsAnimatingScroll1: Boolean = false
-    private var mIsAnimatingScroll2: Boolean = false
-    private fun animateScrollStateUI(i: Int, animate : Boolean = true) {
-        if(i >= 1){
-            if(mIsAnimatingScroll2){
-                mFragmentMainBinding.constraintMiniPlayerContainer.apply {
-                    mIsAnimatingScroll2 = false
-                    clearAnimation()
-                }
-            }
-            if(mIsAnimatingScroll1)
-                return
-            mIsAnimatingScroll1 = true
-            ViewAnimatorsUtils.crossTranslateOutFromVertical(mFragmentMainBinding.constraintMiniPlayerContainer,  1, animate, 150,300.0f)
-        }else{
-            if(mIsAnimatingScroll1){
-                mFragmentMainBinding.constraintMiniPlayerContainer.apply {
-                    mIsAnimatingScroll1 = false
-                    clearAnimation()
-                }
-            }
-            if(mIsAnimatingScroll2)
-                return
-            mIsAnimatingScroll2 = true
-            ViewAnimatorsUtils.crossTranslateInFromVertical(mFragmentMainBinding.constraintMiniPlayerContainer,  1, animate, 150,300.0f)
-        }
-    }
-    private fun updateTotalSelectedUI(
-        totalSelected: Int,
-        animate : Boolean = true
-    ) {
-        val ctx : Context = this.context ?: return
-        if(totalSelected > 0 && totalSelected >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
-            MainScope().launch {
-                mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = ContextCompat.getDrawable(
-                    ctx,
-                    R.drawable.check_box
-                )
-            }
-
-            ViewAnimatorsUtils.crossFadeUp(mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover, false, 200, 0.8f)
-        }else{
-            MainScope().launch {
-                mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = ContextCompat.getDrawable(
-                    ctx,
-                    R.drawable.check_box_outline_blank
-                )
-            }
-
-            if (totalSelected >= 2 && mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover.visibility != GONE)
-                ViewAnimatorsUtils.crossFadeDown(mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover, animate, 200)
-            else if(totalSelected < 2 && mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover.visibility != VISIBLE)
-                ViewAnimatorsUtils.crossFadeUp(mFragmentMainBinding.constraintBottomSelectionInclude.constraintRangeMenuHover, animate, 200, 0.8f)
-        }
-        MainScope().launch {
-            mFragmentMainBinding.constraintTopSelectionInclude.textSelectedCount.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
-        }
-    }
-    private fun updateSelectModeUI(
-        selectMode : Boolean,
-        animate : Boolean = true
-    ) = lifecycleScope.launch(context = Dispatchers.Default) {
-        if (selectMode) {
-            if(mFragmentMainBinding.constraintBottomSelectionContainer.visibility != VISIBLE)
-                ViewAnimatorsUtils.crossTranslateInFromVertical(mFragmentMainBinding.constraintBottomSelectionContainer as View, 1, animate, 300)
-            if(mFragmentMainBinding.constraintTopSelectionContainer.visibility != VISIBLE)
-                ViewAnimatorsUtils.crossTranslateInFromVertical(mFragmentMainBinding.constraintTopSelectionContainer as View, -1, animate, 300)
-        }else {
-            if(mFragmentMainBinding.constraintBottomSelectionContainer.visibility != GONE)
-                ViewAnimatorsUtils.crossTranslateOutFromVertical(mFragmentMainBinding.constraintBottomSelectionContainer as View, 1, animate, 300)
-            if(mFragmentMainBinding.constraintTopSelectionContainer.visibility != GONE)
-                ViewAnimatorsUtils.crossTranslateOutFromVertical(mFragmentMainBinding.constraintTopSelectionContainer as View, -1, animate, 300)
-        }
-    }
-    private fun updatePlayerButtonsUI(playing : Boolean) {
-        MainScope().launch {
-            if(playing){
-                mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = AppCompatResources.getDrawable(mContext, R.drawable.pause)
-            }else{
-                mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon = AppCompatResources.getDrawable(mContext, R.drawable.play_arrow)
-            }
-        }
-    }
-    private var mOldPlayingSong : CurrentPlayingSongSP? = null
-    private suspend fun updateMiniPlayerUI(currentSong : CurrentPlayingSongSP?) {
-        withContext(Dispatchers.IO){
-            val ctx : Context = this@MainFragment.context ?: return@withContext
-            if(currentSong != null) {
-                if (currentSong.uri != mOldPlayingSong?.uri) {
-                    mOldPlayingSong = currentSong
-                    val tempUri = Uri.parse(currentSong.uri)
-                    MainScope().launch {
-
-                        mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.text =
-                            if(currentSong.title != null )
-                                currentSong.title
-                            else
-                                currentSong.fileName
-
-                        mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text =
-                            if(currentSong.artist != null )
-                                currentSong.artist
-                            else
-                                ctx.getString(R.string.unknown_artist)
-                    }
-                    ImageLoadersUtils.loadCovertArtFromSongUri(
-                        ctx,
-                        mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer,
-                        tempUri,
-                        60,
-                        100
-                    )
-                    ImageLoadersUtils.loadBlurredCovertArtFromSongUri(
-                        ctx,
-                        mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer,
-                        tempUri,
-                        25
-                    )
-                }
-            }
-        }
-    }
-
-    private suspend fun checkInteractions() {
-        mFragmentMainBinding.constraintMiniPlayerInclude.buttonSkipNext.setOnClickListener{
-            onNextPage()
-        }
-        mFragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.setOnClickListener{
-            onPlayPause()
-        }
-        mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.setOnClickListener{
-            onToggleSelectAll()
-        }
-        mFragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange.setOnClickListener {
-            onToggleSelectRange()
-        }
-        mFragmentMainBinding.constraintBottomSelectionInclude.buttonClose.setOnClickListener {
-            onCloseSelectionMenu()
-        }
-        mFragmentMainBinding.constraintMiniPlayerInclude.constraintMiniPlayer.setOnClickListener{
-//            if(!mFragmentMainBinding.slidingUpPanel.isOpen)
-//                mFragmentMainBinding.slidingUpPanel.openPane()
-            if(mFragmentMainBinding.slidingUpPanel.panelState != PanelState.EXPANDED)
-                mFragmentMainBinding.slidingUpPanel.panelState = PanelState.EXPANDED
-        }
-//        mFragmentMainBinding.slidingUpPanel.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
-//            override fun onPanelSlide(panel: View?, slideOffset: Float) {
-//                Log.i(ConstantValues.TAG, "On panel slide offset : $slideOffset")
-//                if(slideOffset <= 0.21f){
-//                    mFragmentMainBinding.slidingUpPanel.setDragView(mFragmentMainBinding.constraintMiniPlayerContainer)
-//                }else {
-//                    mFragmentMainBinding.slidingUpPanel.setDragView(mFragmentMainBinding.mainFragmentContainer)
-//                }
-//            }
-//
-//            override fun onPanelStateChanged(
-//                panel: View?,
-//                previousState: PanelState?,
-//                newState: PanelState
-//            ) {
-//                Log.i(ConstantValues.TAG, "onPanelStateChanged $newState")
-//            }
-//        })
-    }
-    private fun onCloseSelectionMenu() {
+    private fun onClickButtonCloseSelectionMenu() {
         mMainFragmentViewModel.setSelectMode(false)
     }
-    private fun onToggleSelectRange() {
+
+    private fun onToggleButtonSelectRange() {
         mMainFragmentViewModel.setToggleRange()
     }
-    private fun onToggleSelectAll() {
-        if(((mMainFragmentViewModel.getTotalSelected().value ?: 0) >= (mMainFragmentViewModel.getTotalCount().value ?: 0))) {
+
+    private fun onToggleButtonSelectAll() {
+        val tempTotalSelected: Int = mMainFragmentViewModel.getTotalSelected().value ?: 0
+        val tempTotalCount : Int = mMainFragmentViewModel.getTotalCount().value ?: 0
+        if(tempTotalSelected >= tempTotalCount) {
             mMainFragmentViewModel.setTotalSelected(0)
         }else {
-            mMainFragmentViewModel.setTotalSelected(mMainFragmentViewModel.getTotalCount().value ?: 0)
+            mMainFragmentViewModel.setTotalSelected(tempTotalCount)
         }
     }
-    fun onPlayPause(){
-//        mMainFragmentViewModel.setScrollingState(-1)
-//        val tempPP : Boolean = !(mPlayerFragmentViewModel.getIsPlaying().value ?: false)
-//        mPlayerFragmentViewModel.setIsPlaying(tempPP)
+    private fun onClickButtonSkipNextSong() {
+        mPlayerFragmentViewModel.setSkipNextTrackCounter()
     }
-    fun onNextPage(){
-//        mMainFragmentViewModel.setScrollingState(-1)
-//        val tempCS :Int = mPlayerFragmentViewModel.getCurrentSong().value ?: 0
-//        val tempSongListSize :Int = mPlayerFragmentViewModel.getSongList().value?.size ?: 0
-//        if(tempSongListSize > 0 && tempCS < tempSongListSize - 1)
-//            mPlayerFragmentViewModel.setCurrentSong(tempCS + 1)
+    private fun onClickButtonPlayPause() {
+        mPlayerFragmentViewModel.toggleIsPlaying()
     }
 
     private fun setupFragments() {
         activity?.supportFragmentManager?.commit {
             setReorderingAllowed(true)
-            add<MusicLibraryFragment>(R.id.main_fragment_container)
+            add(R.id.main_fragment_container, mMusicLibraryFragment)
+            add(R.id.main_fragment_container, mFoldersHierarchyFragment)
+            add(R.id.main_fragment_container, mPlaylistsFragment)
+            add(R.id.main_fragment_container, mStreamsFragment)
         }
+
+        showMusicLibraryFragment()
         activity?.supportFragmentManager?.commit {
             setReorderingAllowed(true)
-            add<PlayerFragment>(R.id.player_fragment_container)
+            replace(R.id.player_fragment_container, PlayerFragment.newInstance())
+        }
+    }
+    private fun showMusicLibraryFragment() {
+        activity?.supportFragmentManager?.commit {
+            setReorderingAllowed(true)
+            hide(mFoldersHierarchyFragment)
+            hide(mPlaylistsFragment)
+            hide(mStreamsFragment)
+            show(mMusicLibraryFragment)
+        }
+    }
+    private fun showFolderHierarchyFragment() {
+        activity?.supportFragmentManager?.commit {
+            setReorderingAllowed(true)
+            hide(mMusicLibraryFragment)
+            show(mFoldersHierarchyFragment)
+            hide(mPlaylistsFragment)
+            hide(mStreamsFragment)
+        }
+    }
+    private fun showPlaylistsFragment() {
+        activity?.supportFragmentManager?.commit {
+            setReorderingAllowed(true)
+            hide(mMusicLibraryFragment)
+            hide(mFoldersHierarchyFragment)
+            show(mPlaylistsFragment)
+            hide(mStreamsFragment)
+        }
+    }
+    private fun showStreamsFragment() {
+        activity?.supportFragmentManager?.commit {
+            setReorderingAllowed(true)
+            hide(mMusicLibraryFragment)
+            hide(mFoldersHierarchyFragment)
+            hide(mPlaylistsFragment)
+            show(mStreamsFragment)
         }
     }
 
     private fun initViews() {
-        mFragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer.layout(0,0,0,0)
-        mFragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer.layout(0,0,0,0)
         mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.isSelected = true
         mFragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.isSelected = true
 
         ViewInsetModifiersUtils.updateTopViewInsets(mFragmentMainBinding.mainFragmentContainer)
+        ViewInsetModifiersUtils.updateTopViewInsets(mFragmentMainBinding.constraintTopSelectionInclude.constraintTopSelectionMenu)
         ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentMainBinding.constraintMiniPlayerInclude.constraintMiniPlayer)
         ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentMainBinding.constraintBottomSelectionInclude.constraintBottomSelectionMenu)
-        ViewInsetModifiersUtils.updateTopViewInsets(mFragmentMainBinding.constraintTopSelectionInclude.constraintTopSelectionMenu)
+
+        mFragmentMainBinding.navigationView.setCheckedItem(R.id.music_library)
     }
 
     companion object {
@@ -347,37 +500,5 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                 arguments = Bundle().apply {
                 }
             }
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        when (key) {
-            ConstantValues.SHARED_PREFERENCES_CURRENT_PLAYING_SONG -> {
-//                val currentPlayingSongItem: CurrentPlayingSongItem? = SharedPreferenceManager.loadCurrentPlayingSong(this@PlayerFragment.requireContext(), sharedPreferences)
-                MainScope().launch {
-//                    val position : Int = currentPlayingSongItem?.position?.toInt() ?: 0
-//                    updateTextTitleSubtitleDurationUI(position)
-//                    updateTextCurrentDurationUI(0)
-//                    updateSliderCurrentDurationUI(0)
-//                    updateBlurredBackgroundUI(position)
-                }
-            }
-            ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SOURCE,
-            ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SOURCE_VALUE,
-            ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SIZE -> {
-//                loadSongsForQueueListSource(
-//                    ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SOURCE,
-//                    ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SOURCE_VALUE,
-//                    ConstantValues.SHARED_PREFERENCES_QUEUE_LIST_SIZE
-//                )
-            }
-//            ConstantValues.SHARED_PREFERENCES_REPEAT -> {
-//                val repeatValue = SharedPreferenceManager.loadRepeat(this.requireContext(), sharedPreferences)
-//                updateRepeatUI(repeatValue)
-//            }
-//            ConstantValues.SHARED_PREFERENCES_SHUFFLE -> {
-//                val shuffleValue = SharedPreferenceManager.loadRepeat(this.requireContext(), sharedPreferences)
-//                updateShuffleUI(shuffleValue)
-//            }
-        }
     }
 }

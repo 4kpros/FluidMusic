@@ -10,11 +10,11 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LifecycleOwner
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
@@ -33,6 +33,10 @@ class MusicLibraryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        enterTransition = MaterialFadeThrough()
+        exitTransition = MaterialFadeThrough()
+
         arguments?.let {
         }
     }
@@ -45,17 +49,14 @@ class MusicLibraryFragment : Fragment() {
         val view = mFragmentMusicLibraryBinding.root
 
         initViews()
-
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        MainScope().launch {
-            setupTabLayoutViewPagerAdapter()
-            checkInteractions()
-        }
+        setupTabLayoutViewPagerAdapter()
+        checkInteractions()
         observeLiveData()
     }
 
@@ -90,9 +91,10 @@ class MusicLibraryFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-        mMainFragmentViewModel.getSelectMode().observe(this as LifecycleOwner
-        ) { selectMode -> updateSelectModeUI(selectMode ?: false) }
-        mMainFragmentViewModel.getTotalSelected().observe(this as LifecycleOwner
+        mMainFragmentViewModel.getSelectMode().observe(viewLifecycleOwner) {
+            updateSelectModeUI(it)
+        }
+        mMainFragmentViewModel.getTotalSelected().observe(viewLifecycleOwner
         ) { totalSelected -> updateTotalSelectedItemsUI(totalSelected ?: 0) }
     }
     private  fun updateTotalSelectedItemsUI(totalSelected : Int, animate : Boolean = true){
@@ -101,8 +103,8 @@ class MusicLibraryFragment : Fragment() {
         else if(totalSelected <= 0 && mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover.visibility != VISIBLE)
             ViewAnimatorsUtils.crossFadeUp(mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover, animate, 200, 0.8f)
     }
-    private  fun updateSelectModeUI(selectMode : Boolean, animate : Boolean = true){
-        if (selectMode) {
+    private  fun updateSelectModeUI(isSelectMode: Boolean, animate : Boolean = true){
+        if (isSelectMode) {
             mFragmentMusicLibraryBinding.viewPagerMainExplore.isUserInputEnabled = false
             if(mFragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != VISIBLE)
                 ViewAnimatorsUtils.crossTranslateInFromHorizontal(mFragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View, 1, animate, 300)
@@ -113,9 +115,9 @@ class MusicLibraryFragment : Fragment() {
         }
     }
 
-    private suspend fun checkInteractions() {
+    private fun checkInteractions() {
         mFragmentMusicLibraryBinding.topAppBar.setNavigationOnClickListener {
-            mMainFragmentViewModel.setOnActionBarClickListened(true)
+            mMainFragmentViewModel.setShowDrawerMenuCounter()
         }
         mFragmentMusicLibraryBinding.viewPagerMainExplore.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -132,25 +134,25 @@ class MusicLibraryFragment : Fragment() {
             addSelectionToQueueMusicDialog()
         }
         mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlaylistAdd.setOnClickListener {
-            showAddSelectionToPlaylistDialog()
+            openAddSelectionToPlaylistDialog()
         }
         mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonShare.setOnClickListener {
-            shareSelectionDialog()
+            openShareSelectionDialog()
         }
         mFragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonDelete.setOnClickListener {
-            showDeleteSelectionDialog()
+            openDeleteSelectionDialog()
         }
     }
-    private fun shareSelectionDialog() {
+    private fun openShareSelectionDialog() {
         Toast.makeText(this.requireContext(), "On share selection", Toast.LENGTH_SHORT).show()
     }
-    private fun showAddSelectionToPlaylistDialog() {
+    private fun openAddSelectionToPlaylistDialog() {
         Toast.makeText(this.requireContext(), "On add selection to playlist", Toast.LENGTH_SHORT).show()
     }
     private fun addSelectionToQueueMusicDialog() {
         Toast.makeText(this.requireContext(), "On add selection to queue music", Toast.LENGTH_SHORT).show()
     }
-    private fun showDeleteSelectionDialog() {
+    private fun openDeleteSelectionDialog() {
         MaterialAlertDialogBuilder(this.requireContext())
             .setTitle(resources.getString(R.string.dialog_delete_selection_title))
             .setMessage(resources.getString(R.string.dialog_delete_selection_description))
@@ -171,21 +173,23 @@ class MusicLibraryFragment : Fragment() {
     }
 
     private fun applyAppBarTitle(position: Int) {
-        when(position){
-            0->{
-                mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.songs)
-            }
-            1->{
-                mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.folders)
-            }
-            2->{
-                mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.albums)
-            }
-            3->{
-                mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.artists)
-            }
-            4->{
-                mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.genre)
+        MainScope().launch {
+            when(position){
+                0->{
+                    mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.songs)
+                }
+                1->{
+                    mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.folders)
+                }
+                2->{
+                    mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.albums)
+                }
+                3->{
+                    mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.artists)
+                }
+                4->{
+                    mFragmentMusicLibraryBinding.topAppBar.title = getString(R.string.genre)
+                }
             }
         }
     }

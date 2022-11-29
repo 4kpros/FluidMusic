@@ -153,4 +153,6 @@
     <string name="add_new_playlist">Add new playlist</string>
     <string name="save">Save</string>
     <string name="playlist_name">Playlist name</string>
+    <string name="play">Play</string>
+    <string name="shuffle">Shuffle</string>
 </resources>

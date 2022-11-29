@@ -6,33 +6,15 @@
     <data>
 
     </data>
-
-    <androidx.drawerlayout.widget.DrawerLayout
-        android:id="@+id/drawer_layout"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:openDrawer="start"
-        tools:context=".MainActivity">
-
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <!-- Screen content -->
-            <!-- Use app:layout_behavior="@string/appbar_scrolling_view_behavior" to fit below top app bar -->
-            <FrameLayout
-                android:id="@+id/main_activity_fragment_container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                />
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/navigation_view"
+        tools:context=".MainActivity"
+        >
+        <FrameLayout
+            android:id="@+id/main_activity_fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:menu="@menu/navigation_drawer"
-            app:headerLayout="@layout/_component_header_navigation_drawer"
-            android:layout_gravity="start" />
-
-    </androidx.drawerlayout.widget.DrawerLayout>
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

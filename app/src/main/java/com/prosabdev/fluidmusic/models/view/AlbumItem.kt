@@ -1,19 +1,17 @@
-package com.prosabdev.fluidmusic.models.explore
+package com.prosabdev.fluidmusic.models.view
 
 import androidx.room.DatabaseView
 
 @DatabaseView(
-    "SELECT SongItem.folder as folder, " +
-            "SongItem.uriTreeId as uriTreeId, " +
+    "SELECT SongItem.album as name, " +
             "MAX(SongItem.lastAddedDateToLibrary) as lastAddedDateToLibrary, " +
             "COUNT(SongItem.id) as numberTracks, " +
             "SUM(SongItem.duration) as totalDuration " +
             "FROM SongItem " +
-            "GROUP BY SongItem.folder, SongItem.uriTreeId ORDER BY SongItem.folder ASC"
+            "GROUP BY SongItem.album ORDER BY SongItem.album"
 )
-class FolderItemView {
-    var folder: String? = null
-    var uriTreeId: Long = 0
+class AlbumItem {
+    var name: String? = null
     var lastAddedDateToLibrary: String? = null
     var numberTracks: Int = 0
     var totalDuration: Long = 0

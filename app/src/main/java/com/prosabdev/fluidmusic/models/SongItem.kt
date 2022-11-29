@@ -1,11 +1,7 @@
-package com.prosabdev.fluidmusic.models.explore
+package com.prosabdev.fluidmusic.models
 
 import androidx.recyclerview.widget.DiffUtil
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
-import androidx.room.PrimaryKey
-import com.prosabdev.fluidmusic.models.FolderUriTree
+import androidx.room.*
 
 @Entity(
     foreignKeys = [
@@ -52,6 +48,9 @@ class SongItem {
     var writer: String? = null
     var cdTrackNumber: String? = null
     var numberTracks: String? = null
+
+    @Ignore
+    var position: Int = -1
 
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<SongItem>() {

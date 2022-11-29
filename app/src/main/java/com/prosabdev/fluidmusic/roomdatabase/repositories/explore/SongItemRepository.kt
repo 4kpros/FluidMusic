@@ -2,7 +2,7 @@ package com.prosabdev.fluidmusic.roomdatabase.repositories.explore
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import com.prosabdev.fluidmusic.models.explore.SongItem
+import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.roomdatabase.dao.explore.SongItemDao
 import kotlinx.coroutines.Dispatchers
@@ -48,19 +48,24 @@ class SongItemRepository(ctx : Context) {
             mDao?.getAtUri(uri)
         }
     }
-    suspend fun getAll(order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<SongItem>>? {
+    suspend fun getAllLimit(order_by: String, limit: Int) : LiveData<List<SongItem>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAll(order_name, asc_desc_mode)
+            mDao?.getAllLimit(order_by, limit)
         }
     }
-    suspend fun getAllWhereEqual(whereColumn: String, columnValue: String?, order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<SongItem>>? {
+    suspend fun getAll(order_by: String) : LiveData<List<SongItem>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAllWhereEqual(whereColumn, columnValue, order_name, asc_desc_mode)
+            mDao?.getAll(order_by)
         }
     }
-    suspend fun getAllWhereLike(whereColumn: String, columnValue: String?, order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<SongItem>>? {
+    suspend fun getAllWhereEqual(whereColumn: String, columnValue: String?, order_by: String) : LiveData<List<SongItem>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAllWhereLike(whereColumn, columnValue, order_name, asc_desc_mode)
+            mDao?.getAllWhereEqual(whereColumn, columnValue, order_by)
+        }
+    }
+    suspend fun getAllWhereLike(whereColumn: String, columnValue: String?, order_by: String) : LiveData<List<SongItem>>? {
+        return withContext(Dispatchers.IO){
+            mDao?.getAllWhereLike(whereColumn, columnValue, order_by)
         }
     }
 }

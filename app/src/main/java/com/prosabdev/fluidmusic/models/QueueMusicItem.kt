@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.CASCADE
 import androidx.room.PrimaryKey
-import com.prosabdev.fluidmusic.models.explore.SongItem
 
 @Entity(
     foreignKeys = [

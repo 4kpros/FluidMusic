@@ -8,7 +8,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.AlbumArtistItemAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentAlbumArtistsBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
@@ -23,7 +22,6 @@ class AlbumArtistsFragment : Fragment() {
 
     private lateinit var mAlbumArtistItemViewModel: AlbumArtistItemViewModel
 
-    private var mEmptyBottomSpaceAdapter: HeadlinePlayShuffleAdapter? = null
     private var mAlbumArtistItemAdapter: AlbumArtistItemAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
 

@@ -34,6 +34,8 @@
         <item name="android:navigationBarColor">@color/semiBlack</item>
 
         <item name="android:windowActionBarOverlay">false</item>
+        <item  name="android:windowActivityTransitions">true</item>
+        <item name="android:windowContentTransitions">true</item>
     </style>
 
     <!-- Background -->

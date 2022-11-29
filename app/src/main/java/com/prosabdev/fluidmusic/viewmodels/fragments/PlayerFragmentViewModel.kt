@@ -4,66 +4,141 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
+import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.sharedpreference.SleepTimerSP
+import com.prosabdev.fluidmusic.utils.ConstantValues
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 class PlayerFragmentViewModel : ViewModel()  {
 
+    private val mMutableCurrentPlayingSong = MutableLiveData<SongItem?>(null)
     private val mMutableIsPlaying = MutableLiveData<Boolean>(false)
     private val mMutablePlayingProgressValue = MutableLiveData<Long>(0)
-    private val mMutableSourceOfQueueList = MutableLiveData<String>("")
-    private val mMutableSourceOfQueueListValue = MutableLiveData<String>("")
+    private val mMutableQueueListSource = MutableLiveData<String>(ConstantValues.EXPLORE_ALL_SONGS)
+    private val mMutableQueueListSourceValue = MutableLiveData<String>("")
     private val mMutableShuffle = MutableLiveData<Int>(PlaybackStateCompat.SHUFFLE_MODE_NONE)
     private val mMutableRepeat = MutableLiveData<Int>(PlaybackStateCompat.REPEAT_MODE_NONE)
-    private val mMutableCurrentSong = MutableLiveData<CurrentPlayingSongSP?>(null)
+    private val mMutableSleepTimer = MutableLiveData<SleepTimerSP?>(null)
+    private val mMutableSleepTimerStateStarted = MutableLiveData<Boolean>(false)
 
+    private val mMutableSkipNextTrackCounter = MutableLiveData<Int>(0)
+    private val mMutableSkipPrevTrackCounter = MutableLiveData<Int>(0)
+
+    private val mCurrentPlayingSong: LiveData<SongItem?> get() = mMutableCurrentPlayingSong
     private val mIsPlaying: LiveData<Boolean> get() = mMutableIsPlaying
     private val mPlayingProgressValue: LiveData<Long> get() = mMutablePlayingProgressValue
-    private val mSourceOfQueueList: LiveData<String> get() = mMutableSourceOfQueueList
-    private val mSourceOfQueueListValue: LiveData<String> get() = mMutableSourceOfQueueListValue
-    private val mCurrentSong: LiveData<CurrentPlayingSongSP?> get() = mMutableCurrentSong
+    private val mQueueListSource: LiveData<String> get() = mMutableQueueListSource
+    private val mQueueListSourceValue: LiveData<String> get() = mMutableQueueListSourceValue
     private val mShuffle: LiveData<Int> get() = mMutableShuffle
     private val mRepeat: LiveData<Int> get() = mMutableRepeat
+    private val mSleepTimer: LiveData<SleepTimerSP?> get() = mMutableSleepTimer
+    private val mSleepTimerStateStarted: LiveData<Boolean> get() = mMutableSleepTimerStateStarted
 
+    private val mSkipNextTrackCounter: LiveData<Int> get() = mMutableSkipNextTrackCounter
+    private val mSkipPrevTrackCounter: LiveData<Int> get() = mMutableSkipPrevTrackCounter
+
+    fun setCurrentPlayingSong(songItem : SongItem?){
+        MainScope().launch {
+            mMutableCurrentPlayingSong.value = songItem
+        }
+    }
+    fun getCurrentPlayingSong(): LiveData<SongItem?> {
+        return mCurrentPlayingSong
+    }
     fun setIsPlaying(value : Boolean){
-        mMutableIsPlaying.value = value
+        MainScope().launch {
+            mMutableIsPlaying.value = value
+        }
     }
     fun getIsPlaying(): LiveData<Boolean> {
         return mIsPlaying
     }
+    fun toggleIsPlaying() {
+        MainScope().launch {
+            val tempIsPlaying: Boolean = mIsPlaying.value ?: false
+            mMutableIsPlaying.value = !tempIsPlaying
+        }
+    }
     fun setPlayingProgressValue(value : Long){
-        mMutablePlayingProgressValue.value = value
+        MainScope().launch {
+            mMutablePlayingProgressValue.value = value
+        }
     }
     fun getPlayingProgressValue(): LiveData<Long> {
         return mPlayingProgressValue
     }
-    fun setSourceOfQueueList(source : String){
-        mMutableSourceOfQueueList.value = source
+    fun setQueueListSource(source : String){
+        MainScope().launch {
+            mMutableQueueListSource.value = source
+        }
     }
-    fun getSourceOfQueueList(): LiveData<String> {
-        return mSourceOfQueueList
+    fun getQueueListSource(): LiveData<String> {
+        return mQueueListSource
     }
-    fun setSourceOfQueueListValue(source : String){
-        mMutableSourceOfQueueListValue.value = source
+    fun setQueueListSourceValue(source : String?){
+        MainScope().launch {
+            mMutableQueueListSourceValue.value = source ?: ""
+        }
     }
     fun getSourceOfQueueListValue(): LiveData<String> {
-        return mSourceOfQueueListValue
-    }
-    fun setCurrentSong(newCurrentSong : CurrentPlayingSongSP?){
-        mMutableCurrentSong.value = newCurrentSong
-    }
-    fun getCurrentSong(): LiveData<CurrentPlayingSongSP?> {
-        return mCurrentSong
+        return mQueueListSourceValue
     }
     fun setShuffle(newShuffleValue : Int){
-        mMutableShuffle.value = newShuffleValue
+        MainScope().launch {
+            mMutableShuffle.value = newShuffleValue
+        }
     }
     fun getShuffle(): LiveData<Int> {
         return mShuffle
     }
     fun setRepeat(newRepeatValue : Int){
-        mMutableRepeat.value = newRepeatValue
+        MainScope().launch {
+            mMutableRepeat.value = newRepeatValue
+        }
     }
     fun getRepeat(): LiveData<Int> {
         return mRepeat
+    }
+    fun setSleepTimer(value : SleepTimerSP?){
+        MainScope().launch {
+            mMutableSleepTimer.value = value
+        }
+    }
+    fun getSleepTimer(): LiveData<SleepTimerSP?> {
+        return mSleepTimer
+    }
+    fun setSleepTimerStateStarted(state : Boolean) {
+        MainScope().launch {
+            mMutableSleepTimerStateStarted.value = state
+        }
+    }
+    fun getSleepTimerStateStarted(): LiveData<Boolean> {
+        return mSleepTimerStateStarted
+    }
+
+    fun setSkipNextTrackCounter(){
+        MainScope().launch {
+            var tempCounter: Int = mSkipNextTrackCounter.value ?: 0
+            if(tempCounter >= 100)
+                tempCounter = 0
+            tempCounter++
+            mMutableSkipNextTrackCounter.value = tempCounter
+        }
+    }
+    fun getSkipNextTrackCounter(): LiveData<Int> {
+        return mSkipNextTrackCounter
+    }
+    fun setSkipPrevTrackCounter(){
+        MainScope().launch {
+            var tempCounter: Int = mSkipPrevTrackCounter.value ?: 0
+            if(tempCounter >= 100)
+                tempCounter = 0
+            tempCounter++
+            mMutableSkipPrevTrackCounter.value = tempCounter
+        }
+    }
+    fun getSkipPrevTrackCounter(): LiveData<Int> {
+        return mSkipPrevTrackCounter
     }
 }

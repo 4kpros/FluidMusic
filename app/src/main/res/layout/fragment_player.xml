@@ -199,7 +199,7 @@
                     android:layout_gravity="center_vertical"
                     android:padding="0dp"
                     app:icon="@drawable/play_circle"
-                    app:iconSize="70dp" />
+                    app:iconSize="60dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_skip_next"

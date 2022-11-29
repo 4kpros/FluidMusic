@@ -9,7 +9,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.models.explore.SongItem
+import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.utils.AudioInfoExtractorUtils
 import com.prosabdev.fluidmusic.utils.ConstantValues
@@ -53,9 +53,9 @@ class MediaScannerWorker(
         context: Context,
         updateMethod : String?
     ) = withContext(Dispatchers.IO){
-        var tempFolderSelected: List<FolderUriTree> = ArrayList()
-        tempFolderSelected = AppDatabase.getDatabase(applicationContext).folderUriTreeDao().getAllDirect()
-        if (tempFolderSelected.isEmpty()) {
+        var tempFolderSelected: List<FolderUriTree>? = null
+        tempFolderSelected = AppDatabase.getDatabase(applicationContext).folderUriTreeDao().getAll("id").value
+        if (tempFolderSelected == null || tempFolderSelected.isEmpty()) {
             MainScope().launch {
                 Toast.makeText(context, "Please select folders to scan !", Toast.LENGTH_LONG)
                     .show()

@@ -1,9 +1,22 @@
 package com.prosabdev.fluidmusic.utils
 
+import kotlin.math.floor
+
 abstract class FormattersUtils {
     companion object {
         //Return duration to formatted string
-        fun formatSongDurationToString(durationTemp: Long): String? {
+        fun formatSongDurationToSliderProgress(currentDuration: Long, totalDuration: Long): Float {
+            return if (totalDuration > currentDuration) currentDuration * 100.0f / totalDuration else 0.0f
+        }
+        fun formatSliderProgressToLongDuration(sliderProgress : Int, totalDuration: Long) : Long{
+            val tempProgress: Long = sliderProgress * totalDuration / 100
+            return if(tempProgress > totalDuration) totalDuration else tempProgress
+        }
+        fun formatSliderProgressToLongDuration(sliderProgress : Float, totalDuration: Long) : Long{
+            val tempProgress: Long = floor(sliderProgress).toInt() * totalDuration / 100
+            return if(tempProgress > totalDuration) totalDuration else tempProgress
+        }
+        fun formatSongDurationToString(durationTemp: Long): String {
             var totalOut = ""
             var totalSec: Int
             var totalMin: Int

@@ -12,9 +12,11 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetStorageAccessBinding
 import com.prosabdev.fluidmusic.viewmodels.activities.StorageAccessActivityViewModel
 
-class StorageAccessFullBottomSheetDialog(private val mStorageAccessActivityViewModel: StorageAccessActivityViewModel) : BottomSheetDialogFragment() {
+class StorageAccessFullBottomSheetDialog : BottomSheetDialogFragment() {
 
     private lateinit var mBottomSheetStorageAccessBinding : BottomSheetStorageAccessBinding
+
+    private lateinit var mStorageAccessActivityViewModel: StorageAccessActivityViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,5 +65,11 @@ class StorageAccessFullBottomSheetDialog(private val mStorageAccessActivityViewM
 
     companion object {
         const val TAG = "PlayerMoreDialog"
+
+        @JvmStatic
+        fun newInstance(storageAccessActivityViewModel : StorageAccessActivityViewModel) =
+            StorageAccessFullBottomSheetDialog().apply {
+                mStorageAccessActivityViewModel = storageAccessActivityViewModel
+            }
     }
 }

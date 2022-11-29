@@ -18,8 +18,8 @@ class QueueMusicItemCallback(adapter : QueueMusicItemListAdapter) : ItemTouchHel
 
     interface ItemTouchHelperContract {
         fun onRowMoved(mFromPosition: Int, mToPosition: Int)
-        fun onRowSelected(myViewHolder: QueueMusicItemListAdapter.QueueMusicItemViewHolder?)
-        fun onRowClear(myViewHolder: QueueMusicItemListAdapter.QueueMusicItemViewHolder?)
+        fun onRowSelected(myViewHolder: QueueMusicItemListAdapter.QueueMusicItemHolder?)
+        fun onRowClear(myViewHolder: QueueMusicItemListAdapter.QueueMusicItemHolder?)
     }
 
     override fun isLongPressDragEnabled(): Boolean {
@@ -62,9 +62,9 @@ class QueueMusicItemCallback(adapter : QueueMusicItemListAdapter) : ItemTouchHel
 
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
-            if (viewHolder is QueueMusicItemListAdapter.QueueMusicItemViewHolder) {
-                val myViewHolder: QueueMusicItemListAdapter.QueueMusicItemViewHolder =
-                    viewHolder as QueueMusicItemListAdapter.QueueMusicItemViewHolder
+            if (viewHolder is QueueMusicItemListAdapter.QueueMusicItemHolder) {
+                val myViewHolder: QueueMusicItemListAdapter.QueueMusicItemHolder =
+                    viewHolder
                 mAdapter.onRowSelected(myViewHolder)
             }
         }
@@ -73,9 +73,9 @@ class QueueMusicItemCallback(adapter : QueueMusicItemListAdapter) : ItemTouchHel
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         super.clearView(recyclerView, viewHolder)
-        if (viewHolder is QueueMusicItemListAdapter.QueueMusicItemViewHolder) {
-            val myViewHolder: QueueMusicItemListAdapter.QueueMusicItemViewHolder =
-                viewHolder as QueueMusicItemListAdapter.QueueMusicItemViewHolder
+        if (viewHolder is QueueMusicItemListAdapter.QueueMusicItemHolder) {
+            val myViewHolder: QueueMusicItemListAdapter.QueueMusicItemHolder =
+                viewHolder
 
             mDragStarted = false
             Log.i(ConstantValues.TAG, "Finally : from = $mFromPosition = $mToValue and to = $mToPosition = $mFromValue")

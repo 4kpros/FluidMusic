@@ -9,13 +9,33 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import androidx.viewpager2.widget.CompositePageTransformer
+import androidx.viewpager2.widget.MarginPageTransformer
+import androidx.viewpager2.widget.ViewPager2
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 abstract class ViewAnimatorsUtils {
 
     companion object{
         var defaultTranslationPosition: Float = 500.0f
+
+        fun transformScaleViewPager(viewPager: ViewPager2?) {
+            if(viewPager == null)
+                return
+            val compositePageTransformer = CompositePageTransformer()
+            compositePageTransformer.addTransformer(MarginPageTransformer(5))
+            compositePageTransformer.addTransformer { page, position ->
+                val normalizedPosition = abs(abs(position) - 1)
+                page.alpha = normalizedPosition
+                page.scaleX = normalizedPosition / 2 + 0.5f
+                page.scaleY = normalizedPosition / 2 + 0.5f
+                page.translationX = position * -100
+            }
+            viewPager.setPadding(0, 0, 0, 0)
+            viewPager.setPageTransformer(compositePageTransformer)
+        }
 
         fun crossFadeUp(
             contentView: View, animate: Boolean = false,

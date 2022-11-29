@@ -27,7 +27,7 @@ class FolderUriTreeViewModel(ctx : Context) : ViewModel()  {
     suspend fun getAtId(id: Long) : FolderUriTree? {
         return repository?.getAtId(id)
     }
-    suspend fun getAll(order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<FolderUriTree>>? {
-        return repository?.getAll(order_name, asc_desc_mode)
+    suspend fun getAll(order_by: String = "id") : LiveData<List<FolderUriTree>>? {
+        return repository?.getAll(order_by)
     }
 }

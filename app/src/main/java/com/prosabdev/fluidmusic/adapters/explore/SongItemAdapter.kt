@@ -18,7 +18,7 @@ import com.google.android.material.color.MaterialColors
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapter
 import com.prosabdev.fluidmusic.databinding.ItemGenericExploreListBinding
-import com.prosabdev.fluidmusic.models.explore.SongItem
+import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.FormattersUtils
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
@@ -35,7 +35,6 @@ class SongItemAdapter(
     {
     interface OnItemClickListener {
         fun onSongItemClicked(position: Int)
-        fun onSongItemPlayClicked(position: Int)
         fun onSongItemLongClicked(position: Int)
     }
 
@@ -138,9 +137,6 @@ class SongItemAdapter(
                 mOnItemClickListener.onSongItemLongClicked(bindingAdapterPosition)
                 true
             }
-            mItemGenericExploreListBinding.imageviewCoverArt.setOnClickListener {
-                mOnItemClickListener.onSongItemPlayClicked(bindingAdapterPosition)
-            }
         }
 
         //When item is is recycled(not visible), clear image view to save memory
@@ -149,18 +145,12 @@ class SongItemAdapter(
         }
 
         fun updateCovertArtAndTitleUI(context: Context, songItem: SongItem) {
-            mItemGenericExploreListBinding.textTitle.text =
-                if(songItem.title != null && songItem.title!!.isNotEmpty())
-                    songItem.title
-                else
-                    songItem.fileName
-
-            mItemGenericExploreListBinding.textSubtitle.text =
-                if(songItem.artist != null && songItem.artist!!.isNotEmpty())
-                    songItem.artist
-                else
-                    context.getString(R.string.unknown_artist)
-
+            var tempTitle : String = songItem.title ?: ""
+            var tempArtist : String = songItem.artist ?: ""
+            if(tempTitle.isEmpty()) tempTitle = songItem.fileName ?: context.getString(R.string.unknown_title)
+            if(tempArtist.isEmpty()) tempArtist = context.getString(R.string.unknown_artist)
+            mItemGenericExploreListBinding.textTitle.text = tempTitle
+            mItemGenericExploreListBinding.textSubtitle.text = tempArtist
             mItemGenericExploreListBinding.textDetails.text =
                 context.getString(
                     R.string.item_song_card_text_details,

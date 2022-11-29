@@ -2,7 +2,7 @@ package com.prosabdev.fluidmusic.roomdatabase.repositories.explore
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import com.prosabdev.fluidmusic.models.explore.FolderItemView
+import com.prosabdev.fluidmusic.models.view.FolderItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.roomdatabase.dao.explore.FolderItemDao
 import kotlinx.coroutines.Dispatchers
@@ -12,14 +12,14 @@ class FolderItemRepository(ctx : Context) {
 
     private var mDao: FolderItemDao? = AppDatabase.getDatabase(ctx).folderItemDao()
 
-    suspend fun getAtName(name : String) : FolderItemView? {
+    suspend fun getAtName(name : String) : FolderItem? {
         return withContext(Dispatchers.IO){
             mDao?.getAtName(name)
         }
     }
-    suspend fun getAll(order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<FolderItemView>>? {
+    suspend fun getAll(order_by: String) : LiveData<List<FolderItem>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAll(order_name, asc_desc_mode)
+            mDao?.getAll(order_by)
         }
     }
 }

@@ -11,7 +11,7 @@ import kotlin.math.floor
 import kotlin.math.sin
 
 
-abstract class MathComputaionsUtils {
+abstract class MathComputationsUtils {
     companion object {
 
         fun fadeWithPageOffset(vew : View?, positionOffset: Float){
@@ -28,6 +28,18 @@ abstract class MathComputaionsUtils {
                 val displayMetrics = DisplayMetrics()
                 activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
                 displayMetrics.widthPixels
+            }
+        }
+        fun getScreenHeight(activity: Activity): Int {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val windowMetrics: WindowMetrics = activity.windowManager.currentWindowMetrics
+                val insets: Insets = windowMetrics.windowInsets
+                    .getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())
+                windowMetrics.bounds.height() - insets.top - insets.bottom
+            } else {
+                val displayMetrics = DisplayMetrics()
+                activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
+                displayMetrics.heightPixels
             }
         }
 

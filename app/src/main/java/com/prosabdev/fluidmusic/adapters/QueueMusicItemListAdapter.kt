@@ -18,7 +18,7 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.callbacks.QueueMusicItemCallback
 import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapter
 import com.prosabdev.fluidmusic.databinding.ItemQueueMusicBinding
-import com.prosabdev.fluidmusic.models.explore.SongItem
+import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.FormattersUtils
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
@@ -30,7 +30,7 @@ class QueueMusicItemListAdapter(
     private val mContext: Context,
     private val mOnItemClickListener: OnItemClickListener,
     private val mOnTouchListener: OnTouchListener,
-) : SelectablePlayingItemListAdapter<QueueMusicItemListAdapter.QueueMusicItemViewHolder>(diffCallback),
+) : SelectablePlayingItemListAdapter<QueueMusicItemListAdapter.QueueMusicItemHolder>(SongItem.diffCallback as DiffUtil.ItemCallback<Any>),
     QueueMusicItemCallback.ItemTouchHelperContract
 {
 
@@ -53,20 +53,20 @@ class QueueMusicItemListAdapter(
         selectablePlayingSetCurrentPlayingSong(position)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QueueMusicItemViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QueueMusicItemHolder {
         val tempItemQueueMusicBinding: ItemQueueMusicBinding = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context),
-            R.layout.item_player_card_view, parent, false
+            R.layout.item_queue_music, parent, false
         )
-        return QueueMusicItemViewHolder(
+        return QueueMusicItemHolder(
             tempItemQueueMusicBinding
         )
     }
-    override fun onBindViewHolder(holder: QueueMusicItemViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: QueueMusicItemHolder, position: Int) {
         holder.bindListener(holder, position, mOnItemClickListener, mOnTouchListener)
         holder.updateAllUI(mContext, getItem(position) as SongItem, isPlaying(position))
     }
-    override fun onBindViewHolder(holder: QueueMusicItemViewHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(holder: QueueMusicItemHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.isNotEmpty()) {
             for (payload in payloads) {
                 when (payload) {
@@ -88,7 +88,7 @@ class QueueMusicItemListAdapter(
         }
     }
 
-    override fun onViewRecycled(holder: QueueMusicItemViewHolder) {
+    override fun onViewRecycled(holder: QueueMusicItemHolder) {
         super.onViewRecycled(holder)
         holder.recycleItem()
     }
@@ -106,14 +106,14 @@ class QueueMusicItemListAdapter(
         notifyItemMoved(mFromPosition, mToPosition)
     }
 
-    override fun onRowSelected(myViewHolder: QueueMusicItemViewHolder?) {
+    override fun onRowSelected(myViewHolder: QueueMusicItemHolder?) {
         myViewHolder?.updateItemTouchHelper(true)
     }
-    override fun onRowClear(myViewHolder: QueueMusicItemViewHolder?) {
+    override fun onRowClear(myViewHolder: QueueMusicItemHolder?) {
         myViewHolder?.updateItemTouchHelper(false)
     }
 
-    class QueueMusicItemViewHolder(private val mItemQueueMusicBinding: ItemQueueMusicBinding) : RecyclerView.ViewHolder(mItemQueueMusicBinding.root) {
+    class QueueMusicItemHolder(private val mItemQueueMusicBinding: ItemQueueMusicBinding) : RecyclerView.ViewHolder(mItemQueueMusicBinding.root) {
         fun updateAllUI(context: Context, songItem: SongItem, isPlaying: Boolean){
             updateIsPlayingStateUI(isPlaying)
             updateCovertArtAndTitleUI(context, songItem)
@@ -126,9 +126,12 @@ class QueueMusicItemListAdapter(
 //            if(selected) CustomAnimators.crossScaleIn(mItemSongBinding.songItemContaineras View, true) else CustomAnimators.crossScaleOut(mItemSongBinding.songItemContaineras View, true)
         }
         fun updateCovertArtAndTitleUI(context: Context, songItem: SongItem) {
-            mItemQueueMusicBinding.textTitle.text = if(songItem.title != null && songItem.title!!.isNotEmpty()) songItem.title else songItem.fileName
-            mItemQueueMusicBinding.textSubtitle.text = if(songItem.artist!!.isNotEmpty()) songItem.artist else context.getString(
-                R.string.unknown_artist)
+            var tempTitle : String = songItem.title ?: ""
+            var tempArtist : String = songItem.artist ?: ""
+            if(tempTitle.isEmpty()) tempTitle = songItem.fileName ?: context.getString(R.string.unknown_title)
+            if(tempArtist.isEmpty()) tempArtist = context.getString(R.string.unknown_artist)
+            mItemQueueMusicBinding.textTitle.text = tempTitle
+            mItemQueueMusicBinding.textSubtitle.text = tempArtist
             mItemQueueMusicBinding.textDetails.text = context.getString(
                 R.string.item_song_card_text_details,
                 FormattersUtils.formatSongDurationToString(songItem.duration),
@@ -137,7 +140,14 @@ class QueueMusicItemListAdapter(
 
             MainScope().launch {
                 val tempUri: Uri? = Uri.parse(songItem.uri)
-                ImageLoadersUtils.loadCovertArtFromSongUri(context, mItemQueueMusicBinding.imageviewCoverArt, tempUri, 100)
+                ImageLoadersUtils.loadCovertArtFromSongUri(
+                    context,
+                    mItemQueueMusicBinding.imageviewCoverArt,
+                    tempUri,
+                    100,
+                    50,
+                    true
+                )
             }
         }
         fun updateIsPlayingStateUI(playing: Boolean) {
@@ -168,7 +178,7 @@ class QueueMusicItemListAdapter(
             }
         }
         fun bindListener(
-            holder: QueueMusicItemViewHolder,
+            holder: QueueMusicItemHolder,
             position: Int,
             mOnItemClickListener: OnItemClickListener,
             mOnTouchListener: OnTouchListener
@@ -189,16 +199,5 @@ class QueueMusicItemListAdapter(
 
     companion object {
         const val PAYLOAD_IS_COVERT_ART_TEXT = "PAYLOAD_IS_COVERT_ART_TEXT"
-
-        val diffCallback = object : DiffUtil.ItemCallback<Any>() {
-            override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-                return (oldItem as SongItem).id == (newItem as SongItem).id
-            }
-
-            @SuppressLint("DiffUtilEquals")
-            override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
-                return (oldItem as SongItem) == (newItem as SongItem)
-            }
-        }
     }
 }

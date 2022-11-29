@@ -23,9 +23,9 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraint_container_selection_top"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="?attr/actionBarSize"
             app:layout_constraintTop_toTopOf="parent"
-            android:padding="@dimen/main_medium_margin"
+            android:padding="@dimen/main_margin"
             android:outlineProvider="paddedBounds">
 
             <com.google.android.material.textview.MaterialTextView
@@ -49,7 +49,7 @@
                 style="?attr/textAppearanceTitleMedium"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:gravity="center"
+                android:gravity="end"
                 android:layout_marginStart="@dimen/main_medium_margin"
                 android:text="5/192"
                 app:layout_constraintStart_toEndOf="@+id/text_selected_title"

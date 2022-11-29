@@ -10,20 +10,40 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="@dimen/main_margin"
         >
-        <com.google.android.material.textview.MaterialTextView
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linear_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/MaterialAlertDialog.Material3.Title.Text.CenterStacked"
-            android:text="More settings"
-            />
+            android:layout_height="?actionBarSize"
+            app:layout_constraintTop_toTopOf="parent"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="@dimen/main_margin"
+            android:gravity="center_vertical"
+            >
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/settings"
+                app:srcCompat="@drawable/settings"
+                />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text_organize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:text="More settings"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/main_small_margin"
+                />
+        </androidx.appcompat.widget.LinearLayoutCompat>
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:layout_marginBottom="@dimen/main_margin"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginHorizontal="@dimen/main_margin"
+            >
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_remove_all"
                 android:layout_width="wrap_content"
@@ -33,8 +53,6 @@
                 app:icon="@drawable/delete"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:layout_gravity="center"
-                android:gravity="center"
                 />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.appcompat.widget.LinearLayoutCompat>

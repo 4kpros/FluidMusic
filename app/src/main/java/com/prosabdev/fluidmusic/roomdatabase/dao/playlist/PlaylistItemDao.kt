@@ -27,7 +27,7 @@ interface PlaylistItemDao {
     @Query("DELETE FROM PlaylistItem WHERE id = :id")
     fun deleteAtId(id: Long)
 
-    @Query("SELECT MAX(id) FROM PlaylistItem WHERE name LIKE '%' || :playlistName || '%'")
+    @Query("SELECT MAX(id) FROM PlaylistItem WHERE name GLOB '*' || :playlistName || '*' ")
     fun getMaxIdLikeName(playlistName: String): Long
 
     @Query("SELECT * FROM PlaylistItem WHERE id = :id LIMIT 1")
@@ -36,6 +36,11 @@ interface PlaylistItemDao {
     @Query("SELECT * FROM PlaylistItem WHERE name = :name LIMIT 1")
     fun getWithName(name: String): PlaylistItem?
 
-    @Query("SELECT * FROM PlaylistItem ORDER BY :order_name, :asc_desc_mode")
-    fun getAll(order_name: String = "id", asc_desc_mode: String = "ASC"): LiveData<List<PlaylistItem>>
+    @Query("SELECT * FROM PlaylistItem " +
+            "ORDER BY " +
+            "CASE :order_by WHEN 'name' THEN PlaylistItem.name END ASC," +
+            "CASE :order_by WHEN 'addedDate' THEN PlaylistItem.addedDate END ASC," +
+            "CASE :order_by WHEN 'id' THEN PlaylistItem.id END ASC"
+    )
+    fun getAll(order_by: String): LiveData<List<PlaylistItem>>
 }

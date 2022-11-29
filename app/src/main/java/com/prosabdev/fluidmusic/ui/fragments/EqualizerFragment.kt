@@ -4,19 +4,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentEqualizerBinding
+import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class EqualizerFragment : Fragment() {
+@BuildCompat.PrereleaseSdkCheck class EqualizerFragment : Fragment() {
 
     private lateinit var mFragmentEqualizerBinding: FragmentEqualizerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        enterTransition = MaterialFadeThrough()
+        exitTransition = MaterialFadeThrough()
+
         arguments?.let {
         }
     }
@@ -44,7 +51,9 @@ class EqualizerFragment : Fragment() {
     }
 
     private fun checkInteractions() {
-
+        mFragmentEqualizerBinding.topAppBar.setNavigationOnClickListener {
+            activity?.onBackPressedDispatcher?.onBackPressed()
+        }
     }
 
     private fun observeLiveData() {
@@ -55,6 +64,8 @@ class EqualizerFragment : Fragment() {
     }
 
     private fun initViews() {
+        ViewInsetModifiersUtils.updateTopViewInsets(mFragmentEqualizerBinding.coordinatorLayout)
+        ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentEqualizerBinding.constraintContainer)
     }
 
     companion object {

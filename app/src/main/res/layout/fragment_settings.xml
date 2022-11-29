@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
     </data>
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/coordinator_settings_activity"
+        android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.activities.SettingsActivity">
+        tools:context=".ui.fragments.settings.SettingsFragment"
+        style="@style/DefaultBackground"
+        >
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
@@ -21,7 +22,6 @@
                 android:id="@+id/top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_scrollFlags="scroll|enterAlways"
                 app:title="Settings"
                 app:menu="@menu/main_top_app_bar"
                 app:navigationIcon="@drawable/arrow_back"
@@ -57,6 +57,7 @@
                         android:backgroundTint="@color/transparent"
                         android:clickable="true"
                         android:focusable="true"
+                        android:transitionName="shared_content_language"
                         >
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
@@ -106,6 +107,7 @@
                         android:backgroundTint="@color/transparent"
                         android:clickable="true"
                         android:focusable="true"
+                        android:transitionName="shared_content_interface"
                         >
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
@@ -155,6 +157,7 @@
                         android:backgroundTint="@color/transparent"
                         android:clickable="true"
                         android:focusable="true"
+                        android:transitionName="shared_content_now_playing"
                         >
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
@@ -204,6 +207,7 @@
                         android:backgroundTint="@color/transparent"
                         android:clickable="true"
                         android:focusable="true"
+                        android:transitionName="shared_content_audio"
                         >
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
@@ -253,6 +257,7 @@
                         android:backgroundTint="@color/transparent"
                         android:clickable="true"
                         android:focusable="true"
+                        android:transitionName="shared_content_library_scanner"
                         >
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
@@ -302,6 +307,7 @@
                         android:backgroundTint="@color/transparent"
                         android:clickable="true"
                         android:focusable="true"
+                        android:transitionName="shared_content_lyrics"
                         >
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
@@ -351,6 +357,7 @@
                         android:backgroundTint="@color/transparent"
                         android:clickable="true"
                         android:focusable="true"
+                        android:transitionName="shared_content_headset"
                         >
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
@@ -400,6 +407,7 @@
                         android:backgroundTint="@color/transparent"
                         android:clickable="true"
                         android:focusable="true"
+                        android:transitionName="shared_content_notifications"
                         >
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
@@ -449,6 +457,7 @@
                         android:backgroundTint="@color/transparent"
                         android:clickable="true"
                         android:focusable="true"
+                        android:transitionName="shared_content_about"
                         >
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
@@ -489,13 +498,6 @@
                         </androidx.appcompat.widget.LinearLayoutCompat>
                     </com.google.android.material.card.MaterialCardView>
                 </androidx.appcompat.widget.LinearLayoutCompat>
-                <View
-                    android:id="@+id/empty_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="?actionBarSize"
-                    android:visibility="visible"
-                    app:layout_constraintTop_toBottomOf="@+id/linear_items_container"
-                    />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

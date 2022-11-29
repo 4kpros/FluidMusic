@@ -34,6 +34,19 @@
         <item name="android:navigationBarColor">@color/semiWhite</item>
 
         <item name="android:windowActionBarOverlay">false</item>
+        <item  name="android:windowActivityTransitions">true</item>
+        <item name="android:windowContentTransitions">true</item>
+    </style>
+
+    <style name="CustomScrollBarStyle">
+        <item name="android:smoothScrollbar">true</item>
+        <item name="android:scrollbarAlwaysDrawVerticalTrack">false</item>
+        <item name="android:scrollbarStyle">insideOverlay</item>
+        <item name="android:scrollbars">vertical</item>
+        <item name="android:fadeScrollbars">true</item>
+        <item name="android:verticalScrollbarPosition">defaultPosition</item>
+        <item name="android:scrollbarThumbVertical">@drawable/custom_scroll_view_thumb</item>
+        <item name="android:scrollbarTrackVertical">@drawable/custom_scroll_view_track</item>
     </style>
 
     <!-- Background -->
@@ -46,14 +59,5 @@
     <style name="PlayerForeground">
         <item name="android:background">@color/white</item>
         <item name="android:alpha">0.4</item>
-    </style>
-
-    <style name="CustomBottomSheetDialogTheme" parent="Widget.Material3.BottomSheet">
-        <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
-    </style>
-
-    <style name="CustomBottomSheetStyle" parent="Widget.Material3.BottomSheet">
-        <item name="android:background">@android:color/transparent</item>
-        <item name="android:layout_height">match_parent</item>
     </style>
 </resources>

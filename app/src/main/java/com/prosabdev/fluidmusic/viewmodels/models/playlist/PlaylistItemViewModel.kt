@@ -30,5 +30,5 @@ class PlaylistItemViewModel(ctx : Context) : ViewModel() {
 
     suspend fun getWithName(name: String) : PlaylistItem? = repository?.getWithName(name)
 
-    suspend fun getAll(order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<PlaylistItem>>? = repository?.getAll(order_name, asc_desc_mode)
+    suspend fun getAll(order_by: String = "id") : LiveData<List<PlaylistItem>>? = repository?.getAll(order_by)
 }

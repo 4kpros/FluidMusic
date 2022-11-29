@@ -38,9 +38,9 @@ class QueueMusicItemRepository(ctx : Context) {
             mDao?.getAtId(id)
         }
     }
-    suspend fun getAll(order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<QueueMusicItem>>? {
+    suspend fun getAll(order_by: String) : LiveData<List<QueueMusicItem>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAll(order_name, asc_desc_mode)
+            mDao?.getAll(order_by)
         }
     }
 }

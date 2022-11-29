@@ -1,7 +1,6 @@
 package com.prosabdev.fluidmusic.viewmodels.models.playlist
 
 import android.content.Context
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
@@ -31,7 +30,7 @@ class PlaylistSongItemViewModel(ctx : Context) : ViewModel() {
     suspend fun getAtId(id: Long) : PlaylistSongItem? {
         return repository?.getAtId(id)
     }
-    suspend fun getAll(order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<PlaylistSongItem>>? {
-        return repository?.getAll(order_name, asc_desc_mode)
+    suspend fun getAll(order_by: String = "id") : LiveData<List<PlaylistSongItem>>? {
+        return repository?.getAll(order_by)
     }
 }

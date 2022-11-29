@@ -24,7 +24,6 @@ import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.FolderUriTreeAdapter
 import com.prosabdev.fluidmusic.databinding.ActivityStorageAccessSettingsBinding
 import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.StorageAccessFullBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.DeviceInfoAndParserUtils
 import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
@@ -87,7 +86,7 @@ import kotlinx.coroutines.withContext
 
     private suspend fun alertUriChangedBeforeExit() {
         withContext(Dispatchers.IO){
-            finish()
+            supportFinishAfterTransition()
         }
     }
 
@@ -137,7 +136,7 @@ import kotlinx.coroutines.withContext
     }
 
     private fun showBottomSheetDialog() {
-        StorageAccessFullBottomSheetDialog(mStorageAccessActivityViewModel).show(supportFragmentManager, StorageAccessFullBottomSheetDialog.TAG)
+//        StorageAccessFullBottomSheetDialog(mStorageAccessActivityViewModel).show(supportFragmentManager, StorageAccessFullBottomSheetDialog.TAG)
     }
 
     private fun requestNewFolderFromSAF() {

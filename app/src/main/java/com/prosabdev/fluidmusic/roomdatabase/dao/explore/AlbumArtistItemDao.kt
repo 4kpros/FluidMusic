@@ -3,13 +3,20 @@ package com.prosabdev.fluidmusic.roomdatabase.dao.explore
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
-import com.prosabdev.fluidmusic.models.explore.AlbumArtistItemView
+import com.prosabdev.fluidmusic.models.view.AlbumArtistItem
 
 @Dao
 interface AlbumArtistItemDao {
-    @Query("SELECT * FROM AlbumArtistItemView WHERE albumArtist = :name LIMIT 1")
-    fun getAtName(name : String): AlbumArtistItemView?
+    @Query("SELECT * FROM AlbumArtistItem WHERE name = :name LIMIT 1")
+    fun getAtName(name : String): AlbumArtistItem?
 
-    @Query("SELECT * FROM AlbumArtistItemView ORDER BY :order_name, :asc_desc_mode")
-    fun getAll(order_name: String = "albumArtist", asc_desc_mode: String = "ASC"): LiveData<List<AlbumArtistItemView>>?
+    @Query(
+        "SELECT * FROM AlbumArtistItem " +
+            "ORDER BY " +
+                "CASE :order_by WHEN 'name' THEN AlbumArtistItem.name END ASC," +
+                "CASE :order_by WHEN 'numberTracks' THEN AlbumArtistItem.numberTracks END ASC," +
+                "CASE :order_by WHEN 'totalDuration' THEN AlbumArtistItem.totalDuration END ASC," +
+                "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN AlbumArtistItem.lastAddedDateToLibrary END ASC"
+    )
+    fun getAll(order_by: String): LiveData<List<AlbumArtistItem>>?
 }

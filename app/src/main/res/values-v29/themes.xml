@@ -37,5 +37,8 @@
         <item name="android:windowActionBarOverlay">false</item>
         <!-- Since the nav bar is white, we will use dark icons -->
         <item name="android:windowLightNavigationBar">false</item>
+
+        <item  name="android:windowActivityTransitions">true</item>
+        <item name="android:windowContentTransitions">true</item>
     </style>
 </resources>

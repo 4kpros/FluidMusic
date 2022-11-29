@@ -30,6 +30,12 @@ interface PlaylistSongItemDao {
     @Query("SELECT * FROM PlaylistSongItem WHERE id = :id LIMIT 1")
     fun getAtId(id: Long): PlaylistSongItem?
 
-    @Query("SELECT * FROM PlaylistSongItem ORDER BY :order_name, :asc_desc_mode")
-    fun getAll(order_name: String = "id", asc_desc_mode: String = "ASC"): LiveData<List<PlaylistSongItem>>
+    @Query("SELECT * FROM PlaylistSongItem " +
+            "ORDER BY " +
+            "CASE :order_by WHEN 'songId' THEN PlaylistSongItem.songId END ASC," +
+            "CASE :order_by WHEN 'playlistId' THEN PlaylistSongItem.playlistId END ASC," +
+            "CASE :order_by WHEN 'addedDate' THEN PlaylistSongItem.addedDate END ASC," +
+            "CASE :order_by WHEN 'id' THEN PlaylistSongItem.id END ASC"
+    )
+    fun getAll(order_by: String): LiveData<List<PlaylistSongItem>>
 }

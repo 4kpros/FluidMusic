@@ -3,7 +3,7 @@ package com.prosabdev.fluidmusic.viewmodels.models.explore
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.prosabdev.fluidmusic.models.explore.SongItem
+import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.repositories.explore.SongItemRepository
 
 
@@ -33,13 +33,16 @@ class SongItemViewModel(ctx : Context) : ViewModel() {
     suspend fun getAtUri(uri: String) : SongItem? {
         return repository?.getAtUri(uri)
     }
-    suspend fun getAll(order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<SongItem>>? {
-        return repository?.getAll(order_name, asc_desc_mode)
+    suspend fun getAllLimit(order_by: String = "title", limit: Int) : LiveData<List<SongItem>>? {
+        return repository?.getAllLimit(order_by, limit)
     }
-    suspend fun getAllWhereEqual(whereColumn: String, columnValue: String?, order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<SongItem>>? {
-        return repository?.getAllWhereEqual(whereColumn, columnValue, order_name, asc_desc_mode)
+    suspend fun getAll(order_by: String = "title") : LiveData<List<SongItem>>? {
+        return repository?.getAll(order_by)
     }
-    suspend fun getAllWhereLike(whereColumn: String, columnValue: String?, order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<SongItem>>? {
-        return repository?.getAllWhereLike(whereColumn, columnValue, order_name, asc_desc_mode)
+    suspend fun getAllWhereEqual(whereColumn: String, columnValue: String?, order_by: String = "title") : LiveData<List<SongItem>>? {
+        return repository?.getAllWhereEqual(whereColumn, columnValue, order_by)
+    }
+    suspend fun getAllWhereLike(whereColumn: String, columnValue: String?, order_by: String = "title") : LiveData<List<SongItem>>? {
+        return repository?.getAllWhereLike(whereColumn, columnValue, order_by)
     }
 }

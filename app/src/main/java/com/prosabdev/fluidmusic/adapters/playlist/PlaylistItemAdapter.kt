@@ -8,8 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemPlaylistBinding
 import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
-import com.prosabdev.fluidmusic.models.playlist.PlaylistItemView
-import com.prosabdev.fluidmusic.utils.FormattersUtils
 
 class PlaylistItemAdapter(
     private val mListener: OnItemClickListener

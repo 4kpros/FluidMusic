@@ -30,6 +30,11 @@ interface QueueMusicItemDao {
     @Query("SELECT * FROM QueueMusicItem WHERE id = :id LIMIT 1")
     fun getAtId(id: Long): QueueMusicItem?
 
-    @Query("SELECT * FROM QueueMusicItem ORDER BY :order_name, :asc_desc_mode")
-    fun getAll(order_name: String = "id", asc_desc_mode: String = "ASC"): LiveData<List<QueueMusicItem>>?
+    @Query("SELECT * FROM QueueMusicItem " +
+            "ORDER BY " +
+            "CASE :order_by WHEN 'uriTree' THEN QueueMusicItem.songId END ASC," +
+            "CASE :order_by WHEN 'path' THEN QueueMusicItem.addedDate END ASC," +
+            "CASE :order_by WHEN 'id' THEN QueueMusicItem.id END ASC"
+    )
+    fun getAll(order_by: String): LiveData<List<QueueMusicItem>>?
 }

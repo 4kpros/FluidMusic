@@ -1,7 +1,6 @@
 package com.prosabdev.fluidmusic
 
 import android.content.ComponentName
-import android.content.Intent
 import android.media.AudioManager
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
@@ -10,6 +9,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
@@ -17,17 +17,29 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
 import com.google.android.material.color.DynamicColors
 import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
+import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.sharedpreference.SleepTimerSP
 import com.prosabdev.fluidmusic.service.MediaPlaybackService
-import com.prosabdev.fluidmusic.ui.activities.SettingsActivity
-import com.prosabdev.fluidmusic.ui.fragments.*
+import com.prosabdev.fluidmusic.ui.fragments.MainFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.utils.SharedPreferenceManagerUtils
+import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AllSongsFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
+import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @BuildCompat.PrereleaseSdkCheck class MainActivity : AppCompatActivity(){
 
     private lateinit var mActivityMainBinding: ActivityMainBinding
+
+    private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by viewModels()
+    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by viewModels()
+    private lateinit var mSongItemViewModel: SongItemViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,101 +49,128 @@ import kotlinx.coroutines.launch
 
         mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        setupAudioSettings()
-        initViews()
-
         MainScope().launch {
+            initViews()
+            loadLastPlayerSession()
+            preloadSongs()
             attachFragments()
-            checkInteractions()
+            setupAudioSettings()
             createMediaBrowserService()
         }
     }
 
+    private fun preloadSongs() {
+        val tempSongId : Long = mPlayerFragmentViewModel.getCurrentPlayingSong().value?.id ?: -1
+        mAllSongsFragmentViewModel.requestSongAtId(mSongItemViewModel, tempSongId)
+    }
+
+    override fun onDestroy() {
+        saveCurrentPlayingSession()
+        super.onDestroy()
+    }
+
+    private fun saveCurrentPlayingSession() {
+        SharedPreferenceManagerUtils.Player.saveCurrentPlayingSong(
+            applicationContext,
+            mPlayerFragmentViewModel.getCurrentPlayingSong().value
+        )
+        SharedPreferenceManagerUtils.Player.savePlayingProgressValue(
+            applicationContext,
+            mPlayerFragmentViewModel.getPlayingProgressValue().value
+        )
+        SharedPreferenceManagerUtils.Player.saveQueueListSource(
+            applicationContext,
+            mPlayerFragmentViewModel.getQueueListSource().value
+        )
+        SharedPreferenceManagerUtils.Player.saveQueueListSourceValue(
+            applicationContext,
+            mPlayerFragmentViewModel.getSourceOfQueueListValue().value
+        )
+        SharedPreferenceManagerUtils.Player.saveRepeat(
+            applicationContext,
+            mPlayerFragmentViewModel.getRepeat().value
+        )
+        SharedPreferenceManagerUtils.Player.saveShuffle(
+            applicationContext,
+            mPlayerFragmentViewModel.getShuffle().value
+        )
+        SharedPreferenceManagerUtils.Player.saveSleepTimer(
+            applicationContext,
+            mPlayerFragmentViewModel.getSleepTimer().value
+        )
+    }
+    private fun createMediaBrowserService() {
+        mMediaBrowser = MediaBrowserCompat(
+            applicationContext,
+            ComponentName(applicationContext, MediaPlaybackService::class.java),
+            mConnectionCallbacks,
+            null
+        )
+    }
+    private fun setupAudioSettings() {
+        volumeControlStream = AudioManager.STREAM_MUSIC
+    }
+    private suspend fun loadLastPlayerSession() {
+        withContext(Dispatchers.IO){
+            val songItem: SongItem? = SharedPreferenceManagerUtils.Player.loadCurrentPlayingSong(applicationContext)
+            val progressValue: Long = SharedPreferenceManagerUtils.Player.loadPlayingProgressValue(applicationContext)
+            val queueListSource: String? = SharedPreferenceManagerUtils.Player.loadQueueListSource(applicationContext)
+            val queueListSourceValue: String? = SharedPreferenceManagerUtils.Player.loadQueueListSourceValue(applicationContext)
+            val repeat: Int = SharedPreferenceManagerUtils.Player.loadRepeat(applicationContext)
+            val shuffle: Int = SharedPreferenceManagerUtils.Player.loadShuffle(applicationContext)
+            val sleepTimer: SleepTimerSP? = SharedPreferenceManagerUtils.Player.loadSleepTimer(applicationContext)
+
+            if(songItem?.uri == null){
+                tryToGetFirstSong()
+            }else{
+                val tempSongItem : SongItem? =
+                    mSongItemViewModel.getAtUri(songItem.uri ?: "")
+                if(tempSongItem?.uri == null){
+                    tryToGetFirstSong()
+                }else{
+                    mPlayerFragmentViewModel.setCurrentPlayingSong(tempSongItem)
+                    mPlayerFragmentViewModel.setPlayingProgressValue(progressValue)
+                    mPlayerFragmentViewModel.setIsPlaying(false)
+                    mPlayerFragmentViewModel.setRepeat(repeat)
+                    mPlayerFragmentViewModel.setShuffle(shuffle)
+                    mPlayerFragmentViewModel.setQueueListSource(queueListSource ?: ConstantValues.EXPLORE_ALL_SONGS)
+                    mPlayerFragmentViewModel.setQueueListSourceValue(queueListSourceValue)
+                    mPlayerFragmentViewModel.setSleepTimer(sleepTimer)
+                    mPlayerFragmentViewModel.setSleepTimerStateStarted(false)
+                }
+            }
+        }
+    }
+    private suspend fun tryToGetFirstSong() {
+        withContext(Dispatchers.IO){
+            mSongItemViewModel.getFirstSong().apply {
+                SharedPreferenceManagerUtils.Player.saveQueueListSource(applicationContext, ConstantValues.EXPLORE_ALL_SONGS)
+                SharedPreferenceManagerUtils.Player.saveQueueListSourceValue(applicationContext, "")
+                SharedPreferenceManagerUtils.Player.saveRepeat(applicationContext, PlaybackStateCompat.REPEAT_MODE_NONE)
+                SharedPreferenceManagerUtils.Player.saveShuffle(applicationContext, PlaybackStateCompat.SHUFFLE_MODE_NONE)
+                SharedPreferenceManagerUtils.Player.saveSleepTimer(applicationContext, null)
+                SharedPreferenceManagerUtils.Player.savePlayingProgressValue(applicationContext, 0)
+
+                if(this@apply?.uri == null){
+                    mPlayerFragmentViewModel.setCurrentPlayingSong(null)
+                    SharedPreferenceManagerUtils.Player.saveCurrentPlayingSong(applicationContext, null)
+                }else{
+                    mPlayerFragmentViewModel.setCurrentPlayingSong(this@apply)
+                    SharedPreferenceManagerUtils.Player.saveCurrentPlayingSong(applicationContext, this@apply)
+                }
+            }
+        }
+    }
     private fun attachFragments() {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             replace(R.id.main_activity_fragment_container, MainFragment.newInstance())
         }
     }
-
-    private fun createMediaBrowserService() {
-        mMediaBrowser = MediaBrowserCompat(
-            applicationContext,
-            ComponentName(applicationContext, MediaPlaybackService::class.java),
-            mConnectionCallbacks,
-            null // optional Bundle
-        )
-    }
-
-    private fun checkInteractions() {
-        mActivityMainBinding.navigationView.setNavigationItemSelectedListener { menuItem ->
-            if(mActivityMainBinding.navigationView.checkedItem?.itemId != menuItem.itemId){
-                when (menuItem.itemId) {
-                    R.id.music_library -> {
-                        mActivityMainBinding.drawerLayout.close()
-                        supportFragmentManager.commit {
-                            setReorderingAllowed(true)
-                            replace(R.id.main_fragment_container, MusicLibraryFragment.newInstance())
-                        }
-                    }
-                    R.id.folders_hierarchy -> {
-                        mActivityMainBinding.drawerLayout.close()
-                        supportFragmentManager.commit {
-                            setReorderingAllowed(true)
-                            replace(R.id.main_fragment_container, FoldersHierarchyFragment.newInstance())
-                        }
-                    }
-                    R.id.playlists -> {
-                        mActivityMainBinding.drawerLayout.close()
-                        supportFragmentManager.commit {
-                            setReorderingAllowed(true)
-                            replace(R.id.main_fragment_container, PlaylistsFragment.newInstance())
-                        }
-                    }
-                    R.id.streams -> {
-                        mActivityMainBinding.drawerLayout.close()
-                        supportFragmentManager.commit {
-                            setReorderingAllowed(true)
-                            replace(R.id.main_fragment_container, StreamsFragment.newInstance())
-                        }
-                    }
-                }
-            }
-            when (menuItem.itemId) {
-                R.id.settings -> {
-                    startActivity(Intent(this.applicationContext, SettingsActivity::class.java).apply {})
-                }
-            }
-            menuItem.isChecked = true
-
-            true
-        }
-    }
-    private fun updateDrawerMenu() {
-        when (supportFragmentManager.findFragmentById(R.id.main_fragment_container)) {
-            is MusicLibraryFragment -> {
-                mActivityMainBinding.navigationView.setCheckedItem(R.id.music_library)
-            }
-            is FoldersHierarchyFragment -> {
-                mActivityMainBinding.navigationView.setCheckedItem(R.id.folders_hierarchy)
-            }
-            is PlaylistsFragment -> {
-                mActivityMainBinding.navigationView.setCheckedItem(R.id.playlists)
-            }
-            is StreamsFragment -> {
-                mActivityMainBinding.navigationView.setCheckedItem(R.id.streams)
-            }
-        }
-    }
-
-
-    private fun setupAudioSettings() {
-        volumeControlStream = AudioManager.STREAM_MUSIC
-    }
-
     private fun initViews(){
-        mActivityMainBinding.navigationView.setCheckedItem(R.id.music_library)
+        mSongItemViewModel = ModelsViewModelFactory(applicationContext).create(SongItemViewModel::class.java)
     }
+
 
     private var mMediaBrowser: MediaBrowserCompat? = null
     private var mConnectionCallbacks: ConnectionCallback = object : ConnectionCallback(){
@@ -182,7 +221,6 @@ import kotlinx.coroutines.launch
     public override fun onResume() {
         super.onResume()
         setupAudioSettings()
-        updateDrawerMenu()
     }
 
     public override fun onStop() {

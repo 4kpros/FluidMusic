@@ -1,8 +1,8 @@
 package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 
 import android.content.Context
-import android.content.res.Resources
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,23 +10,24 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.QueueMusicItemListAdapter
 import com.prosabdev.fluidmusic.databinding.BottomSheetQueueMusicBinding
-import com.prosabdev.fluidmusic.models.explore.SongItem
-import com.prosabdev.fluidmusic.models.sharedpreference.CurrentPlayingSongSP
+import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.utils.MathComputationsUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 
-class QueueMusicBottomSheetDialog(private val mPlayerFragmentViewModel: PlayerFragmentViewModel) : GenericFullBottomSheetDialogFragment() {
+class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
 
     private lateinit var mBottomSheetQueueMusicBinding: BottomSheetQueueMusicBinding
 
-    private var mBottomSheetBehavior: BottomSheetBehavior<View?>? = null
+    private lateinit var mPlayerFragmentViewModel: PlayerFragmentViewModel
+
     private var mQueueMusicItemAdapter :QueueMusicItemListAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
+
+    private var mSongList: List<SongItem>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,24 +38,19 @@ class QueueMusicBottomSheetDialog(private val mPlayerFragmentViewModel: PlayerFr
         val view = mBottomSheetQueueMusicBinding.root
 
         initViews()
-        MainScope().launch {
-            setupRecyclerView()
-            checkInteractions()
-        }
-
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupRecyclerView()
+        checkInteractions()
+        observeLiveData()
     }
 
-    fun updateSongList(songList : ArrayList<SongItem>){
-        mQueueMusicItemAdapter?.submitList(songList as List<Any>)
-    }
-
-    fun setPlayingPosition(position : Int){
-        mQueueMusicItemAdapter?.setCurrentPlayingSong(position)
+    private fun observeLiveData() {
+        //
     }
 
     private fun checkInteractions() {
@@ -64,50 +60,50 @@ class QueueMusicBottomSheetDialog(private val mPlayerFragmentViewModel: PlayerFr
     }
 
     private fun setupRecyclerView() {
-        val ctx : Context = context ?: return
-
-        mQueueMusicItemAdapter = QueueMusicItemListAdapter(
-            ctx,
-            object : QueueMusicItemListAdapter.OnItemClickListener{
-                override fun onSongItemClicked(position: Int) {
-                    mPlayerFragmentViewModel.setIsPlaying(true)
-                    val tempSong = mQueueMusicItemAdapter?.currentList?.get(position) as SongItem
-                    val currentPlayingSongSP : CurrentPlayingSongSP = CurrentPlayingSongSP().apply {
-                        this.id = tempSong.id
-                        this.position = position.toLong()
-                        this.uri = tempSong.uri
-                        this.uriTreeId = tempSong.uriTreeId
-                        this.title = tempSong.title
-                        this.artist = tempSong.artist
-                        this.duration = tempSong.duration
-                        this.fileName = tempSong.fileName
-                        this.typeMime = tempSong.typeMime
-                        this.currentSeekDuration = 0
+        context?.let { ctx ->
+            mQueueMusicItemAdapter = QueueMusicItemListAdapter(
+                ctx,
+                object : QueueMusicItemListAdapter.OnItemClickListener{
+                    override fun onSongItemClicked(position: Int) {
                     }
-                    mPlayerFragmentViewModel.setCurrentSong(currentPlayingSongSP)
+                },
+                object : QueueMusicItemListAdapter.OnTouchListener{
+                    override fun onItemMovedTo(position: Int) {
+                        //
+                    }
+                    override fun requestDrag(viewHolder: RecyclerView.ViewHolder?) {
+                        //
+                    }
                 }
-            },
-            object : QueueMusicItemListAdapter.OnTouchListener{
-                override fun onItemMovedTo(position: Int) {
-                    //
-                }
+            )
+            //Add Layout manager
+            mLayoutManager = GridLayoutManager(ctx, 1, GridLayoutManager.VERTICAL, false)
+            mBottomSheetQueueMusicBinding.recyclerView.adapter = mQueueMusicItemAdapter
+            mBottomSheetQueueMusicBinding.recyclerView.layoutManager = mLayoutManager
+            mQueueMusicItemAdapter?.submitList(mSongList)
 
-                override fun requestDrag(viewHolder: RecyclerView.ViewHolder?) {
-                    //
-                }
-            }
-        )
-        //Add Layout manager
-        mLayoutManager = GridLayoutManager(ctx, 1, GridLayoutManager.VERTICAL, false)
-        mBottomSheetQueueMusicBinding.recyclerView.adapter = mQueueMusicItemAdapter
-        mBottomSheetQueueMusicBinding.recyclerView.layoutManager = mLayoutManager
+            val tempCurrentSong: SongItem = mPlayerFragmentViewModel.getCurrentPlayingSong().value ?: return
+            mLayoutManager?.scrollToPosition(tempCurrentSong.position)
+        }
     }
 
     private fun initViews() {
         //
     }
+
+    fun updateQueueMusicList(songList: List<SongItem>?){
+        mSongList = songList
+    }
+
     companion object {
         const val TAG = "QueueMusicBottomSheetDialog"
+
+        @JvmStatic
+        fun newInstance(playerFragmentViewModel : PlayerFragmentViewModel, songList: List<SongItem>?) =
+            QueueMusicBottomSheetDialog().apply {
+                mPlayerFragmentViewModel = playerFragmentViewModel
+                updateQueueMusicList(songList)
+            }
     }
 
 }

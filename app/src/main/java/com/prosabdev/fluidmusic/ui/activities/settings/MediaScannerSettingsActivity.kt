@@ -63,12 +63,12 @@ import kotlinx.coroutines.launch
             onBackInvokedDispatcher.registerOnBackInvokedCallback(
                 OnBackInvokedDispatcher.PRIORITY_DEFAULT
             ) {
-                finish()
+                supportFinishAfterTransition()
             }
         } else {
             onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    finish()
+                    supportFinishAfterTransition()
                 }
             })
         }

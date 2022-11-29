@@ -27,7 +27,7 @@ class QueueMusicItemViewModel(ctx : Context) : ViewModel()  {
     suspend fun getAtId(id: Long) : QueueMusicItem? {
         return repository?.getAtId(id)
     }
-    suspend fun getAll(order_name: String = "title", asc_desc_mode: String = "ASC") : LiveData<List<QueueMusicItem>>? {
-        return repository?.getAll(order_name, asc_desc_mode)
+    suspend fun getAll(order_by: String = "id") : LiveData<List<QueueMusicItem>>? {
+        return repository?.getAll(order_by)
     }
 }

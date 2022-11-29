@@ -12,15 +12,17 @@ import androidx.databinding.DataBindingUtil
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetDialogSongInfoBinding
-import com.prosabdev.fluidmusic.models.explore.SongItem
+import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.FormattersUtils
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 
-class SongInfoFullBottomSheetDialogFragment(private val mSongItem : SongItem?) : GenericFullBottomSheetDialogFragment() {
+class SongInfoFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFragment() {
 
     private lateinit var mBottomSheetDialogSongInfoBinding: BottomSheetDialogSongInfoBinding
+
+    private var mSongItem : SongItem? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -100,5 +102,11 @@ class SongInfoFullBottomSheetDialogFragment(private val mSongItem : SongItem?) :
     }
     companion object {
         const val TAG = "SongInfoDialog"
+
+        @JvmStatic
+        fun newInstance(songItem: SongItem?) =
+            SongInfoFullBottomSheetDialogFragment().apply {
+                mSongItem = songItem
+            }
     }
 }

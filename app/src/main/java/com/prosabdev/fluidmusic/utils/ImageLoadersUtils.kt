@@ -16,9 +16,10 @@ import com.bumptech.glide.request.transition.Transition
 import com.bumptech.glide.signature.ObjectKey
 import com.prosabdev.fluidmusic.R
 import jp.wasabeef.blurry.Blurry
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 abstract class ImageLoadersUtils {
@@ -31,13 +32,13 @@ abstract class ImageLoadersUtils {
             widthHeight: Int? = null,
             crossFadeDuration : Int = 0,
             showPlaceHolder : Boolean = false
-        ) = coroutineScope {
+        ) = withContext(Dispatchers.IO) {
             if(imageView == null)
-                return@coroutineScope
+                return@withContext
 
             if (uri == null || uri.toString().isEmpty()) {
                 loadWithResourceID(context, imageView, 0, crossFadeDuration)
-                return@coroutineScope
+                return@withContext
             }
 
             val byteArray: ByteArray? =
@@ -45,7 +46,7 @@ abstract class ImageLoadersUtils {
 
             if (byteArray == null) {
                 loadWithResourceID(context, imageView, 0, crossFadeDuration)
-                return@coroutineScope
+                return@withContext
             }
 
             if(widthHeight != null){
@@ -55,7 +56,6 @@ abstract class ImageLoadersUtils {
                         .centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .skipMemoryCache(true)
-//                        .signature(ObjectKey(byteArray.decodeToString()))
                         .transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
                         .placeholder(
                             if(showPlaceHolder)
@@ -73,7 +73,6 @@ abstract class ImageLoadersUtils {
                         .centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .skipMemoryCache(true)
-//                        .signature(ObjectKey(byteArray.decodeToString()))
                         .transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
                         .placeholder(
                             if(showPlaceHolder)
@@ -91,11 +90,11 @@ abstract class ImageLoadersUtils {
             imageView : ImageView?,
             uri: Uri?,
             widthHeight: Int = 100
-        ) = coroutineScope {
+        ) = withContext(Dispatchers.IO) {
             if (imageView == null)
-                return@coroutineScope
+                return@withContext
             if (uri == null || uri.toString().isEmpty())
-                return@coroutineScope
+                return@withContext
 
             val byteArray: ByteArray? =
                 AudioInfoExtractorUtils.extractImageBinaryDataFromAudioUri(context, uri)
@@ -105,7 +104,7 @@ abstract class ImageLoadersUtils {
                     imageView.setImageBitmap(null)
                     Glide.with(context).clear(imageView)
                 }
-                return@coroutineScope
+                return@withContext
             }
             val customTarget: CustomTarget<Bitmap?> = object : CustomTarget<Bitmap?>() {
                 override fun onResourceReady(

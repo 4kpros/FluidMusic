@@ -20,7 +20,8 @@ class HeadlinePlayShuffleAdapter(
     interface OnItemClickListener {
         fun onPlayButtonClicked()
         fun onShuffleButtonClicked()
-        fun onFilterButtonClicked()
+        fun onSortButtonClicked()
+        fun onOrganizeButtonClicked()
     }
 
     fun onSelectModeValue(value : Boolean){
@@ -54,8 +55,11 @@ class HeadlinePlayShuffleAdapter(
             mItemHeadlinePlayShuffleBinding.buttonShuffle.setOnClickListener {
                 listener.onShuffleButtonClicked()
             }
-            mItemHeadlinePlayShuffleBinding.buttonFilter.setOnClickListener {
-                listener.onFilterButtonClicked()
+            mItemHeadlinePlayShuffleBinding.buttonSort.setOnClickListener {
+                listener.onSortButtonClicked()
+            }
+            mItemHeadlinePlayShuffleBinding.buttonOrganize.setOnClickListener {
+                listener.onOrganizeButtonClicked()
             }
         }
 

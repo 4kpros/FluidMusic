@@ -8,7 +8,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.YearItemAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentYearsBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
@@ -23,7 +22,6 @@ class YearsFragment : Fragment() {
 
     private lateinit var mYearItemViewModel: YearItemViewModel
 
-    private var mEmptyBottomSpaceAdapter: HeadlinePlayShuffleAdapter? = null
     private var mYearItemAdapter: YearItemAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
 

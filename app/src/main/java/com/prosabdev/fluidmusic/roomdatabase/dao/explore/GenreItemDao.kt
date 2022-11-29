@@ -3,13 +3,20 @@ package com.prosabdev.fluidmusic.roomdatabase.dao.explore
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
-import com.prosabdev.fluidmusic.models.explore.GenreItemView
+import com.prosabdev.fluidmusic.models.view.GenreItem
 
 @Dao
 interface GenreItemDao {
-    @Query("SELECT * FROM GenreItemView WHERE genre = :name LIMIT 1")
-    fun getAtName(name : String): GenreItemView?
+    @Query("SELECT * FROM GenreItem WHERE name = :name LIMIT 1")
+    fun getAtName(name : String): GenreItem?
 
-    @Query("SELECT * FROM GenreItemView ORDER BY :order_name, :asc_desc_mode")
-    fun getAll(order_name: String = "genre", asc_desc_mode: String = "ASC"): LiveData<List<GenreItemView>>?
+    @Query(
+        "SELECT * FROM GenreItem " +
+            "ORDER BY " +
+                "CASE :order_by WHEN 'name' THEN GenreItem.name END ASC," +
+                "CASE :order_by WHEN 'numberTracks' THEN GenreItem.numberTracks END ASC," +
+                "CASE :order_by WHEN 'totalDuration' THEN GenreItem.totalDuration END ASC," +
+                "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN GenreItem.lastAddedDateToLibrary END ASC"
+    )
+    fun getAll(order_by: String): LiveData<List<GenreItem>>?
 }
