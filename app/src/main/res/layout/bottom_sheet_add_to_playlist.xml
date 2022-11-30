@@ -46,7 +46,7 @@
                     android:id="@+id/button_new_playlist"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/Widget.Material3.Button.TextButton.Icon"
+                    style="@style/Widget.Material3.Button.OutlinedButton.Icon"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     android:text="@string/new_playlist"

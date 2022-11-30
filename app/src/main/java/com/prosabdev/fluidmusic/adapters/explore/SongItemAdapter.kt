@@ -39,14 +39,17 @@ class SongItemAdapter(
     }
 
     //Methods for selectable playing
-    private fun isPlaying(position: Int): Boolean {
-        return selectablePlayingIsPlaying(position)
+    fun getIsPlaying(): Boolean {
+        return getSelectableIsPlaying()
     }
-    fun getCurrentPlayingSong(): Int {
-        return selectablePlayingGetCurrentPlayingSong()
+    fun setIsPlaying(isPlaying: Boolean) {
+        return setSelectableIsPlaying(isPlaying)
     }
-    fun setCurrentPlayingSong(position: Int) {
-        selectablePlayingSetCurrentPlayingSong(position)
+    fun getPlayingPosition(): Int {
+        return getSelectablePlayingPosition()
+    }
+    fun setPlayingPosition(position: Int) {
+        setSelectablePlayingPosition(position)
     }
 
     //Methods for selectable items
@@ -101,7 +104,7 @@ class SongItemAdapter(
                     }
                     PAYLOAD_PLAYBACK_STATE -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_PLAYBACK_STATE")
-                        holder.updateIsPlayingStateUI(isPlaying(position))
+                        holder.updateIsPlayingStateUI(mContext, getIsPlaying(), getPlayingPosition())
                     }
                     PAYLOAD_IS_COVERT_ART_TEXT -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
@@ -115,7 +118,7 @@ class SongItemAdapter(
         } else {
             //If the is no payload specified on notify adapter, refresh all UI to be safe
             holder.updateSelectedStateUI(selectableIsSelected(position))
-            holder.updateIsPlayingStateUI(isPlaying(position))
+            holder.updateIsPlayingStateUI(mContext, getIsPlaying(), getPlayingPosition())
             holder.updateCovertArtAndTitleUI(mContext, getItem(position) as SongItem)
         }
     }
@@ -139,7 +142,6 @@ class SongItemAdapter(
             }
         }
 
-        //When item is is recycled(not visible), clear image view to save memory
         fun recycleItem(ctx : Context){
             Glide.with(ctx).clear(mItemGenericExploreListBinding.imageviewCoverArt)
         }
@@ -164,8 +166,8 @@ class SongItemAdapter(
             }
         }
 
-        fun updateIsPlayingStateUI(playing: Boolean) {
-            if(playing){
+        fun updateIsPlayingStateUI(ctx : Context, isPlaying: Boolean, playingPosition : Int) {
+            if(playingPosition == bindingAdapterPosition){
                 mItemGenericExploreListBinding.textTitle.setTypeface(null, Typeface.BOLD)
                 mItemGenericExploreListBinding.textSubtitle.setTypeface(null, Typeface.BOLD)
                 mItemGenericExploreListBinding.textDetails.setTypeface(null, Typeface.BOLD)
@@ -175,6 +177,11 @@ class SongItemAdapter(
                 mItemGenericExploreListBinding.textTitle.setTextColor(value)
                 mItemGenericExploreListBinding.textSubtitle.setTextColor(value)
                 mItemGenericExploreListBinding.textDetails.setTextColor(value)
+                if(isPlaying){
+                    mItemGenericExploreListBinding.textNowPlaying.text = ctx.getString(R.string.playing)
+                }else{
+                    mItemGenericExploreListBinding.textNowPlaying.text = ctx.getString(R.string.paused)
+                }
                 mItemGenericExploreListBinding.textNowPlaying.setTextColor(value)
                 mItemGenericExploreListBinding.textNowPlaying.visibility = VISIBLE
             }else{

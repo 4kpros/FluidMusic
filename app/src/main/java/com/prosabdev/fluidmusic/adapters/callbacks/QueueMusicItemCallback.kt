@@ -25,15 +25,11 @@ class QueueMusicItemCallback(adapter : QueueMusicItemListAdapter) : ItemTouchHel
     override fun isLongPressDragEnabled(): Boolean {
         return false
     }
-
     override fun isItemViewSwipeEnabled(): Boolean {
         return false
     }
-
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        //
     }
-
     override fun getMovementFlags(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder
@@ -41,7 +37,6 @@ class QueueMusicItemCallback(adapter : QueueMusicItemListAdapter) : ItemTouchHel
         val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
         return makeMovementFlags(dragFlags, 0)
     }
-
     override fun onMove(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,

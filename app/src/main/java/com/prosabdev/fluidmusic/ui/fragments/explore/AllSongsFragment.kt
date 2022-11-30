@@ -12,7 +12,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
@@ -23,6 +25,7 @@ import com.prosabdev.fluidmusic.databinding.FragmentAllSongsBinding
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortItemsBottomSheetDialogFragment
+import com.prosabdev.fluidmusic.utils.CenterSmoothScroller
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.MathComputationsUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
@@ -34,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.ceil
 
 
 class AllSongsFragment : Fragment() {
@@ -91,7 +95,7 @@ class AllSongsFragment : Fragment() {
         mAllSongsFragmentViewModel.listenAllSongs(mSongItemViewModel, viewLifecycleOwner)
 
         mAllSongsFragmentViewModel.getAllSongs().observe(viewLifecycleOwner){
-            addSongsToAdapter(it as ArrayList<SongItem>?)
+            addSongsToAdapter(it)
         }
         mAllSongsFragmentViewModel.getIsInverted().observe(viewLifecycleOwner){
             updateInvertedValueChangeUI(it)
@@ -102,7 +106,10 @@ class AllSongsFragment : Fragment() {
 
         //Listen to player changes
         mPlayerFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner) {
-            updatePlayingSongUI(it?.position ?: -1)
+            updatePlayingSongUI(it)
+        }
+        mPlayerFragmentViewModel.getIsPlaying().observe(viewLifecycleOwner) {
+            updatePlaybackStateUI(it)
         }
         mMainFragmentViewModel.getSelectMode().observe(viewLifecycleOwner) {
             onSelectionModeChanged(it)
@@ -138,8 +145,33 @@ class AllSongsFragment : Fragment() {
         mSongItemAdapter?.selectableSetSelectionMode(it?:false)
         mHeadlineTopPlayShuffleAdapter?.onSelectModeValue(it ?: false)
     }
-    private fun updatePlayingSongUI(playingPosition: Int) {
-        //
+    private fun updatePlayingSongUI(songItem: SongItem?) {
+        val songPosition: Int = songItem?.position ?: -1
+        if(mPlayerFragmentViewModel.getQueueListSource().value == ConstantValues.EXPLORE_ALL_SONGS){
+            mSongItemAdapter?.setPlayingPosition(songPosition)
+        }else{
+            if((mSongItemAdapter?.getPlayingPosition() ?: -1) >= 0)
+                mSongItemAdapter?.setPlayingPosition(-1)
+        }
+        tryToScrollOnCurrentItem(songPosition)
+    }
+    private fun tryToScrollOnCurrentItem(songPosition: Int) {
+        if(songPosition >= 0) {
+            context?.let { ctx ->
+                val tempListSize: Int = mSongItemAdapter?.currentList?.size ?: 0
+                val tempTargetPosition = if(songPosition + 2 <= tempListSize) songPosition + 2 else tempListSize
+                mLayoutManager?.startSmoothScroll(CenterSmoothScroller(ctx).apply { targetPosition = tempTargetPosition})
+            }
+        }
+    }
+
+    private fun updatePlaybackStateUI(isPlaying: Boolean) {
+        if(mPlayerFragmentViewModel.getQueueListSource().value == ConstantValues.EXPLORE_ALL_SONGS){
+            mSongItemAdapter?.setIsPlaying(isPlaying)
+        }else{
+            if(mSongItemAdapter?.getIsPlaying() == true)
+                mSongItemAdapter?.setIsPlaying(false)
+        }
     }
     private fun updateInvertedValueChangeUI(isInverted: Boolean?) {
         mLayoutManager?.reverseLayout = isInverted == true
@@ -245,9 +277,15 @@ class AllSongsFragment : Fragment() {
 
             //Setup concat adapter
             val concatAdapter = ConcatAdapter()
-            concatAdapter.addAdapter(mHeadlineTopPlayShuffleAdapter!!)
-            concatAdapter.addAdapter(mSongItemAdapter!!)
-            concatAdapter.addAdapter(mEmptyBottomAdapter!!)
+            mHeadlineTopPlayShuffleAdapter?.let {
+                concatAdapter.addAdapter(it)
+            }
+            mSongItemAdapter?.let {
+                concatAdapter.addAdapter(it)
+            }
+            mEmptyBottomAdapter?.let {
+                concatAdapter.addAdapter(it)
+            }
 
             //Add Layout manager
             mLayoutManager = GridLayoutManager(ctx, spanCount, GridLayoutManager.VERTICAL, false)
@@ -281,7 +319,7 @@ class AllSongsFragment : Fragment() {
             withContext(Dispatchers.Default){
                 val randomExcludedNumber: Int =
                     MathComputationsUtils.randomExcluded(
-                        mSongItemAdapter?.getCurrentPlayingSong() ?: -1,
+                        mSongItemAdapter?.getPlayingPosition() ?: -1,
                         (mSongItemAdapter?.currentList?.size ?: 0) -1
                     )
                 playSongAtPosition(randomExcludedNumber, PlaybackStateCompat.REPEAT_MODE_NONE, PlaybackStateCompat.SHUFFLE_MODE_NONE)

@@ -41,7 +41,6 @@
     <style name="CustomScrollBarStyle">
         <item name="android:smoothScrollbar">true</item>
         <item name="android:scrollbarAlwaysDrawVerticalTrack">false</item>
-        <item name="android:scrollbarStyle">insideOverlay</item>
         <item name="android:scrollbars">vertical</item>
         <item name="android:fadeScrollbars">true</item>
         <item name="android:verticalScrollbarPosition">defaultPosition</item>

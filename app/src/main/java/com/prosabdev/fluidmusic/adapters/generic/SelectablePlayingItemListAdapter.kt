@@ -9,20 +9,25 @@ abstract class SelectablePlayingItemListAdapter<VH : RecyclerView.ViewHolder>(
 {
     private val mTAG: String = SelectablePlayingItemListAdapter::class.java.simpleName
     private var mPlayingItem: Int = -1
+    private var mIsPlaying: Boolean = false
 
-    protected fun selectablePlayingIsPlaying(position: Int): Boolean {
-        return (position == mPlayingItem && mPlayingItem >= 0)
+    protected fun setSelectableIsPlaying(isPlaying: Boolean) {
+        mIsPlaying = isPlaying
+        notifyItemChanged(mPlayingItem, PAYLOAD_PLAYBACK_STATE)
     }
-    protected fun selectablePlayingGetCurrentPlayingSong(): Int {
-        return mPlayingItem
+    protected fun getSelectableIsPlaying(): Boolean {
+        return mIsPlaying
     }
-    protected fun selectablePlayingSetCurrentPlayingSong(position: Int) {
+    protected fun setSelectablePlayingPosition(position: Int) {
         val oldPlaying = mPlayingItem
         mPlayingItem = if(position >= 0) position else -1
         if(oldPlaying >= 0)
             notifyItemChanged(oldPlaying, PAYLOAD_PLAYBACK_STATE)
         if(mPlayingItem >= 0)
             notifyItemChanged(position, PAYLOAD_PLAYBACK_STATE)
+    }
+    protected fun getSelectablePlayingPosition(): Int {
+        return mPlayingItem
     }
 
     companion object {

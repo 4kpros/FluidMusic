@@ -1,21 +1,17 @@
 package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.QueueMusicItemListAdapter
 import com.prosabdev.fluidmusic.databinding.BottomSheetQueueMusicBinding
 import com.prosabdev.fluidmusic.models.SongItem
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.MathComputationsUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 
 class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
@@ -50,7 +46,35 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
     }
 
     private fun observeLiveData() {
-        //
+        mPlayerFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner) {
+            updatePlayingSongUI(it)
+        }
+        mPlayerFragmentViewModel.getIsPlaying().observe(viewLifecycleOwner) {
+            updatePlaybackStateUI(it)
+        }
+    }
+    private fun updatePlayingSongUI(songItem: SongItem?) {
+        val songPosition: Int = songItem?.position ?: -1
+        if((mQueueMusicItemAdapter?.getPlayingPosition() ?: -1) != songPosition)
+            mQueueMusicItemAdapter?.setPlayingPosition(songPosition)
+        tryToScrollOnCurrentItem(songPosition)
+    }
+    private fun tryToScrollOnCurrentItem(songPosition : Int) {
+        if(songPosition <= 0) return
+        //This is required to create every time new smooth scroller
+        val smoothScroller: RecyclerView.SmoothScroller = object : LinearSmoothScroller(context) {
+            override fun getVerticalSnapPreference(): Int {
+                return SNAP_TO_START
+            }
+        }.apply {
+            targetPosition = songPosition
+        }
+        mLayoutManager?.startSmoothScroll(smoothScroller)
+    }
+
+    private fun updatePlaybackStateUI(isPlaying: Boolean) {
+        if(mQueueMusicItemAdapter?.getIsPlaying() != isPlaying)
+            mQueueMusicItemAdapter?.setIsPlaying(isPlaying)
     }
 
     private fun checkInteractions() {
