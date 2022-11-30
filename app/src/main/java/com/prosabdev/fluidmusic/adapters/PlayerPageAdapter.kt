@@ -80,7 +80,7 @@ class PlayerPageAdapter(
         }
 
         fun recycleItem(ctx : Context){
-            Glide.with(ctx).clear(mItemPlayerCardViewBinding.playerViewpagerImageview)
+            Glide.with(ctx.applicationContext).clear(mItemPlayerCardViewBinding.playerViewpagerImageview)
         }
 
         private suspend fun animateButtons() {

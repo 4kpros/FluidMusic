@@ -18,7 +18,7 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
 
     private lateinit var mBottomSheetQueueMusicBinding: BottomSheetQueueMusicBinding
 
-    private lateinit var mPlayerFragmentViewModel: PlayerFragmentViewModel
+    private var mPlayerFragmentViewModel: PlayerFragmentViewModel? = null
 
     private var mQueueMusicItemAdapter :QueueMusicItemListAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
@@ -46,10 +46,10 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
     }
 
     private fun observeLiveData() {
-        mPlayerFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner) {
+        mPlayerFragmentViewModel?.getCurrentPlayingSong()?.observe(viewLifecycleOwner) {
             updatePlayingSongUI(it)
         }
-        mPlayerFragmentViewModel.getIsPlaying().observe(viewLifecycleOwner) {
+        mPlayerFragmentViewModel?.getIsPlaying()?.observe(viewLifecycleOwner) {
             updatePlaybackStateUI(it)
         }
     }
@@ -106,7 +106,8 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
             mBottomSheetQueueMusicBinding.recyclerView.layoutManager = mLayoutManager
             mQueueMusicItemAdapter?.submitList(mSongList)
 
-            val tempCurrentSong: SongItem = mPlayerFragmentViewModel.getCurrentPlayingSong().value ?: return
+            val tempCurrentSong: SongItem = mPlayerFragmentViewModel?.getCurrentPlayingSong()?.value
+                ?: return
             mLayoutManager?.scrollToPosition(tempCurrentSong.position)
         }
     }

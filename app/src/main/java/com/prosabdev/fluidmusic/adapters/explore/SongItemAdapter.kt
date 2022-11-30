@@ -143,7 +143,7 @@ class SongItemAdapter(
         }
 
         fun recycleItem(ctx : Context){
-            Glide.with(ctx).clear(mItemGenericExploreListBinding.imageviewCoverArt)
+            Glide.with(ctx.applicationContext).clear(mItemGenericExploreListBinding.imageviewCoverArt)
         }
 
         fun updateCovertArtAndTitleUI(context: Context, songItem: SongItem) {

@@ -12,9 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
@@ -23,6 +21,7 @@ import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentAllSongsBinding
 import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortItemsBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.utils.CenterSmoothScroller
@@ -37,7 +36,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.ceil
 
 
 class AllSongsFragment : Fragment() {
@@ -45,7 +43,9 @@ class AllSongsFragment : Fragment() {
 
     private lateinit var mFragmentAllSongsBinding: FragmentAllSongsBinding
 
-    private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by activityViewModels()
+    private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by lazy {
+        AllSongsFragmentViewModel()
+    }
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
     private lateinit var mSongItemViewModel: SongItemViewModel
@@ -57,6 +57,8 @@ class AllSongsFragment : Fragment() {
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
     private var mSongItemAdapter: SongItemAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
+
+    private var mIsDragging: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -160,11 +162,18 @@ class AllSongsFragment : Fragment() {
             context?.let { ctx ->
                 val tempListSize: Int = mSongItemAdapter?.currentList?.size ?: 0
                 val tempTargetPosition = if(songPosition + 2 <= tempListSize) songPosition + 2 else tempListSize
-                mLayoutManager?.startSmoothScroll(CenterSmoothScroller(ctx).apply { targetPosition = tempTargetPosition})
+                MainScope().launch {
+                    mLayoutManager?.let {
+                        it?.startSmoothScroll(
+                            CenterSmoothScroller(ctx).apply {
+                                targetPosition = tempTargetPosition
+                            }
+                        )
+                    }
+                }
             }
         }
     }
-
     private fun updatePlaybackStateUI(isPlaying: Boolean) {
         if(mPlayerFragmentViewModel.getQueueListSource().value == ConstantValues.EXPLORE_ALL_SONGS){
             mSongItemAdapter?.setIsPlaying(isPlaying)
@@ -206,19 +215,48 @@ class AllSongsFragment : Fragment() {
     private fun checkInteractions() {
         mFragmentAllSongsBinding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if(dy < 0){
-                    Log.i(ConstantValues.TAG, "Scrolling --> TOP")
-                    mMainFragmentViewModel.setScrollingState(-1)
-                }else if(dy > 0){
-                    Log.i(ConstantValues.TAG, "Scrolling --> BOTTOM")
-                    mMainFragmentViewModel.setScrollingState(1)
+                if(mIsDragging){
+                    if(dy < 0){
+                        Log.i(ConstantValues.TAG, "Scrolling --> TOP")
+                        mMainFragmentViewModel.setScrollingState(-1)
+                    }else if(dy > 0){
+                        Log.i(ConstantValues.TAG, "Scrolling --> BOTTOM")
+                        mMainFragmentViewModel.setScrollingState(1)
+                    }
+                    if (!recyclerView.canScrollVertically(1) && dy > 0) {
+                        Log.i(ConstantValues.TAG, "Scrolled to BOTTOM")
+                        mMainFragmentViewModel.setScrollingState(2)
+                    } else if (!recyclerView.canScrollVertically(-1) && dy < 0) {
+                        Log.i(ConstantValues.TAG, "Scrolled to TOP")
+                        mMainFragmentViewModel.setScrollingState(-2)
+                    }
+                }else{
+                    if (!recyclerView.canScrollVertically(1) && dy > 0) {
+                        Log.i(ConstantValues.TAG, "Scrolled to BOTTOM")
+                        if(mMainFragmentViewModel.getScrollingState().value != 2)
+                            mMainFragmentViewModel.setScrollingState(2)
+                    } else if (!recyclerView.canScrollVertically(-1) && dy < 0) {
+                        Log.i(ConstantValues.TAG, "Scrolled to TOP")
+                        if(mMainFragmentViewModel.getScrollingState().value != -2)
+                            mMainFragmentViewModel.setScrollingState(-2)
+                    }
                 }
-                if (!recyclerView.canScrollVertically(1) && dy > 0) {
-                    Log.i(ConstantValues.TAG, "Scrolled to BOTTOM")
-                    mMainFragmentViewModel.setScrollingState(2)
-                } else if (!recyclerView.canScrollVertically(-1) && dy < 0) {
-                    Log.i(ConstantValues.TAG, "Scrolled to TOP")
-                    mMainFragmentViewModel.setScrollingState(-2)
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_IDLE -> {
+                        mIsDragging = false
+                        println("The RecyclerView is SCROLL_STATE_IDLE")
+                    }
+                    RecyclerView.SCROLL_STATE_DRAGGING -> {
+                        mIsDragging = true
+                        println("The RecyclerView is SCROLL_STATE_DRAGGING")
+                    }
+                    RecyclerView.SCROLL_STATE_SETTLING -> {
+                        println("The RecyclerView is SCROLL_STATE_SETTLING")
+                    }
                 }
             }
         })
@@ -332,6 +370,8 @@ class AllSongsFragment : Fragment() {
         mPlayerFragmentViewModel.setPlayingProgressValue(0)
         mPlayerFragmentViewModel.setRepeat(repeat ?: mPlayerFragmentViewModel.getRepeat().value ?: PlaybackStateCompat.REPEAT_MODE_NONE)
         mPlayerFragmentViewModel.setShuffle(shuffle ?: mPlayerFragmentViewModel.getShuffle().value ?: PlaybackStateCompat.SHUFFLE_MODE_NONE)
+        if(mFragmentAllSongsBinding.recyclerView.scrollState == RecyclerView.SCROLL_STATE_SETTLING)
+            mIsDragging = false
         mMainFragmentViewModel.setScrollingState(-1)
         mPlayerFragmentViewModel.setQueueListSource(ConstantValues.EXPLORE_ALL_SONGS)
     }

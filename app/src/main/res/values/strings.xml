@@ -156,4 +156,10 @@
     <string name="play">Play</string>
     <string name="shuffle">Shuffle</string>
     <string name="paused">Paused</string>
+    <string name="explore">Explore</string>
+    <string name="tracks">Tracks</string>
+    <string name="genres">Genres</string>
+    <string name="years">Years</string>
+    <string name="composers">Composers</string>
+    <string name="album_artists">Album artists</string>
 </resources>

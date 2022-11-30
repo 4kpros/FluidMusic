@@ -51,10 +51,10 @@ abstract class ImageLoadersUtils {
 
             if(widthHeight != null){
                 MainScope().launch {
-                    Glide.with(context)
+                    Glide.with(context.applicationContext)
                         .load(byteArray)
                         .centerCrop()
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .skipMemoryCache(true)
                         .transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
                         .placeholder(
@@ -68,10 +68,10 @@ abstract class ImageLoadersUtils {
                 }
             }else{
                 MainScope().launch {
-                    Glide.with(context)
+                    Glide.with(context.applicationContext)
                         .load(byteArray)
                         .centerCrop()
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .skipMemoryCache(true)
                         .transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
                         .placeholder(
@@ -102,7 +102,7 @@ abstract class ImageLoadersUtils {
             if (byteArray == null) {
                 MainScope().launch {
                     imageView.setImageBitmap(null)
-                    Glide.with(context).clear(imageView)
+                    Glide.with(context.applicationContext).clear(imageView)
                 }
                 return@withContext
             }
@@ -112,7 +112,7 @@ abstract class ImageLoadersUtils {
                     transition: Transition<in Bitmap?>?
                 ) {
                     MainScope().launch {
-                        Blurry.with(context)
+                        Blurry.with(context.applicationContext)
                             .radius(15)
                             .sampling(2)
                             .from(resource)
@@ -126,10 +126,10 @@ abstract class ImageLoadersUtils {
             val factory =
                 DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
             MainScope().launch {
-                Glide.with(context)
+                Glide.with(context.applicationContext)
                     .asBitmap()
                     .load(byteArray)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .skipMemoryCache(true)
                     .signature(ObjectKey(byteArray.decodeToString()))
                     .override(widthHeight, widthHeight)
@@ -149,9 +149,9 @@ abstract class ImageLoadersUtils {
                 return
 
             MainScope().launch {
-                Glide.with(context)
+                Glide.with(context.applicationContext)
                     .load(resourceId)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .skipMemoryCache(true)
                     .signature(ObjectKey(resourceId))
                     .centerCrop()

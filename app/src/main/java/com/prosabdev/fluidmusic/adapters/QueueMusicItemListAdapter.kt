@@ -142,7 +142,7 @@ class QueueMusicItemListAdapter(
         }
 
         fun recycleItem(ctx : Context){
-            Glide.with(ctx).clear(mItemQueueMusicBinding.imageviewCoverArt)
+            Glide.with(ctx.applicationContext).clear(mItemQueueMusicBinding.imageviewCoverArt)
         }
         fun updateCovertArtAndTitleUI(context: Context, songItem: SongItem) {
             var tempTitle : String = songItem.title ?: ""
