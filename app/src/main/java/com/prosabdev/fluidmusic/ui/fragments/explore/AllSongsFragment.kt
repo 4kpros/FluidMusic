@@ -54,7 +54,7 @@ class AllSongsFragment : Fragment() {
     private var mSongItemAdapter: SongItemAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
 
-    private var mIsDragging: Boolean = false
+    private var mIsDraggingToScroll: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -204,13 +204,15 @@ class AllSongsFragment : Fragment() {
     }
     private fun addSongsToAdapter(songList: ArrayList<SongItem>?) {
         mSongItemAdapter?.submitList(songList as ArrayList<Any>?)
-        mMainFragmentViewModel.setTotalCount(songList?.size ?: 0)
+        if(mMainFragmentViewModel.getCurrentSelectablePage().value == ConstantValues.EXPLORE_ALL_SONGS){
+            mMainFragmentViewModel.setTotalCount(songList?.size ?: 0)
+        }
     }
 
     private fun checkInteractions() {
         mFragmentAllSongsBinding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if(mIsDragging){
+                if(mIsDraggingToScroll){
                     if(dy < 0){
                         Log.i(ConstantValues.TAG, "Scrolling --> TOP")
                         mMainFragmentViewModel.setScrollingState(-1)
@@ -242,11 +244,11 @@ class AllSongsFragment : Fragment() {
                 super.onScrollStateChanged(recyclerView, newState)
                 when (newState) {
                     RecyclerView.SCROLL_STATE_IDLE -> {
-                        mIsDragging = false
+                        mIsDraggingToScroll = false
                         println("The RecyclerView is SCROLL_STATE_IDLE")
                     }
                     RecyclerView.SCROLL_STATE_DRAGGING -> {
-                        mIsDragging = true
+                        mIsDraggingToScroll = true
                         println("The RecyclerView is SCROLL_STATE_DRAGGING")
                     }
                     RecyclerView.SCROLL_STATE_SETTLING -> {
@@ -328,6 +330,9 @@ class AllSongsFragment : Fragment() {
             MainScope().launch {
                 mFragmentAllSongsBinding.recyclerView.adapter = concatAdapter
                 mFragmentAllSongsBinding.recyclerView.layoutManager = mLayoutManager
+
+                mFragmentAllSongsBinding.fastScroller.setSectionIndexer(mSongItemAdapter)
+                mFragmentAllSongsBinding.fastScroller.attachRecyclerView(mFragmentAllSongsBinding.recyclerView)
             }
         }
     }
@@ -363,7 +368,7 @@ class AllSongsFragment : Fragment() {
         mPlayerFragmentViewModel.setRepeat(repeat ?: mPlayerFragmentViewModel.getRepeat().value ?: PlaybackStateCompat.REPEAT_MODE_NONE)
         mPlayerFragmentViewModel.setShuffle(shuffle ?: mPlayerFragmentViewModel.getShuffle().value ?: PlaybackStateCompat.SHUFFLE_MODE_NONE)
         if(mFragmentAllSongsBinding.recyclerView.scrollState == RecyclerView.SCROLL_STATE_SETTLING)
-            mIsDragging = false
+            mIsDraggingToScroll = false
         mMainFragmentViewModel.setScrollingState(-1)
         mPlayerFragmentViewModel.setQueueListSource(ConstantValues.EXPLORE_ALL_SONGS)
     }
@@ -379,6 +384,8 @@ class AllSongsFragment : Fragment() {
     }
 
     companion object {
+        const val TAG = "AllSongsFragment"
+
         @JvmStatic
         fun newInstance(pageIndex: Int) =
             AllSongsFragment().apply {

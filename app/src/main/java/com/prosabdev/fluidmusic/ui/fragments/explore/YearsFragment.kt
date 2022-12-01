@@ -69,6 +69,8 @@ class YearsFragment : Fragment() {
     }
 
     companion object {
+        const val TAG = "YearsFragment"
+
         @JvmStatic
         fun newInstance(pageIndex: Int) =
             YearsFragment().apply {

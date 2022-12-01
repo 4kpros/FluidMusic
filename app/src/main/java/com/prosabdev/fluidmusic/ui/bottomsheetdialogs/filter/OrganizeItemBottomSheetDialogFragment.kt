@@ -14,6 +14,7 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private lateinit var mBottomSheetOrganizeItemsBinding: BottomSheetOrganizeItemsBinding
 
     private var mFromSource: String? = null
+    private var mFromSourceValue: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,9 +46,10 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment() {
         const val TAG = "OrganizeItemBottomSheetDialogFragment"
 
         @JvmStatic
-        fun newInstance(fromSource: String?) =
+        fun newInstance(fromSource: String?, fromSourceValue: String? = null) =
             OrganizeItemBottomSheetDialogFragment().apply {
                 mFromSource = fromSource
+                mFromSourceValue = fromSourceValue
             }
     }
 }

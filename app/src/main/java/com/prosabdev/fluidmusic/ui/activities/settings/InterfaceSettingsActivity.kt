@@ -72,4 +72,8 @@ import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
         ViewInsetModifiersUtils.updateTopViewInsets(mActivityInterfaceSettingsBinding.coordinatorSettingsActivity)
         ViewInsetModifiersUtils.updateBottomViewInsets(mActivityInterfaceSettingsBinding.emptyView)
     }
+
+    companion object {
+        const val TAG = "InterfaceSettingsActivity"
+    }
 }

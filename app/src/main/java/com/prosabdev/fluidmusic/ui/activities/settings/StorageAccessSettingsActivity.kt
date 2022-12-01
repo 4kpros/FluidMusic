@@ -249,4 +249,8 @@ import kotlinx.coroutines.withContext
             mFolderUriTreeViewModel.delete(folderUriTree)
         }
     }
+
+    companion object {
+        const val TAG = "StorageAccessSettingsActivity"
+    }
 }

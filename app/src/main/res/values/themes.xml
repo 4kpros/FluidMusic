@@ -13,10 +13,10 @@
         <item name="android:scrollbarAlwaysDrawVerticalTrack">false</item>
         <item name="android:scrollbars">vertical</item>
         <item name="android:fadeScrollbars">true</item>
-        <item name="android:isScrollContainer">true</item>
         <item name="android:verticalScrollbarPosition">defaultPosition</item>
         <item name="android:scrollbarThumbVertical">@drawable/custom_scroll_view_thumb</item>
         <item name="android:scrollbarTrackVertical">@drawable/custom_scroll_view_track</item>
+
     </style>
     <style name="BaseThemeLight" parent="BaseTheme">
         <item name="android:statusBarColor">@color/semiBlack</item>

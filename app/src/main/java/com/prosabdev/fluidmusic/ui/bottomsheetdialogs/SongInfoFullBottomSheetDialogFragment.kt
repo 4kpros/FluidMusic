@@ -101,7 +101,7 @@ class SongInfoFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFragme
         //
     }
     companion object {
-        const val TAG = "SongInfoDialog"
+        const val TAG = "SongInfoFullBottomSheetDialogFragment"
 
         @JvmStatic
         fun newInstance(songItem: SongItem?) =

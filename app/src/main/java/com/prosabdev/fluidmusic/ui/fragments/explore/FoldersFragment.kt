@@ -69,6 +69,8 @@ class FoldersFragment : Fragment() {
     }
 
     companion object {
+        const val TAG = "FoldersFragment"
+
         @JvmStatic
         fun newInstance(pageIndex: Int) =
             FoldersFragment().apply {

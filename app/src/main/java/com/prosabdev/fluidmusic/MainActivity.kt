@@ -26,7 +26,9 @@ import com.prosabdev.fluidmusic.ui.fragments.MainFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.SharedPreferenceManagerUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AlbumsFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AllSongsFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.explore.AlbumItemViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -38,9 +40,12 @@ import kotlinx.coroutines.withContext
 
     private lateinit var mActivityMainBinding: ActivityMainBinding
 
-    private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by viewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by viewModels()
+
+    private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by viewModels()
+    private val mAlbumsFragmentViewModel: AlbumsFragmentViewModel by viewModels()
     private val mSongItemViewModel: SongItemViewModel by viewModels()
+    private val mAlbumItemViewModel: AlbumItemViewModel by viewModels()
 
     private val mMainFragment = MainFragment.newInstance()
     private val mEqualizerFragment = EqualizerFragment.newInstance()
@@ -57,7 +62,7 @@ import kotlinx.coroutines.withContext
         MainScope().launch {
             initViews()
             loadLastPlayerSession()
-            preloadSongs()
+            requestListenData()
             observeLiveData()
             setupAudioSettings()
             createMediaBrowserService()
@@ -82,8 +87,9 @@ import kotlinx.coroutines.withContext
 //        }
     }
 
-    private fun preloadSongs() {
+    private fun requestListenData() {
         mAllSongsFragmentViewModel.listenAllSongs(mSongItemViewModel, this)
+        mAlbumsFragmentViewModel.listenAllAlbums(mAlbumItemViewModel, this)
     }
 
     override fun onDestroy() {
@@ -257,5 +263,9 @@ import kotlinx.coroutines.withContext
         super.onStop()
         MediaControllerCompat.getMediaController(this)?.unregisterCallback(mControllerCallback)
         mMediaBrowser?.disconnect()
+    }
+
+    companion object {
+        const val TAG = "MainActivity"
     }
 }

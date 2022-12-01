@@ -72,4 +72,8 @@ import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
         ViewInsetModifiersUtils.updateTopViewInsets(mActivityLanguageSettingsBinding.coordinatorSettingsActivity)
         ViewInsetModifiersUtils.updateBottomViewInsets(mActivityLanguageSettingsBinding.emptyView)
     }
+
+    companion object {
+        const val TAG = "LanguageSettingsActivity"
+    }
 }

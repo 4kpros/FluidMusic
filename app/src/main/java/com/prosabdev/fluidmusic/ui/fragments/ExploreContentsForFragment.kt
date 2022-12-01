@@ -70,6 +70,8 @@ class ExploreContentsForFragment : Fragment() {
 
 
     companion object {
+        const val TAG = "ExploreContentsForFragment"
+
         @JvmStatic
         fun newInstance(loadSongFromSource: String?, value : String?) =
             ExploreContentsForFragment().apply {

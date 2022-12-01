@@ -27,7 +27,6 @@ import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistSongItemViewModel
 import kotlinx.coroutines.*
 
 class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
@@ -399,7 +398,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     companion object {
-        const val TAG = "PlayerMoreDialog"
+        const val TAG = "PlayerMoreFullBottomSheetDialog"
 
         @JvmStatic
         fun newInstance(playerFragmentViewModel : PlayerFragmentViewModel, mainFragmentViewModel : MainFragmentViewModel, screenShootPlayerView : View) =

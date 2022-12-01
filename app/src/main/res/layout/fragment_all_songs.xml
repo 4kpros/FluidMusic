@@ -17,8 +17,21 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            style="@style/CustomScrollBarStyle"
-            android:fillViewport="true"
+            />
+        <com.l4digital.fastscroll.FastScroller
+            android:id="@+id/fast_scroller"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_gravity="end"
+            app:hideScrollbar="true"
+            app:bubbleSize="small"
+            app:showBubble="true"
+            app:showBubbleAlways="false"
+            app:bubbleTextColor="?colorOnPrimary"
+            app:bubbleColor="?colorPrimary"
+            app:handleColor="?colorPrimary"
+            app:trackColor="?colorOutline"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

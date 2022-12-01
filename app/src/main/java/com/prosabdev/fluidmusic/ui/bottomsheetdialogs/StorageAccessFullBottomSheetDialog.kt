@@ -64,7 +64,7 @@ class StorageAccessFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     companion object {
-        const val TAG = "PlayerMoreDialog"
+        const val TAG: String = "StorageAccessFullBottomSheetDialog"
 
         @JvmStatic
         fun newInstance(storageAccessActivityViewModel : StorageAccessActivityViewModel) =

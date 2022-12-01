@@ -5,7 +5,6 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
-import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -14,7 +13,6 @@ import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.utils.AudioInfoExtractorUtils
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
 import kotlinx.coroutines.*
 
 

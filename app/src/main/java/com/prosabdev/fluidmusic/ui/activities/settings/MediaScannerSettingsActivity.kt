@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.work.WorkInfo
 import com.google.android.material.color.DynamicColors
@@ -272,5 +271,9 @@ import kotlinx.coroutines.launch
     private fun initViews() {
         ViewInsetModifiersUtils.updateTopViewInsets(mActivityMediaScannerSettingsBinding.coordinatorLayout)
         ViewInsetModifiersUtils.updateBottomViewInsets(mActivityMediaScannerSettingsBinding.container)
+    }
+
+    companion object {
+        const val TAG = "MediaScannerSettingsActivity"
     }
 }

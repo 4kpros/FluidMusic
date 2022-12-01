@@ -14,6 +14,8 @@ interface AlbumItemDao {
         "SELECT * FROM AlbumItem " +
             "ORDER BY " +
                 "CASE :order_by WHEN 'name' THEN AlbumItem.name END ASC," +
+                "CASE :order_by WHEN 'albumArtist' THEN AlbumItem.albumArtist END ASC," +
+                "CASE :order_by WHEN 'artist' THEN AlbumItem.artist END ASC," +
                 "CASE :order_by WHEN 'numberTracks' THEN AlbumItem.numberTracks END ASC," +
                 "CASE :order_by WHEN 'totalDuration' THEN AlbumItem.totalDuration END ASC," +
                 "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN AlbumItem.lastAddedDateToLibrary END ASC"

@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.color.DynamicColors
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivitySettingsBinding
@@ -96,5 +95,9 @@ import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
     private fun initViews() {
         ViewInsetModifiersUtils.updateTopViewInsets(mActivitySettingsBinding.coordinatorLayout)
         ViewInsetModifiersUtils.updateBottomViewInsets(mActivitySettingsBinding.container)
+    }
+
+    companion object {
+        const val TAG = "SettingsActivity"
     }
 }

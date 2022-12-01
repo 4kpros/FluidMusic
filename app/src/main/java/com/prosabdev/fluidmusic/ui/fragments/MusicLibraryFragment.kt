@@ -63,15 +63,15 @@ class MusicLibraryFragment : Fragment() {
     private fun setupTabLayoutViewPagerAdapter() {
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
             mTabLayoutAdapter = TabLayoutAdapter(this)
-            fragmentMusicLibraryBinding.viewPagerMainExplore.adapter = mTabLayoutAdapter
-            fragmentMusicLibraryBinding.viewPagerMainExplore.offscreenPageLimit = 5
+            fragmentMusicLibraryBinding.viewPager.adapter = mTabLayoutAdapter
+            fragmentMusicLibraryBinding.viewPager.offscreenPageLimit = 8
             TabLayoutMediator(
                 fragmentMusicLibraryBinding.tabLayout,
-                fragmentMusicLibraryBinding.viewPagerMainExplore
+                fragmentMusicLibraryBinding.viewPager
             ) { tab, position ->
                 applyToolBarTitle(position, tab)
             }.attach()
-            fragmentMusicLibraryBinding.viewPagerMainExplore.currentItem = 0
+            fragmentMusicLibraryBinding.viewPager.currentItem = 0
         }
     }
     private fun applyToolBarTitle(position: Int, tab: TabLayout.Tab) {
@@ -80,16 +80,25 @@ class MusicLibraryFragment : Fragment() {
                 tab.text = getString(R.string.songs)
             }
             1->{
-                tab.text = getString(R.string.folders)
-            }
-            2->{
                 tab.text = getString(R.string.albums)
             }
-            3->{
+            2->{
                 tab.text = getString(R.string.artists)
+            }
+            3->{
+                tab.text = getString(R.string.folders)
             }
             4->{
                 tab.text = getString(R.string.genre)
+            }
+            5->{
+                tab.text = getString(R.string.album_artists)
+            }
+            6->{
+                tab.text = getString(R.string.composers)
+            }
+            7->{
+                tab.text = getString(R.string.years)
             }
         }
     }
@@ -140,7 +149,7 @@ class MusicLibraryFragment : Fragment() {
     private  fun updateSelectModeUI(isSelectMode: Boolean, animate : Boolean = true){
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
             if (isSelectMode) {
-                fragmentMusicLibraryBinding.viewPagerMainExplore.isUserInputEnabled = false
+                fragmentMusicLibraryBinding.viewPager.isUserInputEnabled = false
                 if (fragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != VISIBLE)
                     ViewAnimatorsUtils.crossTranslateInFromHorizontal(
                         fragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View,
@@ -150,7 +159,7 @@ class MusicLibraryFragment : Fragment() {
                     )
 //                fragmentMusicLibraryBinding.tabLayout.visibility = GONE
             } else {
-                fragmentMusicLibraryBinding.viewPagerMainExplore.isUserInputEnabled = true
+                fragmentMusicLibraryBinding.viewPager.isUserInputEnabled = true
                 if (fragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != GONE)
                     ViewAnimatorsUtils.crossTranslateOutFromHorizontal(
                         fragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View,
@@ -168,7 +177,7 @@ class MusicLibraryFragment : Fragment() {
             fragmentMusicLibraryBinding.topAppBar.setNavigationOnClickListener {
                 mMainFragmentViewModel.setShowDrawerMenuCounter()
             }
-            fragmentMusicLibraryBinding.viewPagerMainExplore.registerOnPageChangeCallback(object :
+            fragmentMusicLibraryBinding.viewPager.registerOnPageChangeCallback(object :
                 ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
@@ -242,20 +251,29 @@ class MusicLibraryFragment : Fragment() {
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
             MainScope().launch {
                 when (position) {
-                    0 -> {
+                    0->{
                         fragmentMusicLibraryBinding.topAppBar.title = getString(R.string.songs)
                     }
-                    1 -> {
-                        fragmentMusicLibraryBinding.topAppBar.title = getString(R.string.folders)
-                    }
-                    2 -> {
+                    1->{
                         fragmentMusicLibraryBinding.topAppBar.title = getString(R.string.albums)
                     }
-                    3 -> {
+                    2->{
                         fragmentMusicLibraryBinding.topAppBar.title = getString(R.string.artists)
                     }
-                    4 -> {
+                    3->{
+                        fragmentMusicLibraryBinding.topAppBar.title = getString(R.string.folders)
+                    }
+                    4->{
                         fragmentMusicLibraryBinding.topAppBar.title = getString(R.string.genre)
+                    }
+                    5->{
+                        fragmentMusicLibraryBinding.topAppBar.title = getString(R.string.album_artists)
+                    }
+                    6->{
+                        fragmentMusicLibraryBinding.topAppBar.title = getString(R.string.composers)
+                    }
+                    7->{
+                        fragmentMusicLibraryBinding.topAppBar.title = getString(R.string.years)
                     }
                 }
             }
@@ -266,6 +284,8 @@ class MusicLibraryFragment : Fragment() {
     }
 
     companion object {
+        const val TAG = "MusicLibraryFragment"
+
         @JvmStatic
         fun newInstance(exploreContent: Int = 0) =
             MusicLibraryFragment().apply {

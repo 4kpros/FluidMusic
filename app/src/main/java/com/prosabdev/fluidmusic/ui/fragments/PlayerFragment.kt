@@ -15,7 +15,6 @@ import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.slider.Slider
 import com.google.android.material.slider.Slider.OnSliderTouchListener
@@ -483,6 +482,8 @@ import kotlinx.coroutines.withContext
     }
 
     companion object {
+        const val TAG = "PlayerFragment"
+
         @JvmStatic
         fun newInstance() =
             PlayerFragment().apply {

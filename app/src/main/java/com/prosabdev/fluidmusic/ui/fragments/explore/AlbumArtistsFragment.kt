@@ -71,6 +71,8 @@ class AlbumArtistsFragment : Fragment() {
     }
 
     companion object {
+        const val TAG = "AlbumArtistsFragment"
+
         @JvmStatic
         fun newInstance(pageIndex: Int) =
             AlbumArtistsFragment().apply {

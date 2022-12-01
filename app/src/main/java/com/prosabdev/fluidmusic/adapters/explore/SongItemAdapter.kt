@@ -15,10 +15,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.color.MaterialColors
+import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapter
 import com.prosabdev.fluidmusic.databinding.ItemGenericExploreListBinding
 import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.view.AlbumItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.FormattersUtils
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
@@ -31,8 +33,8 @@ class SongItemAdapter(
     private val mContext: Context,
     private val mOnItemClickListener: OnItemClickListener,
     private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener
-    ) : SelectablePlayingItemListAdapter<SongItemAdapter.SongItemViewHolder>(SongItem.diffCallback as DiffUtil.ItemCallback<Any>)
-    {
+    ) : SelectablePlayingItemListAdapter<SongItemAdapter.SongItemViewHolder>(SongItem.diffCallback as DiffUtil.ItemCallback<Any>),
+    FastScroller.SectionIndexer {
     interface OnItemClickListener {
         fun onSongItemClicked(position: Int)
         fun onSongItemLongClicked(position: Int)
@@ -76,6 +78,17 @@ class SongItemAdapter(
     }
     fun selectableClearSelection(layoutManager : GridLayoutManager? = null) {
         selectableItemClearAllSelection(layoutManager)
+    }
+
+    override fun getSectionText(position: Int): CharSequence {
+        val tempText: String =
+            if(position >= 0 && position < currentList.size)
+                    (currentList[position] as SongItem?)?.title ?:
+                    (currentList[position] as SongItem?)?.fileName ?:
+                    "#"
+            else
+                "#"
+        return tempText.substring(0, 1)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongItemViewHolder {

@@ -9,8 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.prosabdev.fluidmusic.R
@@ -238,7 +236,7 @@ class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFra
     }
 
     companion object {
-        const val TAG = "PlaylistAddBottomSheetDialog"
+        const val TAG = "PlaylistAddFullBottomSheetDialogFragment"
         const val DEFAULT_PLAYLIST_NAME : String = "Playlist"
 
         @JvmStatic

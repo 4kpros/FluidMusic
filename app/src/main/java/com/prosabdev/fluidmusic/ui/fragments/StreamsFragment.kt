@@ -63,6 +63,8 @@ class StreamsFragment : Fragment() {
     }
 
     companion object {
+        const val TAG = "StreamsFragment"
+
         @JvmStatic
         fun newInstance() =
             StreamsFragment().apply {

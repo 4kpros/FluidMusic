@@ -14,6 +14,7 @@ class SortItemsBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private lateinit var mBottomSheetSortItemsBinding: BottomSheetSortItemsBinding
 
     private var mFromSource: String? = null
+    private var mFromSourceValue: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,12 +42,13 @@ class SortItemsBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     companion object {
-        const val TAG = "SortOrganizeItemsBottomSheetDialog"
+        const val TAG = "SortItemsBottomSheetDialogFragment"
 
         @JvmStatic
-        fun newInstance(fromSource: String?) =
+        fun newInstance(fromSource: String?, fromSourceValue: String? = null) =
             SortItemsBottomSheetDialogFragment().apply {
                 mFromSource = fromSource
+                mFromSourceValue = fromSourceValue
             }
     }
 }

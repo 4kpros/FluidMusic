@@ -6,25 +6,34 @@ import com.prosabdev.fluidmusic.ui.fragments.explore.*
 
 class TabLayoutAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int {
-        return 5
+        return 8
     }
     override fun createFragment(position: Int): Fragment {
         var fragment = Fragment()
         when (position) {
-            0 -> {
+            0->{
                 fragment = AllSongsFragment.newInstance(position)
             }
-            1 -> {
-                fragment = FoldersFragment.newInstance(position)
-            }
-            2 -> {
+            1->{
                 fragment = AlbumsFragment.newInstance(position)
             }
-            3 -> {
+            2->{
                 fragment = ArtistsFragment.newInstance(position)
             }
-            4 -> {
+            3->{
+                fragment = FoldersFragment.newInstance(position)
+            }
+            4->{
                 fragment = GenresFragment.newInstance(position)
+            }
+            5->{
+                fragment = AlbumArtistsFragment.newInstance(position)
+            }
+            6->{
+                fragment = ComposersFragment.newInstance(position)
+            }
+            7->{
+                fragment = YearsFragment.newInstance(position)
             }
         }
 

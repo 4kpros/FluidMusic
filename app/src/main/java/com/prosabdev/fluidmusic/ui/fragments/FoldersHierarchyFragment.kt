@@ -63,6 +63,8 @@ class FoldersHierarchyFragment : Fragment() {
     }
 
     companion object {
+        const val TAG = "FoldersHierarchyFragment"
+
         @JvmStatic
         fun newInstance() =
             FoldersHierarchyFragment().apply {

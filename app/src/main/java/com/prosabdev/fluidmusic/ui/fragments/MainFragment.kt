@@ -530,6 +530,7 @@ import kotlinx.coroutines.launch
 
     companion object {
         const val TAG: String = "MainFragment"
+
         @JvmStatic
         fun newInstance() =
             MainFragment().apply {
