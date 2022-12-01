@@ -187,8 +187,7 @@ import kotlinx.coroutines.launch
                         ViewAnimatorsUtils.crossFadeDownClickable(
                             fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange,
                             animate,
-                            200,
-                            0.4f
+                            200
                         )
                 }else{
                     fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = context?.let {
@@ -208,8 +207,7 @@ import kotlinx.coroutines.launch
                         ViewAnimatorsUtils.crossFadeDownClickable(
                             fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange,
                             animate,
-                            200,
-                            0.4f
+                            200
                         )
                 }
                 fragmentMainBinding.constraintTopSelectionInclude.textSelectedCount.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"

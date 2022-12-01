@@ -57,7 +57,12 @@ abstract class ViewAnimatorsUtils {
                 }
             }
         }
-        fun crossFadeDownClickable(contentView : View, animate : Boolean = false, duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime), minAlpha: Float = 0.0f) {
+        fun crossFadeDownClickable(
+            contentView : View,
+            animate : Boolean = false,
+            duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime),
+            minAlpha: Float = 0.35f
+        ) {
             MainScope().launch {
                 if(animate){
                     contentView.apply {

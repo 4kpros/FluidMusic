@@ -4,11 +4,13 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.sothree.slidinguppanel.PanelState
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
+    private val mMutableCurrentSelectablePage = MutableLiveData<String>(ConstantValues.EXPLORE_ALL_SONGS)
     private val mMutableSelectMode = MutableLiveData<Boolean>(false)
     private val mMutableToggleOnRange = MutableLiveData<Int>(0)
     private val mMutableTotalSelected = MutableLiveData<Int>(0)
@@ -21,6 +23,7 @@ class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mMutableShowSlidingUpPanelCounter = MutableLiveData<Int>(0)
     private val mMutableHideSlidingUpPanelCounter = MutableLiveData<Int>(0)
 
+    private val mCurrentSelectablePage: LiveData<String> get() = mMutableCurrentSelectablePage
     private val mSelectMode: LiveData<Boolean> get() = mMutableSelectMode
     private val mToggleOnRange: LiveData<Int> get() = mMutableToggleOnRange
     private val mTotalSelected: LiveData<Int> get() = mMutableTotalSelected
@@ -33,6 +36,14 @@ class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mShowSlidingUpPanelCounter: LiveData<Int> get() = mMutableShowSlidingUpPanelCounter
     private val mHideSlidingUpPanelCounter: LiveData<Int> get() = mMutableHideSlidingUpPanelCounter
 
+    fun setCurrentSelectablePage(page : String) {
+        MainScope().launch {
+            mMutableCurrentSelectablePage.value = page
+        }
+    }
+    fun getCurrentSelectablePage(): LiveData<String> {
+        return mCurrentSelectablePage
+    }
     fun setSlidingUpPanelState(state : PanelState) {
         MainScope().launch {
             mMutableSlidingUpPanelState.value = state
@@ -107,14 +118,6 @@ class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
     }
     fun getTotalCount(): LiveData<Int> {
         return mTotalCount
-    }
-    fun setActivePage(page : Int) {
-        MainScope().launch {
-            mMutableActivePage.value = page
-        }
-    }
-    fun getActivePage(): LiveData<Int> {
-        return mActivePage
     }
     fun setShowDrawerMenuCounter() {
         MainScope().launch {

@@ -49,13 +49,13 @@ class MusicLibraryFragment : Fragment() {
         val view = mFragmentMusicLibraryBinding?.root
 
         initViews()
+        setupTabLayoutViewPagerAdapter()
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupTabLayoutViewPagerAdapter()
         checkInteractions()
         observeLiveData()
     }
@@ -71,9 +71,7 @@ class MusicLibraryFragment : Fragment() {
             ) { tab, position ->
                 applyToolBarTitle(position, tab)
             }.attach()
-            fragmentMusicLibraryBinding.viewPagerMainExplore.currentItem =
-                mMainFragmentViewModel.getActivePage().value ?: 0
-            applyAppBarTitle(mMainFragmentViewModel.getActivePage().value ?: 0)
+            fragmentMusicLibraryBinding.viewPagerMainExplore.currentItem = 0
         }
     }
     private fun applyToolBarTitle(position: Int, tab: TabLayout.Tab) {
@@ -105,12 +103,40 @@ class MusicLibraryFragment : Fragment() {
     }
     private  fun updateTotalSelectedItemsUI(totalSelected : Int, animate : Boolean = true){
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
-            if (totalSelected > 0 && fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover.visibility != GONE)
-                ViewAnimatorsUtils.crossFadeDown(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover, animate, 200)
-            else if(totalSelected <= 0 && fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover.visibility != VISIBLE)
-                ViewAnimatorsUtils.crossFadeUp(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.constraintSideMenuHover, animate, 200, 0.8f)
+            if (totalSelected > 0) {
+                if(!fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter.isClickable){
+                    enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter)
+                    enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlaylistAdd)
+                    enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonEditTags)
+                    enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonShare)
+                    enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonDelete)
+                }
+            }else{
+                if(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter.isClickable){
+                    disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter)
+                    disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlaylistAdd)
+                    disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonEditTags)
+                    disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonShare)
+                    disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonDelete)
+                }
+            }
         }
     }
+    private fun disableSideSelectionActions(view : View) {
+        ViewAnimatorsUtils.crossFadeDownClickable(
+            view,
+            true,
+            200
+        )
+    }
+    private fun enableSideSelectionActions(view : View) {
+        ViewAnimatorsUtils.crossFadeUpClickable(
+            view,
+            true,
+            200
+        )
+    }
+
     private  fun updateSelectModeUI(isSelectMode: Boolean, animate : Boolean = true){
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
             if (isSelectMode) {
@@ -149,18 +175,18 @@ class MusicLibraryFragment : Fragment() {
                     applyAppBarTitle(position)
                     mMainFragmentViewModel.setSelectMode(false)
                     mMainFragmentViewModel.setTotalSelected(0)
-                    mMainFragmentViewModel.setActivePage(position)
+                    updateViewModelLibraryPage(position)
                     updateSelectModeUI(false)
                 }
             })
             fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter.setOnClickListener {
                 addToPlayAfter()
             }
-            fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonQueueMusicAdd.setOnClickListener {
-                addSelectionToQueueMusicDialog()
-            }
             fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlaylistAdd.setOnClickListener {
-                openAddSelectionToPlaylistDialog()
+                openPlaylistAddDialog()
+            }
+            fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonEditTags.setOnClickListener {
+                openTagEditorDialog()
             }
             fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonShare.setOnClickListener {
                 openShareSelectionDialog()
@@ -170,6 +196,19 @@ class MusicLibraryFragment : Fragment() {
             }
         }
     }
+    private fun openTagEditorDialog() {
+        //
+    }
+    private fun openPlaylistAddDialog() {
+        //
+    }
+
+    private fun updateViewModelLibraryPage(position: Int) {
+        if (position == 0){
+            mMainFragmentViewModel.setCurrentSelectablePage(ConstantValues.EXPLORE_ALL_SONGS)
+        }
+    }
+
     private fun openShareSelectionDialog() {
         Toast.makeText(this.requireContext(), "On share selection", Toast.LENGTH_SHORT).show()
     }

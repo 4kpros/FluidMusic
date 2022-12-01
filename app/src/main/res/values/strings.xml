@@ -163,4 +163,6 @@
     <string name="years">Years</string>
     <string name="composers">Composers</string>
     <string name="album_artists">Album artists</string>
+    <string name="edit_tags">Edit tags</string>
+    <string name="play_after">Play after</string>
 </resources>

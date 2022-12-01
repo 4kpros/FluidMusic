@@ -121,13 +121,13 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun updateOnScrollingStateUI(i: Int) {
-        if(mMainFragmentViewModel.getActivePage().value == mPageIndex){
+        if(mMainFragmentViewModel.getCurrentSelectablePage().value == ConstantValues.EXPLORE_ALL_SONGS){
             if(i == 2)
                 mEmptyBottomAdapter?.onSetScrollState(2)
         }
     }
     private fun onToggleRangeChanged() {
-        mSongItemAdapter?.selectableToggleSelectRange(mLayoutManager)
+        mSongItemAdapter?.selectableOnSelectRange(mLayoutManager)
     }
     private fun onTotalSelectedItemsChanged(it: Int?) {
         if((it ?: 0) > 0 && (it ?: 0) >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
@@ -137,7 +137,9 @@ class AllSongsFragment : Fragment() {
         }
     }
     private fun onSelectionModeChanged(it: Boolean?) {
-        mSongItemAdapter?.selectableSetSelectionMode(it?:false)
+        mLayoutManager?.let { it1 ->
+            mSongItemAdapter?.selectableSetSelectionMode(it?:false, it1)
+        }
         mHeadlineTopPlayShuffleAdapter?.onSelectModeValue(it ?: false)
     }
     private fun updatePlayingSongUI(songItem: SongItem?) {
@@ -157,7 +159,7 @@ class AllSongsFragment : Fragment() {
                 val tempTargetPosition = if(songPosition + 2 <= tempListSize) songPosition + 2 else tempListSize
                 MainScope().launch {
                     mLayoutManager?.let {
-                        it?.startSmoothScroll(
+                        it.startSmoothScroll(
                             CenterSmoothScroller(ctx).apply {
                                 targetPosition = tempTargetPosition
                             }
@@ -284,8 +286,7 @@ class AllSongsFragment : Fragment() {
                 object : SongItemAdapter.OnItemClickListener{
                     override fun onSongItemClicked(position: Int) {
                         if(mSongItemAdapter?.selectableGetSelectionMode() == true){
-                            mSongItemAdapter?.selectableToggleSelection(position, mLayoutManager)
-                            mMainFragmentViewModel.setTotalSelected(mSongItemAdapter?.selectableGetSelectedItemCount() ?: 0)
+                            mSongItemAdapter?.selectableOnSelectFromPosition(position, mLayoutManager)
                         }else{
                             playSongAtPosition(position)
                         }
@@ -295,6 +296,10 @@ class AllSongsFragment : Fragment() {
                     }
                 },
                 object : SelectableItemListAdapter.OnSelectSelectableItemListener {
+                    override fun onSelectModeChange(selectMode: Boolean) {
+                        mMainFragmentViewModel.setSelectMode(selectMode)
+                    }
+
                     override fun onTotalSelectedItemChange(totalSelected: Int) {
                         mMainFragmentViewModel.setTotalSelected(totalSelected)
                     }
@@ -327,15 +332,7 @@ class AllSongsFragment : Fragment() {
         }
     }
     private fun checkMultipleSelection(position: Int) {
-        if(mSongItemAdapter?.selectableGetSelectionMode() == true){
-            mSongItemAdapter?.selectableToggleSelection(position, mLayoutManager)
-            mMainFragmentViewModel.setTotalSelected(mSongItemAdapter?.selectableGetSelectedItemCount() ?: 0)
-        }else{
-            mSongItemAdapter?.selectableSetSelectionMode(true, mLayoutManager)
-            mMainFragmentViewModel.setSelectMode(mSongItemAdapter?.selectableGetSelectionMode() ?: false)
-            mSongItemAdapter?.selectableToggleSelection(position, mLayoutManager)
-            mMainFragmentViewModel.setTotalSelected(mSongItemAdapter?.selectableGetSelectedItemCount() ?: 0)
-        }
+        mSongItemAdapter?.selectableOnSelectFromPosition(position, mLayoutManager)
     }
     private fun showSortSongsDialog() {
         if(!mSortItemsBottomSheetDialogFragment.isVisible)

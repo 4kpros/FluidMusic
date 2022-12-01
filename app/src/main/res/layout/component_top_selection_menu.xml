@@ -41,7 +41,7 @@
                     android:id="@+id/text_selected_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    style="?attr/textAppearanceTitleLarge"
+                    style="@style/TextAppearance.Material3.TitleMedium"
                     android:textStyle="bold"
                     android:maxLines="1"
                     android:ellipsize="end"

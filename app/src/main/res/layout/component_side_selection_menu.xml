@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:clickable="true"
-            android:focusable="false">
+            >
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/container_icons"
@@ -40,21 +40,12 @@
                     android:id="@+id/button_play_after"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/play_arrow"
-                    style="?attr/materialIconButtonStyle"
-                    android:layout_gravity="center"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_queue_music_add"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     app:icon="@drawable/fast_forward"
-                    style="?attr/materialIconButtonStyle"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_gravity="center"
-                    app:layout_constraintTop_toBottomOf="@+id/button_play_after"
+                    android:contentDescription="@string/play_after"
+                    android:tooltipText="@string/play_after"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
@@ -63,9 +54,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/playlist_add"
-                    style="?attr/materialIconButtonStyle"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_gravity="center"
-                    app:layout_constraintTop_toBottomOf="@+id/button_queue_music_add"
+                    android:contentDescription="@string/add_to_playlist"
+                    android:tooltipText="@string/add_to_playlist"
+                    app:layout_constraintTop_toBottomOf="@+id/button_play_after"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_edit_tags"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/edit"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/edit_tags"
+                    android:tooltipText="@string/edit_tags"
+                    app:layout_constraintTop_toBottomOf="@+id/button_playlist_add"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
@@ -74,9 +80,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/share"
-                    style="?attr/materialIconButtonStyle"
+                    android:contentDescription="@string/share"
+                    android:tooltipText="@string/share"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_gravity="center"
-                    app:layout_constraintTop_toBottomOf="@+id/button_playlist_add"
+                    app:layout_constraintTop_toBottomOf="@+id/button_edit_tags"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
@@ -85,26 +93,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/delete"
-                    style="?attr/materialIconButtonStyle"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_gravity="center"
+                    android:contentDescription="@string/delete"
+                    android:tooltipText="@string/delete"
                     app:layout_constraintTop_toBottomOf="@+id/button_share"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:id="@+id/constraint_side_menu_hover"
-                android:clickable="true"
-                android:focusable="false"
-                app:layout_constraintTop_toTopOf="@+id/container_icons"
-                app:layout_constraintBottom_toBottomOf="@+id/container_icons"
-                app:layout_constraintStart_toStartOf="@+id/container_icons"
-                app:layout_constraintEnd_toEndOf="@+id/container_icons"
-                android:background="?android:colorBackground"
-                android:alpha="0"
-                android:visibility="gone" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

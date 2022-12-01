@@ -56,20 +56,17 @@ class SongItemAdapter(
     fun selectableGetSelectionMode(): Boolean {
         return selectableItemGetSelectionMode()
     }
-    fun selectableSetSelectionMode(value : Boolean, layoutManager : GridLayoutManager? = null) {
+    fun selectableSetSelectionMode(value : Boolean, layoutManager : GridLayoutManager) {
         return selectableItemSetSelectionMode(value, layoutManager)
     }
-    fun selectableIsSelected(position: Int): Boolean {
+    private fun selectableIsSelected(position: Int): Boolean {
         return selectableItemIsSelected(position)
     }
-    fun selectableToggleSelection(position: Int, layoutManager : GridLayoutManager? = null) {
-        selectableItemToggleSelection(position, layoutManager)
+    fun selectableOnSelectFromPosition(position: Int, layoutManager : GridLayoutManager? = null) {
+        selectableItemOnSelectFromPosition(position, mOnSelectSelectableItemListener, layoutManager)
     }
-    fun selectableUpdateSelection(position: Int, value : Boolean) {
-        selectableItemUpdateSelection(position, value)
-    }
-    fun selectableToggleSelectRange(layoutManager : GridLayoutManager? = null) {
-        selectableItemToggleSelectRange(mOnSelectSelectableItemListener, layoutManager)
+    fun selectableOnSelectRange(layoutManager : GridLayoutManager? = null) {
+        selectableItemOnSelectRange(mOnSelectSelectableItemListener, layoutManager)
     }
     fun selectableGetSelectedItemCount(): Int {
         return selectableItemGetSelectedItemCount()
@@ -126,6 +123,11 @@ class SongItemAdapter(
     override fun onViewRecycled(holder: SongItemViewHolder) {
         super.onViewRecycled(holder)
         holder.recycleItem(mContext)
+    }
+
+    override fun onViewAttachedToWindow(holder: SongItemViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        holder.updateSelectedStateUI(selectableIsSelected(holder.bindingAdapterPosition))
     }
 
     class SongItemViewHolder(

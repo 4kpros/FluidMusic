@@ -16,10 +16,7 @@ import com.bumptech.glide.request.transition.Transition
 import com.bumptech.glide.signature.ObjectKey
 import com.prosabdev.fluidmusic.R
 import jp.wasabeef.blurry.Blurry
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 
 abstract class ImageLoadersUtils {
@@ -32,21 +29,23 @@ abstract class ImageLoadersUtils {
             widthHeight: Int? = null,
             crossFadeDuration : Int = 0,
             showPlaceHolder : Boolean = false
-        ) = withContext(Dispatchers.IO) {
+        ) = coroutineScope {
             if(imageView == null)
-                return@withContext
+                return@coroutineScope
 
             if (uri == null || uri.toString().isEmpty()) {
                 loadWithResourceID(context, imageView, 0, crossFadeDuration)
-                return@withContext
+                return@coroutineScope
             }
 
             val byteArray: ByteArray? =
-                AudioInfoExtractorUtils.extractImageBinaryDataFromAudioUri(context, uri)
+                withContext(Dispatchers.IO){
+                    return@withContext AudioInfoExtractorUtils.extractImageBinaryDataFromAudioUri(context, uri)
+                }
 
             if (byteArray == null) {
                 loadWithResourceID(context, imageView, 0, crossFadeDuration)
-                return@withContext
+                return@coroutineScope
             }
 
             if(widthHeight != null){
@@ -90,21 +89,23 @@ abstract class ImageLoadersUtils {
             imageView : ImageView?,
             uri: Uri?,
             widthHeight: Int = 100
-        ) = withContext(Dispatchers.IO) {
+        ) = coroutineScope {
             if (imageView == null)
-                return@withContext
+                return@coroutineScope
             if (uri == null || uri.toString().isEmpty())
-                return@withContext
+                return@coroutineScope
 
             val byteArray: ByteArray? =
-                AudioInfoExtractorUtils.extractImageBinaryDataFromAudioUri(context, uri)
+                withContext(Dispatchers.IO){
+                    return@withContext AudioInfoExtractorUtils.extractImageBinaryDataFromAudioUri(context, uri)
+                }
 
             if (byteArray == null) {
                 MainScope().launch {
                     imageView.setImageBitmap(null)
                     Glide.with(context.applicationContext).clear(imageView)
                 }
-                return@withContext
+                return@coroutineScope
             }
             val customTarget: CustomTarget<Bitmap?> = object : CustomTarget<Bitmap?>() {
                 override fun onResourceReady(
