@@ -1,12 +1,10 @@
 package com.prosabdev.fluidmusic.ui.fragments.explore
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -15,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.adapters.CustomGridItemDecoration
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.AlbumItemListAdapter
@@ -172,6 +171,9 @@ class AlbumsFragment : Fragment() {
             MainScope().launch {
                 mFragmentAlbumsBinding.recyclerView.adapter = concatAdapter
                 mFragmentAlbumsBinding.recyclerView.layoutManager = mLayoutManager
+                context?.let { ctx ->
+                    mFragmentAlbumsBinding.recyclerView.addItemDecoration(CustomGridItemDecoration(ctx, spanCount))
+                }
 
                 mFragmentAlbumsBinding.fastScroller.setSectionIndexer(mAlbumItemAdapter)
                 mFragmentAlbumsBinding.fastScroller.attachRecyclerView(mFragmentAlbumsBinding.recyclerView)

@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.transition.platform.MaterialFadeThrough
+import com.l4digital.fastscroll.FastScroller
+import com.l4digital.fastscroll.FastScroller.FastScrollListener
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
@@ -333,6 +335,17 @@ class AllSongsFragment : Fragment() {
 
                 mFragmentAllSongsBinding.fastScroller.setSectionIndexer(mSongItemAdapter)
                 mFragmentAllSongsBinding.fastScroller.attachRecyclerView(mFragmentAllSongsBinding.recyclerView)
+                mFragmentAllSongsBinding.fastScroller.setFastScrollListener(object : FastScrollListener{
+                    override fun onFastScrollStart(fastScroller: FastScroller) {
+                        if(mMainFragmentViewModel.getScrollingState().value != -2)
+                            mMainFragmentViewModel.setScrollingState(-2)
+                    }
+
+                    override fun onFastScrollStop(fastScroller: FastScroller) {
+                        //
+                    }
+
+                })
             }
         }
     }

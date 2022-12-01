@@ -107,7 +107,7 @@ class AlbumItemListAdapter(
 
     override fun onViewRecycled(holder: AlbumItemHolder) {
         super.onViewRecycled(holder)
-        holder.recycleItem(mContext)
+//        holder.recycleItem(mContext)
     }
 
     override fun onViewAttachedToWindow(holder: AlbumItemHolder) {
@@ -149,8 +149,8 @@ class AlbumItemListAdapter(
 
         fun updateSelectedStateUI(selectableIsSelected: Boolean, animated: Boolean = true) {
             if(selectableIsSelected && mItemGenericExploreGridBinding.songItemIsSelected.visibility != View.VISIBLE)
-                ViewAnimatorsUtils.crossFadeUp(mItemGenericExploreGridBinding.songItemIsSelected, animated, 150)
-            else if(!selectableIsSelected && mItemGenericExploreGridBinding.songItemIsSelected.alpha == 1.0f)
+                ViewAnimatorsUtils.crossFadeUp(mItemGenericExploreGridBinding.songItemIsSelected, animated, 150, 0.15f)
+            else if(!selectableIsSelected && mItemGenericExploreGridBinding.songItemIsSelected.alpha == 0.15f)
                 ViewAnimatorsUtils.crossFadeDown(mItemGenericExploreGridBinding.songItemIsSelected, animated, 150)
         }
     }

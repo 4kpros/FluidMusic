@@ -135,7 +135,7 @@ class SongItemAdapter(
 
     override fun onViewRecycled(holder: SongItemViewHolder) {
         super.onViewRecycled(holder)
-        holder.recycleItem(mContext)
+//        holder.recycleItem(mContext)
     }
 
     override fun onViewAttachedToWindow(holder: SongItemViewHolder) {
@@ -216,8 +216,8 @@ class SongItemAdapter(
 
         fun updateSelectedStateUI(selectableIsSelected: Boolean, animated: Boolean = true) {
             if(selectableIsSelected && mItemGenericExploreListBinding.songItemIsSelected.visibility != VISIBLE)
-                ViewAnimatorsUtils.crossFadeUp(mItemGenericExploreListBinding.songItemIsSelected, animated, 150)
-            else if(!selectableIsSelected && mItemGenericExploreListBinding.songItemIsSelected.alpha == 1.0f)
+                ViewAnimatorsUtils.crossFadeUp(mItemGenericExploreListBinding.songItemIsSelected, animated, 150, 0.15f)
+            else if(!selectableIsSelected && mItemGenericExploreListBinding.songItemIsSelected.alpha == 0.15f)
                 ViewAnimatorsUtils.crossFadeDown(mItemGenericExploreListBinding.songItemIsSelected, animated, 150)
         }
     }
