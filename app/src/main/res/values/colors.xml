@@ -7,7 +7,6 @@
     <color name="semiBlack">#33000000</color>
     <color name="semiWhite">#33FFFFFF</color>
 
-    <color name="seed">#6750A4</color>
     <color name="md_theme_light_primary">#6750A4</color>
     <color name="md_theme_light_onPrimary">#FFFFFF</color>
     <color name="md_theme_light_primaryContainer">#EADDFF</color>

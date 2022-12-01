@@ -1,8 +1,9 @@
 package com.prosabdev.fluidmusic.viewmodels.fragments
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 
-class ExploreContentsForFragmentViewModel : ViewModel() {
+class ExploreContentsForFragmentViewModel(app: Application) : AndroidViewModel(app){
 
 
 }

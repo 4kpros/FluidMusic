@@ -1,12 +1,13 @@
 package com.prosabdev.fluidmusic.viewmodels.activities
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class StorageAccessActivityViewModel : ViewModel() {
+class StorageAccessActivityViewModel(app: Application) : AndroidViewModel(app) {
 
     private val mMutableRequestRemoveAllFolderUriTrees = MutableLiveData<Int>(0)
 

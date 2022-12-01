@@ -1,14 +1,14 @@
 package com.prosabdev.fluidmusic.viewmodels.models
 
-import android.content.Context
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
 import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.roomdatabase.repositories.FolderUriTreeRepository
 
-class FolderUriTreeViewModel(ctx : Context) : ViewModel()  {
+class FolderUriTreeViewModel(app: Application) : AndroidViewModel(app) {
 
-    private var repository: FolderUriTreeRepository? = FolderUriTreeRepository(ctx)
+    private var repository: FolderUriTreeRepository? = FolderUriTreeRepository(app)
 
     suspend fun insert(folderUriTree: FolderUriTree?) : Long? {
         return repository?.insert(folderUriTree)

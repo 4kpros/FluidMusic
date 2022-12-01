@@ -44,6 +44,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginHorizontal="@dimen/main_margin"
+            android:layout_marginBottom="@dimen/main_margin"
             android:orientation="vertical"
             >
             <RadioGroup

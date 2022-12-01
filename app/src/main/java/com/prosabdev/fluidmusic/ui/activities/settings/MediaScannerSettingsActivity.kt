@@ -10,6 +10,7 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
@@ -25,11 +26,8 @@ import com.prosabdev.fluidmusic.databinding.ActivityMediaScannerSettingsBinding
 import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
-import com.prosabdev.fluidmusic.viewmodels.activities.ActivityViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.activities.MediaScannerActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
-import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -37,9 +35,8 @@ import kotlinx.coroutines.launch
 
     private lateinit var mActivityMediaScannerSettingsBinding : ActivityMediaScannerSettingsBinding
 
-    private lateinit var mSongItemViewModel: SongItemViewModel
-    private lateinit var mFolderUriTreeViewModel: FolderUriTreeViewModel
-    private lateinit var mMediaScannerActivityViewModel: MediaScannerActivityViewModel
+    private val mFolderUriTreeViewModel: FolderUriTreeViewModel by viewModels()
+    private val mMediaScannerActivityViewModel: MediaScannerActivityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,9 +46,8 @@ import kotlinx.coroutines.launch
 
         mActivityMediaScannerSettingsBinding = DataBindingUtil.setContentView(this, R.layout.activity_media_scanner_settings)
 
-        initializeUIs()
+        initViews()
         MainScope().launch {
-            initViewsModels()
             observeLiveData()
             checkInteractions()
             registerOnBackPressedCallback()
@@ -72,14 +68,6 @@ import kotlinx.coroutines.launch
                 }
             })
         }
-    }
-
-    private fun initViewsModels() {
-        mSongItemViewModel = ModelsViewModelFactory(this.baseContext).create(SongItemViewModel::class.java)
-        mFolderUriTreeViewModel = ModelsViewModelFactory(this.baseContext).create(FolderUriTreeViewModel::class.java)
-
-        mMediaScannerActivityViewModel = ActivityViewModelFactory(this.application).create(
-            MediaScannerActivityViewModel::class.java)
     }
 
     private fun checkInteractions() {
@@ -168,22 +156,22 @@ import kotlinx.coroutines.launch
     }
 
     private suspend fun observeLiveData() {
-        mFolderUriTreeViewModel.getAll()?.observe(this as LifecycleOwner){
+        mFolderUriTreeViewModel.getAll()?.observe(this){
             updateFolderUriTrees(it)
         }
-        mMediaScannerActivityViewModel.getIsLoadingInBackground().observe(this as LifecycleOwner){
+        mMediaScannerActivityViewModel.getIsLoadingInBackground().observe(this){
             updateLoadingUI(it)
         }
-        mMediaScannerActivityViewModel.getFoldersCounter().observe(this as LifecycleOwner){
+        mMediaScannerActivityViewModel.getFoldersCounter().observe(this){
             updateFoldersCounterUI(it)
         }
-        mMediaScannerActivityViewModel.getSongsCounter().observe(this as LifecycleOwner){
+        mMediaScannerActivityViewModel.getSongsCounter().observe(this){
             updateSongsCounterUI(it)
         }
-        mMediaScannerActivityViewModel.getPlaylistsCounter().observe(this as LifecycleOwner){
+        mMediaScannerActivityViewModel.getPlaylistsCounter().observe(this){
             updatePlaylistCounterUI(it)
         }
-        mMediaScannerActivityViewModel.getEmptyFolderUriCounter().observe(this as LifecycleOwner){
+        mMediaScannerActivityViewModel.getEmptyFolderUriCounter().observe(this){
             updateEmptyFolderUriTreeUI(it)
         }
         mMediaScannerActivityViewModel.getOutputWorkInfoList().observe(this){
@@ -195,7 +183,6 @@ import kotlinx.coroutines.launch
         if (it.isNullOrEmpty()){
             return
         }
-
         val workInfo = it[0]
 
         if(workInfo.state.isFinished){
@@ -282,8 +269,8 @@ import kotlinx.coroutines.launch
         mActivityMediaScannerSettingsBinding.isLoading = it
     }
 
-    private fun initializeUIs() {
-        ViewInsetModifiersUtils.updateTopViewInsets(mActivityMediaScannerSettingsBinding.coordinatorSettingsActivity)
-        ViewInsetModifiersUtils.updateBottomViewInsets(mActivityMediaScannerSettingsBinding.emptyView)
+    private fun initViews() {
+        ViewInsetModifiersUtils.updateTopViewInsets(mActivityMediaScannerSettingsBinding.coordinatorLayout)
+        ViewInsetModifiersUtils.updateBottomViewInsets(mActivityMediaScannerSettingsBinding.container)
     }
 }

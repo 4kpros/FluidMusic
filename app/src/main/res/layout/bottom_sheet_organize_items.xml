@@ -44,6 +44,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginHorizontal="@dimen/main_margin"
+            android:layout_marginBottom="@dimen/main_margin"
             android:orientation="vertical"
             >
             <RadioGroup
@@ -65,24 +66,21 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/dialog_small_list"
-                        app:useMaterialThemeColors="true"
-                        style="@style/Widget.Material3.CompoundButton.RadioButton" />
+                        app:useMaterialThemeColors="true" />
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/radio_file_dialog_medium_list"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/dialog_medium_list"
-                        app:useMaterialThemeColors="true"
-                        style="@style/Widget.Material3.CompoundButton.RadioButton" />
+                        app:useMaterialThemeColors="true" />
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/radio_dialog_large_list"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/dialog_large_list"
-                        app:useMaterialThemeColors="true"
-                        style="@style/Widget.Material3.CompoundButton.RadioButton" />
+                        app:useMaterialThemeColors="true" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -97,7 +95,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/dialog_small_grid"
                         app:useMaterialThemeColors="true"
-                        style="@style/Widget.Material3.CompoundButton.RadioButton" />
+                        />
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/radio_file_dialog_medium_grid"
@@ -105,7 +103,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/dialog_medium_grid"
                         app:useMaterialThemeColors="true"
-                        style="@style/Widget.Material3.CompoundButton.RadioButton" />
+                        />
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/radio_dialog_large_grid"
@@ -113,7 +111,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/dialog_large_grid"
                         app:useMaterialThemeColors="true"
-                        style="@style/Widget.Material3.CompoundButton.RadioButton" />
+                        />
                 </androidx.appcompat.widget.LinearLayoutCompat>
             </RadioGroup>
         </androidx.appcompat.widget.LinearLayoutCompat>

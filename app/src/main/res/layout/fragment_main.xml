@@ -12,22 +12,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:openDrawer="start"
-        tools:context=".MainActivity">
+        tools:context=".ui.fragments.MainFragment"
+        >
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:id="@+id/coordinator_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             >
             <com.sothree.slidinguppanel.SlidingUpPanelLayout
-                tools:context=".ui.fragments.MainFragment"
                 android:id="@+id/sliding_up_panel"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:umanoPanelHeight="0dp"
                 app:umanoShadowHeight="0dp"
-                app:umanoInitialState="expanded"
+                app:umanoInitialState="collapsed"
                 app:umanoScrollInterpolator="?attr/quantizeMotionInterpolator"
-                app:umanoFlingVelocity="@integer/material_motion_duration_short_1"
                 android:gravity="bottom"
                 >
 
@@ -47,7 +46,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        style="@style/DefaultBackground">
+                        android:backgroundTint="?colorPrimary"
+                        >
 
                         <include
                             android:id="@+id/constraint_mini_player_include"
@@ -60,7 +60,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        style="@style/DefaultBackground"
+                        android:backgroundTint="?colorPrimary"
                         android:visibility="gone"
                         android:alpha="0"
                         android:translationY="0dp">
@@ -75,7 +75,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:layout_constraintTop_toTopOf="parent"
-                        style="@style/DefaultBackground"
+                        android:backgroundTint="?colorPrimary"
                         android:visibility="gone"
                         android:alpha="0"
                         android:translationY="0dp">

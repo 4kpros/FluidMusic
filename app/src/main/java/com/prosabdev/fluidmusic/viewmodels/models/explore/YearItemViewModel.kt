@@ -1,14 +1,14 @@
 package com.prosabdev.fluidmusic.viewmodels.models.explore
 
-import android.content.Context
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
 import com.prosabdev.fluidmusic.models.view.YearItem
 import com.prosabdev.fluidmusic.roomdatabase.repositories.explore.YearItemRepository
 
-class YearItemViewModel(ctx : Context) : ViewModel() {
+class YearItemViewModel(app: Application) : AndroidViewModel(app) {
 
-    private var repository: YearItemRepository? = YearItemRepository(ctx)
+    private var repository: YearItemRepository? = YearItemRepository(app)
 
     suspend fun getAtName(name : String) : YearItem? {
         return repository?.getAtName(name)

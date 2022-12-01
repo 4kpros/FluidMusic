@@ -9,7 +9,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        >
 
         <ImageView
             android:id="@+id/imageview_blurred_mini_player"
@@ -28,8 +29,8 @@
             app:layout_constraintBottom_toBottomOf="@+id/imageview_blurred_mini_player"
             app:layout_constraintStart_toStartOf="@+id/imageview_blurred_mini_player"
             app:layout_constraintEnd_toEndOf="@+id/imageview_blurred_mini_player"
-            style="@style/DefaultBackground"
-            android:alpha="0.5" />
+            android:background="?android:colorBackground"
+            android:alpha="0.35" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraint_mini_player"

@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.viewmodels.fragments.explore
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 
-class FoldersFragmentViewModel() : ViewModel() {
+class FoldersFragmentViewModel(app: Application) : AndroidViewModel(app) {
 }

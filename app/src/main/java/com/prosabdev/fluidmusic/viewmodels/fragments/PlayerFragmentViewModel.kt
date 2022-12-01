@@ -1,16 +1,17 @@
 package com.prosabdev.fluidmusic.viewmodels.fragments
 
+import android.app.Application
 import android.support.v4.media.session.PlaybackStateCompat
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.SleepTimerSP
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class PlayerFragmentViewModel : ViewModel()  {
+class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
 
     private val mMutableCurrentPlayingSong = MutableLiveData<SongItem?>(null)
     private val mMutableIsPlaying = MutableLiveData<Boolean>(false)
@@ -21,9 +22,11 @@ class PlayerFragmentViewModel : ViewModel()  {
     private val mMutableRepeat = MutableLiveData<Int>(PlaybackStateCompat.REPEAT_MODE_NONE)
     private val mMutableSleepTimer = MutableLiveData<SleepTimerSP?>(null)
     private val mMutableSleepTimerStateStarted = MutableLiveData<Boolean>(false)
-
     private val mMutableSkipNextTrackCounter = MutableLiveData<Int>(0)
     private val mMutableSkipPrevTrackCounter = MutableLiveData<Int>(0)
+
+    private val mMutableShowEqualizerFragmentCounter = MutableLiveData<Int>(0)
+    private val mMutableShowMediaScannerFragmentCounter = MutableLiveData<Int>(0)
 
     private val mCurrentPlayingSong: LiveData<SongItem?> get() = mMutableCurrentPlayingSong
     private val mIsPlaying: LiveData<Boolean> get() = mMutableIsPlaying
@@ -34,9 +37,11 @@ class PlayerFragmentViewModel : ViewModel()  {
     private val mRepeat: LiveData<Int> get() = mMutableRepeat
     private val mSleepTimer: LiveData<SleepTimerSP?> get() = mMutableSleepTimer
     private val mSleepTimerStateStarted: LiveData<Boolean> get() = mMutableSleepTimerStateStarted
-
     private val mSkipNextTrackCounter: LiveData<Int> get() = mMutableSkipNextTrackCounter
     private val mSkipPrevTrackCounter: LiveData<Int> get() = mMutableSkipPrevTrackCounter
+
+    private val mShowEqualizerFragmentCounter: LiveData<Int> get() = mMutableShowEqualizerFragmentCounter
+    private val mShowMediaScannerFragmentCounter: LiveData<Int> get() = mMutableShowMediaScannerFragmentCounter
 
     fun setCurrentPlayingSong(songItem : SongItem?){
         MainScope().launch {
@@ -55,6 +60,7 @@ class PlayerFragmentViewModel : ViewModel()  {
         return mIsPlaying
     }
     fun toggleIsPlaying() {
+        if(mCurrentPlayingSong.value == null || mCurrentPlayingSong.value?.uri == null) return
         MainScope().launch {
             val tempIsPlaying: Boolean = mIsPlaying.value ?: false
             mMutableIsPlaying.value = !tempIsPlaying
@@ -140,5 +146,18 @@ class PlayerFragmentViewModel : ViewModel()  {
     }
     fun getSkipPrevTrackCounter(): LiveData<Int> {
         return mSkipPrevTrackCounter
+    }
+
+    fun setShowEqualizerFragmentCounter(){
+        MainScope().launch {
+            var tempCounter: Int = mShowEqualizerFragmentCounter.value ?: 0
+            if(tempCounter >= 100)
+                tempCounter = 0
+            tempCounter++
+            mMutableShowEqualizerFragmentCounter.value = tempCounter
+        }
+    }
+    fun getShowEqualizerFragmentCounter(): LiveData<Int> {
+        return mShowEqualizerFragmentCounter
     }
 }

@@ -74,7 +74,6 @@
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/MaterialAlertDialog.Material3.Body.Text"
                             android:text="@string/file_path"
                             android:maxLines="1"
                             android:ellipsize="end"
@@ -96,7 +95,6 @@
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/MaterialAlertDialog.Material3.Body.Text"
                             android:text="@string/details"
                             />
                         <com.google.android.material.textview.MaterialTextView
@@ -116,7 +114,6 @@
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/MaterialAlertDialog.Material3.Body.Text"
                             android:text="@string/duration"
                             />
                         <com.google.android.material.textview.MaterialTextView
@@ -136,7 +133,6 @@
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/MaterialAlertDialog.Material3.Body.Text"
                             android:text="@string/file_size"
                             />
                         <com.google.android.material.textview.MaterialTextView
@@ -230,7 +226,6 @@
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/MaterialAlertDialog.Material3.Body.Text"
                             android:text="@string/file_name"
                             android:maxLines="1"
                             android:ellipsize="end"
@@ -252,7 +247,6 @@
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/MaterialAlertDialog.Material3.Body.Text"
                             android:text="@string/title"
                             android:maxLines="1"
                             android:ellipsize="end"
@@ -274,7 +268,6 @@
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/MaterialAlertDialog.Material3.Body.Text"
                             android:text="@string/artist"
                             android:maxLines="1"
                             android:ellipsize="end"
@@ -296,7 +289,6 @@
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/MaterialAlertDialog.Material3.Body.Text"
                             android:text="@string/album"
                             android:maxLines="1"
                             android:ellipsize="end"
@@ -318,7 +310,6 @@
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/MaterialAlertDialog.Material3.Body.Text"
                             android:text="@string/album_artist"
                             android:maxLines="1"
                             android:ellipsize="end"
@@ -340,7 +331,6 @@
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/MaterialAlertDialog.Material3.Body.Text"
                             android:text="@string/genre"
                             android:maxLines="1"
                             android:ellipsize="end"
@@ -361,7 +351,6 @@
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/MaterialAlertDialog.Material3.Body.Text"
                             android:text="@string/composer"
                             android:maxLines="1"
                             android:ellipsize="end"

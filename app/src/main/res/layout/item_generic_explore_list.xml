@@ -28,8 +28,8 @@
                 android:id="@+id/song_item_is_selected"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                style="@style/SongSelectedBackground"
-                android:alpha=".35"
+                android:background="?colorSecondaryContainer"
+                android:alpha="0.5"
                 android:visibility="invisible"
                 />
         </com.google.android.material.card.MaterialCardView>

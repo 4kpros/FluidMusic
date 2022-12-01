@@ -1,14 +1,14 @@
 package com.prosabdev.fluidmusic.viewmodels.models.explore
 
-import android.content.Context
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
 import com.prosabdev.fluidmusic.models.view.FolderItem
 import com.prosabdev.fluidmusic.roomdatabase.repositories.explore.FolderItemRepository
 
-class FolderItemViewModel(ctx : Context) : ViewModel() {
+class FolderItemViewModel(app: Application) : AndroidViewModel(app) {
 
-    private var repository: FolderItemRepository? = FolderItemRepository(ctx)
+    private var repository: FolderItemRepository? = FolderItemRepository(app)
 
     suspend fun getAtName(name : String) : FolderItem? {
         return repository?.getAtName(name)

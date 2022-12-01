@@ -11,23 +11,21 @@
         android:id="@+id/constraint_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        style="@style/DefaultBackground"
+        android:backgroundTint="?android:colorBackground"
         tools:context=".ui.fragments.PlayerFragment"
         >
         <ImageView
             android:id="@+id/blurred_imageview"
-            style="@style/DefaultBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             />
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <View
             android:id="@+id/constraint_hover_blurred_view"
-            style="@style/DefaultBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:alpha="0.4"
-            android:scaleType="centerCrop"
+            android:background="?android:colorBackground"
+            android:alpha="0.35"
             />
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linear_viewpager"
@@ -277,7 +275,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:alpha="0.05"
-                android:background="@drawable/aaaaa_top_rounded_background"
+                android:background="@drawable/custom_top_rounded_background"
                 />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_queue_music"

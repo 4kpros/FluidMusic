@@ -7,6 +7,7 @@ import android.widget.Toast
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.core.os.BuildCompat
@@ -27,10 +28,8 @@ import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.DeviceInfoAndParserUtils
 import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
-import com.prosabdev.fluidmusic.viewmodels.activities.ActivityViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.activities.StorageAccessActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -40,8 +39,8 @@ import kotlinx.coroutines.withContext
 
     private lateinit var mActivityStorageAccessSettingsBinding: ActivityStorageAccessSettingsBinding
 
-    private lateinit var mFolderUriTreeViewModel: FolderUriTreeViewModel
-    private lateinit var mStorageAccessActivityViewModel: StorageAccessActivityViewModel
+    private val mFolderUriTreeViewModel: FolderUriTreeViewModel by viewModels()
+    private val mStorageAccessActivityViewModel: StorageAccessActivityViewModel by viewModels()
 
     private var mEmptyBottomAdapter: EmptyBottomAdapter? = null
     private var mFolderUriTreeAdapter: FolderUriTreeAdapter? = null
@@ -180,12 +179,8 @@ import kotlinx.coroutines.withContext
     }
 
     private fun initViews() {
-        mFolderUriTreeViewModel = ModelsViewModelFactory(this.baseContext).create(FolderUriTreeViewModel::class.java)
-        mStorageAccessActivityViewModel = ActivityViewModelFactory().create(
-            StorageAccessActivityViewModel::class.java)
-
         ViewInsetModifiersUtils.updateTopViewInsets(mActivityStorageAccessSettingsBinding.coordinatorLayout)
-        ViewInsetModifiersUtils.updateBottomViewInsets(mActivityStorageAccessSettingsBinding.linearButtonsContainer)
+        ViewInsetModifiersUtils.updateBottomViewInsets(mActivityStorageAccessSettingsBinding.container)
     }
 
     private var treeUri: String?

@@ -1,16 +1,17 @@
 package com.prosabdev.fluidmusic.viewmodels.fragments.explore
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class AllSongsFragmentViewModel : ViewModel() {
+class AllSongsFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mMutableSongList = MutableLiveData<ArrayList<SongItem>>(null)
     private val mMutableSortBy = MutableLiveData<String>("title")
     private val mMutableOrganizeListGrid = MutableLiveData<Int>(ConstantValues.ORGANIZE_LIST)

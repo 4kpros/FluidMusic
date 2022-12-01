@@ -25,6 +25,7 @@
 
     <string name="folders">Folders</string>
     <string name="songs">Songs</string>
+    <string name="all_songs">All songs</string>
     <string name="albums">Albums</string>
     <string name="artists">Artists</string>
     <string name="genre">Genre</string>

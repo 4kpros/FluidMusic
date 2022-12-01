@@ -20,6 +20,7 @@
         tools:targetApi="31">
         <activity
             android:name=".ui.activities.settings.InterfaceSettingsActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|uiMode|smallestScreenSize"
             android:exported="false"
             android:label="Interface settings">
             <meta-data
@@ -28,6 +29,7 @@
         </activity>
         <activity
             android:name=".ui.activities.settings.LanguageSettingsActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|uiMode|smallestScreenSize"
             android:exported="false"
             android:label="Language settings">
             <meta-data
@@ -36,22 +38,34 @@
         </activity>
         <activity
             android:name=".ui.activities.settings.MediaScannerSettingsActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|uiMode|smallestScreenSize"
             android:exported="false"
-            android:label="@string/title_activity_media_scanner">
+            android:label="Media scanner">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".ui.activities.settings.StorageAccessSettingsActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|uiMode|smallestScreenSize"
             android:exported="false"
-            android:label="@string/title_activity_storage_access">
+            android:label="Storage access">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".ui.activities.SettingsActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|uiMode|smallestScreenSize"
+            android:exported="false"
+            android:label="Settings">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|uiMode|smallestScreenSize"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

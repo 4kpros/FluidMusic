@@ -9,18 +9,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.ConcatAdapter
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.playlist.PlaylistItemAdapter
 import com.prosabdev.fluidmusic.databinding.BottomSheetAddToPlaylistBinding
 import com.prosabdev.fluidmusic.databinding.DialogNewPlaylistBinding
 import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
 import com.prosabdev.fluidmusic.utils.SystemSettingsUtils
-import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistItemViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistSongItemViewModel
 import kotlinx.coroutines.Dispatchers
@@ -236,14 +235,6 @@ class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFra
     }
 
     private fun initViews() {
-        context?.let { ctx ->
-            mPlaylistItemViewModel = ModelsViewModelFactory(ctx).create(
-                PlaylistItemViewModel::class.java
-            )
-            mPlaylistSongItemViewModel = ModelsViewModelFactory(ctx).create(
-                PlaylistSongItemViewModel::class.java
-            )
-        }
     }
 
     companion object {
@@ -255,7 +246,7 @@ class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFra
             PlaylistAddFullBottomSheetDialogFragment().apply {
                 mSongsToAddOnPlaylist = songsToAddOnPlaylist
                 mPlaylists = playlists
-                mDefaultPlaylistCount = defaultPlaylistCount
+                mDefaultPlaylistCount = defaultPlaylistCount//Last default playlist name + index(counter)
             }
     }
 }

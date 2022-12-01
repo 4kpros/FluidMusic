@@ -11,7 +11,7 @@ import com.prosabdev.fluidmusic.workers.MediaScannerWorker
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class MediaScannerActivityViewModel(application: Application) : AndroidViewModel(application) {
+class MediaScannerActivityViewModel(app: Application) : AndroidViewModel(app) {
 
     private val mMutableIsLoadingInBackground = MutableLiveData<Boolean>(false)
     private val mMutableFoldersCounter = MutableLiveData<Int>(0)
@@ -26,7 +26,7 @@ class MediaScannerActivityViewModel(application: Application) : AndroidViewModel
     private val mEmptyFolderUriCounter: LiveData<Int> get() = mMutableEmptyFolderUriCounter
 
     private val outputWorkInfoItems : LiveData<List<WorkInfo>>
-    private val workManager : WorkManager = WorkManager.getInstance(application)
+    private val workManager : WorkManager = WorkManager.getInstance(app.applicationContext)
     init {
         outputWorkInfoItems = workManager.getWorkInfosByTagLiveData(ConstantValues.MEDIA_SCANNER_WORKER_OUTPUT)
     }

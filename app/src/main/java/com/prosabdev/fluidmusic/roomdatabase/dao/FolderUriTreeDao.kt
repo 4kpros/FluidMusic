@@ -49,6 +49,9 @@ interface FolderUriTreeDao {
     )
     fun getAll(order_by: String): LiveData<List<FolderUriTree>>
 
+    @Query("SELECT * FROM FolderUriTree")
+    fun getAllDirectly(): List<FolderUriTree>
+
     @Query("UPDATE FolderUriTree SET lastModified = -1")
     fun resetAllFolderUriTreesLastModified()
 }

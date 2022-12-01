@@ -5,75 +5,71 @@
     <data>
 
     </data>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/constraint_bottom_selection_menu"
-        android:clickable="true"
-        android:focusable="false">
-
-        <View
-            android:id="@+id/top_line"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?attr/colorOutline"
-            app:layout_constraintTop_toTopOf="parent" />
-
+        style="@style/Widget.Material3.CardView.Elevated"
+        app:cardElevation="3dp"
+        app:cardCornerRadius="0dp"
+        android:layout_marginTop="2dp"
+        >
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/top_line"
-            android:paddingHorizontal="@dimen/main_margin"
-            android:paddingVertical="@dimen/main_medium_margin"
+            android:id="@+id/constraint_bottom_selection_menu"
+            android:clickable="true"
+            android:focusable="false"
             >
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_select_all"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="?attr/materialIconButtonStyle"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:icon="@drawable/check_box_outline_blank"
-                app:iconPadding="2dp"
-                android:text="@string/all" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_select_range"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="?attr/materialIconButtonStyle"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/button_select_all"
-                app:icon="@drawable/expand"
-                app:iconPadding="2dp"
-                android:text="@string/range" />
-
             <View
-                android:id="@+id/constraint_range_menu_hover"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintTop_toTopOf="@+id/button_select_range"
-                app:layout_constraintBottom_toBottomOf="@+id/button_select_range"
-                app:layout_constraintStart_toStartOf="@+id/button_select_range"
-                app:layout_constraintEnd_toEndOf="@+id/button_select_range"
-                style="@style/DefaultBackground"
-                android:alpha="0.5"
-                android:visibility="visible"
-                android:clickable="true"
-                android:focusable="false" />
+                android:id="@+id/top_line"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:visibility="gone"
+                android:background="?attr/colorOutline"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_close"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="?attr/materialIconButtonStyle"
-                app:icon="@drawable/close"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/top_line"
+                android:paddingHorizontal="@dimen/main_margin"
+                android:paddingVertical="@dimen/main_medium_margin"
+                >
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_select_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="?attr/materialIconButtonStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:icon="@drawable/check_box_outline_blank"
+                    app:iconPadding="2dp"
+                    android:text="@string/all" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_select_range"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="?attr/materialIconButtonStyle"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/button_select_all"
+                    app:icon="@drawable/expand"
+                    app:iconPadding="2dp"
+                    android:text="@string/range" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_close"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="?attr/materialIconButtonStyle"
+                    app:icon="@drawable/close"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 </layout>

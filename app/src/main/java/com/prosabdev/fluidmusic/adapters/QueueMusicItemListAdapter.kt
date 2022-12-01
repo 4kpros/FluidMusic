@@ -1,6 +1,5 @@
 package com.prosabdev.fluidmusic.adapters
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
 import android.net.Uri

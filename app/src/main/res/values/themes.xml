@@ -1,14 +1,27 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="AppTheme" parent="Theme.Material3.Light.NoActionBar">
-        <item name="colorPrimary">@color/md_theme_light_primary</item>
-        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
-        <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
-        <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
-        <item name="colorSecondary">@color/md_theme_light_secondary</item>
-        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
-        <item name="colorSecondaryContainer">@color/md_theme_light_secondaryContainer</item>
-        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
+    <style name="BaseTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowActionBarOverlay">false</item>
+        <item  name="android:windowActivityTransitions">true</item>
+        <item name="android:windowContentTransitions">true</item>
+    </style>
+    <style name="CustomScrollBarStyle">
+        <item name="android:smoothScrollbar">true</item>
+        <item name="android:scrollbarAlwaysDrawVerticalTrack">false</item>
+        <item name="android:scrollbars">vertical</item>
+        <item name="android:fadeScrollbars">true</item>
+        <item name="android:isScrollContainer">true</item>
+        <item name="android:verticalScrollbarPosition">defaultPosition</item>
+        <item name="android:scrollbarThumbVertical">@drawable/custom_scroll_view_thumb</item>
+        <item name="android:scrollbarTrackVertical">@drawable/custom_scroll_view_track</item>
+    </style>
+    <style name="BaseThemeLight" parent="BaseTheme">
+        <item name="android:statusBarColor">@color/semiBlack</item>
+        <item name="android:navigationBarColor">@color/semiWhite</item>
+
         <item name="colorTertiary">@color/md_theme_light_tertiary</item>
         <item name="colorOnTertiary">@color/md_theme_light_onTertiary</item>
         <item name="colorTertiaryContainer">@color/md_theme_light_tertiaryContainer</item>
@@ -17,6 +30,92 @@
         <item name="colorOnError">@color/md_theme_light_onError</item>
         <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
         <item name="colorOnErrorContainer">@color/md_theme_light_onErrorContainer</item>
+    </style>
+
+
+
+
+    <style name="MainTheme" parent="BaseThemeLight">
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+        <item name="colorPrimaryContainer">#FFFFFF</item>
+        <item name="colorOnPrimaryContainer">#000000</item>
+        <item name="colorSecondary">#000000</item>
+        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
+        <item name="colorSecondaryContainer">#DFDFDF</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
+        <item name="colorOutline">#858585</item>
+        <item name="android:colorBackground">@color/md_theme_light_background</item>
+        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="colorSurfaceVariant">#EFEFEF</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
+        <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
+        <item name="colorOnSurfaceInverse">#F4F4F4</item>
+        <item name="colorPrimaryInverse">#CFCFCF</item>
+
+        <item name="colorAccent">@color/black</item>
+        <item name="colorControlActivated">@color/black</item>
+        <item name="colorControlNormal">@color/black</item>
+        <item name="colorControlHighlight">@color/black</item>
+
+        <item name="android:buttonTint">@color/black</item>
+
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@color/black</item>
+        <item name="android:textColorTertiary">@color/black</item>
+        <item name="android:textColorHighlight">@color/black</item>
+        <item name="android:textColorHint">@color/black</item>
+        <item name="android:editTextColor">@color/black</item>
+    </style>
+
+    <style name="JustDark" parent="BaseThemeLight">
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+        <item name="colorPrimaryContainer">#FFFFFF</item>
+        <item name="colorOnPrimaryContainer">#000000</item>
+        <item name="colorSecondary">#000000</item>
+        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
+        <item name="colorSecondaryContainer">#DFDFDF</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
+        <item name="colorOutline">#858585</item>
+        <item name="android:colorBackground">@color/md_theme_light_background</item>
+        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="colorSurfaceVariant">#EFEFEF</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
+        <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
+        <item name="colorOnSurfaceInverse">#F4F4F4</item>
+        <item name="colorPrimaryInverse">#CFCFCF</item>
+
+        <item name="colorAccent">@color/black</item>
+        <item name="colorControlActivated">@color/black</item>
+        <item name="colorControlNormal">@color/black</item>
+        <item name="colorControlHighlight">@color/black</item>
+
+        <item name="android:buttonTint">@color/black</item>
+
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@color/black</item>
+        <item name="android:textColorTertiary">@color/black</item>
+        <item name="android:textColorHighlight">@color/black</item>
+        <item name="android:textColorHint">@color/black</item>
+        <item name="android:editTextColor">@color/black</item>
+    </style>
+
+    <style name="AppTheme" parent="BaseThemeLight">
+        <item name="colorPrimary">@color/md_theme_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_light_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
         <item name="colorOutline">@color/md_theme_light_outline</item>
         <item name="android:colorBackground">@color/md_theme_light_background</item>
         <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
@@ -27,36 +126,5 @@
         <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
         <item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowTranslucentStatus">false</item>
-        <item name="android:windowTranslucentNavigation">false</item>
-        <item name="android:statusBarColor">@color/semiBlack</item>
-        <item name="android:navigationBarColor">@color/semiWhite</item>
-
-        <item name="android:windowActionBarOverlay">false</item>
-        <item  name="android:windowActivityTransitions">true</item>
-        <item name="android:windowContentTransitions">true</item>
-    </style>
-
-    <style name="CustomScrollBarStyle">
-        <item name="android:smoothScrollbar">true</item>
-        <item name="android:scrollbarAlwaysDrawVerticalTrack">false</item>
-        <item name="android:scrollbars">vertical</item>
-        <item name="android:fadeScrollbars">true</item>
-        <item name="android:verticalScrollbarPosition">defaultPosition</item>
-        <item name="android:scrollbarThumbVertical">@drawable/custom_scroll_view_thumb</item>
-        <item name="android:scrollbarTrackVertical">@drawable/custom_scroll_view_track</item>
-    </style>
-
-    <!-- Background -->
-    <style name="DefaultBackground">
-        <item name="android:background">@color/md_theme_light_background</item>
-    </style>
-    <style name="SongSelectedBackground">
-        <item name="android:background">@color/md_theme_light_secondaryContainer</item>
-    </style>
-    <style name="PlayerForeground">
-        <item name="android:background">@color/white</item>
-        <item name="android:alpha">0.4</item>
     </style>
 </resources>

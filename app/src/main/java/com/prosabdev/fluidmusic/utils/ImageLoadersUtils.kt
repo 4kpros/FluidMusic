@@ -54,7 +54,7 @@ abstract class ImageLoadersUtils {
                     Glide.with(context.applicationContext)
                         .load(byteArray)
                         .centerCrop()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .skipMemoryCache(true)
                         .transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
                         .placeholder(
@@ -71,7 +71,7 @@ abstract class ImageLoadersUtils {
                     Glide.with(context.applicationContext)
                         .load(byteArray)
                         .centerCrop()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .skipMemoryCache(true)
                         .transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
                         .placeholder(
@@ -129,7 +129,7 @@ abstract class ImageLoadersUtils {
                 Glide.with(context.applicationContext)
                     .asBitmap()
                     .load(byteArray)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .skipMemoryCache(true)
                     .signature(ObjectKey(byteArray.decodeToString()))
                     .override(widthHeight, widthHeight)
@@ -151,7 +151,7 @@ abstract class ImageLoadersUtils {
             MainScope().launch {
                 Glide.with(context.applicationContext)
                     .load(resourceId)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .skipMemoryCache(true)
                     .signature(ObjectKey(resourceId))
                     .centerCrop()

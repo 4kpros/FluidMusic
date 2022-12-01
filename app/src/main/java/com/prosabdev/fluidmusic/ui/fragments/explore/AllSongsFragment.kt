@@ -21,7 +21,6 @@ import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentAllSongsBinding
 import com.prosabdev.fluidmusic.models.SongItem
-import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortItemsBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.utils.CenterSmoothScroller
@@ -30,7 +29,6 @@ import com.prosabdev.fluidmusic.utils.MathComputationsUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AllSongsFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -43,12 +41,10 @@ class AllSongsFragment : Fragment() {
 
     private lateinit var mFragmentAllSongsBinding: FragmentAllSongsBinding
 
-    private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by lazy {
-        AllSongsFragmentViewModel()
-    }
+    private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by activityViewModels()
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
-    private lateinit var mSongItemViewModel: SongItemViewModel
+    private val mSongItemViewModel: SongItemViewModel by activityViewModels()
 
     private var mSortItemsBottomSheetDialogFragment: SortItemsBottomSheetDialogFragment = SortItemsBottomSheetDialogFragment.newInstance(ConstantValues.EXPLORE_ALL_SONGS)
     private var mOrganizeItemBottomSheetDialogFragment: OrganizeItemBottomSheetDialogFragment = OrganizeItemBottomSheetDialogFragment.newInstance(ConstantValues.EXPLORE_ALL_SONGS)
@@ -93,9 +89,6 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-        //Listen to sort and filters changes
-        mAllSongsFragmentViewModel.listenAllSongs(mSongItemViewModel, viewLifecycleOwner)
-
         mAllSongsFragmentViewModel.getAllSongs().observe(viewLifecycleOwner){
             addSongsToAdapter(it)
         }
@@ -353,6 +346,7 @@ class AllSongsFragment : Fragment() {
             mOrganizeItemBottomSheetDialogFragment.show(childFragmentManager, OrganizeItemBottomSheetDialogFragment.TAG)
     }
     private fun playSongsShuffle() {
+        if((mSongItemAdapter?.currentList?.size ?: 0) <= 0) return
         MainScope().launch {
             withContext(Dispatchers.Default){
                 val randomExcludedNumber: Int =
@@ -365,6 +359,7 @@ class AllSongsFragment : Fragment() {
         }
     }
     private fun playSongAtPosition(position: Int, repeat: Int? = null, shuffle: Int? = null) {
+        if((mSongItemAdapter?.currentList?.size ?: 0) <= 0) return
         mPlayerFragmentViewModel.setCurrentPlayingSong(getCurrentPlayingSongFromPosition(position))
         mPlayerFragmentViewModel.setIsPlaying(true)
         mPlayerFragmentViewModel.setPlayingProgressValue(0)
@@ -384,7 +379,6 @@ class AllSongsFragment : Fragment() {
 
 
     private fun initViews() {
-        mSongItemViewModel = ModelsViewModelFactory(this.requireContext()).create(SongItemViewModel::class.java)
     }
 
     companion object {

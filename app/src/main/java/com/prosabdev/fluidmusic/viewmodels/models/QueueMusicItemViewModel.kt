@@ -1,14 +1,14 @@
 package com.prosabdev.fluidmusic.viewmodels.models
 
-import android.content.Context
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
 import com.prosabdev.fluidmusic.models.QueueMusicItem
 import com.prosabdev.fluidmusic.roomdatabase.repositories.QueueMusicItemRepository
 
-class QueueMusicItemViewModel(ctx : Context) : ViewModel()  {
+class QueueMusicItemViewModel(app: Application) : AndroidViewModel(app) {
 
-    private var repository: QueueMusicItemRepository? = QueueMusicItemRepository(ctx)
+    private var repository: QueueMusicItemRepository? = QueueMusicItemRepository(app)
 
     suspend fun insert(queueMusicItem: QueueMusicItem?) : Long? {
         return repository?.insert(queueMusicItem)

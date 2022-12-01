@@ -9,7 +9,12 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="?attr/materialCardViewStyle">
+        style="@style/Widget.Material3.CardView.Elevated"
+        app:cardElevation="3dp"
+        android:layout_margin="2dp"
+        app:strokeWidth="0dp"
+        app:strokeColor="?attr/colorOutline"
+        >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
@@ -97,7 +102,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/container_icons"
                 app:layout_constraintStart_toStartOf="@+id/container_icons"
                 app:layout_constraintEnd_toEndOf="@+id/container_icons"
-                style="@style/DefaultBackground"
+                android:background="?android:colorBackground"
                 android:alpha="0"
                 android:visibility="gone" />
         </androidx.constraintlayout.widget.ConstraintLayout>

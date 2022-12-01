@@ -1,20 +1,23 @@
 package com.prosabdev.fluidmusic.viewmodels.fragments
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import com.sothree.slidinguppanel.PanelState
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class MainFragmentViewModel : ViewModel() {
+class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mMutableSelectMode = MutableLiveData<Boolean>(false)
     private val mMutableToggleOnRange = MutableLiveData<Int>(0)
     private val mMutableTotalSelected = MutableLiveData<Int>(0)
     private val mMutableTotalCount = MutableLiveData<Int>(0)
     private val mMutableActivePage = MutableLiveData<Int>(0)
     private val mMutableShowDrawerMenuCounter = MutableLiveData<Int>()
-    private val mMutableScrollingState = MutableLiveData<Int>(-2)
+    private val mMutableSlidingUpPanelState = MutableLiveData<PanelState>(PanelState.COLLAPSED)
 
+    private val mMutableScrollingState = MutableLiveData<Int>(-2)
     private val mMutableShowSlidingUpPanelCounter = MutableLiveData<Int>(0)
     private val mMutableHideSlidingUpPanelCounter = MutableLiveData<Int>(0)
 
@@ -24,15 +27,26 @@ class MainFragmentViewModel : ViewModel() {
     private val mTotalCount: LiveData<Int> get() = mMutableTotalCount
     private val mActivePage: LiveData<Int> get() = mMutableActivePage
     private val mShowDrawerMenuCounter: LiveData<Int> get() = mMutableShowDrawerMenuCounter
-    private val mScrollingState: LiveData<Int> get() = mMutableScrollingState
+    private val mSlidingUpPanelState: LiveData<PanelState> get() = mMutableSlidingUpPanelState
 
+    private val mScrollingState: LiveData<Int> get() = mMutableScrollingState
     private val mShowSlidingUpPanelCounter: LiveData<Int> get() = mMutableShowSlidingUpPanelCounter
     private val mHideSlidingUpPanelCounter: LiveData<Int> get() = mMutableHideSlidingUpPanelCounter
 
+    fun setSlidingUpPanelState(state : PanelState) {
+        MainScope().launch {
+            mMutableSlidingUpPanelState.value = state
+        }
+    }
+    fun getSlidingUpPanelState(): LiveData<PanelState> {
+        return mSlidingUpPanelState
+    }
     fun setShowSlidingPanelCounter() {
         MainScope().launch {
-            val tempValue : Int = (mShowSlidingUpPanelCounter.value ?: 0)+1
-            mMutableShowSlidingUpPanelCounter.value = tempValue
+            if(mSlidingUpPanelState.value != PanelState.EXPANDED){
+                val tempValue : Int = (mShowSlidingUpPanelCounter.value ?: 0)+1
+                mMutableShowSlidingUpPanelCounter.value = tempValue
+            }
         }
     }
     fun getShowSlidingPanelCounter(): LiveData<Int> {
@@ -40,8 +54,10 @@ class MainFragmentViewModel : ViewModel() {
     }
     fun setHideSlidingPanelCounter() {
         MainScope().launch {
-            val tempValue : Int = (mShowSlidingUpPanelCounter.value ?: 0)+1
-            mMutableHideSlidingUpPanelCounter.value = tempValue
+            if(mSlidingUpPanelState.value != PanelState.COLLAPSED) {
+                val tempValue: Int = (mShowSlidingUpPanelCounter.value ?: 0) + 1
+                mMutableHideSlidingUpPanelCounter.value = tempValue
+            }
         }
     }
     fun getHideSlidingPanelCounter(): LiveData<Int> {

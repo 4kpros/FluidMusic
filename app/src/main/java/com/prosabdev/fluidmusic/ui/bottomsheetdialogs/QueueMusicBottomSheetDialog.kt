@@ -18,7 +18,7 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
 
     private lateinit var mBottomSheetQueueMusicBinding: BottomSheetQueueMusicBinding
 
-    private var mPlayerFragmentViewModel: PlayerFragmentViewModel? = null
+    private lateinit var mPlayerFragmentViewModel: PlayerFragmentViewModel
 
     private var mQueueMusicItemAdapter :QueueMusicItemListAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
@@ -46,10 +46,10 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
     }
 
     private fun observeLiveData() {
-        mPlayerFragmentViewModel?.getCurrentPlayingSong()?.observe(viewLifecycleOwner) {
+        mPlayerFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner) {
             updatePlayingSongUI(it)
         }
-        mPlayerFragmentViewModel?.getIsPlaying()?.observe(viewLifecycleOwner) {
+        mPlayerFragmentViewModel.getIsPlaying().observe(viewLifecycleOwner) {
             updatePlaybackStateUI(it)
         }
     }
@@ -81,6 +81,22 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
         mBottomSheetQueueMusicBinding.dragHandle.setOnClickListener{
             dismiss()
         }
+        mBottomSheetQueueMusicBinding.buttonClearQueueMusic.setOnClickListener{
+            clearQueueMusicList()
+        }
+        mBottomSheetQueueMusicBinding.buttonAddToPlaylist.setOnClickListener{
+            addAllQueueMusicToPlaylist()
+        }
+    }
+
+    private fun addAllQueueMusicToPlaylist() {
+        val queueMusicSize : Int = mQueueMusicItemAdapter?.currentList?.size ?: 0
+        if(queueMusicSize <= 0) return
+    }
+
+    private fun clearQueueMusicList() {
+        val queueMusicSize : Int = mQueueMusicItemAdapter?.currentList?.size ?: 0
+        if(queueMusicSize <= 0) return
     }
 
     private fun setupRecyclerView() {
@@ -106,7 +122,7 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
             mBottomSheetQueueMusicBinding.recyclerView.layoutManager = mLayoutManager
             mQueueMusicItemAdapter?.submitList(mSongList)
 
-            val tempCurrentSong: SongItem = mPlayerFragmentViewModel?.getCurrentPlayingSong()?.value
+            val tempCurrentSong: SongItem = mPlayerFragmentViewModel.getCurrentPlayingSong().value
                 ?: return
             mLayoutManager?.scrollToPosition(tempCurrentSong.position)
         }

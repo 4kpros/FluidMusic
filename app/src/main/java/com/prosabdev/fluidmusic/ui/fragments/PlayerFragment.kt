@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
@@ -14,7 +15,7 @@ import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LifecycleOwner
+import androidx.fragment.app.viewModels
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.slider.Slider
 import com.google.android.material.slider.Slider.OnSliderTouchListener
@@ -23,15 +24,16 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentPlayerBinding
 import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreFullBottomSheetDialog
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicBottomSheetDialog
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AllSongsFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.models.QueueMusicItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistSongItemViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -40,18 +42,19 @@ import kotlinx.coroutines.withContext
 
 @BuildCompat.PrereleaseSdkCheck class PlayerFragment : Fragment() {
 
-    private var mQueueMusicBottomSheetDialog: QueueMusicBottomSheetDialog? = null
-    private lateinit var mFragmentPlayerBinding: FragmentPlayerBinding
+    private var mFragmentPlayerBinding: FragmentPlayerBinding? = null
 
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
     private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by activityViewModels()
-
-    private lateinit var mSongItemViewModel: SongItemViewModel
     private val mQueueMusicItemViewModel: QueueMusicItemViewModel by activityViewModels()
+    private val mPlaylistItemViewModel: PlaylistItemViewModel by activityViewModels()
+    private val mPlaylistSongItemViewModel: PlaylistSongItemViewModel by activityViewModels()
+
+    private var mQueueMusicBottomSheetDialog: QueueMusicBottomSheetDialog? = null
+    private var mPlayerMoreBottomSheetDialog: PlayerMoreFullBottomSheetDialog? = null
 
     private var mPlayerPagerAdapter: PlayerPageAdapter? = null
-    private var mPlayerMoreBottomSheetDialog: PlayerMoreFullBottomSheetDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,9 +67,9 @@ import kotlinx.coroutines.withContext
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         mFragmentPlayerBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_player,container,false)
-        val view = mFragmentPlayerBinding.root
+        val view = mFragmentPlayerBinding?.root
 
         initViews()
         return view
@@ -81,26 +84,31 @@ import kotlinx.coroutines.withContext
     }
 
     private fun updateEmptyListUI(size: Int) {
-        MainScope().launch {
-            if(size > 0){
-                mFragmentPlayerBinding.linearRescanDeviceContainer.visibility = GONE
-            }else{
-                mFragmentPlayerBinding.linearRescanDeviceContainer.visibility = VISIBLE
+        mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
+            MainScope().launch {
+                if(size > 0){
+                    fragmentPlayerBinding.linearRescanDeviceContainer.visibility = GONE
+                }else{
+                    fragmentPlayerBinding.linearRescanDeviceContainer.visibility = VISIBLE
+                }
             }
         }
     }
     private suspend fun updateBlurredBackgroundUI(position: Int) {
-        if ((mPlayerPagerAdapter?.currentList?.size ?: 0) <= position)
-            return
-        withContext(Dispatchers.Default){
-            val ctx : Context = this@PlayerFragment.context ?: return@withContext
-            val tempUri : Uri = Uri.parse(mPlayerPagerAdapter?.currentList?.get(position)?.uri ?: "")
-            ImageLoadersUtils.loadBlurredCovertArtFromSongUri(
-                ctx,
-                mFragmentPlayerBinding.blurredImageview,
-                tempUri,
-                100
-            )
+        mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
+            if ((mPlayerPagerAdapter?.currentList?.size ?: 0) <= position)
+                return
+            withContext(Dispatchers.Default) {
+                val ctx: Context = this@PlayerFragment.context ?: return@withContext
+                val tempUri: Uri =
+                    Uri.parse(mPlayerPagerAdapter?.currentList?.get(position)?.uri ?: "")
+                ImageLoadersUtils.loadBlurredCovertArtFromSongUri(
+                    ctx,
+                    fragmentPlayerBinding.blurredImageview,
+                    tempUri,
+                    100
+                )
+            }
         }
     }
 
@@ -115,41 +123,36 @@ import kotlinx.coroutines.withContext
                 }
             }
         }
-        mPlayerFragmentViewModel.getSourceOfQueueListValue().observe(this as LifecycleOwner){
+        mPlayerFragmentViewModel.getSourceOfQueueListValue().observe(viewLifecycleOwner){
             //
         }
-        mPlayerFragmentViewModel.getCurrentPlayingSong().observe(this as LifecycleOwner){
+        mPlayerFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner){
             updateCurrentPlayingSongUI(it)
         }
-        mPlayerFragmentViewModel.getIsPlaying().observe(this as LifecycleOwner){
+        mPlayerFragmentViewModel.getIsPlaying().observe(viewLifecycleOwner){
             updatePlaybackStateUI(it)
         }
-        mPlayerFragmentViewModel.getPlayingProgressValue().observe(this as LifecycleOwner){
+        mPlayerFragmentViewModel.getPlayingProgressValue().observe(viewLifecycleOwner){
             updateProgressValueUI(it)
         }
-        mPlayerFragmentViewModel.getShuffle().observe(this as LifecycleOwner){
+        mPlayerFragmentViewModel.getShuffle().observe(viewLifecycleOwner){
             updateShuffleUI(it)
         }
-        mPlayerFragmentViewModel.getRepeat().observe(this as LifecycleOwner){
+        mPlayerFragmentViewModel.getRepeat().observe(viewLifecycleOwner){
             updateRepeatUI(it)
         }
-        mPlayerFragmentViewModel.getSkipNextTrackCounter().observe(this as LifecycleOwner){
+        mPlayerFragmentViewModel.getSkipNextTrackCounter().observe(viewLifecycleOwner){
             onSkipToNextTrack(it)
         }
-        mPlayerFragmentViewModel.getSkipPrevTrackCounter().observe(this as LifecycleOwner){
+        mPlayerFragmentViewModel.getSkipPrevTrackCounter().observe(viewLifecycleOwner){
             onSkipToPrevTrack(it)
         }
-        mPlayerFragmentViewModel.getSleepTimer().observe(this as LifecycleOwner){
+        mPlayerFragmentViewModel.getSleepTimer().observe(viewLifecycleOwner){
             //
         }
-        mPlayerFragmentViewModel.getSleepTimerStateStarted().observe(this as LifecycleOwner){
+        mPlayerFragmentViewModel.getSleepTimerStateStarted().observe(viewLifecycleOwner){
             //
         }
-
-        //Observe changes from all songs fragment
-
-        val tempIsInverted: Boolean = mAllSongsFragmentViewModel.getIsInverted().value ?: false
-        val tempOrganizeListGrid: Int = mAllSongsFragmentViewModel.getOrganizeListGrid().value ?: ConstantValues.ORGANIZE_LIST
     }
     private fun onSkipToPrevTrack(skipCounter: Int?) {
         if((skipCounter ?: 0) <= 0) return
@@ -160,61 +163,78 @@ import kotlinx.coroutines.withContext
         onNextPageButtonClicked()
     }
     private fun updateRepeatUI(repeat: Int?) {
-        MainScope().launch {
-            context?.let {
-                when (repeat) {
-                    PlaybackStateCompat.REPEAT_MODE_ALL -> {
-                        mFragmentPlayerBinding.buttonRepeat.alpha = 1.0f
-                        mFragmentPlayerBinding.buttonRepeat.icon =
-                            ContextCompat.getDrawable(it, R.drawable.repeat)
-                    }
-                    PlaybackStateCompat.REPEAT_MODE_ONE -> {
-                        mFragmentPlayerBinding.buttonRepeat.alpha = 1.0f
-                        mFragmentPlayerBinding.buttonRepeat.icon =
-                            ContextCompat.getDrawable(it, R.drawable.repeat_one)
-                    }
-                    else -> {
-                        mFragmentPlayerBinding.buttonRepeat.alpha = 0.4f
-                        mFragmentPlayerBinding.buttonRepeat.icon =
-                            ContextCompat.getDrawable(it, R.drawable.repeat)
+        mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
+            MainScope().launch {
+                context?.let {
+                    when (repeat) {
+                        PlaybackStateCompat.REPEAT_MODE_ALL -> {
+                            fragmentPlayerBinding.buttonRepeat.alpha = 1.0f
+                            fragmentPlayerBinding.buttonRepeat.icon =
+                                ContextCompat.getDrawable(it, R.drawable.repeat)
+                        }
+                        PlaybackStateCompat.REPEAT_MODE_ONE -> {
+                            fragmentPlayerBinding.buttonRepeat.alpha = 1.0f
+                            fragmentPlayerBinding.buttonRepeat.icon =
+                                ContextCompat.getDrawable(it, R.drawable.repeat_one)
+                        }
+                        else -> {
+                            fragmentPlayerBinding.buttonRepeat.alpha = 0.4f
+                            fragmentPlayerBinding.buttonRepeat.icon =
+                                ContextCompat.getDrawable(it, R.drawable.repeat)
+                        }
                     }
                 }
             }
         }
     }
     private fun updateShuffleUI(shuffle: Int?) {
-        MainScope().launch {
-            context?.let {
-                when (shuffle) {
-                    PlaybackStateCompat.SHUFFLE_MODE_ALL -> {
-                        mFragmentPlayerBinding.buttonShuffle.alpha = 1.0f
-                        mFragmentPlayerBinding.buttonShuffle.icon = ContextCompat.getDrawable(it, R.drawable.shuffle)
-                    }
-                    else -> {
-                        mFragmentPlayerBinding.buttonShuffle.alpha = 0.4f
-                        mFragmentPlayerBinding.buttonShuffle.icon = ContextCompat.getDrawable(it, R.drawable.shuffle)
+        mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
+            MainScope().launch {
+                context?.let {
+                    when (shuffle) {
+                        PlaybackStateCompat.SHUFFLE_MODE_ALL -> {
+                            fragmentPlayerBinding.buttonShuffle.alpha = 1.0f
+                            fragmentPlayerBinding.buttonShuffle.icon =
+                                ContextCompat.getDrawable(it, R.drawable.shuffle)
+                        }
+                        else -> {
+                            fragmentPlayerBinding.buttonShuffle.alpha = 0.4f
+                            fragmentPlayerBinding.buttonShuffle.icon =
+                                ContextCompat.getDrawable(it, R.drawable.shuffle)
+                        }
                     }
                 }
             }
-
         }
     }
     private fun updateProgressValueUI(currentDuration: Long) {
-        MainScope().launch {
-            context?.let {
-                val totalDuration: Long = mPlayerFragmentViewModel.getCurrentPlayingSong().value?.duration ?: 0
-                mFragmentPlayerBinding.slider.value = FormattersUtils.formatSongDurationToSliderProgress(currentDuration, totalDuration)
-                mFragmentPlayerBinding.textDurationCurrent.text = FormattersUtils.formatSongDurationToString(currentDuration)
+        mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
+            MainScope().launch {
+                context?.let {
+                    val totalDuration: Long =
+                        mPlayerFragmentViewModel.getCurrentPlayingSong().value?.duration ?: 0
+                    fragmentPlayerBinding.slider.value =
+                        FormattersUtils.formatSongDurationToSliderProgress(
+                            currentDuration,
+                            totalDuration
+                        )
+                    fragmentPlayerBinding.textDurationCurrent.text =
+                        FormattersUtils.formatSongDurationToString(currentDuration)
+                }
             }
         }
     }
     private fun updatePlaybackStateUI(isPlaying: Boolean?) {
-        MainScope().launch {
-            context?.let {
-                if(isPlaying == true){
-                    mFragmentPlayerBinding.buttonPlayPause.icon = ContextCompat.getDrawable(it, R.drawable.pause_circle)
-                }else{
-                    mFragmentPlayerBinding.buttonPlayPause.icon = ContextCompat.getDrawable(it, R.drawable.play_circle)
+        mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
+            MainScope().launch {
+                context?.let {
+                    if (isPlaying == true) {
+                        fragmentPlayerBinding.buttonPlayPause.icon =
+                            ContextCompat.getDrawable(it, R.drawable.pause_circle)
+                    } else {
+                        fragmentPlayerBinding.buttonPlayPause.icon =
+                            ContextCompat.getDrawable(it, R.drawable.play_circle)
+                    }
                 }
             }
         }
@@ -225,133 +245,153 @@ import kotlinx.coroutines.withContext
         updateBlurredBackgroundUIFromUri(songItem?.uri)
     }
     private fun updateViewpagerUI(songItem: SongItem?) {
-        if (songItem == null || (mPlayerPagerAdapter?.currentList?.size ?: 0) <= 0) return
-        val tempOldPosition : Int = mFragmentPlayerBinding.viewPagerPlayer.currentItem
-        val tempOldSongItem : SongItem? = mPlayerPagerAdapter?.currentList?.get(tempOldPosition)
-        if(
-            tempOldSongItem == null ||
-            tempOldSongItem.id != songItem.id ||
-            tempOldSongItem.uri != songItem.uri ||
-            tempOldSongItem.title != songItem.title ||
-            tempOldSongItem.artist != songItem.artist ||
-            tempOldSongItem.duration != songItem.duration ||
-            tempOldSongItem.position != songItem.position
-        ){
-            mFragmentPlayerBinding.viewPagerPlayer.currentItem = songItem.position
+        mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
+            if (songItem == null || (mPlayerPagerAdapter?.currentList?.size ?: 0) <= 0) return
+            val tempOldPosition: Int = fragmentPlayerBinding.viewPagerPlayer.currentItem
+            val tempOldSongItem: SongItem? = mPlayerPagerAdapter?.currentList?.get(tempOldPosition)
+            if (
+                tempOldSongItem == null ||
+                tempOldSongItem.id != songItem.id ||
+                tempOldSongItem.uri != songItem.uri ||
+                tempOldSongItem.title != songItem.title ||
+                tempOldSongItem.artist != songItem.artist ||
+                tempOldSongItem.duration != songItem.duration ||
+                tempOldSongItem.position != songItem.position
+            ) {
+                fragmentPlayerBinding.viewPagerPlayer.currentItem = songItem.position
+            }
         }
     }
 
     private fun updateBlurredBackgroundUIFromUri(uriString: String?) {
-        MainScope().launch {
-            context?.let {
-                val tempUri : Uri = Uri.parse(uriString ?: "")
-                ImageLoadersUtils.loadBlurredCovertArtFromSongUri(
-                    it,
-                    mFragmentPlayerBinding.blurredImageview,
-                    tempUri,
-                    100
-                )
+        mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
+            MainScope().launch {
+                context?.let {
+                    val tempUri: Uri = Uri.parse(uriString ?: "")
+                    ImageLoadersUtils.loadBlurredCovertArtFromSongUri(
+                        it,
+                        fragmentPlayerBinding.blurredImageview,
+                        tempUri,
+                        100
+                    )
+                }
             }
         }
     }
     private fun updateTextTitleSubtitleDurationUI(songItem: SongItem?) {
-        if ((mPlayerPagerAdapter?.currentList?.size ?: 0) <= (songItem?.position ?: 0))
-            return
-        MainScope().launch {
-            context?.let {
-                mFragmentPlayerBinding.textTitle.text =
-                    if(songItem?.title != null )
-                        songItem.title
-                    else
-                        songItem?.fileName
-                mFragmentPlayerBinding.textArtist.text =
-                    if(songItem?.artist != null )
-                        songItem.artist
-                    else
-                        it.getString(R.string.unknown_artist)
-                mFragmentPlayerBinding.textDuration.text =
-                    FormattersUtils.formatSongDurationToString(
-                    songItem?.duration ?: 0
-                    )
+        mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
+            if ((mPlayerPagerAdapter?.currentList?.size ?: 0) <= (songItem?.position ?: 0))
+                return
+            MainScope().launch {
+                context?.let {
+                    fragmentPlayerBinding.textTitle.text =
+                        if (songItem?.title != null)
+                            songItem.title
+                        else
+                            songItem?.fileName
+                    fragmentPlayerBinding.textArtist.text =
+                        if (songItem?.artist != null)
+                            songItem.artist
+                        else
+                            it.getString(R.string.unknown_artist)
+                    fragmentPlayerBinding.textDuration.text =
+                        FormattersUtils.formatSongDurationToString(
+                            songItem?.duration ?: 0
+                        )
+                }
             }
         }
     }
 
     private fun setupViewPagerAdapter() {
-        mPlayerPagerAdapter =
-            PlayerPageAdapter(this.requireContext(), object : PlayerPageAdapter.OnItemClickListener {
-                override fun onButtonLyricsClicked(position: Int) {
-                }
-                override fun onButtonFullscreenClicked(position: Int) {
-                }
+        mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
+            mPlayerPagerAdapter =
+                PlayerPageAdapter(
+                    this.requireContext(),
+                    object : PlayerPageAdapter.OnItemClickListener {
+                        override fun onButtonLyricsClicked(position: Int) {
+                        }
 
-            })
-        mFragmentPlayerBinding.viewPagerPlayer.adapter = mPlayerPagerAdapter
-        mFragmentPlayerBinding.viewPagerPlayer.clipToPadding = false
-        mFragmentPlayerBinding.viewPagerPlayer.clipChildren = false
-        mFragmentPlayerBinding.viewPagerPlayer.offscreenPageLimit = 5
-        mFragmentPlayerBinding.viewPagerPlayer.getChildAt(0)?.overScrollMode = View.OVER_SCROLL_NEVER
-        ViewAnimatorsUtils.transformScaleViewPager(mFragmentPlayerBinding.viewPagerPlayer)
+                        override fun onButtonFullscreenClicked(position: Int) {
+                        }
+
+                    })
+            fragmentPlayerBinding.viewPagerPlayer.adapter = mPlayerPagerAdapter
+            fragmentPlayerBinding.viewPagerPlayer.clipToPadding = false
+            fragmentPlayerBinding.viewPagerPlayer.clipChildren = false
+            fragmentPlayerBinding.viewPagerPlayer.offscreenPageLimit = 5
+            fragmentPlayerBinding.viewPagerPlayer.getChildAt(0)?.overScrollMode =
+                View.OVER_SCROLL_NEVER
+            ViewAnimatorsUtils.transformScaleViewPager(fragmentPlayerBinding.viewPagerPlayer)
+        }
     }
 
     private fun checkInteractions() {
-        mFragmentPlayerBinding.viewPagerPlayer.registerOnPageChangeCallback(object : OnPageChangeCallback() {
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                MathComputationsUtils.fadeWithPageOffset(mFragmentPlayerBinding.blurredImageview, positionOffset)
+        mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
+            fragmentPlayerBinding.viewPagerPlayer.registerOnPageChangeCallback(object :
+                OnPageChangeCallback() {
+                override fun onPageScrolled(
+                    position: Int,
+                    positionOffset: Float,
+                    positionOffsetPixels: Int
+                ) {
+                    super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+                    MathComputationsUtils.fadeWithPageOffset(
+                        fragmentPlayerBinding.blurredImageview,
+                        positionOffset
+                    )
+                }
+
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    onViewpagerPageChanged(position)
+                }
+            })
+            fragmentPlayerBinding.slider.addOnSliderTouchListener(object : OnSliderTouchListener {
+                override fun onStartTrackingTouch(slider: Slider) {
+                }
+
+                override fun onStopTrackingTouch(slider: Slider) {
+                    updateOnStopTrackingTouch(slider.value)
+                }
+            })
+            fragmentPlayerBinding.buttonPlayPause.setOnClickListener {
+                onPlayPauseButtonClicked()
             }
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                onViewpagerPageChanged(position)
+            fragmentPlayerBinding.buttonSkipNext.setOnClickListener {
+                onNextPageButtonClicked()
             }
-        })
-        mFragmentPlayerBinding.slider.addOnSliderTouchListener(object : OnSliderTouchListener{
-            override fun onStartTrackingTouch(slider: Slider) {
+            fragmentPlayerBinding.buttonSkipPrev.setOnClickListener {
+                onPrevPageButtonClicked()
             }
-            override fun onStopTrackingTouch(slider: Slider) {
-                updateOnStopTrackingTouch(slider.value)
+            fragmentPlayerBinding.buttonShuffle.setOnClickListener {
+                onShuffleButtonClicked()
             }
-        })
-        mFragmentPlayerBinding.buttonPlayPause.setOnClickListener {
-            onPlayPauseButtonClicked()
-        }
-        mFragmentPlayerBinding.buttonSkipNext.setOnClickListener {
-            onNextPageButtonClicked()
-        }
-        mFragmentPlayerBinding.buttonSkipPrev.setOnClickListener {
-            onPrevPageButtonClicked()
-        }
-        mFragmentPlayerBinding.buttonShuffle.setOnClickListener {
-            onShuffleButtonClicked()
-        }
-        mFragmentPlayerBinding.buttonRepeat.setOnClickListener {
-            onRepeatButtonClicked()
-        }
-        mFragmentPlayerBinding.buttonMore.setOnClickListener {
-            showMoreOptionsDialog()
-        }
-        mFragmentPlayerBinding.buttonEqualizer.setOnClickListener {
-            openEqualizerFragment()
-        }
-        mFragmentPlayerBinding.buttonRescanDevice.setOnClickListener {
-            openMediaScannerFragment()
-        }
-        mFragmentPlayerBinding.dragHandleViewContainer.setOnClickListener{
-            showQueueMusicDialog()
+            fragmentPlayerBinding.buttonRepeat.setOnClickListener {
+                onRepeatButtonClicked()
+            }
+            fragmentPlayerBinding.buttonMore.setOnClickListener {
+                showMoreOptionsDialog()
+            }
+            fragmentPlayerBinding.buttonEqualizer.setOnClickListener {
+                openEqualizerFragment()
+            }
+            fragmentPlayerBinding.buttonRescanDevice.setOnClickListener {
+                openMediaScannerActivity()
+            }
+            fragmentPlayerBinding.dragHandleViewContainer.setOnClickListener {
+                showQueueMusicDialog()
+            }
         }
     }
     private fun showQueueMusicDialog() {
         mQueueMusicBottomSheetDialog?.show(childFragmentManager, QueueMusicBottomSheetDialog.TAG)
     }
-    private fun openMediaScannerFragment() {
-        //
+    private fun openMediaScannerActivity() {
+        startActivity(Intent(context, MediaScannerSettingsActivity::class.java).apply {})
     }
     private fun openEqualizerFragment() {
-        //
+        mPlayerFragmentViewModel.setShowEqualizerFragmentCounter()
     }
     private fun showMoreOptionsDialog() {
         if(mPlayerMoreBottomSheetDialog?.isVisible == false)
@@ -379,6 +419,7 @@ import kotlinx.coroutines.withContext
         }
     }
     private fun onPrevPageButtonClicked(){
+        if((mPlayerPagerAdapter?.currentList?.size ?: 0) <= 0) return
         val tempPosition : Int = mPlayerFragmentViewModel.getCurrentPlayingSong().value?.position ?: return
         val tempSongItem : SongItem = getCurrentPlayingSongFromPosition((tempPosition - 1))
             ?: return
@@ -386,6 +427,7 @@ import kotlinx.coroutines.withContext
         mPlayerFragmentViewModel.setCurrentPlayingSong(tempSongItem)
     }
     private fun onNextPageButtonClicked(){
+        if((mPlayerPagerAdapter?.currentList?.size ?: 0) <= 0) return
         val tempPosition : Int = mPlayerFragmentViewModel.getCurrentPlayingSong().value?.position ?: return
         val tempSongItem : SongItem = getCurrentPlayingSongFromPosition((tempPosition + 1))
             ?: return
@@ -394,7 +436,7 @@ import kotlinx.coroutines.withContext
     }
     private fun getCurrentPlayingSongFromPosition(position: Int): SongItem? {
         if (position < 0 || position >= (mPlayerPagerAdapter?.currentList?.size ?: 0)) return null
-        val tempSongItem: SongItem = mPlayerPagerAdapter?.currentList?.get(position.toInt()) ?: return null
+        val tempSongItem: SongItem = mPlayerPagerAdapter?.currentList?.get(position) ?: return null
         tempSongItem.position = position
         return tempSongItem
     }
@@ -402,6 +444,7 @@ import kotlinx.coroutines.withContext
         mPlayerFragmentViewModel.toggleIsPlaying()
     }
     private fun updateOnStopTrackingTouch(value: Float) {
+        if((mPlayerPagerAdapter?.currentList?.size ?: 0) <= 0) return
         val totalDuration : Long = mPlayerFragmentViewModel.getCurrentPlayingSong().value?.duration ?: 0
         val tempProgress : Long = FormattersUtils.formatSliderProgressToLongDuration(value, totalDuration)
         mPlayerFragmentViewModel.setPlayingProgressValue(tempProgress)
@@ -414,22 +457,29 @@ import kotlinx.coroutines.withContext
     }
 
     private fun initViews() {
-        mSongItemViewModel = ModelsViewModelFactory(this.requireContext()).create(SongItemViewModel::class.java)
+        mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
+            fragmentPlayerBinding.blurredImageview.layout(0, 0, 0, 0)
+            fragmentPlayerBinding.textTitle.isSelected = true
+            fragmentPlayerBinding.textArtist.isSelected = true
 
-        mFragmentPlayerBinding.blurredImageview.layout(0,0,0,0)
-        mFragmentPlayerBinding.textTitle.isSelected = true
-        mFragmentPlayerBinding.textArtist.isSelected = true
+            ViewInsetModifiersUtils.updateTopViewInsets(fragmentPlayerBinding.linearRescanDeviceContainer)
+            ViewInsetModifiersUtils.updateTopViewInsets(fragmentPlayerBinding.linearViewpager)
 
-        ViewInsetModifiersUtils.updateTopViewInsets(mFragmentPlayerBinding.linearRescanDeviceContainer)
-        ViewInsetModifiersUtils.updateTopViewInsets(mFragmentPlayerBinding.linearViewpager)
+            ViewInsetModifiersUtils.updateBottomViewInsets(fragmentPlayerBinding.dragHandleViewContainer)
+            ViewInsetModifiersUtils.updateBottomViewInsets(fragmentPlayerBinding.constraintBottomButtonsContainer)
 
-        ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentPlayerBinding.dragHandleViewContainer)
-        ViewInsetModifiersUtils.updateBottomViewInsets(mFragmentPlayerBinding.constraintBottomButtonsContainer)
-
-        if(mPlayerMoreBottomSheetDialog == null)
-            mPlayerMoreBottomSheetDialog = PlayerMoreFullBottomSheetDialog.newInstance(mPlayerFragmentViewModel, mMainFragmentViewModel, mFragmentPlayerBinding.root)
-        if(mQueueMusicBottomSheetDialog == null)
-            mQueueMusicBottomSheetDialog = QueueMusicBottomSheetDialog.newInstance(mPlayerFragmentViewModel, mPlayerPagerAdapter?.currentList)
+            if (mPlayerMoreBottomSheetDialog == null)
+                mPlayerMoreBottomSheetDialog = PlayerMoreFullBottomSheetDialog.newInstance(
+                    mPlayerFragmentViewModel,
+                    mMainFragmentViewModel,
+                    fragmentPlayerBinding.root
+                )
+            if (mQueueMusicBottomSheetDialog == null)
+                mQueueMusicBottomSheetDialog = QueueMusicBottomSheetDialog.newInstance(
+                    mPlayerFragmentViewModel,
+                    mPlayerPagerAdapter?.currentList
+                )
+        }
     }
 
     companion object {

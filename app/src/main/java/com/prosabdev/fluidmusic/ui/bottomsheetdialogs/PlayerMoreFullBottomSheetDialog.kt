@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
+import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
@@ -25,15 +26,15 @@ import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistSongItemViewModel
 import kotlinx.coroutines.*
 
 class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
 
     private lateinit var mBottomSheetPlayerMoreBinding: BottomSheetPlayerMoreBinding
 
-    private lateinit var mPlaylistItemViewModel: PlaylistItemViewModel
+    private val mPlaylistItemViewModel: PlaylistItemViewModel by viewModels()
 
     private lateinit var mPlayerFragmentViewModel: PlayerFragmentViewModel
     private lateinit var mMainFragmentViewModel: MainFragmentViewModel
@@ -137,6 +138,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun showDeleteSelectionDialog() {
+        val tempSongItem : SongItem = mPlayerFragmentViewModel.getCurrentPlayingSong().value ?: return
         context?.let { ctx ->
             MaterialAlertDialogBuilder(this.requireContext())
                 .setTitle(ctx.getString(R.string.dialog_delete_selection_title))
@@ -157,9 +159,9 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun setSongAsRingtone() {
+        val tempSongItem : SongItem = mPlayerFragmentViewModel.getCurrentPlayingSong().value ?: return
         context?.let { ctx ->
             if(PermissionsManagerUtils.haveWriteSystemSettingsPermission(ctx)){
-                val tempSongItem : SongItem = mPlayerFragmentViewModel.getCurrentPlayingSong().value ?: return
                 val tempUri : Uri = Uri.parse(tempSongItem.uri ?: return) ?: return
                 SystemSettingsUtils.setRingtone(ctx, tempUri, tempSongItem.fileName, true)
             }else{
@@ -185,8 +187,9 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun showGoToSongDialog() {
-        val mDialogGotoSongBinding : DialogGotoSongBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_goto_song, null, false)
+        val tempSongItem : SongItem = mPlayerFragmentViewModel.getCurrentPlayingSong().value ?: return
 
+        val mDialogGotoSongBinding : DialogGotoSongBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_goto_song, null, false)
         val tempFragmentManager = activity?.supportFragmentManager ?: return
         context?.let { ctx ->
             MaterialAlertDialogBuilder(ctx)
@@ -197,7 +200,6 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     dialog.dismiss()
                 }
                 .show().apply {
-                    val tempSongItem : SongItem = mPlayerFragmentViewModel.getCurrentPlayingSong().value ?: return
                     mDialogGotoSongBinding.buttonArtist.setOnClickListener{
                         this.dismiss()
                         mMainFragmentViewModel.setHideSlidingPanelCounter()
@@ -358,7 +360,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun fetchLyrics() {
-        //On delete song
+        val tempSongItem : SongItem = mPlayerFragmentViewModel.getCurrentPlayingSong().value ?: return
     }
 
     private fun showAddToPlaylistDialog() {
@@ -370,8 +372,17 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         psI.addedDate = SystemSettingsUtils.getCurrentDateInMilli()
         songsToAddOnPlaylist.add(psI)
 
-        val playlistAddBottomSheetDialog = PlaylistAddFullBottomSheetDialogFragment.newInstance(songsToAddOnPlaylist, mPlaylists, mDefaultPlaylistCount)
-        activity ?.supportFragmentManager?.let { playlistAddBottomSheetDialog.show(it, PlaylistAddFullBottomSheetDialogFragment.TAG) }
+        val playlistAddBottomSheetDialog = PlaylistAddFullBottomSheetDialogFragment.newInstance(
+            songsToAddOnPlaylist,
+            mPlaylists,
+            mDefaultPlaylistCount
+        )
+        activity ?.supportFragmentManager?.let {
+            playlistAddBottomSheetDialog.show(
+                it,
+                PlaylistAddFullBottomSheetDialogFragment.TAG
+            )
+        }
         dismiss()
     }
 
@@ -385,11 +396,6 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         mBottomSheetPlayerMoreBinding.covertArt.layout(0,0,0,0)
         mBottomSheetPlayerMoreBinding.textTitle.isSelected = true
         mBottomSheetPlayerMoreBinding.textDescription.isSelected = true
-
-        val ctx = context ?: return
-        mPlaylistItemViewModel = ModelsViewModelFactory(ctx).create(
-            PlaylistItemViewModel::class.java
-        )
     }
 
     companion object {

@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic
 
 import android.content.ComponentName
+import android.content.res.Configuration
 import android.media.AudioManager
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
@@ -20,12 +21,12 @@ import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.models.sharedpreference.SleepTimerSP
 import com.prosabdev.fluidmusic.service.MediaPlaybackService
+import com.prosabdev.fluidmusic.ui.fragments.EqualizerFragment
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.SharedPreferenceManagerUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AllSongsFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.ModelsViewModelFactory
 import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -39,7 +40,10 @@ import kotlinx.coroutines.withContext
 
     private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by viewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by viewModels()
-    private lateinit var mSongItemViewModel: SongItemViewModel
+    private val mSongItemViewModel: SongItemViewModel by viewModels()
+
+    private val mMainFragment = MainFragment.newInstance()
+    private val mEqualizerFragment = EqualizerFragment.newInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,19 +53,37 @@ import kotlinx.coroutines.withContext
 
         mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
+        setupFragments()
         MainScope().launch {
             initViews()
             loadLastPlayerSession()
             preloadSongs()
-            attachFragments()
+            observeLiveData()
             setupAudioSettings()
             createMediaBrowserService()
         }
     }
 
+    private fun observeLiveData() {
+        mPlayerFragmentViewModel.getShowEqualizerFragmentCounter().observe(this){
+            if(it > 0){
+                showEqualizerFragment()
+            }
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // Checks the orientation of the screen
+//        if (newConfig.uiMode == UI_MODE_NIGHT_NO) {
+//            setTheme(R.style.MainTheme)
+//        } else {
+//            setTheme(R.style.MainThemeDark)
+//        }
+    }
+
     private fun preloadSongs() {
-        val tempSongId : Long = mPlayerFragmentViewModel.getCurrentPlayingSong().value?.id ?: -1
-        mAllSongsFragmentViewModel.requestSongAtId(mSongItemViewModel, tempSongId)
+        mAllSongsFragmentViewModel.listenAllSongs(mSongItemViewModel, this)
     }
 
     override fun onDestroy() {
@@ -161,14 +183,22 @@ import kotlinx.coroutines.withContext
             }
         }
     }
-    private fun attachFragments() {
+
+    private fun setupFragments() {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            replace(R.id.main_activity_fragment_container, MainFragment.newInstance())
+            replace(R.id.main_activity_fragment_container, mMainFragment)
         }
     }
+    private fun showEqualizerFragment() {
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            add(R.id.main_activity_fragment_container, mEqualizerFragment)
+            addToBackStack(EqualizerFragment.TAG)
+        }
+    }
+
     private fun initViews(){
-        mSongItemViewModel = ModelsViewModelFactory(applicationContext).create(SongItemViewModel::class.java)
     }
 
 

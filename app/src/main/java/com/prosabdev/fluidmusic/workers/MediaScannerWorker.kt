@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -13,6 +14,7 @@ import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.utils.AudioInfoExtractorUtils
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
 import kotlinx.coroutines.*
 
 
@@ -53,8 +55,7 @@ class MediaScannerWorker(
         context: Context,
         updateMethod : String?
     ) = withContext(Dispatchers.IO){
-        var tempFolderSelected: List<FolderUriTree>? = null
-        tempFolderSelected = AppDatabase.getDatabase(applicationContext).folderUriTreeDao().getAll("id").value
+        val tempFolderSelected: List<FolderUriTree>? = AppDatabase.getDatabase(applicationContext).folderUriTreeDao().getAllDirectly()
         if (tempFolderSelected == null || tempFolderSelected.isEmpty()) {
             MainScope().launch {
                 Toast.makeText(context, "Please select folders to scan !", Toast.LENGTH_LONG)

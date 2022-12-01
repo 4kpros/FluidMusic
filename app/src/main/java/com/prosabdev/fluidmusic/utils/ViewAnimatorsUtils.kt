@@ -1,6 +1,5 @@
 package com.prosabdev.fluidmusic.utils
 
-import android.R
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.util.Log
@@ -37,16 +36,15 @@ abstract class ViewAnimatorsUtils {
             viewPager.setPageTransformer(compositePageTransformer)
         }
 
-        fun crossFadeUp(
+        fun crossFadeUpClickable(
             contentView: View, animate: Boolean = false,
-            duration: Int = contentView.resources.getInteger(R.integer.config_shortAnimTime),
+            duration: Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime),
             maxAlpha: Float = 1.0f
         ) {
             MainScope().launch {
                 if(animate){
                     contentView.apply {
-                        alpha = 0f
-                        visibility = View.VISIBLE
+                        contentView.isClickable = true
                         animate()
                             .alpha(maxAlpha)
                             .setInterpolator(DecelerateInterpolator())
@@ -54,27 +52,74 @@ abstract class ViewAnimatorsUtils {
                             .setListener(null)
                     }
                 }else{
-                    contentView.visibility = View.VISIBLE
+                    contentView.isClickable = true
                     contentView.alpha = maxAlpha
                 }
             }
         }
-        fun crossFadeDown(contentView : View, animate : Boolean = false, duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)) {
+        fun crossFadeDownClickable(contentView : View, animate : Boolean = false, duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime), minAlpha: Float = 0.0f) {
             MainScope().launch {
                 if(animate){
                     contentView.apply {
+                        alpha = 1.0f
                         animate()
-                            .alpha(0f)
+                            .alpha(minAlpha)
                             .setInterpolator(AccelerateDecelerateInterpolator())
                             .setDuration(duration.toLong())
                             .setListener(object : AnimatorListenerAdapter() {
                                 override fun onAnimationEnd(animation: Animator) {
-                                    contentView.visibility = View.GONE
+                                    contentView.isClickable = false
                                 }
                             })
                     }
                 }else{
-                    contentView.visibility = View.GONE
+                    contentView.isClickable = false
+                    contentView.alpha = minAlpha
+                }
+            }
+        }
+        fun crossFadeUp(
+            contentView: View, animate: Boolean = false,
+            duration: Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime),
+            maxAlpha: Float = 1.0f
+        ) {
+            MainScope().launch {
+                if(animate){
+                    contentView.apply {
+                        alpha = 0f
+                        visibility = VISIBLE
+                        animate()
+                            .alpha(maxAlpha)
+                            .setInterpolator(DecelerateInterpolator())
+                            .setDuration(duration.toLong())
+                            .setListener(null)
+                    }
+                }else{
+                    contentView.visibility = VISIBLE
+                    contentView.alpha = maxAlpha
+                }
+            }
+        }
+        fun crossFadeDown(
+            contentView : View,
+            animate : Boolean = false,
+            duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)
+        ) {
+            MainScope().launch {
+                if(animate){
+                    contentView.apply {
+                        animate()
+                            .alpha(0.0f)
+                            .setInterpolator(AccelerateDecelerateInterpolator())
+                            .setDuration(duration.toLong())
+                            .setListener(object : AnimatorListenerAdapter() {
+                                override fun onAnimationEnd(animation: Animator) {
+                                    contentView.visibility = GONE
+                                }
+                            })
+                    }
+                }else{
+                    contentView.visibility = GONE
                     contentView.alpha = 0.0f
                 }
             }
@@ -191,7 +236,7 @@ abstract class ViewAnimatorsUtils {
         }
         fun crossScaleYDown(
             contentView: View, animate: Boolean = false,
-            duration: Int = contentView.resources.getInteger(R.integer.config_shortAnimTime)
+            duration: Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)
         ) {
             MainScope().launch {
                 if(animate){
