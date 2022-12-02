@@ -19,9 +19,12 @@ class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mMutableShowDrawerMenuCounter = MutableLiveData<Int>()
     private val mMutableSlidingUpPanelState = MutableLiveData<PanelState>(PanelState.COLLAPSED)
 
+    private val mMutableIsFastScrolling = MutableLiveData<Boolean>(false)
     private val mMutableScrollingState = MutableLiveData<Int>(-2)
     private val mMutableShowSlidingUpPanelCounter = MutableLiveData<Int>(0)
     private val mMutableHideSlidingUpPanelCounter = MutableLiveData<Int>(0)
+
+
 
     private val mCurrentSelectablePage: LiveData<String> get() = mMutableCurrentSelectablePage
     private val mSelectMode: LiveData<Boolean> get() = mMutableSelectMode
@@ -32,10 +35,19 @@ class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mShowDrawerMenuCounter: LiveData<Int> get() = mMutableShowDrawerMenuCounter
     private val mSlidingUpPanelState: LiveData<PanelState> get() = mMutableSlidingUpPanelState
 
+    private val mIsFastScrolling: LiveData<Boolean> get() = mMutableIsFastScrolling
     private val mScrollingState: LiveData<Int> get() = mMutableScrollingState
     private val mShowSlidingUpPanelCounter: LiveData<Int> get() = mMutableShowSlidingUpPanelCounter
     private val mHideSlidingUpPanelCounter: LiveData<Int> get() = mMutableHideSlidingUpPanelCounter
 
+    fun setIsFastScrolling(isFastScrolling : Boolean) {
+        MainScope().launch {
+            mMutableIsFastScrolling.value = isFastScrolling
+        }
+    }
+    fun getIsFastScrolling(): LiveData<Boolean> {
+        return mIsFastScrolling
+    }
     fun setCurrentSelectablePage(page : String) {
         MainScope().launch {
             mMutableCurrentSelectablePage.value = page

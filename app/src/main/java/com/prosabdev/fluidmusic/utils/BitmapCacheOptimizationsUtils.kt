@@ -28,7 +28,7 @@ abstract class BitmapCacheOptimizationsUtils {
         private lateinit var memoryCache: LruCache<String, Bitmap>
 
         suspend fun initBitmapMemoryCachingSystem() {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.Default){
                 val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
                 val cacheSize = maxMemory / 8
                 memoryCache = object : LruCache<String, Bitmap>(cacheSize) {

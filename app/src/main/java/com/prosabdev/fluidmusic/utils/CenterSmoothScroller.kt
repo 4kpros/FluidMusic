@@ -28,12 +28,12 @@ class CenterSmoothScroller(
 
     override fun calculateTimeForScrolling(dx: Int): Int {
 //        return super.calculateTimeForScrolling(dx)
-        return 300
+        return 500
     }
 
     override fun calculateTimeForDeceleration(dx: Int): Int {
 //        return super.calculateTimeForDeceleration(dx)
-        return 300
+        return 500
     }
 
     companion object {

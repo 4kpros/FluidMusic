@@ -2,6 +2,8 @@ package com.prosabdev.fluidmusic.adapters.explore
 
 import android.content.Context
 import android.graphics.Typeface
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +11,7 @@ import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -20,7 +23,6 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapter
 import com.prosabdev.fluidmusic.databinding.ItemGenericExploreListBinding
 import com.prosabdev.fluidmusic.models.SongItem
-import com.prosabdev.fluidmusic.models.view.AlbumItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.FormattersUtils
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
@@ -115,6 +117,7 @@ class SongItemAdapter(
                     PAYLOAD_PLAYBACK_STATE -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_PLAYBACK_STATE")
                         holder.updateIsPlayingStateUI(mContext, getIsPlaying(), getPlayingPosition())
+
                     }
                     PAYLOAD_IS_COVERT_ART_TEXT -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
@@ -131,16 +134,6 @@ class SongItemAdapter(
             holder.updateIsPlayingStateUI(mContext, getIsPlaying(), getPlayingPosition())
             holder.updateCovertArtAndTitleUI(mContext, getItem(position) as SongItem)
         }
-    }
-
-    override fun onViewRecycled(holder: SongItemViewHolder) {
-        super.onViewRecycled(holder)
-//        holder.recycleItem(mContext)
-    }
-
-    override fun onViewAttachedToWindow(holder: SongItemViewHolder) {
-        super.onViewAttachedToWindow(holder)
-        holder.updateSelectedStateUI(selectableIsSelected(holder.bindingAdapterPosition))
     }
 
     class SongItemViewHolder(
@@ -160,25 +153,37 @@ class SongItemAdapter(
         fun recycleItem(ctx : Context){
             Glide.with(ctx.applicationContext).clear(mItemGenericExploreListBinding.imageviewCoverArt)
         }
-
-        fun updateCovertArtAndTitleUI(context: Context, songItem: SongItem) {
+        fun fastUpdateCoverArtUI(context: Context, songItem: SongItem) {
+            MainScope().launch {
+                val tempUri: Uri? = Uri.parse(songItem.uri ?: "")
+                ImageLoadersUtils.loadCovertArtFromSongUri(
+                    context, mItemGenericExploreListBinding.imageviewCoverArt,
+                    tempUri,
+                    songItem.hashedCovertArtSignature,
+                    200
+                )
+            }
+        }
+        fun updateCovertArtAndTitleUI(ctx: Context, songItem: SongItem) {
             var tempTitle : String = songItem.title ?: ""
             var tempArtist : String = songItem.artist ?: ""
-            if(tempTitle.isEmpty()) tempTitle = songItem.fileName ?: context.getString(R.string.unknown_title)
-            if(tempArtist.isEmpty()) tempArtist = context.getString(R.string.unknown_artist)
+            if(tempTitle.isEmpty()) tempTitle = songItem.fileName ?: ctx.getString(R.string.unknown_title)
+            if(tempArtist.isEmpty()) tempArtist = ctx.getString(R.string.unknown_artist)
             mItemGenericExploreListBinding.textTitle.text = tempTitle
             mItemGenericExploreListBinding.textSubtitle.text = tempArtist
             mItemGenericExploreListBinding.textDetails.text =
-                context.getString(
+                ctx.getString(
                     R.string.item_song_card_text_details,
                     FormattersUtils.formatSongDurationToString(songItem.duration),
                     songItem.fileExtension
                 )
 
-            MainScope().launch {
-                val tempUri: Uri? = Uri.parse(songItem.uri)
-                ImageLoadersUtils.loadCovertArtFromSongUri(context, mItemGenericExploreListBinding.imageviewCoverArt, tempUri, 100, 50, true)
-            }
+            val tempUri: Uri? = Uri.parse(songItem.uri ?: "")
+            val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newOriginalCardInstance()
+            imageRequest.uri = tempUri
+            imageRequest.imageView = mItemGenericExploreListBinding.imageviewCoverArt
+            imageRequest.hashedCovertArtSignature = songItem.hashedCovertArtSignature
+            ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
         }
 
         fun updateIsPlayingStateUI(ctx : Context, isPlaying: Boolean, playingPosition : Int) {

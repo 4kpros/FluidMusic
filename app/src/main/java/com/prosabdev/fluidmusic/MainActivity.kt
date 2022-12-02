@@ -24,12 +24,11 @@ import com.prosabdev.fluidmusic.service.MediaPlaybackService
 import com.prosabdev.fluidmusic.ui.fragments.EqualizerFragment
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
 import com.prosabdev.fluidmusic.utils.SharedPreferenceManagerUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AlbumsFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AllSongsFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.explore.AlbumItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.explore.*
+import com.prosabdev.fluidmusic.viewmodels.models.explore.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -44,8 +43,21 @@ import kotlinx.coroutines.withContext
 
     private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by viewModels()
     private val mAlbumsFragmentViewModel: AlbumsFragmentViewModel by viewModels()
+    private val mAlbumArtistsFragmentViewModel: AlbumArtistsFragmentViewModel by viewModels()
+    private val mArtistsFragmentViewModel: ArtistsFragmentViewModel by viewModels()
+    private val mFoldersFragmentViewModel: FoldersFragmentViewModel by viewModels()
+    private val mGenresFragmentViewModel: GenresFragmentViewModel by viewModels()
+    private val mComposersFragmentViewModel: ComposersFragmentViewModel by viewModels()
+    private val mYearsFragmentViewModel: YearsFragmentViewModel by viewModels()
+
     private val mSongItemViewModel: SongItemViewModel by viewModels()
     private val mAlbumItemViewModel: AlbumItemViewModel by viewModels()
+    private val mAlbumArtistItemViewModel: AlbumArtistItemViewModel by viewModels()
+    private val mArtistItemViewModel: ArtistItemViewModel by viewModels()
+    private val mFolderItemViewModel: FolderItemViewModel by viewModels()
+    private val mGenreItemViewModel: GenreItemViewModel by viewModels()
+    private val mComposerItemViewModel: ComposerItemViewModel by viewModels()
+    private val mYearItemViewModel: YearItemViewModel by viewModels()
 
     private val mMainFragment = MainFragment.newInstance()
     private val mEqualizerFragment = EqualizerFragment.newInstance()
@@ -88,11 +100,18 @@ import kotlinx.coroutines.withContext
     }
 
     private fun requestListenData() {
-        mAllSongsFragmentViewModel.listenAllSongs(mSongItemViewModel, this)
-        mAlbumsFragmentViewModel.listenAllAlbums(mAlbumItemViewModel, this)
+        mAllSongsFragmentViewModel.listenAllData(mSongItemViewModel, this)
+        mAlbumsFragmentViewModel.listenAllData(mAlbumItemViewModel, this)
+        mAlbumArtistsFragmentViewModel.listenAllData(mAlbumArtistItemViewModel, this)
+        mArtistsFragmentViewModel.listenAllData(mArtistItemViewModel, this)
+        mFoldersFragmentViewModel.listenAllData(mFolderItemViewModel, this)
+        mGenresFragmentViewModel.listenAllData(mGenreItemViewModel, this)
+        mComposersFragmentViewModel.listenAllData(mComposerItemViewModel, this)
+        mYearsFragmentViewModel.listenAllData(mYearItemViewModel, this)
     }
 
     override fun onDestroy() {
+        ImageLoadersUtils.stopAllJobsWorkers()
         saveCurrentPlayingSession()
         super.onDestroy()
     }
@@ -250,17 +269,25 @@ import kotlinx.coroutines.withContext
         mediaController.registerCallback(mControllerCallback)
     }
 
+    override fun onPause() {
+        super.onPause()
+        ImageLoadersUtils.stopAllJobsWorkers()
+    }
+
     public override fun onStart() {
         super.onStart()
+        ImageLoadersUtils.initializeJobWorker()
         mMediaBrowser?.connect()
     }
     public override fun onResume() {
         super.onResume()
+        ImageLoadersUtils.initializeJobWorker()
         setupAudioSettings()
     }
 
     public override fun onStop() {
         super.onStop()
+        ImageLoadersUtils.stopAllJobsWorkers()
         MediaControllerCompat.getMediaController(this)?.unregisterCallback(mControllerCallback)
         mMediaBrowser?.disconnect()
     }

@@ -48,7 +48,7 @@ class MediaScannerAutomaticWorker(
         coroutineScope {
             for (i in 0 until tempFolderSelected.size){
                 val tempDocFile: DocumentFile? =
-                    DocumentFile.fromTreeUri(context, Uri.parse(tempFolderSelected[i].uriTree))
+                    DocumentFile.fromTreeUri(context, Uri.parse(tempFolderSelected[i].uriTree ?: ""))
 
                 scanDocumentUriContent(
                     context,

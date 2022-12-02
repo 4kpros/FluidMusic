@@ -40,7 +40,7 @@ class SongItem {
     var bitPerSample: String? = null
 
     //
-    var lastUpdateDate: String? = null
+    var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
 
     var author: String? = null
@@ -48,6 +48,8 @@ class SongItem {
     var writer: String? = null
     var cdTrackNumber: String? = null
     var numberTracks: String? = null
+
+    var hashedCovertArtSignature: Int = -1
 
     @Ignore
     var position: Int = -1

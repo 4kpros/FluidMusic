@@ -88,7 +88,7 @@ abstract class PermissionsManagerUtils {
         fun requestWriteSystemSettingsPermission(activity: Activity) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                intent.data = Uri.parse("package:" + activity.packageName);
+                intent.data = Uri.parse("package:" + activity.packageName)
                 activity.startActivity(intent)
             } else {
                 //

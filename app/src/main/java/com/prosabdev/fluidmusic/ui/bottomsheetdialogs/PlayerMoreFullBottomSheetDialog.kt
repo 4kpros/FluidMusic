@@ -104,7 +104,11 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     )
 
                 val tempUri: Uri? = Uri.parse(songItem.uri ?: "")
-                ImageLoadersUtils.loadCovertArtFromSongUri(ctx, mBottomSheetPlayerMoreBinding.covertArt, tempUri, 100, 200, true)
+                val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newOriginalCardInstance()
+                imageRequest.uri = tempUri
+                imageRequest.imageView = mBottomSheetPlayerMoreBinding.covertArt
+                imageRequest.hashedCovertArtSignature = songItem.hashedCovertArtSignature
+                ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
             }
         }
     }
@@ -161,7 +165,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         val tempSongItem : SongItem = mPlayerFragmentViewModel.getCurrentPlayingSong().value ?: return
         context?.let { ctx ->
             if(PermissionsManagerUtils.haveWriteSystemSettingsPermission(ctx)){
-                val tempUri : Uri = Uri.parse(tempSongItem.uri ?: return) ?: return
+                val tempUri : Uri = Uri.parse(tempSongItem.uri ?: "") ?: return
                 SystemSettingsUtils.setRingtone(ctx, tempUri, tempSongItem.fileName, true)
             }else{
                 MaterialAlertDialogBuilder(this.requireContext())
@@ -321,7 +325,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     dialogShareSongBinding.buttonShareFile.setOnClickListener{
                         MainScope().launch {
                             withContext(Dispatchers.IO){
-                                val tempUri = Uri.parse(tempSongItem.uri) ?: return@withContext
+                                val tempUri = Uri.parse(tempSongItem.uri ?: "") ?: return@withContext
                                 val tempDesc =
                                     if(tempSongItem.title != null)
                                         ctx.getString(R.string._music_content_by, tempSongItem.title, tempSongItem.artist ?: "")

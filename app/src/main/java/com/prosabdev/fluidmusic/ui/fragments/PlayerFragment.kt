@@ -10,6 +10,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
@@ -99,12 +100,13 @@ import kotlinx.coroutines.withContext
                 return
             withContext(Dispatchers.Default) {
                 val ctx: Context = this@PlayerFragment.context ?: return@withContext
-                val tempUri: Uri =
-                    Uri.parse(mPlayerPagerAdapter?.currentList?.get(position)?.uri ?: "")
+                val tempSongItem: SongItem? = mPlayerPagerAdapter?.currentList?.get(position)
+                val tempUri = Uri.parse(tempSongItem?.uri ?: "")
                 ImageLoadersUtils.loadBlurredCovertArtFromSongUri(
                     ctx,
                     fragmentPlayerBinding.blurredImageview,
                     tempUri,
+                    tempSongItem?.hashedCovertArtSignature ?: -1,
                     100
                 )
             }
@@ -241,7 +243,7 @@ import kotlinx.coroutines.withContext
     private fun updateCurrentPlayingSongUI(songItem: SongItem?) {
         updateTextTitleSubtitleDurationUI(songItem)
         updateViewpagerUI(songItem)
-        updateBlurredBackgroundUIFromUri(songItem?.uri)
+        updateBlurredBackgroundUIFromUri(songItem)
     }
     private fun updateViewpagerUI(songItem: SongItem?) {
         mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
@@ -262,17 +264,16 @@ import kotlinx.coroutines.withContext
         }
     }
 
-    private fun updateBlurredBackgroundUIFromUri(uriString: String?) {
+    private fun updateBlurredBackgroundUIFromUri(songItem: SongItem?) {
         mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
             MainScope().launch {
-                context?.let {
-                    val tempUri: Uri = Uri.parse(uriString ?: "")
-                    ImageLoadersUtils.loadBlurredCovertArtFromSongUri(
-                        it,
-                        fragmentPlayerBinding.blurredImageview,
-                        tempUri,
-                        100
-                    )
+                context?.let { ctx ->
+                    val tempUri: Uri = Uri.parse(songItem?.uri ?: "")
+                    val imageRequestBlurred: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newBlurInstance()
+                    imageRequestBlurred.uri = tempUri
+                    imageRequestBlurred.hashedCovertArtSignature = songItem?.hashedCovertArtSignature ?: -1
+                    imageRequestBlurred.imageView = fragmentPlayerBinding.blurredImageview
+                    ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequestBlurred)
                 }
             }
         }
@@ -457,7 +458,6 @@ import kotlinx.coroutines.withContext
 
     private fun initViews() {
         mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
-            fragmentPlayerBinding.blurredImageview.layout(0, 0, 0, 0)
             fragmentPlayerBinding.textTitle.isSelected = true
             fragmentPlayerBinding.textArtist.isSelected = true
 

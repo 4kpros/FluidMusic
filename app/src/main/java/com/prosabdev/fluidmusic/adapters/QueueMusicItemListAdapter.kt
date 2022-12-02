@@ -143,24 +143,26 @@ class QueueMusicItemListAdapter(
         fun recycleItem(ctx : Context){
             Glide.with(ctx.applicationContext).clear(mItemQueueMusicBinding.imageviewCoverArt)
         }
-        fun updateCovertArtAndTitleUI(context: Context, songItem: SongItem) {
+        fun updateCovertArtAndTitleUI(ctx: Context, songItem: SongItem) {
             var tempTitle : String = songItem.title ?: ""
             var tempArtist : String = songItem.artist ?: ""
-            if(tempTitle.isEmpty()) tempTitle = songItem.fileName ?: context.getString(R.string.unknown_title)
-            if(tempArtist.isEmpty()) tempArtist = context.getString(R.string.unknown_artist)
+            if(tempTitle.isEmpty()) tempTitle = songItem.fileName ?: ctx.getString(R.string.unknown_title)
+            if(tempArtist.isEmpty()) tempArtist = ctx.getString(R.string.unknown_artist)
             mItemQueueMusicBinding.textTitle.text = tempTitle
             mItemQueueMusicBinding.textSubtitle.text = tempArtist
             mItemQueueMusicBinding.textDetails.text =
-                context.getString(
+                ctx.getString(
                     R.string.item_song_card_text_details,
                     FormattersUtils.formatSongDurationToString(songItem.duration),
                     songItem.fileExtension
                 )
 
-            MainScope().launch {
-                val tempUri: Uri? = Uri.parse(songItem.uri)
-                ImageLoadersUtils.loadCovertArtFromSongUri(context, mItemQueueMusicBinding.imageviewCoverArt, tempUri, 100, 50, true)
-            }
+            val tempUri: Uri? = Uri.parse(songItem.uri ?: "")
+            val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newOriginalCardInstance()
+            imageRequest.uri = tempUri
+            imageRequest.imageView = mItemQueueMusicBinding.imageviewCoverArt
+            imageRequest.hashedCovertArtSignature = songItem.hashedCovertArtSignature
+            ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
         }
         fun updateIsPlayingStateUI(ctx : Context, isPlaying: Boolean, playingPosition : Int) {
             if(playingPosition == bindingAdapterPosition){

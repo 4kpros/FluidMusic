@@ -14,6 +14,8 @@ import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.utils.AudioInfoExtractorUtils
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import kotlinx.coroutines.*
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.LinkedBlockingQueue
 
 
 class MediaScannerWorker(
@@ -21,23 +23,21 @@ class MediaScannerWorker(
     params: WorkerParameters
 ) : CoroutineWorker(ctx, params) {
 
-    private val mScanCounter : Array<Int> = Array(3) { 0 }
-    private val mSongList : ArrayList<SongItem> = ArrayList()
-
+    private var mScanCounter : Array<Int> = Array(3){0}
+    private val mSongList : LinkedBlockingQueue<SongItem> = LinkedBlockingQueue()
     override suspend fun doWork(): Result {
         val updateMethod = inputData.getString(ConstantValues.MEDIA_SCANNER_WORKER_SCAN_METHOD)
         return withContext(Dispatchers.IO) {
             try {
+                mSongList.clear()
                 mScanCounter[0] = 0
                 mScanCounter[1] = 0
                 mScanCounter[2] = 0
                 scanDeviceFolderUriTrees(applicationContext, updateMethod)
+                mScanCounter[1] = mSongList.size
                 if(mSongList.size > 0){
                     launch {
-                        for(i in 0 until (mSongList.size)){
-                            mSongList[i].id = i.toLong()
-                            AppDatabase.getDatabase(applicationContext).songItemDao().insert(mSongList[i])
-                        }
+                        AppDatabase.getDatabase(applicationContext).songItemDao().insertMultiple(mSongList)
                     }
                 }
                 Log.i(ConstantValues.TAG, "Load finished ${mSongList.size}")
@@ -72,7 +72,7 @@ class MediaScannerWorker(
         }
         for (i in tempFolderSelected.indices) {
             val tempDocFile: DocumentFile? =
-                DocumentFile.fromTreeUri(context, Uri.parse(tempFolderSelected[i].uriTree))
+                DocumentFile.fromTreeUri(context, Uri.parse(tempFolderSelected[i].uriTree ?: ""))
             scanDocumentUriContent(
                 context,
                 tempDocFile?.uri,
@@ -112,6 +112,7 @@ class MediaScannerWorker(
                                     withContext(Dispatchers.Default){
                                         if(tempSong != null){
                                             tempSong?.uriTreeId = folderUriTreeId ?: -1
+                                            tempSong?.id = (mSongList.size+1).toLong()
                                             mSongList.add(tempSong!!)
                                             mScanCounter[1] = mSongList.size
                                         }

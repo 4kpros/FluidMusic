@@ -1,13 +1,16 @@
 package com.prosabdev.fluidmusic.ui.custom;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
-public class CustomImageViewRatio11 extends AppCompatImageView {
+public class CustomImageViewRatio11 extends androidx.appcompat.widget.AppCompatImageView {
     public CustomImageViewRatio11(@NonNull Context context) {
         super(context);
     }

@@ -7,7 +7,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
@@ -114,7 +116,10 @@ import kotlinx.coroutines.launch
             updateTotalSelectedTracksUI(it)
         }
         mMainFragmentViewModel.getScrollingState().observe(viewLifecycleOwner){
-            updateMiniPlayerScrollingStateUI(it)
+            tryToUpdateScrollStateUI(it)
+        }
+        mMainFragmentViewModel.getIsFastScrolling().observe(viewLifecycleOwner){
+            tryToUpdateFastScrollStateUI(it)
         }
         mMainFragmentViewModel.getShowDrawerMenuCounter().observe(viewLifecycleOwner){
             openDrawerMenuUI(it)
@@ -128,13 +133,23 @@ import kotlinx.coroutines.launch
                 fragmentMainBinding.drawerLayout.open()
         }
     }
+    private fun tryToUpdateFastScrollStateUI(isFastScrolling: Boolean = true) {
+        if(isFastScrolling){
+            Log.i(ConstantValues.TAG, "FASSSSSSSSSSSSSST SCROLLING ---------------------->")
+            updateMiniPlayerScrollingStateUI(1)
+        }
+    }
+    private fun tryToUpdateScrollStateUI(scrollState: Int, animate: Boolean = true) {
+        if(mMainFragmentViewModel.getIsFastScrolling().value == true) return
+        updateMiniPlayerScrollingStateUI(scrollState, animate)
+    }
     private var mIsAnimatingScroll1: Boolean = false
     private var mIsAnimatingScroll2: Boolean = false
     private fun updateMiniPlayerScrollingStateUI(scrollState: Int, animate: Boolean = true) {
         mFragmentMainBinding?.let { fragmentMainBinding ->
             MainScope().launch {
                 if (scrollState >= 1) {
-                    if(fragmentMainBinding.constraintMiniPlayerContainer.visibility == GONE) return@launch
+                    if(fragmentMainBinding.constraintMiniPlayerContainer.alpha < 1.0f) return@launch
 
                     if (mIsAnimatingScroll2) {
                         fragmentMainBinding.constraintMiniPlayerContainer.apply {
@@ -153,7 +168,7 @@ import kotlinx.coroutines.launch
                         300.0f
                     )
                 } else {
-                    if(fragmentMainBinding.constraintMiniPlayerContainer.translationY == 0.0f) return@launch
+                    if(fragmentMainBinding.constraintMiniPlayerContainer.visibility == VISIBLE) return@launch
                     if (mIsAnimatingScroll1) {
                         fragmentMainBinding.constraintMiniPlayerContainer.apply {
                             mIsAnimatingScroll1 = false
@@ -320,11 +335,7 @@ import kotlinx.coroutines.launch
                         ImageLoadersUtils.loadWithResourceID(
                             it,
                             fragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer,
-                            0,
                             0
-                        )
-                        Glide.with(it).clear(
-                            fragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer
                         )
                     }
                     return@launch
@@ -341,21 +352,20 @@ import kotlinx.coroutines.launch
                     else
                         context?.getString(R.string.unknown_artist)
 
-                val tempUri = Uri.parse(songItem.uri)
-                context?.let {
-                    ImageLoadersUtils.loadCovertArtFromSongUri(
-                        it,
-                        fragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer,
-                        tempUri,
-                        100,
-                        100
-                    )
-                    ImageLoadersUtils.loadBlurredCovertArtFromSongUri(
-                        it,
-                        fragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer,
-                        tempUri,
-                        25
-                    )
+                val tempUri = Uri.parse(songItem.uri ?: "")
+                context?.let { ctx ->
+                    val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newOriginalCardInstance()
+                    val imageRequestBlurred: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newBlurInstance()
+
+                    imageRequest.uri = tempUri
+                    imageRequest.hashedCovertArtSignature = songItem.hashedCovertArtSignature
+                    imageRequest.imageView = fragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer
+                    ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
+
+                    imageRequestBlurred.uri = tempUri
+                    imageRequestBlurred.hashedCovertArtSignature = songItem.hashedCovertArtSignature
+                    imageRequestBlurred.imageView = fragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer as ImageView
+                    ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequestBlurred)
                 }
             }
         }

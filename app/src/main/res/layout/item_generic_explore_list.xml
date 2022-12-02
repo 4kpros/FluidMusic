@@ -15,8 +15,8 @@
         >
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/linear_cover_art_container"
-            android:layout_width="@dimen/image_list_small_size"
-            android:layout_height="@dimen/image_list_small_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -25,15 +25,15 @@
             >
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_view_cover_art"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 style="@style/Widget.Material3.CardView.Elevated"
                 >
-                <androidx.appcompat.widget.AppCompatImageView
+                <com.prosabdev.fluidmusic.ui.custom.CustomImageViewRatio11
                     android:id="@+id/imageview_cover_art"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="fitCenter"
+                    android:layout_width="@dimen/image_list_small_size"
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/ic_fluid_music_icon_with_padding"
                     app:srcCompat="@drawable/ic_fluid_music_icon_with_padding"
                     />

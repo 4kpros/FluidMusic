@@ -30,6 +30,7 @@
     <string name="artists">Artists</string>
     <string name="genre">Genre</string>
     <string name="unknown_artist">Unknown artist</string>
+    <string name="unknown_artists">Unknown artists</string>
     <string name="unknown_title">Unknown title</string>
     <string name="unknown_album">Unknown album</string>
     <string name="unknown_composer">Unknown composer</string>
@@ -170,4 +171,5 @@
     <string name="album_artists">Album artists</string>
     <string name="edit_tags">Edit tags</string>
     <string name="play_after">Play after</string>
+    <string name="many_artists">Many artists</string>
 </resources>

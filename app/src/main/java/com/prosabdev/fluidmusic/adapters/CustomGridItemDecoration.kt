@@ -6,7 +6,7 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
 
-class CustomGridItemDecoration(context: Context, private val mSpanCount : Int) : RecyclerView.ItemDecoration() {
+class CustomGridItemDecoration(context: Context, private val mSpanCount : Int, private val mApplySpaceInsideItem: Boolean) : RecyclerView.ItemDecoration() {
 
     var mDecorationMargin : Int = context.resources.getDimensionPixelSize(R.dimen.main_medium_margin)
     var mDecorationSpacing : Int = context.resources.getDimensionPixelSize(R.dimen.main_small_margin)
@@ -27,26 +27,26 @@ class CustomGridItemDecoration(context: Context, private val mSpanCount : Int) :
 
         if (itemPosition >= 1 && itemPosition < totalCount - 1) {
             //Add space to first and last item on every row
-            if(mSpanCount >= 1){
+            if(mSpanCount == 1){
+                outRect.left = mDecorationMargin
+                outRect.right = mDecorationMargin
+            }else if(mSpanCount > 1){
                 if(itemPosition < mSpanCount) {
                     if(itemPosition == 1){
                         outRect.left = mDecorationMargin
-                        if(mSpanCount == 2){
-                            outRect.right = mDecorationSpacing
-                        }
-                    }else{
-                        outRect.left = mDecorationSpacing
+                    }
+                    if(mApplySpaceInsideItem) {
                         outRect.right = mDecorationSpacing
                     }
                 }else{
                     if(itemPosition % mSpanCount == 0){
                         outRect.right = mDecorationMargin
-                    }else if(itemPosition % mSpanCount == 1){
-                        outRect.left = mDecorationMargin
-                    }else{
-                        //Here add space between items
-                        outRect.left = mDecorationSpacing
-                        outRect.right = mDecorationSpacing
+                    }else {
+                        if(itemPosition % mSpanCount == 1){
+                            outRect.left = mDecorationMargin
+                        }
+                        if(mApplySpaceInsideItem)
+                            outRect.right = mDecorationSpacing
                     }
                 }
             }else{

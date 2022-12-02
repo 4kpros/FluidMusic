@@ -27,7 +27,6 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:padding="@dimen/main_small_margin"
                     >
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/card_view_cover_art"

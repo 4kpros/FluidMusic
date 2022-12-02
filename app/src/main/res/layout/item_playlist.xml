@@ -39,28 +39,35 @@
             >
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_view_cover_art"
-                android:layout_width="@dimen/image_playlist_list_size"
-                android:layout_height="@dimen/image_playlist_list_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 style="@style/Widget.Material3.CardView.Elevated"
                 android:layout_margin="1dp"
                 >
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     >
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
                         android:scaleType="centerInside"
                         android:src="@drawable/playlist_play"
                         app:srcCompat="@drawable/playlist_play"
-                        android:layout_gravity="center"
+                        app:layout_constraintTop_toTopOf="@+id/imageview_cover_art"
+                        app:layout_constraintBottom_toBottomOf="@+id/imageview_cover_art"
+                        app:layout_constraintStart_toStartOf="@+id/imageview_cover_art"
+                        app:layout_constraintEnd_toEndOf="@+id/imageview_cover_art"
                         />
-                    <androidx.appcompat.widget.AppCompatImageView
+                    <com.prosabdev.fluidmusic.ui.custom.CustomImageViewRatio11
                         android:id="@+id/imageview_cover_art"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_width="@dimen/image_playlist_list_size"
+                        android:layout_height="wrap_content"
                         android:scaleType="centerCrop"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
                         />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>

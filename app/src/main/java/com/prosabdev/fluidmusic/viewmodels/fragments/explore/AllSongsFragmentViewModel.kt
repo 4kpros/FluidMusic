@@ -6,64 +6,21 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.view.YearItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.explore.YearItemViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class AllSongsFragmentViewModel(app: Application) : AndroidViewModel(app) {
-    private val mMutableSongList = MutableLiveData<ArrayList<SongItem>>(null)
-    private val mMutableSortBy = MutableLiveData<String>("title")
-    private val mMutableOrganizeListGrid = MutableLiveData<Int>(ConstantValues.ORGANIZE_LIST)
-    private val mMutableIsInverted = MutableLiveData<Boolean>(false)
+class AllSongsFragmentViewModel(app: Application) : GenericListenDataViewModel(app) {
 
-    private val mSongList: LiveData<ArrayList<SongItem>> get() = mMutableSongList
-    private val mSortBy: LiveData<String> get() = mMutableSortBy
-    private val mOrganizeListGrid: LiveData<Int> get() = mMutableOrganizeListGrid
-    private val mIsInverted: LiveData<Boolean> get() = mMutableIsInverted
-
-    fun requestSongAtId(songItemViewModel: SongItemViewModel, songId : Long){
+    fun listenAllData(viewModel: SongItemViewModel, lifecycleOwner: LifecycleOwner){
         MainScope().launch {
-            val tempSong : SongItem? = songItemViewModel.getAtId(songId)
-            tempSong?.let { it ->
-                val tempSongList: ArrayList<SongItem> = ArrayList()
-                tempSongList.add(it)
-                mMutableSongList.value = tempSongList
+            viewModel.getAll(getSortBy().value ?: "title")?.observe(lifecycleOwner){
+                mMutableDataList.value = it as ArrayList<Any>?
             }
         }
-    }
-    fun listenAllSongs(songItemViewModel: SongItemViewModel, lifecycleOwner: LifecycleOwner){
-        MainScope().launch {
-            songItemViewModel.getAll(mSortBy.value ?: "title")?.observe(lifecycleOwner){
-                mMutableSongList.value = it as ArrayList<SongItem>?
-            }
-        }
-    }
-    fun getAllSongs(): LiveData<ArrayList<SongItem>> {
-        return mSongList
-    }
-    fun setSortBy(sortBy : String) {
-        MainScope().launch {
-            mMutableSortBy.value = sortBy
-        }
-    }
-    fun getSortBy(): LiveData<String> {
-        return mSortBy
-    }
-    fun setOrganizeListGrid(organizeListGrid : Int) {
-        MainScope().launch {
-            mMutableOrganizeListGrid.value = organizeListGrid
-        }
-    }
-    fun getOrganizeListGrid(): LiveData<Int> {
-        return mOrganizeListGrid
-    }
-    fun setIsInverted(isInverted : Boolean) {
-        MainScope().launch {
-            mMutableIsInverted.value = isInverted
-        }
-    }
-    fun getIsInverted(): LiveData<Boolean> {
-        return mIsInverted
     }
 }

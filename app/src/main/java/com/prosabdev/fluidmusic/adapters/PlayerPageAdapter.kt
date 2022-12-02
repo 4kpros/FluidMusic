@@ -99,9 +99,8 @@ class PlayerPageAdapter(
                     context,
                     mItemPlayerCardViewBinding.playerViewpagerImageview,
                     tempUri,
-                    300,
-                    200,
-                    false
+                    songItem.hashedCovertArtSignature,
+                    800
                 )
             }
         }

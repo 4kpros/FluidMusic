@@ -32,8 +32,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class AlbumsFragment : Fragment() {
-    private var mPageIndex: Int? = -1
-
     private lateinit var mFragmentAlbumsBinding: FragmentAlbumsBinding
 
     private val mAlbumsFragmentViewModel: AlbumsFragmentViewModel by activityViewModels()
@@ -53,7 +51,6 @@ class AlbumsFragment : Fragment() {
         exitTransition = MaterialFadeThrough()
         reenterTransition = MaterialFadeThrough()
         arguments?.let {
-            mPageIndex = it.getInt(ConstantValues.EXPLORE_ALBUMS)
         }
     }
 
@@ -172,7 +169,7 @@ class AlbumsFragment : Fragment() {
                 mFragmentAlbumsBinding.recyclerView.adapter = concatAdapter
                 mFragmentAlbumsBinding.recyclerView.layoutManager = mLayoutManager
                 context?.let { ctx ->
-                    mFragmentAlbumsBinding.recyclerView.addItemDecoration(CustomGridItemDecoration(ctx, spanCount))
+                    mFragmentAlbumsBinding.recyclerView.addItemDecoration(CustomGridItemDecoration(ctx, spanCount, false))
                 }
 
                 mFragmentAlbumsBinding.fastScroller.setSectionIndexer(mAlbumItemAdapter)
@@ -192,7 +189,6 @@ class AlbumsFragment : Fragment() {
         fun newInstance(pageIndex : Int) =
             AlbumsFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(ConstantValues.EXPLORE_ALBUMS, pageIndex)
                 }
             }
     }

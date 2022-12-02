@@ -29,10 +29,10 @@
                 android:layout_margin="1dp"
                 >
 
-                <androidx.appcompat.widget.AppCompatImageView
+                <com.prosabdev.fluidmusic.ui.custom.CustomImageViewRatio11
                     android:id="@+id/covert_art"
-                    android:layout_width="@dimen/image_player_dialog_sizer"
-                    android:layout_height="@dimen/image_player_dialog_sizer"
+                    android:layout_width="@dimen/image_mini_player_size"
+                    android:layout_height="wrap_content"
                     android:src="@drawable/ic_fluid_music_icon_with_padding"
                     android:layout_gravity="center" />
             </com.google.android.material.card.MaterialCardView>

@@ -156,6 +156,10 @@ class AllSongsFragment : Fragment() {
     }
     private fun tryToScrollOnCurrentItem(songPosition: Int) {
         if(songPosition >= 0) {
+            val tempFV: Int = (mLayoutManager?.findFirstVisibleItemPosition() ?: 0) -1
+            val tempLV: Int = mLayoutManager?.findLastVisibleItemPosition() ?: +1
+            val tempVisibility: Boolean = songPosition in tempFV .. tempLV
+            if(!tempVisibility) return
             context?.let { ctx ->
                 val tempListSize: Int = mSongItemAdapter?.currentList?.size ?: 0
                 val tempTargetPosition = if(songPosition + 2 <= tempListSize) songPosition + 2 else tempListSize
@@ -337,12 +341,13 @@ class AllSongsFragment : Fragment() {
                 mFragmentAllSongsBinding.fastScroller.attachRecyclerView(mFragmentAllSongsBinding.recyclerView)
                 mFragmentAllSongsBinding.fastScroller.setFastScrollListener(object : FastScrollListener{
                     override fun onFastScrollStart(fastScroller: FastScroller) {
-                        if(mMainFragmentViewModel.getScrollingState().value != -2)
-                            mMainFragmentViewModel.setScrollingState(-2)
+                        mMainFragmentViewModel.setIsFastScrolling(true)
+                        println("FASSSSSSSSSSSSSST SCROLLING STARTED")
                     }
 
                     override fun onFastScrollStop(fastScroller: FastScroller) {
-                        //
+                        mMainFragmentViewModel.setIsFastScrolling(false)
+                        println("FASSSSSSSSSSSSSST SCROLLING STOPED")
                     }
 
                 })
@@ -380,8 +385,9 @@ class AllSongsFragment : Fragment() {
         mPlayerFragmentViewModel.setPlayingProgressValue(0)
         mPlayerFragmentViewModel.setRepeat(repeat ?: mPlayerFragmentViewModel.getRepeat().value ?: PlaybackStateCompat.REPEAT_MODE_NONE)
         mPlayerFragmentViewModel.setShuffle(shuffle ?: mPlayerFragmentViewModel.getShuffle().value ?: PlaybackStateCompat.SHUFFLE_MODE_NONE)
-        if(mFragmentAllSongsBinding.recyclerView.scrollState == RecyclerView.SCROLL_STATE_SETTLING)
+        if(mFragmentAllSongsBinding.recyclerView.scrollState == RecyclerView.SCROLL_STATE_SETTLING){
             mIsDraggingToScroll = false
+        }
         mMainFragmentViewModel.setScrollingState(-1)
         mPlayerFragmentViewModel.setQueueListSource(ConstantValues.EXPLORE_ALL_SONGS)
     }

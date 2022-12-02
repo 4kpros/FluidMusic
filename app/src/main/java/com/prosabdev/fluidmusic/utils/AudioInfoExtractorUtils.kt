@@ -9,6 +9,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import com.prosabdev.fluidmusic.models.SongItem
 import kotlinx.coroutines.Dispatchers
@@ -70,10 +71,10 @@ abstract class AudioInfoExtractorUtils {
                 ctx.contentResolver.openAssetFileDescriptor(
                     uri,
                     "r"
-                ).use {
+                ).use { afD ->
                     try {
                         val mdr = MediaMetadataRetriever()
-                        mdr.setDataSource(it?.fileDescriptor)
+                        mdr.setDataSource(afD?.fileDescriptor)
 
                         val tempDocFile: DocumentFile? =
                             DocumentFile.fromTreeUri(ctx, uri)
@@ -112,11 +113,23 @@ abstract class AudioInfoExtractorUtils {
                         tempSong.writer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_WRITER)
                         tempSong.numberTracks = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS)
 
-                        tempSong.lastUpdateDate = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
+                        val tempUpdatedDate: Long = tempDocFile?.lastModified() ?: 0
+                        tempSong.lastUpdateDate = tempUpdatedDate
                         tempSong.lastAddedDateToLibrary = SystemSettingsUtils.getCurrentDateInMilli()
 
+                        val tempBinary : ByteArray? = extractImageBinaryDataFromAudioUri(ctx,
+                            tempDocFile?.uri
+                        )
+                        if(tempBinary != null){
+                            val tempHashedImage: Int = tempBinary.decodeToString().hashCode()
+                            tempSong.hashedCovertArtSignature = if(tempHashedImage < 0) tempHashedImage * -1 else tempHashedImage
+
+                        }else{
+                            tempSong.hashedCovertArtSignature = -1
+                        }
+
                         val extractor : MediaExtractor = MediaExtractor()
-                        extractor.setDataSource(it?.fileDescriptor!!)
+                        extractor.setDataSource(afD?.fileDescriptor!!)
                         val numTracks : Int = extractor.trackCount
                         for (i in 0 until numTracks) {
                             val format : MediaFormat = extractor.getTrackFormat(i)
