@@ -117,10 +117,10 @@ import kotlinx.coroutines.withContext
         mPlayerFragmentViewModel.getQueueListSource().observe(viewLifecycleOwner){
             val queueListSource: String = it ?: ConstantValues.EXPLORE_ALL_SONGS
             if(queueListSource == ConstantValues.EXPLORE_ALL_SONGS) {
-                mAllSongsFragmentViewModel.getAllSongs().observe(viewLifecycleOwner){ songList ->
+                mAllSongsFragmentViewModel.getAll().observe(viewLifecycleOwner){ songList ->
                     updateEmptyListUI(songList?.size ?: 0)
-                    mPlayerPagerAdapter?.submitList(songList)
-                    mQueueMusicBottomSheetDialog?.updateQueueMusicList(songList)
+                    mPlayerPagerAdapter?.submitList(songList as ArrayList<SongItem>?)
+                    mQueueMusicBottomSheetDialog?.updateQueueMusicList(songList as ArrayList<SongItem>?)
                 }
             }
         }

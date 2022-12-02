@@ -91,7 +91,7 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-        mAllSongsFragmentViewModel.getAllSongs().observe(viewLifecycleOwner){
+        mAllSongsFragmentViewModel.getAll().observe(viewLifecycleOwner){
             addSongsToAdapter(it)
         }
         mAllSongsFragmentViewModel.getIsInverted().observe(viewLifecycleOwner){
@@ -208,8 +208,8 @@ class AllSongsFragment : Fragment() {
             }
         }
     }
-    private fun addSongsToAdapter(songList: ArrayList<SongItem>?) {
-        mSongItemAdapter?.submitList(songList as ArrayList<Any>?)
+    private fun addSongsToAdapter(songList: ArrayList<Any>?) {
+        mSongItemAdapter?.submitList(songList)
         if(mMainFragmentViewModel.getCurrentSelectablePage().value == ConstantValues.EXPLORE_ALL_SONGS){
             mMainFragmentViewModel.setTotalCount(songList?.size ?: 0)
         }
@@ -342,12 +342,12 @@ class AllSongsFragment : Fragment() {
                 mFragmentAllSongsBinding.fastScroller.setFastScrollListener(object : FastScrollListener{
                     override fun onFastScrollStart(fastScroller: FastScroller) {
                         mMainFragmentViewModel.setIsFastScrolling(true)
-                        println("FASSSSSSSSSSSSSST SCROLLING STARTED")
+                        println("FAST SCROLLING STARTED")
                     }
 
                     override fun onFastScrollStop(fastScroller: FastScroller) {
                         mMainFragmentViewModel.setIsFastScrolling(false)
-                        println("FASSSSSSSSSSSSSST SCROLLING STOPED")
+                        println("FAST SCROLLING STOPED")
                     }
 
                 })

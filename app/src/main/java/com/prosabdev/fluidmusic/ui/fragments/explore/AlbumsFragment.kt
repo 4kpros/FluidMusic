@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import com.google.android.material.transition.platform.MaterialFadeThrough
+import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.CustomGridItemDecoration
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
@@ -85,8 +86,8 @@ class AlbumsFragment : Fragment() {
             addDataToAdapter(it)
         }
     }
-    private fun addDataToAdapter(albumList: ArrayList<AlbumItem>?) {
-        mAlbumItemAdapter?.submitList(albumList as ArrayList<Any>?)
+    private fun addDataToAdapter(albumList: ArrayList<Any>?) {
+        mAlbumItemAdapter?.submitList(albumList)
         if(mMainFragmentViewModel.getCurrentSelectablePage().value == ConstantValues.EXPLORE_ALBUMS){
             mMainFragmentViewModel.setTotalCount(albumList?.size ?: 0)
         }
@@ -174,6 +175,19 @@ class AlbumsFragment : Fragment() {
 
                 mFragmentAlbumsBinding.fastScroller.setSectionIndexer(mAlbumItemAdapter)
                 mFragmentAlbumsBinding.fastScroller.attachRecyclerView(mFragmentAlbumsBinding.recyclerView)
+                mFragmentAlbumsBinding.fastScroller.setFastScrollListener(object :
+                    FastScroller.FastScrollListener {
+                    override fun onFastScrollStart(fastScroller: FastScroller) {
+                        mMainFragmentViewModel.setIsFastScrolling(true)
+                        println("FAST SCROLLING STARTED")
+                    }
+
+                    override fun onFastScrollStop(fastScroller: FastScroller) {
+                        mMainFragmentViewModel.setIsFastScrolling(false)
+                        println("FAST SCROLLING STOPED")
+                    }
+
+                })
             }
         }
     }

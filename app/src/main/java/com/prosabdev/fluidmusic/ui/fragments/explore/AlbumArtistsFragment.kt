@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
+import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.CustomGridItemDecoration
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
@@ -23,6 +24,7 @@ import com.prosabdev.fluidmusic.models.view.AlbumItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AlbumArtistsFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AlbumsFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.explore.AlbumArtistItemViewModel
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +37,7 @@ class AlbumArtistsFragment : Fragment() {
 
     private lateinit var mFragmentAlbumArtistsBinding: FragmentAlbumArtistsBinding
 
-    private val mAlbumsFragmentViewModel: AlbumsFragmentViewModel by activityViewModels()
+    private val mAlbumArtistsFragmentViewModel: AlbumArtistsFragmentViewModel by activityViewModels()
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 
@@ -77,12 +79,12 @@ class AlbumArtistsFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-        mAlbumsFragmentViewModel.getAll().observe(viewLifecycleOwner){
+        mAlbumArtistsFragmentViewModel.getAll().observe(viewLifecycleOwner){
             addDataToAdapter(it)
         }
     }
-    private fun addDataToAdapter(albumList: ArrayList<AlbumItem>?) {
-        mAlbumArtistItemListAdapter?.submitList(albumList as ArrayList<Any>?)
+    private fun addDataToAdapter(albumList: ArrayList<Any>?) {
+        mAlbumArtistItemListAdapter?.submitList(albumList)
         if(mMainFragmentViewModel.getCurrentSelectablePage().value == ConstantValues.EXPLORE_ALBUMS){
             mMainFragmentViewModel.setTotalCount(albumList?.size ?: 0)
         }
@@ -170,6 +172,19 @@ class AlbumArtistsFragment : Fragment() {
 
                 mFragmentAlbumArtistsBinding.fastScroller.setSectionIndexer(mAlbumArtistItemListAdapter)
                 mFragmentAlbumArtistsBinding.fastScroller.attachRecyclerView(mFragmentAlbumArtistsBinding.recyclerView)
+                mFragmentAlbumArtistsBinding.fastScroller.setFastScrollListener(object :
+                    FastScroller.FastScrollListener {
+                    override fun onFastScrollStart(fastScroller: FastScroller) {
+                        mMainFragmentViewModel.setIsFastScrolling(true)
+                        println("FAST SCROLLING STARTED")
+                    }
+
+                    override fun onFastScrollStop(fastScroller: FastScroller) {
+                        mMainFragmentViewModel.setIsFastScrolling(false)
+                        println("FAST SCROLLING STOPED")
+                    }
+
+                })
             }
         }
     }
