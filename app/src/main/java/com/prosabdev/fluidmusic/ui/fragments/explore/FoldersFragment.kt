@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.explore.FolderItemAdapter
+import com.prosabdev.fluidmusic.adapters.explore.FolderItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentFoldersBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.models.explore.FolderItemViewModel
@@ -22,7 +22,7 @@ class FoldersFragment : Fragment() {
 
     private lateinit var mFolderItemViewModel: FolderItemViewModel
 
-    private var mFolderItemAdapter: FolderItemAdapter? = null
+    private var mFolderItemListAdapter: FolderItemListAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

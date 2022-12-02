@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.explore.GenreItemAdapter
+import com.prosabdev.fluidmusic.adapters.explore.GenreItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentGenresBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.models.explore.GenreItemViewModel
@@ -22,7 +22,7 @@ class GenresFragment : Fragment() {
 
     private lateinit var mGenreItemViewModel: GenreItemViewModel
 
-    private var mGenreItemAdapter: GenreItemAdapter? = null
+    private var mGenreItemListAdapter: GenreItemListAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -5,28 +5,28 @@ import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.ItemGenericExploreGridBinding
-import com.prosabdev.fluidmusic.models.view.AlbumArtistItem
+import com.prosabdev.fluidmusic.models.view.ArtistItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.FormattersUtils
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
 import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
 
-class AlbumArtistItemListAdapter(
+class ArtistItemListAdapter(
     private val mContext: Context,
     private val mOnItemClickListener: OnItemClickListener,
     private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener
 ) :
-    SelectableItemListAdapter<AlbumArtistItemListAdapter.AlbumArtistItemHolder>(AlbumArtistItem.diffCallback as DiffUtil.ItemCallback<Any>),
+    SelectableItemListAdapter<ArtistItemListAdapter.ArtistItemHolder>(ArtistItem.diffCallback as DiffUtil.ItemCallback<Any>),
     FastScroller.SectionIndexer {
 
     interface OnItemClickListener {
@@ -63,27 +63,27 @@ class AlbumArtistItemListAdapter(
     override fun getSectionText(position: Int): CharSequence {
         val tempText: String =
             if(position >= 0 && position < currentList.size)
-                (currentList[position] as AlbumArtistItem?)?.name ?:
+                (currentList[position] as ArtistItem?)?.name ?:
                 "#"
             else
                 "#"
         return tempText.substring(0, 1)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumArtistItemHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArtistItemHolder {
         val dataBinding: ItemGenericExploreGridBinding = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context),
             R.layout.item_generic_explore_grid, parent, false
         )
-        return AlbumArtistItemHolder(
+        return ArtistItemHolder(
             dataBinding,
             mOnItemClickListener
         )
     }
-    override fun onBindViewHolder(holder: AlbumArtistItemHolder, position: Int) {
+    override fun onBindViewHolder(holder: ArtistItemHolder, position: Int) {
         onBindViewHolder(holder, position, mutableListOf())
     }
-    override fun onBindViewHolder(holder: AlbumArtistItemHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(holder: ArtistItemHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.isNotEmpty()) {
             for (payload in payloads) {
                 when (payload) {
@@ -93,7 +93,7 @@ class AlbumArtistItemListAdapter(
                     }
                     PAYLOAD_IS_COVERT_ART_TEXT -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
-                        holder.updateCovertArtAndTitleUI(mContext, getItem(position) as AlbumArtistItem)
+                        holder.updateCovertArtAndTitleUI(mContext, getItem(position) as ArtistItem)
                     }
                     else -> {
                         super.onBindViewHolder(holder, position, payloads)
@@ -103,16 +103,16 @@ class AlbumArtistItemListAdapter(
         } else {
             //If the is no payload specified on notify adapter, refresh all UI to be safe
             holder.updateSelectedStateUI(selectableIsSelected(position))
-            holder.updateCovertArtAndTitleUI(mContext, getItem(position) as AlbumArtistItem)
+            holder.updateCovertArtAndTitleUI(mContext, getItem(position) as ArtistItem)
         }
     }
 
-    override fun onViewAttachedToWindow(holder: AlbumArtistItemHolder) {
+    override fun onViewAttachedToWindow(holder: ArtistItemHolder) {
         super.onViewAttachedToWindow(holder)
         holder.updateSelectedStateUI(selectableIsSelected(holder.bindingAdapterPosition))
     }
 
-    class AlbumArtistItemHolder(
+    class ArtistItemHolder(
         private val mItemGenericExploreGridBinding: ItemGenericExploreGridBinding,
         mOnItemClickListener: OnItemClickListener
     ) : RecyclerView.ViewHolder(mItemGenericExploreGridBinding.root) {
@@ -126,29 +126,19 @@ class AlbumArtistItemListAdapter(
             }
         }
 
-        fun updateCovertArtAndTitleUI(ctx: Context, albumArtistItem: AlbumArtistItem) {
-            val tempTitle : String = albumArtistItem.name ?: ctx.getString(R.string.unknown_album_artist)
-            val tempSubtitle : String = albumArtistItem.artist ?: ctx.getString(R.string.unknown_artists)
-            val tempDetails : String = "${albumArtistItem.numberTracks} song(s) | ${FormattersUtils.formatSongDurationToString(albumArtistItem.totalDuration)} min"
+        fun updateCovertArtAndTitleUI(ctx: Context, artistItem: ArtistItem) {
+            val tempTitle : String = artistItem.name ?: ctx.getString(R.string.unknown_artist)
+            val tempSubtitle : String = ""
+            val tempDetails : String = "${artistItem.numberTracks} song(s) | ${FormattersUtils.formatSongDurationToString(artistItem.totalDuration)} min"
             mItemGenericExploreGridBinding.textTitle.text = tempTitle
-            mItemGenericExploreGridBinding.textSubtitle.text =
-                if (tempTitle != ctx.getString(R.string.unknown_album))
-                    if (albumArtistItem.numberArtists <= 1)
-                        tempSubtitle
-                    else
-                        "${albumArtistItem.numberArtists} artist(s)"
-                else
-                    if(tempTitle == ctx.getString(R.string.unknown_artists))
-                        tempSubtitle
-                    else
-                        "${albumArtistItem.numberArtists} artist(s)"
-            mItemGenericExploreGridBinding.textDetails.text = tempDetails
+            mItemGenericExploreGridBinding.textSubtitle.text = tempDetails
+            mItemGenericExploreGridBinding.textDetails.visibility = GONE
 
-            val tempUri = Uri.parse(albumArtistItem.uriImage ?: "")
+            val tempUri = Uri.parse(artistItem.uriImage ?: "")
             val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newOriginalCardInstance()
             imageRequest.uri = tempUri
             imageRequest.imageView = mItemGenericExploreGridBinding.imageviewCoverArt
-            imageRequest.hashedCovertArtSignature = albumArtistItem.hashedCovertArtSignature
+            imageRequest.hashedCovertArtSignature = artistItem.hashedCovertArtSignature
             ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
         }
 

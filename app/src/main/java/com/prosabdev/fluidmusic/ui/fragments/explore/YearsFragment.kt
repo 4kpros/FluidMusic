@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.explore.YearItemAdapter
+import com.prosabdev.fluidmusic.adapters.explore.YearItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentYearsBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.models.explore.YearItemViewModel
@@ -22,7 +22,7 @@ class YearsFragment : Fragment() {
 
     private lateinit var mYearItemViewModel: YearItemViewModel
 
-    private var mYearItemAdapter: YearItemAdapter? = null
+    private var mYearItemListAdapter: YearItemListAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

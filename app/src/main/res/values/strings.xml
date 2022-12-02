@@ -35,7 +35,8 @@
     <string name="unknown_album">Unknown album</string>
     <string name="unknown_composer">Unknown composer</string>
     <string name="unknown_genre">Unknown genre</string>
-    <string name="unknown_album_artist">Unknown album artist</string>
+    <string name="unknown_folder">Unknown folder</string>
+    <string name="unknown_folder_parent">Unknown folder parent</string>
     <string name="unknown_year">Unknown year</string>
     <string name="pause">Pause</string>
     <string name="next">Next</string>
