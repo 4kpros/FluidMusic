@@ -47,10 +47,10 @@ interface FolderUriTreeDao {
             "CASE :order_by WHEN 'pathTree' THEN FolderUriTree.pathTree END ASC," +
             "CASE :order_by WHEN 'id' THEN FolderUriTree.id END ASC"
     )
-    fun getAll(order_by: String): LiveData<List<FolderUriTree>>
+    fun getAll(order_by: String): LiveData<List<FolderUriTree>>?
 
     @Query("SELECT * FROM FolderUriTree")
-    fun getAllDirectly(): List<FolderUriTree>
+    fun getAllDirectly(): List<FolderUriTree>?
 
     @Query("UPDATE FolderUriTree SET lastModified = -1")
     fun resetAllFolderUriTreesLastModified()

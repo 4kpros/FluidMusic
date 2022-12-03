@@ -14,6 +14,7 @@
         style="@style/Widget.Material3.CardView.Filled"
         android:layout_marginTop="2dp"
         android:backgroundTint="@color/transparent"
+        app:cardCornerRadius="@dimen/medium_corner_radius"
         >
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

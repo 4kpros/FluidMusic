@@ -100,6 +100,7 @@ import kotlinx.coroutines.withContext
     }
 
     private fun requestListenData() {
+        mAllSongsFragmentViewModel.setSortBy("title")
         mAllSongsFragmentViewModel.listenAllData(mSongItemViewModel, this)
         mAlbumsFragmentViewModel.listenAllData(mAlbumItemViewModel, this)
         mAlbumArtistsFragmentViewModel.listenAllData(mAlbumArtistItemViewModel, this)

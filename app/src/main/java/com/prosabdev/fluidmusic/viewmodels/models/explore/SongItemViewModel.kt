@@ -33,16 +33,16 @@ class SongItemViewModel(app: Application) : AndroidViewModel(app) {
     suspend fun getAtUri(uri: String) : SongItem? {
         return repository?.getAtUri(uri)
     }
-    suspend fun getAllLimit(order_by: String = "title", limit: Int) : LiveData<List<SongItem>>? {
+    suspend fun getAllLimit(order_by: String, limit: Int) : LiveData<List<SongItem>>? {
         return repository?.getAllLimit(order_by, limit)
     }
-    suspend fun getAll(order_by: String = "title") : LiveData<List<SongItem>>? {
+    suspend fun getAll(order_by: String) : LiveData<List<SongItem>>? {
         return repository?.getAll(order_by)
     }
-    suspend fun getAllWhereEqual(whereColumn: String, columnValue: String?, order_by: String = "title") : LiveData<List<SongItem>>? {
+    suspend fun getAllWhereEqual(whereColumn: String, columnValue: String?, order_by: String) : LiveData<List<SongItem>>? {
         return repository?.getAllWhereEqual(whereColumn, columnValue, order_by)
     }
-    suspend fun getAllWhereLike(whereColumn: String, columnValue: String?, order_by: String = "title") : LiveData<List<SongItem>>? {
+    suspend fun getAllWhereLike(whereColumn: String, columnValue: String?, order_by: String) : LiveData<List<SongItem>>? {
         return repository?.getAllWhereLike(whereColumn, columnValue, order_by)
     }
 }

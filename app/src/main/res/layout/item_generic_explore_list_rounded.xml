@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
 
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
+
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/linear_cover_art_container"
             android:layout_width="wrap_content"
@@ -17,18 +20,19 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginVertical="@dimen/main_small_margin"
-            android:layout_marginStart="@dimen/main_margin"
-            >
+            android:layout_marginStart="@dimen/main_margin">
+
             <com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
                 android:id="@+id/imageview_cover_art"
                 android:layout_width="@dimen/image_list_small_size"
                 android:layout_height="wrap_content"
-                app:shapeAppearanceOverlay="@style/ShapeFullRounded"
+                app:shapeAppearanceOverlay="@style/ShapeFullCircle"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_fluid_music_icon_with_padding"
                 app:srcCompat="@drawable/ic_fluid_music_icon_with_padding"
                 />
         </androidx.appcompat.widget.LinearLayoutCompat>
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_title"
             android:layout_width="0dp"
@@ -42,8 +46,8 @@
             android:textAppearance="?attr/textAppearanceBody2"
             android:textStyle="bold"
             android:layout_marginStart="@dimen/main_medium_margin"
-            android:layout_marginEnd="@dimen/main_margin"
-            />
+            android:layout_marginEnd="@dimen/main_margin" />
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_subtitle"
             android:layout_width="0dp"
@@ -55,8 +59,8 @@
             android:text=""
             android:maxLines="1"
             android:ellipsize="end"
-            android:textAppearance="?attr/textAppearanceBody2"
-            />
+            android:textAppearance="?attr/textAppearanceBody2" />
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_details"
             android:layout_width="0dp"
@@ -69,8 +73,8 @@
             android:alpha="0.5"
             android:text=""
             android:maxLines="1"
-            android:ellipsize="end"
-            />
+            android:ellipsize="end" />
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_now_playing"
             android:layout_width="wrap_content"
@@ -82,8 +86,8 @@
             android:alpha="0.5"
             android:text="Playing"
             android:maxLines="1"
-            android:ellipsize="end"
-            />
+            android:ellipsize="end" />
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_view_clickable"
             android:layout_width="0dp"
@@ -99,14 +103,14 @@
             android:focusable="true"
             app:cardCornerRadius="@dimen/medium_corner_radius"
             >
+
             <View
                 android:id="@+id/song_item_is_selected"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="?colorPrimary"
                 android:alpha="0.15"
-                android:visibility="invisible"
-                />
+                android:visibility="invisible" />
         </com.google.android.material.card.MaterialCardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

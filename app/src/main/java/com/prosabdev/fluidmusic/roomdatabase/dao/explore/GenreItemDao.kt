@@ -13,15 +13,15 @@ interface GenreItemDao {
     @Query(
         "SELECT * FROM GenreItem " +
             "ORDER BY " +
-                "CASE :order_by WHEN 'name' THEN COALESCE(GenreItem.name, 'Unknown field') END, GenreItem.lastAddedDateToLibrary," +
-                "CASE :order_by WHEN 'lastUpdateDate' THEN GenreItem.lastUpdateDate END, COALESCE(GenreItem.name, 'Unknown field'), GenreItem.lastAddedDateToLibrary," +
-                "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN GenreItem.lastAddedDateToLibrary END, COALESCE(GenreItem.name, 'Unknown field')," +
-                "CASE :order_by WHEN 'numberArtists' THEN GenreItem.numberArtists END, COALESCE(GenreItem.name, 'Unknown field'), GenreItem.lastAddedDateToLibrary," +
-                "CASE :order_by WHEN 'numberAlbums' THEN GenreItem.numberAlbums END, COALESCE(GenreItem.name, 'Unknown field'), GenreItem.lastAddedDateToLibrary," +
-                "CASE :order_by WHEN 'numberAlbumArtists' THEN GenreItem.numberAlbumArtists END, COALESCE(GenreItem.name, 'Unknown field'), GenreItem.lastAddedDateToLibrary," +
-                "CASE :order_by WHEN 'numberComposers' THEN GenreItem.numberComposers END, COALESCE(GenreItem.name, 'Unknown field'), GenreItem.lastAddedDateToLibrary," +
-                "CASE :order_by WHEN 'numberTracks' THEN GenreItem.numberTracks END, COALESCE(GenreItem.name, 'Unknown field'), GenreItem.lastAddedDateToLibrary," +
-                "CASE :order_by WHEN 'totalDuration' THEN GenreItem.totalDuration END, COALESCE(GenreItem.name, 'Unknown field'), GenreItem.lastAddedDateToLibrary"
+                "CASE :order_by WHEN 'name' THEN COALESCE(GenreItem.name, 'Unknown field') END COLLATE NOCASE, GenreItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'lastUpdateDate' THEN GenreItem.lastUpdateDate END DESC, COALESCE(GenreItem.name, 'Unknown field') COLLATE NOCASE, GenreItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN GenreItem.lastAddedDateToLibrary END DESC, COALESCE(GenreItem.name, 'Unknown field') COLLATE NOCASE," +
+                "CASE :order_by WHEN 'numberArtists' THEN GenreItem.numberArtists END, COALESCE(GenreItem.name, 'Unknown field') COLLATE NOCASE, GenreItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'numberAlbums' THEN GenreItem.numberAlbums END, COALESCE(GenreItem.name, 'Unknown field') COLLATE NOCASE, GenreItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'numberAlbumArtists' THEN GenreItem.numberAlbumArtists END, COALESCE(GenreItem.name, 'Unknown field') COLLATE NOCASE, GenreItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'numberComposers' THEN GenreItem.numberComposers END, COALESCE(GenreItem.name, 'Unknown field') COLLATE NOCASE, GenreItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'numberTracks' THEN GenreItem.numberTracks END, COALESCE(GenreItem.name, 'Unknown field') COLLATE NOCASE, GenreItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'totalDuration' THEN GenreItem.totalDuration END, COALESCE(GenreItem.name, 'Unknown field') COLLATE NOCASE, GenreItem.lastAddedDateToLibrary DESC"
     )
     fun getAll(order_by: String): LiveData<List<GenreItem>>?
 }

@@ -36,10 +36,10 @@ class MediaScannerAutomaticWorker(
     private suspend fun scanDeviceFolderUriTrees(
         context: Context
     ) {
-        val tempFolderSelected: ArrayList<FolderUriTree> =
-            AppDatabase.getDatabase(applicationContext).folderUriTreeDao().getAll("id").value as ArrayList<FolderUriTree>
+        val tempFolderSelected: ArrayList<FolderUriTree>? =
+            AppDatabase.getDatabase(applicationContext).folderUriTreeDao().getAll("id")?.value as ArrayList<FolderUriTree>?
 
-        if (tempFolderSelected.isEmpty()){
+        if (tempFolderSelected == null || tempFolderSelected.isEmpty()){
             Log.i(ConstantValues.TAG, "No folder uri tree to scan !")
             Log.i(ConstantValues.TAG, "Break and stay calm !")
             return

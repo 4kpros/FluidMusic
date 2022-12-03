@@ -2,6 +2,7 @@ package com.prosabdev.fluidmusic.ui.fragments.explore
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,10 +11,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.CustomGridItemDecoration
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
+import com.prosabdev.fluidmusic.adapters.GridSpacingItemDecoration
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.ArtistItemListAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
@@ -28,7 +30,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ArtistsFragment : Fragment() {
-    private var mPageIndex: Int? = -1
 
     private lateinit var mFragmentArtistsBinding: FragmentArtistsBinding
 
@@ -41,10 +42,11 @@ class ArtistsFragment : Fragment() {
     private var mEmptyBottomAdapter: EmptyBottomAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
 
+    private var mIsDraggingToScroll: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            mPageIndex = it.getInt(ConstantValues.EXPLORE_ARTISTS)
         }
     }
 
@@ -71,7 +73,53 @@ class ArtistsFragment : Fragment() {
     }
 
     private fun checkInteractions() {
-        //
+        mFragmentArtistsBinding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if(mIsDraggingToScroll){
+                    if(dy < 0){
+                        Log.i(ConstantValues.TAG, "Scrolling --> TOP")
+                        mMainFragmentViewModel.setScrollingState(-1)
+                    }else if(dy > 0){
+                        Log.i(ConstantValues.TAG, "Scrolling --> BOTTOM")
+                        mMainFragmentViewModel.setScrollingState(1)
+                    }
+                    if (!recyclerView.canScrollVertically(1) && dy > 0) {
+                        Log.i(ConstantValues.TAG, "Scrolled to BOTTOM")
+                        mMainFragmentViewModel.setScrollingState(2)
+                    } else if (!recyclerView.canScrollVertically(-1) && dy < 0) {
+                        Log.i(ConstantValues.TAG, "Scrolled to TOP")
+                        mMainFragmentViewModel.setScrollingState(-2)
+                    }
+                }else{
+                    if (!recyclerView.canScrollVertically(1) && dy > 0) {
+                        Log.i(ConstantValues.TAG, "Scrolled to BOTTOM")
+                        if(mMainFragmentViewModel.getScrollingState().value != 2)
+                            mMainFragmentViewModel.setScrollingState(2)
+                    } else if (!recyclerView.canScrollVertically(-1) && dy < 0) {
+                        Log.i(ConstantValues.TAG, "Scrolled to TOP")
+                        if(mMainFragmentViewModel.getScrollingState().value != -2)
+                            mMainFragmentViewModel.setScrollingState(-2)
+                    }
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_IDLE -> {
+                        mIsDraggingToScroll = false
+                        println("The RecyclerView is SCROLL_STATE_IDLE")
+                    }
+                    RecyclerView.SCROLL_STATE_DRAGGING -> {
+                        mIsDraggingToScroll = true
+                        println("The RecyclerView is SCROLL_STATE_DRAGGING")
+                    }
+                    RecyclerView.SCROLL_STATE_SETTLING -> {
+                        println("The RecyclerView is SCROLL_STATE_SETTLING")
+                    }
+                }
+            }
+        })
     }
 
     private fun observeLiveData() {
@@ -162,9 +210,9 @@ class ArtistsFragment : Fragment() {
             MainScope().launch {
                 mFragmentArtistsBinding.recyclerView.adapter = concatAdapter
                 mFragmentArtistsBinding.recyclerView.layoutManager = mLayoutManager
-                context?.let { ctx ->
-                    mFragmentArtistsBinding.recyclerView.addItemDecoration(CustomGridItemDecoration(ctx, spanCount, false))
-                }
+                mFragmentArtistsBinding.recyclerView.addItemDecoration(
+                    GridSpacingItemDecoration(spanCount)
+                )
 
                 mFragmentArtistsBinding.fastScroller.setSectionIndexer(mArtistItemListAdapter)
                 mFragmentArtistsBinding.fastScroller.attachRecyclerView(mFragmentArtistsBinding.recyclerView)
@@ -177,7 +225,7 @@ class ArtistsFragment : Fragment() {
 
                     override fun onFastScrollStop(fastScroller: FastScroller) {
                         mMainFragmentViewModel.setIsFastScrolling(false)
-                        println("FAST SCROLLING STOPED")
+                        println("FAST SCROLLING STOPPED")
                     }
 
                 })
@@ -196,7 +244,6 @@ class ArtistsFragment : Fragment() {
         fun newInstance(pageIndex: Int) =
             ArtistsFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(ConstantValues.EXPLORE_ARTISTS, pageIndex)
                 }
             }
     }

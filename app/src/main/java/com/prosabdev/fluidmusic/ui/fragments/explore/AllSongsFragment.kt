@@ -18,6 +18,7 @@ import com.l4digital.fastscroll.FastScroller
 import com.l4digital.fastscroll.FastScroller.FastScrollListener
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
+import com.prosabdev.fluidmusic.adapters.GridSpacingItemDecoration
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
@@ -46,7 +47,6 @@ class AllSongsFragment : Fragment() {
     private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by activityViewModels()
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
-    private val mSongItemViewModel: SongItemViewModel by activityViewModels()
 
     private var mSortItemsBottomSheetDialogFragment: SortItemsBottomSheetDialogFragment = SortItemsBottomSheetDialogFragment.newInstance(ConstantValues.EXPLORE_ALL_SONGS)
     private var mOrganizeItemBottomSheetDialogFragment: OrganizeItemBottomSheetDialogFragment = OrganizeItemBottomSheetDialogFragment.newInstance(ConstantValues.EXPLORE_ALL_SONGS)
@@ -336,6 +336,9 @@ class AllSongsFragment : Fragment() {
             MainScope().launch {
                 mFragmentAllSongsBinding.recyclerView.adapter = concatAdapter
                 mFragmentAllSongsBinding.recyclerView.layoutManager = mLayoutManager
+                mFragmentAllSongsBinding.recyclerView.addItemDecoration(
+                    GridSpacingItemDecoration(spanCount)
+                )
 
                 mFragmentAllSongsBinding.fastScroller.setSectionIndexer(mSongItemAdapter)
                 mFragmentAllSongsBinding.fastScroller.attachRecyclerView(mFragmentAllSongsBinding.recyclerView)
@@ -347,7 +350,7 @@ class AllSongsFragment : Fragment() {
 
                     override fun onFastScrollStop(fastScroller: FastScroller) {
                         mMainFragmentViewModel.setIsFastScrolling(false)
-                        println("FAST SCROLLING STOPED")
+                        println("FAST SCROLLING STOPPED")
                     }
 
                 })

@@ -5,15 +5,17 @@
     <data>
 
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="@dimen/main_small_margin"
-            >
+            android:padding="@dimen/main_small_margin">
+
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -22,29 +24,30 @@
                 app:cardBackgroundColor="@color/transparent"
                 app:cardCornerRadius="@dimen/medium_corner_radius"
                 >
+
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/linear_cover_art_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    >
+                    app:layout_constraintEnd_toEndOf="parent">
+
                     <com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
                         android:id="@+id/imageview_cover_art"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:shapeAppearanceOverlay="@style/ShapeFullRounded"
+                        app:shapeAppearanceOverlay="@style/ShapeFullCircle"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_fluid_music_icon_with_padding"
                         app:srcCompat="@drawable/ic_fluid_music_icon_with_padding"
                         />
+
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:layout_constraintTop_toBottomOf="@+id/imageview_cover_art"
-
                         >
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/text_title"
@@ -59,8 +62,8 @@
                             android:textAppearance="?attr/textAppearanceBody2"
                             android:textStyle="bold"
                             android:layout_marginTop="@dimen/main_small_margin"
-                            android:layout_marginHorizontal="@dimen/main_medium_margin"
-                            />
+                            android:layout_marginHorizontal="@dimen/main_medium_margin" />
+
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/text_subtitle"
                             android:layout_width="0dp"
@@ -71,8 +74,8 @@
                             android:text=""
                             android:maxLines="1"
                             android:ellipsize="end"
-                            android:textAppearance="?attr/textAppearanceBody2"
-                            />
+                            android:textAppearance="?attr/textAppearanceBody2" />
+
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/text_details"
                             android:layout_width="0dp"
@@ -86,8 +89,8 @@
                             android:text=""
                             android:maxLines="1"
                             android:ellipsize="end"
-                            android:paddingBottom="@dimen/main_small_margin"
-                            />
+                            android:paddingBottom="@dimen/main_small_margin" />
+
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/text_now_playing"
                             android:layout_width="wrap_content"
@@ -99,8 +102,7 @@
                             android:alpha="0.5"
                             android:text=""
                             android:maxLines="1"
-                            android:ellipsize="end"
-                            />
+                            android:ellipsize="end" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -119,14 +121,14 @@
             app:cardBackgroundColor="@color/transparent"
             app:cardCornerRadius="@dimen/medium_corner_radius"
             >
+
             <View
                 android:id="@+id/song_item_is_selected"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="?colorPrimary"
                 android:alpha="0.15"
-                android:visibility="invisible"
-                />
+                android:visibility="invisible" />
         </com.google.android.material.card.MaterialCardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

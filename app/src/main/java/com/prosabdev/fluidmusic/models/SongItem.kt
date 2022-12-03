@@ -23,6 +23,7 @@ class SongItem {
     var genre: String? = null
     var uriPath: String? = null
     var folder: String? = null
+    var folderParent: String? = null
     var folderUri: String? = null
     var year: String? = null
     var duration: Long = 0

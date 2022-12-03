@@ -14,7 +14,6 @@ import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.utils.AudioInfoExtractorUtils
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import kotlinx.coroutines.*
-import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 
 
@@ -76,14 +75,16 @@ class MediaScannerWorker(
             scanDocumentUriContent(
                 context,
                 tempDocFile?.uri,
-                tempFolderSelected[i].id
+                tempFolderSelected[i].id,
+                null,
             )
         }
     }
     private suspend fun scanDocumentUriContent(
         context: Context,
         uriTree: Uri?,
-        folderUriTreeId : Long?
+        folderUriTreeId : Long?,
+        parentFolder : String? = null
     ) :Unit = coroutineScope {
         if(uriTree != null) {
             val tempDocFile: DocumentFile? =
@@ -94,7 +95,7 @@ class MediaScannerWorker(
                     if (tempDocFile.listFiles()[i].isDirectory) {
                         launch {
                             val tempRecursiveUri = tempDocFile.listFiles()[i].uri
-                            scanDocumentUriContent(context, tempRecursiveUri, folderUriTreeId)
+                            scanDocumentUriContent(context, tempRecursiveUri, folderUriTreeId, tempDocFile.name)
                         }
                     } else {
                         launch {
@@ -105,15 +106,15 @@ class MediaScannerWorker(
                                     tempFFF.uri,
                                     "r"
                                 ).use {
-                                    var tempSong : SongItem? = null
+                                    var tempSong : SongItem?
                                     withContext(Dispatchers.IO){
                                         tempSong = AudioInfoExtractorUtils.extractAudioInfoFromUri(applicationContext, tempFFF.uri)
-                                    }
-                                    withContext(Dispatchers.Default){
+                                        tempSong?.folder = tempDocFile.name
+                                        tempSong?.folderUri = uriTree.toString()
+                                        tempSong?.folderParent = parentFolder
                                         if(tempSong != null){
                                             tempSong?.uriTreeId = folderUriTreeId ?: -1
-                                            tempSong?.id = (mSongList.size+1).toLong()
-                                            mSongList.add(tempSong!!)
+                                            mSongList.add(tempSong)
                                             mScanCounter[1] = mSongList.size
                                         }
                                     }

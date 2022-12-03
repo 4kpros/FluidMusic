@@ -31,7 +31,20 @@
         <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
         <item name="colorOnErrorContainer">@color/md_theme_light_onErrorContainer</item>
     </style>
-
+    <style name="ShapeFullCircle">
+        <item name="cornerSize">50%</item>
+    </style>
+    <style name="ShapeFullRounded">
+        <item name="cornerSize">@dimen/medium_corner_radius</item>
+    </style>
+    <style name="ShapeTopRounded">
+        <item name="cornerSizeTopLeft">@dimen/medium_corner_radius</item>
+        <item name="cornerSizeTopRight">@dimen/medium_corner_radius</item>
+    </style>
+    <style name="ShapeBottomRounded">
+        <item name="cornerSizeBottomLeft">@dimen/medium_corner_radius</item>
+        <item name="cornerSizeBottomRight">@dimen/medium_corner_radius</item>
+    </style>
 
 
 

@@ -24,6 +24,7 @@
             app:cardBackgroundColor="@color/transparent"
             android:clickable="true"
             android:focusable="true"
+            app:cardCornerRadius="@dimen/medium_corner_radius"
             >
         </com.google.android.material.card.MaterialCardView>
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -37,40 +38,34 @@
             android:layout_marginStart="@dimen/main_margin"
             android:layout_marginVertical="@dimen/main_small_margin"
             >
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_view_cover_art"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/Widget.Material3.CardView.Elevated"
-                android:layout_margin="1dp"
                 >
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="wrap_content"
+                <com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/playlist_play"
+                    app:srcCompat="@drawable/playlist_play"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:cardCornerRadius="@dimen/medium_corner_radius"
+                    />
+                <com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
+                    android:id="@+id/imageview_cover_art"
+                    android:layout_width="@dimen/image_playlist_list_size"
                     android:layout_height="wrap_content"
-                    >
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/playlist_play"
-                        app:srcCompat="@drawable/playlist_play"
-                        app:layout_constraintTop_toTopOf="@+id/imageview_cover_art"
-                        app:layout_constraintBottom_toBottomOf="@+id/imageview_cover_art"
-                        app:layout_constraintStart_toStartOf="@+id/imageview_cover_art"
-                        app:layout_constraintEnd_toEndOf="@+id/imageview_cover_art"
-                        />
-                    <com.prosabdev.fluidmusic.ui.custom.CustomImageViewRatio11
-                        android:id="@+id/imageview_cover_art"
-                        android:layout_width="@dimen/image_playlist_list_size"
-                        android:layout_height="wrap_content"
-                        android:scaleType="centerCrop"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
+                    android:scaleType="centerCrop"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:cardCornerRadius="@dimen/medium_corner_radius"
+                    />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.appcompat.widget.LinearLayoutCompat>
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="0dp"

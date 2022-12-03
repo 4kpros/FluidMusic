@@ -47,7 +47,7 @@
             android:layout_marginBottom="@dimen/main_margin"
             android:orientation="vertical"
             >
-            <RadioGroup
+            <com.jbvincey.nestedradiobutton.NestedConstraintRadioGroup
                 android:id="@+id/radio_group_organize"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -56,64 +56,78 @@
                 >
 
                 <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/linear_left_radio_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    app:layout_constraintWidth_percent="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    >
 
-                    <com.google.android.material.radiobutton.MaterialRadioButton
+                    <com.jbvincey.nestedradiobutton.NestedRadioButton
                         android:id="@+id/radio_dialog_small_list"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.CompoundButton.RadioButton"
                         android:text="@string/dialog_small_list"
                         app:useMaterialThemeColors="true" />
 
-                    <com.google.android.material.radiobutton.MaterialRadioButton
+                    <com.jbvincey.nestedradiobutton.NestedRadioButton
                         android:id="@+id/radio_file_dialog_medium_list"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.CompoundButton.RadioButton"
                         android:text="@string/dialog_medium_list"
                         app:useMaterialThemeColors="true" />
 
-                    <com.google.android.material.radiobutton.MaterialRadioButton
+                    <com.jbvincey.nestedradiobutton.NestedRadioButton
                         android:id="@+id/radio_dialog_large_list"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.CompoundButton.RadioButton"
                         android:text="@string/dialog_large_list"
                         app:useMaterialThemeColors="true" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
-                    android:layout_width="match_parent"
+                    android:id="@+id/linear_right_radio_group"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    app:layout_constraintWidth_percent="0.5"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    >
 
-                    <com.google.android.material.radiobutton.MaterialRadioButton
+                    <com.jbvincey.nestedradiobutton.NestedRadioButton
                         android:id="@+id/radio_dialog_small_grid"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.CompoundButton.RadioButton"
                         android:text="@string/dialog_small_grid"
                         app:useMaterialThemeColors="true"
                         />
 
-                    <com.google.android.material.radiobutton.MaterialRadioButton
+                    <com.jbvincey.nestedradiobutton.NestedRadioButton
                         android:id="@+id/radio_file_dialog_medium_grid"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.CompoundButton.RadioButton"
                         android:text="@string/dialog_medium_grid"
                         app:useMaterialThemeColors="true"
                         />
 
-                    <com.google.android.material.radiobutton.MaterialRadioButton
+                    <com.jbvincey.nestedradiobutton.NestedRadioButton
                         android:id="@+id/radio_dialog_large_grid"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.CompoundButton.RadioButton"
                         android:text="@string/dialog_large_grid"
                         app:useMaterialThemeColors="true"
                         />
                 </androidx.appcompat.widget.LinearLayoutCompat>
-            </RadioGroup>
+            </com.jbvincey.nestedradiobutton.NestedConstraintRadioGroup>
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.appcompat.widget.LinearLayoutCompat>
 </layout>

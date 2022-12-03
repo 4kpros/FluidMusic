@@ -2,7 +2,6 @@ package com.prosabdev.fluidmusic.models.view
 
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.DatabaseView
-import com.prosabdev.fluidmusic.models.SongItem
 
 @DatabaseView(
     "SELECT songItem.artist as name, " +

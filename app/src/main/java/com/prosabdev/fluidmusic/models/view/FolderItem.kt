@@ -2,11 +2,11 @@ package com.prosabdev.fluidmusic.models.view
 
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.DatabaseView
-import com.prosabdev.fluidmusic.models.SongItem
 
 @DatabaseView(
     "SELECT songItem.folder as name, " +
-            "MAX(songItem.folder) as parentFolder, " +
+            "folderUriTree.deviceName as deviceName, " +
+            "MAX(songItem.folderParent) as parentFolder, " +
             "MAX(songItem.lastUpdateDate) as lastUpdateDate, " +
             "MAX(songItem.lastAddedDateToLibrary) as lastAddedDateToLibrary, " +
             "COUNT(DISTINCT songItem.artist) as numberArtists, " +
@@ -18,10 +18,12 @@ import com.prosabdev.fluidmusic.models.SongItem
             "MAX(songItem.hashedCovertArtSignature) as hashedCovertArtSignature, " +
             "(SELECT tempSI.uri FROM SongItem as tempSI WHERE tempSI.hashedCovertArtSignature = songItem.hashedCovertArtSignature LIMIT 1) as uriImage " +
             "FROM SongItem as songItem " +
+            "INNER JOIN FolderUriTree as folderUriTree ON songItem.uriTreeId = folderUriTree.id " +
             "GROUP BY SongItem.folder ORDER BY SongItem.folder"
 )
 class FolderItem {
     var name: String? = null
+    var deviceName: String? = null
     var parentFolder: String? = null
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0

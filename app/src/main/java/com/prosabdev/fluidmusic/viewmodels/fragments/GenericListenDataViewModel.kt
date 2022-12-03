@@ -2,7 +2,6 @@ package com.prosabdev.fluidmusic.viewmodels.fragments
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.prosabdev.fluidmusic.utils.ConstantValues

@@ -15,6 +15,7 @@ import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.ItemGenericExploreGridBinding
+import com.prosabdev.fluidmusic.databinding.ItemGenericExploreGridRoundedBinding
 import com.prosabdev.fluidmusic.models.view.ArtistItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.FormattersUtils
@@ -71,9 +72,9 @@ class ArtistItemListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArtistItemHolder {
-        val dataBinding: ItemGenericExploreGridBinding = DataBindingUtil.inflate(
+        val dataBinding: ItemGenericExploreGridRoundedBinding = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context),
-            R.layout.item_generic_explore_grid, parent, false
+            R.layout.item_generic_explore_grid_rounded, parent, false
         )
         return ArtistItemHolder(
             dataBinding,
@@ -113,7 +114,7 @@ class ArtistItemListAdapter(
     }
 
     class ArtistItemHolder(
-        private val mItemGenericExploreGridBinding: ItemGenericExploreGridBinding,
+        private val mItemGenericExploreGridBinding: ItemGenericExploreGridRoundedBinding,
         mOnItemClickListener: OnItemClickListener
     ) : RecyclerView.ViewHolder(mItemGenericExploreGridBinding.root) {
         init {

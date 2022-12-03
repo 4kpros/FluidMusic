@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="very_large_corner_radius">25dp</dimen>
+    <dimen name="large_corner_radius">25dp</dimen>
+    <dimen name="medium_corner_radius">15dp</dimen>
+    <dimen name="small_corner_radius">5dp</dimen>
+    <dimen name="none_corner_radius">0dp</dimen>
+
     <dimen name="main_small_margin">5dp</dimen>
     <dimen name="main_medium_margin">10dp</dimen>
     <dimen name="main_margin">16dp</dimen>

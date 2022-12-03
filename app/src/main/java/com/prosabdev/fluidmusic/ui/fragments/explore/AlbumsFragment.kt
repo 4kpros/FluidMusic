@@ -2,6 +2,7 @@ package com.prosabdev.fluidmusic.ui.fragments.explore
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,16 +12,16 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.CustomGridItemDecoration
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
+import com.prosabdev.fluidmusic.adapters.GridSpacingItemDecoration
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.AlbumItemListAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentAlbumsBinding
-import com.prosabdev.fluidmusic.models.view.AlbumItem
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortItemsBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
@@ -46,6 +47,8 @@ class AlbumsFragment : Fragment() {
     private var mAlbumItemAdapter: AlbumItemListAdapter? = null
     private var mEmptyBottomAdapter: EmptyBottomAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
+
+    private var mIsDraggingToScroll: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +81,53 @@ class AlbumsFragment : Fragment() {
     }
 
     private fun checkInteractions() {
-        //
+        mFragmentAlbumsBinding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if(mIsDraggingToScroll){
+                    if(dy < 0){
+                        Log.i(ConstantValues.TAG, "Scrolling --> TOP")
+                        mMainFragmentViewModel.setScrollingState(-1)
+                    }else if(dy > 0){
+                        Log.i(ConstantValues.TAG, "Scrolling --> BOTTOM")
+                        mMainFragmentViewModel.setScrollingState(1)
+                    }
+                    if (!recyclerView.canScrollVertically(1) && dy > 0) {
+                        Log.i(ConstantValues.TAG, "Scrolled to BOTTOM")
+                        mMainFragmentViewModel.setScrollingState(2)
+                    } else if (!recyclerView.canScrollVertically(-1) && dy < 0) {
+                        Log.i(ConstantValues.TAG, "Scrolled to TOP")
+                        mMainFragmentViewModel.setScrollingState(-2)
+                    }
+                }else{
+                    if (!recyclerView.canScrollVertically(1) && dy > 0) {
+                        Log.i(ConstantValues.TAG, "Scrolled to BOTTOM")
+                        if(mMainFragmentViewModel.getScrollingState().value != 2)
+                            mMainFragmentViewModel.setScrollingState(2)
+                    } else if (!recyclerView.canScrollVertically(-1) && dy < 0) {
+                        Log.i(ConstantValues.TAG, "Scrolled to TOP")
+                        if(mMainFragmentViewModel.getScrollingState().value != -2)
+                            mMainFragmentViewModel.setScrollingState(-2)
+                    }
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_IDLE -> {
+                        mIsDraggingToScroll = false
+                        println("The RecyclerView is SCROLL_STATE_IDLE")
+                    }
+                    RecyclerView.SCROLL_STATE_DRAGGING -> {
+                        mIsDraggingToScroll = true
+                        println("The RecyclerView is SCROLL_STATE_DRAGGING")
+                    }
+                    RecyclerView.SCROLL_STATE_SETTLING -> {
+                        println("The RecyclerView is SCROLL_STATE_SETTLING")
+                    }
+                }
+            }
+        })
     }
 
     private fun observeLiveData() {
@@ -96,7 +145,7 @@ class AlbumsFragment : Fragment() {
     private suspend fun setupRecyclerViewAdapter() {
         withContext(Dispatchers.Default){
             val ctx : Context = context ?: return@withContext
-            val spanCount = 2
+            val spanCount = 3
             //Setup headline adapter
             val listHeadlines : ArrayList<Int> = ArrayList<Int>()
             listHeadlines.add(0)
@@ -169,9 +218,7 @@ class AlbumsFragment : Fragment() {
             MainScope().launch {
                 mFragmentAlbumsBinding.recyclerView.adapter = concatAdapter
                 mFragmentAlbumsBinding.recyclerView.layoutManager = mLayoutManager
-                context?.let { ctx ->
-                    mFragmentAlbumsBinding.recyclerView.addItemDecoration(CustomGridItemDecoration(ctx, spanCount, false))
-                }
+                mFragmentAlbumsBinding.recyclerView.addItemDecoration(GridSpacingItemDecoration(spanCount))
 
                 mFragmentAlbumsBinding.fastScroller.setSectionIndexer(mAlbumItemAdapter)
                 mFragmentAlbumsBinding.fastScroller.attachRecyclerView(mFragmentAlbumsBinding.recyclerView)
@@ -184,7 +231,7 @@ class AlbumsFragment : Fragment() {
 
                     override fun onFastScrollStop(fastScroller: FastScroller) {
                         mMainFragmentViewModel.setIsFastScrolling(false)
-                        println("FAST SCROLLING STOPED")
+                        println("FAST SCROLLING STOPPED")
                     }
 
                 })

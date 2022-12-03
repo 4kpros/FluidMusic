@@ -3,20 +3,21 @@ package com.prosabdev.fluidmusic.ui.custom;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class CustomImageViewRatio11 extends androidx.appcompat.widget.AppCompatImageView {
-    public CustomImageViewRatio11(@NonNull Context context) {
+import com.google.android.material.imageview.ShapeableImageView;
+
+public class CustomShapeableImageViewImageViewRatio11 extends ShapeableImageView {
+    public CustomShapeableImageViewImageViewRatio11(Context context) {
         super(context);
     }
 
-    public CustomImageViewRatio11(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public CustomShapeableImageViewImageViewRatio11(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public CustomImageViewRatio11(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+    public CustomShapeableImageViewImageViewRatio11(Context context, @Nullable AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
     }
 
     @Override
@@ -28,4 +29,6 @@ public class CustomImageViewRatio11 extends androidx.appcompat.widget.AppCompatI
             setMeasuredDimension(width, width);
         }
     }
+
+
 }

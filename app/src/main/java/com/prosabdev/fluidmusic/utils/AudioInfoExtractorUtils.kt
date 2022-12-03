@@ -9,7 +9,6 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import com.prosabdev.fluidmusic.models.SongItem
 import kotlinx.coroutines.Dispatchers
@@ -82,6 +81,7 @@ abstract class AudioInfoExtractorUtils {
                         tempSong.uri = uri.toString()
                         if (tempDocFile != null) {
                             tempSong.fileName = tempDocFile.name
+                            tempSong.uriPath = tempDocFile.uri.lastPathSegment
                         }
                         val extension: String =
                             uri.lastPathSegment.toString().substringAfterLast(".").uppercase()
@@ -93,12 +93,6 @@ abstract class AudioInfoExtractorUtils {
                         tempSong.album = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
                         tempSong.albumArtist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST)
                         tempSong.genre = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
-
-                        if (tempDocFile != null) {
-                            tempSong.folder = tempDocFile.parentFile?.name
-                            tempSong.folderUri = tempDocFile.parentFile?.uri.toString()
-                            tempSong.uriPath = tempDocFile.uri.lastPathSegment
-                        }
 
                         tempSong.year = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
                         tempSong.duration = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0

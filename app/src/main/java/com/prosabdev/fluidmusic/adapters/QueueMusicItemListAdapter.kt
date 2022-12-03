@@ -24,8 +24,6 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.FormattersUtils
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
 import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import java.util.*
 
 class QueueMusicItemListAdapter(

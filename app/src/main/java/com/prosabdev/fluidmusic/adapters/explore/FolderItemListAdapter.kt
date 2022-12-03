@@ -126,8 +126,8 @@ class FolderItemListAdapter(
         }
 
         fun updateCovertArtAndTitleUI(ctx: Context, folderItem: FolderItem) {
-            val tempTitle : String = folderItem.name ?: ctx.getString(R.string.unknown_folder)
-            val tempSubtitle : String = folderItem.parentFolder ?: ctx.getString(R.string.unknown_folder_parent)
+            val tempTitle : String = "/${folderItem.name ?: ctx.getString(R.string.unknown_folder)}"
+            val tempSubtitle : String = folderItem.parentFolder ?: folderItem.deviceName ?: "/"
             val tempDetails : String = "${folderItem.numberTracks} song(s) | ${FormattersUtils.formatSongDurationToString(folderItem.totalDuration)} min"
             mItemGenericExploreGridBinding.textTitle.text = tempTitle
             mItemGenericExploreGridBinding.textSubtitle.text = tempSubtitle
