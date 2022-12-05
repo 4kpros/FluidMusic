@@ -20,6 +20,8 @@ import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.ComposerItemListAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentComposersBinding
+import com.prosabdev.fluidmusic.sharedprefs.SharedPreferenceManagerUtils
+import com.prosabdev.fluidmusic.sharedprefs.SortOrganizePrefsLoaderAndSetupViewModels
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
@@ -67,8 +69,21 @@ class ComposersFragment : Fragment() {
 
         MainScope().launch {
             setupRecyclerViewAdapter()
-            observeLiveData()
+            loadPrefsAndInitViewModel()
             checkInteractions()
+            observeLiveData()
+        }
+    }
+
+    private suspend fun loadPrefsAndInitViewModel() {
+        context?.let { ctx ->
+            withContext(Dispatchers.Default) {
+                SortOrganizePrefsLoaderAndSetupViewModels.loadSortOrganizeItemsSettings(
+                    ctx,
+                    mComposersFragmentViewModel,
+                    SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SHARED_PREFERENCES_SORT_ORGANIZE_COMPOSERS
+                )
+            }
         }
     }
 
@@ -126,7 +141,7 @@ class ComposersFragment : Fragment() {
             addDataToAdapter(it)
         }
     }
-    private fun addDataToAdapter(albumList: ArrayList<Any>?) {
+    private fun addDataToAdapter(albumList: List<Any>?) {
         mComposerItemAdapter?.submitList(albumList)
         if(mMainFragmentViewModel.getCurrentSelectablePage().value == ConstantValues.EXPLORE_ALBUMS){
             mMainFragmentViewModel.setTotalCount(albumList?.size ?: 0)

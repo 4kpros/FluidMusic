@@ -64,7 +64,7 @@ class MusicLibraryFragment : Fragment() {
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
             mTabLayoutAdapter = TabLayoutAdapter(this)
             fragmentMusicLibraryBinding.viewPager.adapter = mTabLayoutAdapter
-            fragmentMusicLibraryBinding.viewPager.offscreenPageLimit = 8
+            fragmentMusicLibraryBinding.viewPager.offscreenPageLimit = 1
             TabLayoutMediator(
                 fragmentMusicLibraryBinding.tabLayout,
                 fragmentMusicLibraryBinding.viewPager
@@ -110,24 +110,20 @@ class MusicLibraryFragment : Fragment() {
         mMainFragmentViewModel.getTotalSelected().observe(viewLifecycleOwner
         ) { totalSelected -> updateTotalSelectedItemsUI(totalSelected ?: 0) }
     }
-    private  fun updateTotalSelectedItemsUI(totalSelected : Int, animate : Boolean = true){
+    private  fun updateTotalSelectedItemsUI(totalSelected : Int){
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
             if (totalSelected > 0) {
-                if(!fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter.isClickable){
-                    enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter)
-                    enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlaylistAdd)
-                    enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonEditTags)
-                    enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonShare)
-                    enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonDelete)
-                }
+                enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter)
+                enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlaylistAdd)
+                enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonEditTags)
+                enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonShare)
+                enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonDelete)
             }else{
-                if(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter.isClickable){
-                    disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter)
-                    disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlaylistAdd)
-                    disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonEditTags)
-                    disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonShare)
-                    disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonDelete)
-                }
+                disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter)
+                disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlaylistAdd)
+                disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonEditTags)
+                disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonShare)
+                disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonDelete)
             }
         }
     }
@@ -287,10 +283,9 @@ class MusicLibraryFragment : Fragment() {
         const val TAG = "MusicLibraryFragment"
 
         @JvmStatic
-        fun newInstance(exploreContent: Int = 0) =
+        fun newInstance() =
             MusicLibraryFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(ConstantValues.ARGS_EXPLORE_MUSIC_LIBRARY, exploreContent)
                 }
             }
     }

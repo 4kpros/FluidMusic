@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,10 +21,13 @@ import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.ArtistItemListAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentArtistsBinding
+import com.prosabdev.fluidmusic.sharedprefs.SharedPreferenceManagerUtils
+import com.prosabdev.fluidmusic.sharedprefs.SortOrganizePrefsLoaderAndSetupViewModels
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.explore.ArtistsFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.explore.ArtistItemViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -36,6 +40,8 @@ class ArtistsFragment : Fragment() {
     private val mArtistsFragmentViewModel: ArtistsFragmentViewModel by activityViewModels()
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
+
+    private val mArtistItemViewModel: ArtistItemViewModel by viewModels()
 
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
     private var mArtistItemListAdapter: ArtistItemListAdapter? = null
@@ -67,8 +73,21 @@ class ArtistsFragment : Fragment() {
 
         MainScope().launch {
             setupRecyclerViewAdapter()
-            observeLiveData()
+            loadPrefsAndInitViewModel()
             checkInteractions()
+            observeLiveData()
+        }
+    }
+
+    private suspend fun loadPrefsAndInitViewModel() {
+        context?.let { ctx ->
+            withContext(Dispatchers.Default) {
+                SortOrganizePrefsLoaderAndSetupViewModels.loadSortOrganizeItemsSettings(
+                    ctx,
+                    mArtistsFragmentViewModel,
+                    SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SHARED_PREFERENCES_SORT_ORGANIZE_ARTISTS
+                )
+            }
         }
     }
 
@@ -126,8 +145,19 @@ class ArtistsFragment : Fragment() {
         mArtistsFragmentViewModel.getAll().observe(viewLifecycleOwner){
             addDataToAdapter(it)
         }
+        mArtistsFragmentViewModel.getSortBy().observe(viewLifecycleOwner){
+            listenDataChanges()
+        }
     }
-    private fun addDataToAdapter(albumList: ArrayList<Any>?) {
+    private fun listenDataChanges() {
+        MainScope().launch {
+            mArtistsFragmentViewModel.listenAllData(
+                mArtistItemViewModel,
+                viewLifecycleOwner
+            )
+        }
+    }
+    private fun addDataToAdapter(albumList: List<Any>?) {
         mArtistItemListAdapter?.submitList(albumList)
         if(mMainFragmentViewModel.getCurrentSelectablePage().value == ConstantValues.EXPLORE_ALBUMS){
             mMainFragmentViewModel.setTotalCount(albumList?.size ?: 0)

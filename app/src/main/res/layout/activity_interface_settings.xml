@@ -42,7 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginVertical="@dimen/main_small_margin"
+                android:layout_marginVertical="@dimen/margin_small_size"
                 >
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/linear_items_container"
@@ -50,7 +50,7 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintTop_toTopOf="parent"
                     android:orientation="vertical"
-                    android:paddingBottom="@dimen/main_small_margin"
+                    android:paddingBottom="@dimen/margin_small_size"
                     >
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/card_view_theme"
@@ -66,8 +66,8 @@
                             android:orientation="vertical"
                             android:layout_weight="1"
                             android:layout_gravity="center"
-                            android:paddingHorizontal="@dimen/main_margin"
-                            android:paddingVertical="@dimen/main_medium_margin"
+                            android:paddingHorizontal="@dimen/margin_large_size"
+                            android:paddingVertical="@dimen/margin_medium_size"
                             >
                             <com.google.android.material.textview.MaterialTextView
                                 android:layout_width="match_parent"
@@ -88,7 +88,7 @@
                                 android:id="@+id/toggle_group_theme"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/main_small_margin"
+                                android:layout_marginTop="@dimen/margin_small_size"
                                 app:selectionRequired="true"
                                 app:singleSelection="true"
                                 app:checkedButton="@+id/toggle_group_theme_default"
@@ -129,7 +129,7 @@
                         android:layout_height="wrap_content"
                         style="@style/Widget.Material3.CardView.Filled"
                         android:orientation="vertical"
-                        android:layout_marginTop="@dimen/main_medium_margin"
+                        android:layout_marginTop="@dimen/margin_medium_size"
                         android:backgroundTint="@color/transparent"
                         android:clickable="true"
                         android:focusable="true"
@@ -141,15 +141,15 @@
                             android:layout_weight="1"
                             android:layout_gravity="center"
                             android:gravity="center"
-                            android:paddingHorizontal="@dimen/main_margin"
-                            android:paddingVertical="@dimen/main_medium_margin"
+                            android:paddingHorizontal="@dimen/margin_large_size"
+                            android:paddingVertical="@dimen/margin_medium_size"
                             >
                             <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
                                 android:layout_weight="1"
-                                android:layout_marginEnd="@dimen/main_medium_margin"
+                                android:layout_marginEnd="@dimen/margin_medium_size"
                                 >
                                 <com.google.android.material.textview.MaterialTextView
                                     android:layout_width="match_parent"
@@ -181,7 +181,7 @@
                         android:layout_height="wrap_content"
                         style="@style/Widget.Material3.CardView.Filled"
                         android:orientation="vertical"
-                        android:layout_marginTop="@dimen/main_medium_margin"
+                        android:layout_marginTop="@dimen/margin_medium_size"
                         android:backgroundTint="@color/transparent"
                         >
                         <androidx.appcompat.widget.LinearLayoutCompat
@@ -190,8 +190,8 @@
                             android:orientation="vertical"
                             android:layout_weight="1"
                             android:layout_gravity="center"
-                            android:paddingHorizontal="@dimen/main_margin"
-                            android:paddingVertical="@dimen/main_medium_margin"
+                            android:paddingHorizontal="@dimen/margin_large_size"
+                            android:paddingVertical="@dimen/margin_medium_size"
                             >
                             <com.google.android.material.textview.MaterialTextView
                                 android:layout_width="match_parent"
@@ -212,7 +212,7 @@
                                 android:id="@+id/toggle_group_font"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/main_small_margin"
+                                android:layout_marginTop="@dimen/margin_small_size"
                                 app:selectionRequired="true"
                                 app:singleSelection="true"
                                 app:checkedButton="@+id/toggle_group_font_default"
@@ -250,7 +250,7 @@
                         android:layout_height="wrap_content"
                         style="@style/Widget.Material3.CardView.Filled"
                         android:orientation="vertical"
-                        android:layout_marginTop="@dimen/main_medium_margin"
+                        android:layout_marginTop="@dimen/margin_medium_size"
                         android:backgroundTint="@color/transparent"
                         >
                         <androidx.appcompat.widget.LinearLayoutCompat
@@ -260,8 +260,8 @@
                             android:layout_weight="1"
                             android:layout_gravity="center"
                             android:gravity="center"
-                            android:paddingHorizontal="@dimen/main_margin"
-                            android:paddingVertical="@dimen/main_medium_margin"
+                            android:paddingHorizontal="@dimen/margin_large_size"
+                            android:paddingVertical="@dimen/margin_medium_size"
                             >
                             <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
@@ -289,7 +289,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
-                                android:layout_marginTop="@dimen/main_small_margin"
+                                android:layout_marginTop="@dimen/margin_small_size"
                                 >
                                 <com.google.android.material.chip.ChipGroup
                                     android:id="@+id/chipGroup"
@@ -311,10 +311,10 @@
                                         app:checkedIconVisible="true"
                                         app:textStartPadding="0dp"
                                         app:textEndPadding="0dp"
-                                        app:chipIconSize="@dimen/accent_color_chip_icon_size"
-                                        app:iconEndPadding="@dimen/main_medium_margin"
-                                        app:iconStartPadding="@dimen/main_medium_margin"
-                                        app:chipMinHeight="@dimen/accent_color_chip_height"
+                                        app:chipIconSize="@dimen/chip_icon_size"
+                                        app:iconEndPadding="@dimen/margin_medium_size"
+                                        app:iconStartPadding="@dimen/margin_medium_size"
+                                        app:chipMinHeight="@dimen/chip_height"
                                         />
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/_accent_color_red"
@@ -328,10 +328,10 @@
                                         app:checkedIconVisible="true"
                                         app:textStartPadding="0dp"
                                         app:textEndPadding="0dp"
-                                        app:chipIconSize="@dimen/accent_color_chip_icon_size"
-                                        app:iconEndPadding="@dimen/main_medium_margin"
-                                        app:iconStartPadding="@dimen/main_medium_margin"
-                                        app:chipMinHeight="@dimen/accent_color_chip_height"
+                                        app:chipIconSize="@dimen/chip_icon_size"
+                                        app:iconEndPadding="@dimen/margin_medium_size"
+                                        app:iconStartPadding="@dimen/margin_medium_size"
+                                        app:chipMinHeight="@dimen/chip_height"
                                         />
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/_accent_color_purple"
@@ -345,10 +345,10 @@
                                         app:checkedIconVisible="true"
                                         app:textStartPadding="0dp"
                                         app:textEndPadding="0dp"
-                                        app:chipIconSize="@dimen/accent_color_chip_icon_size"
-                                        app:iconEndPadding="@dimen/main_medium_margin"
-                                        app:iconStartPadding="@dimen/main_medium_margin"
-                                        app:chipMinHeight="@dimen/accent_color_chip_height"
+                                        app:chipIconSize="@dimen/chip_icon_size"
+                                        app:iconEndPadding="@dimen/margin_medium_size"
+                                        app:iconStartPadding="@dimen/margin_medium_size"
+                                        app:chipMinHeight="@dimen/chip_height"
                                         />
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/_accent_color_indigo"
@@ -362,10 +362,10 @@
                                         app:checkedIconVisible="true"
                                         app:textStartPadding="0dp"
                                         app:textEndPadding="0dp"
-                                        app:chipIconSize="@dimen/accent_color_chip_icon_size"
-                                        app:iconEndPadding="@dimen/main_medium_margin"
-                                        app:iconStartPadding="@dimen/main_medium_margin"
-                                        app:chipMinHeight="@dimen/accent_color_chip_height"
+                                        app:chipIconSize="@dimen/chip_icon_size"
+                                        app:iconEndPadding="@dimen/margin_medium_size"
+                                        app:iconStartPadding="@dimen/margin_medium_size"
+                                        app:chipMinHeight="@dimen/chip_height"
                                         />
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/_accent_color_blue"
@@ -379,10 +379,10 @@
                                         app:checkedIconVisible="true"
                                         app:textStartPadding="0dp"
                                         app:textEndPadding="0dp"
-                                        app:chipIconSize="@dimen/accent_color_chip_icon_size"
-                                        app:iconEndPadding="@dimen/main_medium_margin"
-                                        app:iconStartPadding="@dimen/main_medium_margin"
-                                        app:chipMinHeight="@dimen/accent_color_chip_height"
+                                        app:chipIconSize="@dimen/chip_icon_size"
+                                        app:iconEndPadding="@dimen/margin_medium_size"
+                                        app:iconStartPadding="@dimen/margin_medium_size"
+                                        app:chipMinHeight="@dimen/chip_height"
                                         />
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/_accent_color_cyan"
@@ -396,10 +396,10 @@
                                         app:checkedIconVisible="true"
                                         app:textStartPadding="0dp"
                                         app:textEndPadding="0dp"
-                                        app:chipIconSize="@dimen/accent_color_chip_icon_size"
-                                        app:iconEndPadding="@dimen/main_medium_margin"
-                                        app:iconStartPadding="@dimen/main_medium_margin"
-                                        app:chipMinHeight="@dimen/accent_color_chip_height"
+                                        app:chipIconSize="@dimen/chip_icon_size"
+                                        app:iconEndPadding="@dimen/margin_medium_size"
+                                        app:iconStartPadding="@dimen/margin_medium_size"
+                                        app:chipMinHeight="@dimen/chip_height"
                                         />
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/_accent_color_green"
@@ -413,10 +413,10 @@
                                         app:checkedIconVisible="true"
                                         app:textStartPadding="0dp"
                                         app:textEndPadding="0dp"
-                                        app:chipIconSize="@dimen/accent_color_chip_icon_size"
-                                        app:iconEndPadding="@dimen/main_medium_margin"
-                                        app:iconStartPadding="@dimen/main_medium_margin"
-                                        app:chipMinHeight="@dimen/accent_color_chip_height"
+                                        app:chipIconSize="@dimen/chip_icon_size"
+                                        app:iconEndPadding="@dimen/margin_medium_size"
+                                        app:iconStartPadding="@dimen/margin_medium_size"
+                                        app:chipMinHeight="@dimen/chip_height"
                                         />
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/_accent_color_lime"
@@ -430,10 +430,10 @@
                                         app:checkedIconVisible="true"
                                         app:textStartPadding="0dp"
                                         app:textEndPadding="0dp"
-                                        app:chipIconSize="@dimen/accent_color_chip_icon_size"
-                                        app:iconEndPadding="@dimen/main_medium_margin"
-                                        app:iconStartPadding="@dimen/main_medium_margin"
-                                        app:chipMinHeight="@dimen/accent_color_chip_height"
+                                        app:chipIconSize="@dimen/chip_icon_size"
+                                        app:iconEndPadding="@dimen/margin_medium_size"
+                                        app:iconStartPadding="@dimen/margin_medium_size"
+                                        app:chipMinHeight="@dimen/chip_height"
                                         />
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/_accent_color_yellow"
@@ -447,10 +447,10 @@
                                         app:checkedIconVisible="true"
                                         app:textStartPadding="0dp"
                                         app:textEndPadding="0dp"
-                                        app:chipIconSize="@dimen/accent_color_chip_icon_size"
-                                        app:iconEndPadding="@dimen/main_medium_margin"
-                                        app:iconStartPadding="@dimen/main_medium_margin"
-                                        app:chipMinHeight="@dimen/accent_color_chip_height"
+                                        app:chipIconSize="@dimen/chip_icon_size"
+                                        app:iconEndPadding="@dimen/margin_medium_size"
+                                        app:iconStartPadding="@dimen/margin_medium_size"
+                                        app:chipMinHeight="@dimen/chip_height"
                                         />
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/_accent_color_orange"
@@ -464,10 +464,10 @@
                                         app:checkedIconVisible="true"
                                         app:textStartPadding="0dp"
                                         app:textEndPadding="0dp"
-                                        app:chipIconSize="@dimen/accent_color_chip_icon_size"
-                                        app:iconEndPadding="@dimen/main_medium_margin"
-                                        app:iconStartPadding="@dimen/main_medium_margin"
-                                        app:chipMinHeight="@dimen/accent_color_chip_height"
+                                        app:chipIconSize="@dimen/chip_icon_size"
+                                        app:iconEndPadding="@dimen/margin_medium_size"
+                                        app:iconStartPadding="@dimen/margin_medium_size"
+                                        app:chipMinHeight="@dimen/chip_height"
                                         />
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/_accent_color_brown"
@@ -481,10 +481,10 @@
                                         app:checkedIconVisible="true"
                                         app:textStartPadding="0dp"
                                         app:textEndPadding="0dp"
-                                        app:chipIconSize="@dimen/accent_color_chip_icon_size"
-                                        app:iconEndPadding="@dimen/main_medium_margin"
-                                        app:iconStartPadding="@dimen/main_medium_margin"
-                                        app:chipMinHeight="@dimen/accent_color_chip_height"
+                                        app:chipIconSize="@dimen/chip_icon_size"
+                                        app:iconEndPadding="@dimen/margin_medium_size"
+                                        app:iconStartPadding="@dimen/margin_medium_size"
+                                        app:chipMinHeight="@dimen/chip_height"
                                         />
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/_accent_color_gray"
@@ -498,10 +498,10 @@
                                         app:checkedIconVisible="true"
                                         app:textStartPadding="0dp"
                                         app:textEndPadding="0dp"
-                                        app:chipIconSize="@dimen/accent_color_chip_icon_size"
-                                        app:iconEndPadding="@dimen/main_medium_margin"
-                                        app:iconStartPadding="@dimen/main_medium_margin"
-                                        app:chipMinHeight="@dimen/accent_color_chip_height"
+                                        app:chipIconSize="@dimen/chip_icon_size"
+                                        app:iconEndPadding="@dimen/margin_medium_size"
+                                        app:iconStartPadding="@dimen/margin_medium_size"
+                                        app:chipMinHeight="@dimen/chip_height"
                                         />
                                 </com.google.android.material.chip.ChipGroup>
                             </androidx.appcompat.widget.LinearLayoutCompat>

@@ -195,10 +195,23 @@ class QueueMusicItemListAdapter(
             }
         }
         fun updateItemTouchHelper(isDragging : Boolean, animated: Boolean = true){
-            if(isDragging && mItemQueueMusicBinding.songItemIsSelected.visibility != VISIBLE)
-                ViewAnimatorsUtils.crossFadeUp(mItemQueueMusicBinding.songItemIsSelected, animated, 150)
-            else if(!isDragging && mItemQueueMusicBinding.songItemIsSelected.alpha == 1.0f)
-                ViewAnimatorsUtils.crossFadeDown(mItemQueueMusicBinding.songItemIsSelected, animated, 150)
+            if(isDragging) {
+                if (mItemQueueMusicBinding.songItemIsSelected.visibility != VISIBLE) {
+                    ViewAnimatorsUtils.crossFadeUp(
+                        mItemQueueMusicBinding.songItemIsSelected,
+                        animated,
+                        150,
+                        0.15f
+                    )
+                }
+            }
+            else {
+                ViewAnimatorsUtils.crossFadeDown(
+                    mItemQueueMusicBinding.songItemIsSelected,
+                    animated,
+                    150
+                )
+            }
         }
     }
 

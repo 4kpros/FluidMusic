@@ -136,14 +136,16 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
         mSongList = songList
     }
 
+    fun updatePlayerFragmentViewModel(playerFragmentViewModel: PlayerFragmentViewModel){
+        mPlayerFragmentViewModel = playerFragmentViewModel
+    }
+
     companion object {
         const val TAG = "QueueMusicBottomSheetDialog"
 
         @JvmStatic
-        fun newInstance(playerFragmentViewModel : PlayerFragmentViewModel, songList: List<SongItem>?) =
+        fun newInstance() =
             QueueMusicBottomSheetDialog().apply {
-                mPlayerFragmentViewModel = playerFragmentViewModel
-                updateQueueMusicList(songList)
             }
     }
 

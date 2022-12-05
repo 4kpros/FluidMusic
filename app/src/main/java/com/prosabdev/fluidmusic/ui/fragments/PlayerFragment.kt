@@ -1,10 +1,10 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -23,6 +23,9 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentPlayerBinding
 import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.sharedprefs.SharedPreferenceManagerUtils
+import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
+import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreFullBottomSheetDialog
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicBottomSheetDialog
@@ -30,9 +33,7 @@ import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AllSongsFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.QueueMusicItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistSongItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -46,12 +47,11 @@ import kotlinx.coroutines.withContext
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
     private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by activityViewModels()
-    private val mQueueMusicItemViewModel: QueueMusicItemViewModel by activityViewModels()
-    private val mPlaylistItemViewModel: PlaylistItemViewModel by activityViewModels()
-    private val mPlaylistSongItemViewModel: PlaylistSongItemViewModel by activityViewModels()
 
-    private var mQueueMusicBottomSheetDialog: QueueMusicBottomSheetDialog? = null
-    private var mPlayerMoreBottomSheetDialog: PlayerMoreFullBottomSheetDialog? = null
+    private val mSongItemViewModel: SongItemViewModel by activityViewModels()
+
+    private var mQueueMusicBottomSheetDialog: QueueMusicBottomSheetDialog = QueueMusicBottomSheetDialog.newInstance()
+    private var mPlayerMoreBottomSheetDialog: PlayerMoreFullBottomSheetDialog = PlayerMoreFullBottomSheetDialog.newInstance()
 
     private var mPlayerPagerAdapter: PlayerPageAdapter? = null
 
@@ -59,6 +59,12 @@ import kotlinx.coroutines.withContext
         super.onCreate(savedInstanceState)
         enterTransition = MaterialFadeThrough()
         exitTransition = MaterialFadeThrough()
+
+        if(savedInstanceState == null){
+            loadLastPlayerSession()
+            loadDirectlyQueueMusicListFromDatabase()
+        }
+
         arguments?.let {
         }
     }
@@ -71,6 +77,7 @@ import kotlinx.coroutines.withContext
         val view = mFragmentPlayerBinding?.root
 
         initViews()
+        setupViewPagerAdapter()
         return view
     }
 
@@ -78,8 +85,172 @@ import kotlinx.coroutines.withContext
         super.onViewCreated(view, savedInstanceState)
 
         checkInteractions()
-        setupViewPagerAdapter()
         observeLiveData()
+    }
+
+    private fun loadDirectlyQueueMusicListFromDatabase() {
+        val queueListSource: String = mPlayerFragmentViewModel.getQueueListSource().value ?: ConstantValues.EXPLORE_ALL_SONGS
+        if(queueListSource == ConstantValues.EXPLORE_ALL_SONGS) {
+            MainScope().launch {
+                val tempIsInverted : Boolean = mAllSongsFragmentViewModel.getIsInverted().value ?: false
+                val songList =
+                    if(tempIsInverted)
+                        mSongItemViewModel.getAllDirectly(mPlayerFragmentViewModel.getSortBy().value ?: "title")
+                            ?.reversed()
+                    else
+                        mSongItemViewModel.getAllDirectly(mPlayerFragmentViewModel.getSortBy().value ?: "title")
+                updateEmptyListUI(songList?.size ?: 0)
+                mPlayerPagerAdapter?.submitList(songList)
+                mQueueMusicBottomSheetDialog?.updateQueueMusicList(songList)
+            }
+        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_CONTENT_FOR_ALBUMS){
+            //
+        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_CONTENT_FOR_ALBUM_ARTISTS){
+            //
+        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_CONTENT_FOR_ARTISTS){
+            //
+        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_CONTENT_FOR_COMPOSERS){
+            //
+        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_CONTENT_FOR_FOLDERS){
+            //
+        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_CONTENT_FOR_GENRES){
+            //
+        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_CONTENT_FOR_YEARS){
+            //
+        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_PLAYLIST_CONTENT){
+            //
+        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_FOLDER_HIERARCHY_FOR){
+            //
+        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_STREAMS_HIERARCHY_FOR){
+            //
+        }else{
+            //
+        }
+    }
+
+    override fun onDestroy() {
+        saveCurrentPlayingSession()
+        super.onDestroy()
+    }
+
+    private fun saveCurrentPlayingSession() {
+        context?.let { ctx ->
+            SharedPreferenceManagerUtils.Player.saveCurrentPlayingSong(
+                ctx,
+                mPlayerFragmentViewModel.getCurrentPlayingSong().value
+            )
+            SharedPreferenceManagerUtils.Player.savePlayingProgressValue(
+                ctx,
+                mPlayerFragmentViewModel.getPlayingProgressValue().value
+            )
+            SharedPreferenceManagerUtils.Player.saveQueueListSource(
+                ctx,
+                mPlayerFragmentViewModel.getQueueListSource().value
+            )
+            SharedPreferenceManagerUtils.Player.saveQueueListSourceValue(
+                ctx,
+                mPlayerFragmentViewModel.getSourceOfQueueListValue().value
+            )
+            SharedPreferenceManagerUtils.Player.saveRepeat(
+                ctx,
+                mPlayerFragmentViewModel.getRepeat().value
+            )
+            SharedPreferenceManagerUtils.Player.saveShuffle(
+                ctx,
+                mPlayerFragmentViewModel.getShuffle().value
+            )
+            SharedPreferenceManagerUtils.Player.saveSleepTimer(
+                ctx,
+                mPlayerFragmentViewModel.getSleepTimer().value
+            )
+            val sortOrganize: SortOrganizeItemSP = SortOrganizeItemSP()
+            sortOrganize.sortOrderBy = mPlayerFragmentViewModel.getSortBy().value ?: "title"
+            sortOrganize.isInvertSort = mPlayerFragmentViewModel.getIsInverted().value ?:false
+            SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.saveSortOrganizeItemsFor(
+                ctx,
+                SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SHARED_PREFERENCES_SORT_ORGANIZE_PLAYER_QUEUE_MUSIC,
+                sortOrganize
+            )
+        }
+    }
+
+    private fun loadLastPlayerSession() {
+        context?.let { ctx ->
+            val sortOrganize: SortOrganizeItemSP? = SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents
+                .loadSortOrganizeItemsFor(
+                    ctx,
+                    SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SHARED_PREFERENCES_SORT_ORGANIZE_PLAYER_QUEUE_MUSIC
+                )
+            val queueListSource: String? = SharedPreferenceManagerUtils.Player.loadQueueListSource(ctx)
+            mPlayerFragmentViewModel.setSortBy(sortOrganize?.sortOrderBy ?: "title")
+            mPlayerFragmentViewModel.setIsInverted(sortOrganize?.isInvertSort ?: false)
+            mPlayerFragmentViewModel.setQueueListSource(queueListSource ?: ConstantValues.EXPLORE_ALL_SONGS)
+
+            val songItem: SongItem? = SharedPreferenceManagerUtils.Player.loadCurrentPlayingSong(ctx)
+            val progressValue: Long = SharedPreferenceManagerUtils.Player.loadPlayingProgressValue(ctx)
+            val queueListSourceValue: String? = SharedPreferenceManagerUtils.Player.loadQueueListSourceValue(ctx)
+            val repeat: Int = SharedPreferenceManagerUtils.Player.loadRepeat(ctx)
+            val shuffle: Int = SharedPreferenceManagerUtils.Player.loadShuffle(ctx)
+            val sleepTimer: SleepTimerSP? = SharedPreferenceManagerUtils.Player.loadSleepTimer(ctx)
+
+            if(songItem?.uri == null){
+                MainScope().launch {
+                    tryToGetFirstSong()
+                }
+            }else{
+                MainScope().launch {
+                    val tempSongItem : SongItem? =
+                        mSongItemViewModel.getAtUri(songItem.uri ?: "")
+                    if(tempSongItem?.uri == null){
+                        MainScope().launch {
+                            tryToGetFirstSong()
+                        }
+                    }else{
+                        tempSongItem.position = songItem.position
+                        mPlayerFragmentViewModel.setCurrentPlayingSong(tempSongItem)
+                        mPlayerFragmentViewModel.setPlayingProgressValue(progressValue)
+                        mPlayerFragmentViewModel.setIsPlaying(false)
+                        mPlayerFragmentViewModel.setRepeat(repeat)
+                        mPlayerFragmentViewModel.setShuffle(shuffle)
+                        mPlayerFragmentViewModel.setQueueListSourceValue(queueListSourceValue)
+                        mPlayerFragmentViewModel.setSleepTimer(sleepTimer)
+                        mPlayerFragmentViewModel.setSleepTimerStateStarted(false)
+                        Log.i(ConstantValues.TAG, "CURRENT SONG sdadasdasd playingPosition : ${tempSongItem?.position}")
+                    }
+                }
+            }
+        }
+    }
+    private suspend fun tryToGetFirstSong() {
+        context?.let { ctx ->
+            withContext(Dispatchers.IO) {
+                mSongItemViewModel.getFirstSong().apply {
+                    SharedPreferenceManagerUtils.Player.saveQueueListSource(
+                        ctx,
+                        ConstantValues.EXPLORE_ALL_SONGS
+                    )
+                    SharedPreferenceManagerUtils.Player.saveQueueListSourceValue(ctx, "")
+                    SharedPreferenceManagerUtils.Player.saveRepeat(
+                        ctx,
+                        PlaybackStateCompat.REPEAT_MODE_NONE
+                    )
+                    SharedPreferenceManagerUtils.Player.saveShuffle(
+                        ctx,
+                        PlaybackStateCompat.SHUFFLE_MODE_NONE
+                    )
+                    SharedPreferenceManagerUtils.Player.saveSleepTimer(ctx, null)
+                    SharedPreferenceManagerUtils.Player.savePlayingProgressValue(ctx, 0)
+
+                    if (this@apply?.uri == null) {
+                        mPlayerFragmentViewModel.setCurrentPlayingSong(null)
+                        SharedPreferenceManagerUtils.Player.saveCurrentPlayingSong(ctx, null)
+                    } else {
+                        mPlayerFragmentViewModel.setCurrentPlayingSong(this@apply)
+                        SharedPreferenceManagerUtils.Player.saveCurrentPlayingSong(ctx, this@apply)
+                    }
+                }
+            }
+        }
     }
 
     private fun updateEmptyListUI(size: Int) {
@@ -93,41 +264,15 @@ import kotlinx.coroutines.withContext
             }
         }
     }
-    private suspend fun updateBlurredBackgroundUI(position: Int) {
-        mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
-            if ((mPlayerPagerAdapter?.currentList?.size ?: 0) <= position)
-                return
-            withContext(Dispatchers.Default) {
-                val ctx: Context = this@PlayerFragment.context ?: return@withContext
-                val tempSongItem: SongItem? = mPlayerPagerAdapter?.currentList?.get(position)
-                val tempUri = Uri.parse(tempSongItem?.uri ?: "")
-                ImageLoadersUtils.loadBlurredCovertArtFromSongUri(
-                    ctx,
-                    fragmentPlayerBinding.blurredImageview,
-                    tempUri,
-                    tempSongItem?.hashedCovertArtSignature ?: -1,
-                    100
-                )
-            }
-        }
-    }
 
     private fun observeLiveData() {
-        mPlayerFragmentViewModel.getQueueListSource().observe(viewLifecycleOwner){
-            val queueListSource: String = it ?: ConstantValues.EXPLORE_ALL_SONGS
-            if(queueListSource == ConstantValues.EXPLORE_ALL_SONGS) {
-                mAllSongsFragmentViewModel.getAll().observe(viewLifecycleOwner){ songList ->
-                    updateEmptyListUI(songList?.size ?: 0)
-                    mPlayerPagerAdapter?.submitList(songList as ArrayList<SongItem>?)
-                    mQueueMusicBottomSheetDialog?.updateQueueMusicList(songList as ArrayList<SongItem>?)
-                }
+        mPlayerFragmentViewModel.getUpdatePlaylistCounter().observe(viewLifecycleOwner){
+            if(it > 0){
+                updatePlayListData()
             }
         }
-        mPlayerFragmentViewModel.getSourceOfQueueListValue().observe(viewLifecycleOwner){
-            //
-        }
         mPlayerFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner){
-            updateCurrentPlayingSongUI(it)
+            updateCurrentPlayingSongUI(it, mPlayerFragmentViewModel.getIsQueueMusicUpdated().value)
         }
         mPlayerFragmentViewModel.getIsPlaying().observe(viewLifecycleOwner){
             updatePlaybackStateUI(it)
@@ -154,6 +299,28 @@ import kotlinx.coroutines.withContext
             //
         }
     }
+
+    private fun updatePlayListData() {
+        val queueListSource: String = mPlayerFragmentViewModel.getQueueListSource().value ?: ConstantValues.EXPLORE_ALL_SONGS
+        if(queueListSource == ConstantValues.EXPLORE_ALL_SONGS) {
+            val tempSortBy : String = mAllSongsFragmentViewModel.getSortBy().value ?: "title"
+            val tempIsInverted : Boolean = mAllSongsFragmentViewModel.getIsInverted().value ?: false
+            mPlayerFragmentViewModel.setSortBy(tempSortBy)
+            mPlayerFragmentViewModel.setIsInverted(tempIsInverted)
+            //Get songs
+            val songList = (
+                    if(tempIsInverted)
+                        mAllSongsFragmentViewModel.getAllDirectly()?.reversed()
+                    else
+                        mAllSongsFragmentViewModel.getAllDirectly()
+                    ) as List<SongItem>
+            mPlayerPagerAdapter?.submitList(songList)
+            mQueueMusicBottomSheetDialog?.updateQueueMusicList(songList)
+            updateEmptyListUI(songList.size)
+            mPlayerFragmentViewModel.setIsQueueMusicUpdated()
+        }
+    }
+
     private fun onSkipToPrevTrack(skipCounter: Int?) {
         if((skipCounter ?: 0) <= 0) return
         onPrevPageButtonClicked()
@@ -239,9 +406,10 @@ import kotlinx.coroutines.withContext
             }
         }
     }
-    private fun updateCurrentPlayingSongUI(songItem: SongItem?) {
-        updateTextTitleSubtitleDurationUI(songItem)
+    private fun updateCurrentPlayingSongUI(songItem: SongItem?, isQueueMusicUpdated: Boolean?) {
+        if(isQueueMusicUpdated == false) return
         updateViewpagerUI(songItem)
+        updateTextTitleSubtitleDurationUI(songItem)
         updateBlurredBackgroundUIFromUri(songItem)
     }
     private fun updateViewpagerUI(songItem: SongItem?) {
@@ -258,7 +426,8 @@ import kotlinx.coroutines.withContext
                 tempOldSongItem.duration != songItem.duration ||
                 tempOldSongItem.position != songItem.position
             ) {
-                fragmentPlayerBinding.viewPagerPlayer.currentItem = songItem.position
+                val smoothScroll: Boolean = mPlayerFragmentViewModel.getCanScrollSmoothViewpager().value ?: false
+                fragmentPlayerBinding.viewPagerPlayer.setCurrentItem(songItem.position, smoothScroll)
             }
         }
     }
@@ -304,9 +473,9 @@ import kotlinx.coroutines.withContext
 
     private fun setupViewPagerAdapter() {
         mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
-            mPlayerPagerAdapter =
-                PlayerPageAdapter(
-                    this.requireContext(),
+            context?.let { ctx ->
+                mPlayerPagerAdapter = PlayerPageAdapter(
+                    ctx,
                     object : PlayerPageAdapter.OnItemClickListener {
                         override fun onButtonLyricsClicked(position: Int) {
                         }
@@ -315,13 +484,14 @@ import kotlinx.coroutines.withContext
                         }
 
                     })
-            fragmentPlayerBinding.viewPagerPlayer.adapter = mPlayerPagerAdapter
-            fragmentPlayerBinding.viewPagerPlayer.clipToPadding = false
-            fragmentPlayerBinding.viewPagerPlayer.clipChildren = false
-            fragmentPlayerBinding.viewPagerPlayer.offscreenPageLimit = 5
-            fragmentPlayerBinding.viewPagerPlayer.getChildAt(0)?.overScrollMode =
-                View.OVER_SCROLL_NEVER
-            ViewAnimatorsUtils.transformScaleViewPager(fragmentPlayerBinding.viewPagerPlayer)
+                fragmentPlayerBinding.viewPagerPlayer.adapter = mPlayerPagerAdapter
+                fragmentPlayerBinding.viewPagerPlayer.clipToPadding = false
+                fragmentPlayerBinding.viewPagerPlayer.clipChildren = false
+                fragmentPlayerBinding.viewPagerPlayer.offscreenPageLimit = 3
+                fragmentPlayerBinding.viewPagerPlayer.getChildAt(0)?.overScrollMode =
+                    View.OVER_SCROLL_NEVER
+                ViewAnimatorsUtils.transformScaleViewPager(fragmentPlayerBinding.viewPagerPlayer)
+            }
         }
     }
 
@@ -384,17 +554,19 @@ import kotlinx.coroutines.withContext
         }
     }
     private fun showQueueMusicDialog() {
-        mQueueMusicBottomSheetDialog?.show(childFragmentManager, QueueMusicBottomSheetDialog.TAG)
+        mQueueMusicBottomSheetDialog.show(childFragmentManager, QueueMusicBottomSheetDialog.TAG)
     }
     private fun openMediaScannerActivity() {
         startActivity(Intent(context, MediaScannerSettingsActivity::class.java).apply {})
     }
     private fun openEqualizerFragment() {
-        mPlayerFragmentViewModel.setShowEqualizerFragmentCounter()
+        //
     }
     private fun showMoreOptionsDialog() {
-        if(mPlayerMoreBottomSheetDialog?.isVisible == false)
-            activity?.supportFragmentManager?.let { mPlayerMoreBottomSheetDialog?.show(it, PlayerMoreFullBottomSheetDialog.TAG) }
+        if(!mPlayerMoreBottomSheetDialog.isVisible)
+            activity?.supportFragmentManager?.let {
+                mPlayerMoreBottomSheetDialog.show(it, PlayerMoreFullBottomSheetDialog.TAG)
+            }
     }
     private fun onRepeatButtonClicked(){
         when (mPlayerFragmentViewModel.getRepeat().value ?: PlaybackStateCompat.REPEAT_MODE_NONE) {
@@ -422,6 +594,7 @@ import kotlinx.coroutines.withContext
         val tempPosition : Int = mPlayerFragmentViewModel.getCurrentPlayingSong().value?.position ?: return
         val tempSongItem : SongItem = getCurrentPlayingSongFromPosition((tempPosition - 1))
             ?: return
+        mPlayerFragmentViewModel.setCanScrollSmoothViewpager(true)
         mPlayerFragmentViewModel.setPlayingProgressValue(0)
         mPlayerFragmentViewModel.setCurrentPlayingSong(tempSongItem)
     }
@@ -430,6 +603,7 @@ import kotlinx.coroutines.withContext
         val tempPosition : Int = mPlayerFragmentViewModel.getCurrentPlayingSong().value?.position ?: return
         val tempSongItem : SongItem = getCurrentPlayingSongFromPosition((tempPosition + 1))
             ?: return
+        mPlayerFragmentViewModel.setCanScrollSmoothViewpager(true)
         mPlayerFragmentViewModel.setPlayingProgressValue(0)
         mPlayerFragmentViewModel.setCurrentPlayingSong(tempSongItem)
     }
@@ -451,6 +625,7 @@ import kotlinx.coroutines.withContext
     private fun onViewpagerPageChanged(position: Int) {
         val tempSongItem : SongItem = getCurrentPlayingSongFromPosition((position))
             ?: return
+        if (position == (mPlayerFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0)) return
         mPlayerFragmentViewModel.setPlayingProgressValue(0)
         mPlayerFragmentViewModel.setCurrentPlayingSong(tempSongItem)
     }
@@ -466,17 +641,14 @@ import kotlinx.coroutines.withContext
             ViewInsetModifiersUtils.updateBottomViewInsets(fragmentPlayerBinding.dragHandleViewContainer)
             ViewInsetModifiersUtils.updateBottomViewInsets(fragmentPlayerBinding.constraintBottomButtonsContainer)
 
-            if (mPlayerMoreBottomSheetDialog == null)
-                mPlayerMoreBottomSheetDialog = PlayerMoreFullBottomSheetDialog.newInstance(
-                    mPlayerFragmentViewModel,
-                    mMainFragmentViewModel,
-                    fragmentPlayerBinding.root
-                )
-            if (mQueueMusicBottomSheetDialog == null)
-                mQueueMusicBottomSheetDialog = QueueMusicBottomSheetDialog.newInstance(
-                    mPlayerFragmentViewModel,
-                    mPlayerPagerAdapter?.currentList
-                )
+            mPlayerMoreBottomSheetDialog.updateData(
+                mPlayerFragmentViewModel,
+                mMainFragmentViewModel,
+                fragmentPlayerBinding.root
+            )
+            mQueueMusicBottomSheetDialog.updatePlayerFragmentViewModel(
+                mPlayerFragmentViewModel
+            )
         }
     }
 

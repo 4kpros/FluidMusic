@@ -209,14 +209,13 @@ import kotlinx.coroutines.launch
                             R.drawable.check_box_outline_blank
                         )
                     }
-                    if (totalSelected >= 2 && !fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange.isClickable)
+                    if (totalSelected >= 2)
                         ViewAnimatorsUtils.crossFadeUpClickable(
                             fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange,
                             animate,
-                            200,
-                            1.0f
+                            200
                         )
-                    else if(totalSelected < 2 && fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange.isClickable)
+                    else
                         ViewAnimatorsUtils.crossFadeDownClickable(
                             fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange,
                             animate,
@@ -463,9 +462,13 @@ import kotlinx.coroutines.launch
         }
     }
     private fun onClickButtonSkipNextSong() {
+        mPlayerFragmentViewModel.setCanScrollCurrentPlayingSong(true)
         mPlayerFragmentViewModel.setSkipNextTrackCounter()
     }
     private fun onClickButtonPlayPause() {
+        if(mPlayerFragmentViewModel.getIsPlaying().value == false) {
+            mPlayerFragmentViewModel.setCanScrollCurrentPlayingSong(true)
+        }
         mPlayerFragmentViewModel.toggleIsPlaying()
     }
 

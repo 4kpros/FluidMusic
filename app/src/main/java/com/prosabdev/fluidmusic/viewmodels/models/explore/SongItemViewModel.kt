@@ -39,6 +39,9 @@ class SongItemViewModel(app: Application) : AndroidViewModel(app) {
     suspend fun getAll(order_by: String) : LiveData<List<SongItem>>? {
         return repository?.getAll(order_by)
     }
+    suspend fun getAllDirectly(order_by: String) : List<SongItem>? {
+        return repository?.getAllDirectly(order_by)
+    }
     suspend fun getAllWhereEqual(whereColumn: String, columnValue: String?, order_by: String) : LiveData<List<SongItem>>? {
         return repository?.getAllWhereEqual(whereColumn, columnValue, order_by)
     }

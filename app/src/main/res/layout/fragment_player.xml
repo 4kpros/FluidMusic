@@ -64,7 +64,7 @@
                     style="@style/TextAppearance.Material3.TitleMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/main_margin"
+                    android:layout_marginVertical="@dimen/margin_large_size"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:text="No sound found !" />
@@ -75,8 +75,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:orientation="vertical"
-            android:paddingHorizontal="@dimen/main_margin"
-            android:paddingBottom="@dimen/main_margin"
+            android:paddingHorizontal="@dimen/margin_large_size"
+            android:paddingBottom="@dimen/margin_large_size"
             app:layout_constraintBottom_toTopOf="@+id/linear_more_buttons"
             app:layout_constraintTop_toBottomOf="@+id/linear_viewpager"
             >
@@ -230,7 +230,7 @@
                 android:id="@+id/constraint_bottom_buttons_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/main_margin"
+                android:layout_marginHorizontal="@dimen/margin_large_size"
                 >
 
                 <com.google.android.material.button.MaterialButton

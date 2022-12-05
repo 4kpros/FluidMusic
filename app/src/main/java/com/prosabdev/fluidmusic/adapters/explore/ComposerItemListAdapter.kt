@@ -43,11 +43,11 @@ class ComposerItemListAdapter (
     private fun selectableIsSelected(position: Int): Boolean {
         return selectableItemIsSelected(position)
     }
-    fun selectableOnSelectFromPosition(position: Int, layoutManager : GridLayoutManager? = null) {
-        selectableItemOnSelectFromPosition(position, mOnSelectSelectableItemListener, layoutManager)
+    fun selectableSelectFromPosition(position: Int, layoutManager : GridLayoutManager? = null) {
+        selectableItemSelectFromPosition(position, mOnSelectSelectableItemListener, layoutManager)
     }
-    fun selectableOnSelectRange(layoutManager : GridLayoutManager? = null) {
-        selectableItemOnSelectRange(mOnSelectSelectableItemListener, layoutManager)
+    fun selectableSelectRange(layoutManager : GridLayoutManager? = null) {
+        selectableItemSelectRange(mOnSelectSelectableItemListener, layoutManager)
     }
     fun selectableGetSelectedItemCount(): Int {
         return selectableItemGetSelectedItemCount()
@@ -88,7 +88,7 @@ class ComposerItemListAdapter (
                 when (payload) {
                     PAYLOAD_IS_SELECTED -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_SELECTED")
-                        holder.updateSelectedStateUI(selectableIsSelected(position))
+                        holder.updateAnAnimateSelectedStateUI(selectableIsSelected(position))
                     }
                     PAYLOAD_IS_COVERT_ART_TEXT -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
@@ -130,8 +130,8 @@ class ComposerItemListAdapter (
             val tempSubtitle : String = ""
             val tempDetails : String = "${composerItem.numberTracks} song(s) | ${FormattersUtils.formatSongDurationToString(composerItem.totalDuration)} min"
             mItemGenericExploreGridBinding.textTitle.text = tempTitle
-            mItemGenericExploreGridBinding.textSubtitle.text = tempDetails
-            mItemGenericExploreGridBinding.textDetails.visibility = View.GONE
+            mItemGenericExploreGridBinding.textSubtitle.visibility = View.GONE
+            mItemGenericExploreGridBinding.textDetails.text = tempDetails
 
             val tempUri = Uri.parse(composerItem.uriImage ?: "")
             val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newOriginalCardInstance()
@@ -141,11 +141,44 @@ class ComposerItemListAdapter (
             ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
         }
 
-        fun updateSelectedStateUI(selectableIsSelected: Boolean, animated: Boolean = true) {
-            if(selectableIsSelected && mItemGenericExploreGridBinding.songItemIsSelected.visibility != View.VISIBLE)
-                ViewAnimatorsUtils.crossFadeUp(mItemGenericExploreGridBinding.songItemIsSelected, animated, 150, 0.15f)
-            else if(!selectableIsSelected && mItemGenericExploreGridBinding.songItemIsSelected.alpha == 0.15f)
-                ViewAnimatorsUtils.crossFadeDown(mItemGenericExploreGridBinding.songItemIsSelected, animated, 150)
+        fun updateAnAnimateSelectedStateUI(selectableIsSelected: Boolean) {
+            if(selectableIsSelected) {
+                if (
+                    mItemGenericExploreGridBinding.songItemIsSelected.visibility != View.VISIBLE
+                ) {
+                    mItemGenericExploreGridBinding.songItemIsSelected.clearAnimation()
+                    ViewAnimatorsUtils.crossFadeUp(
+                        mItemGenericExploreGridBinding.songItemIsSelected,
+                        true,
+                        250,
+                        0.125f
+                    )
+                }
+            }
+            else {
+                ViewAnimatorsUtils.crossFadeDown(
+                    mItemGenericExploreGridBinding.songItemIsSelected,
+                    true,
+                    250
+                )
+            }
+        }
+        fun updateSelectedStateUI(selectableIsSelected: Boolean) {
+            if(selectableIsSelected) {
+                ViewAnimatorsUtils.crossFadeUp(
+                    mItemGenericExploreGridBinding.songItemIsSelected,
+                    false,
+                    0,
+                    0.15f
+                )
+            }
+            else {
+                ViewAnimatorsUtils.crossFadeDown(
+                    mItemGenericExploreGridBinding.songItemIsSelected,
+                    false,
+                    0
+                )
+            }
         }
     }
 

@@ -21,7 +21,7 @@ import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
-import com.prosabdev.fluidmusic.models.sharedpreference.SleepTimerSP
+import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
@@ -401,15 +401,18 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         mBottomSheetPlayerMoreBinding.textDescription.isSelected = true
     }
 
+    fun updateData(playerFragmentViewModel : PlayerFragmentViewModel, mainFragmentViewModel : MainFragmentViewModel, screenShootPlayerView : View){
+        mPlayerFragmentViewModel = playerFragmentViewModel
+        mMainFragmentViewModel = mainFragmentViewModel
+        mScreenShotPlayerView = screenShootPlayerView
+    }
+
     companion object {
         const val TAG = "PlayerMoreFullBottomSheetDialog"
 
         @JvmStatic
-        fun newInstance(playerFragmentViewModel : PlayerFragmentViewModel, mainFragmentViewModel : MainFragmentViewModel, screenShootPlayerView : View) =
+        fun newInstance() =
             PlayerMoreFullBottomSheetDialog().apply {
-                mPlayerFragmentViewModel = playerFragmentViewModel
-                mMainFragmentViewModel = mainFragmentViewModel
-                mScreenShotPlayerView = screenShootPlayerView
             }
     }
 }

@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 class PlayerPageAdapter(
     private val mContext: Context,
     private val mListener: OnItemClickListener
-) : ListAdapter<SongItem, PlayerPageAdapter.PlayerPageHolder>(SongItem.diffCallback) {
+) : ListAdapter<SongItem, PlayerPageAdapter.PlayerPageHolder>(SongItem.diffCallbackViewPager) {
 
     interface OnItemClickListener {
         fun onButtonLyricsClicked(position: Int)
@@ -46,11 +46,6 @@ class PlayerPageAdapter(
         position: Int
     ) {
         holder.loadCovertArt(mContext, getItem(position))
-    }
-
-    override fun onViewRecycled(holder: PlayerPageHolder) {
-        super.onViewRecycled(holder)
-        holder.recycleItem(mContext)
     }
 
     class PlayerPageHolder(
@@ -79,10 +74,6 @@ class PlayerPageAdapter(
             })
         }
 
-        fun recycleItem(ctx : Context){
-            Glide.with(ctx.applicationContext).clear(mItemPlayerCardViewBinding.playerViewpagerImageview)
-        }
-
         private suspend fun animateButtons() {
             ViewAnimatorsUtils.crossFadeUp(mItemPlayerCardViewBinding.buttonLyrics as View, true)
             ViewAnimatorsUtils.crossFadeUp(mItemPlayerCardViewBinding.buttonFullscreen as View, true)
@@ -91,18 +82,13 @@ class PlayerPageAdapter(
             ViewAnimatorsUtils.crossFadeDown(mItemPlayerCardViewBinding.buttonFullscreen as View, true)
         }
 
-        fun loadCovertArt(context: Context, songItem: SongItem) {
-            mItemPlayerCardViewBinding.playerViewpagerImageview.layout(0,0,0,0)
+        fun loadCovertArt(ctx: Context, songItem: SongItem) {
             val tempUri : Uri? = Uri.parse(songItem.uri ?: "")
-            MainScope().launch {
-                ImageLoadersUtils.loadCovertArtFromSongUri(
-                    context,
-                    mItemPlayerCardViewBinding.playerViewpagerImageview,
-                    tempUri,
-                    songItem.hashedCovertArtSignature,
-                    800
-                )
-            }
+            val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newLargeOriginalCardInstance()
+            imageRequest.uri = tempUri
+            imageRequest.imageView = mItemPlayerCardViewBinding.playerViewpagerImageview
+            imageRequest.hashedCovertArtSignature = songItem.hashedCovertArtSignature
+            ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
         }
     }
 }

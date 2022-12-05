@@ -54,7 +54,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="@dimen/main_margin"
+            android:padding="@dimen/margin_large_size"
             android:layout_marginBottom="50dp"
             android:visibility="@{( foldersCounter != 0) ? View.GONE : View.VISIBLE, default=gone}"
             >
@@ -71,7 +71,7 @@
                 android:text="No folder found !"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:layout_marginVertical="@dimen/main_medium_margin"
+                android:layout_marginVertical="@dimen/margin_medium_size"
                 />
         </androidx.appcompat.widget.LinearLayoutCompat>
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -81,7 +81,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_marginBottom="@dimen/main_margin"
+            android:layout_marginBottom="@dimen/margin_large_size"
             >
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_add_folder"
@@ -93,7 +93,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:icon="@drawable/add"
                 android:text="Add folder"
-                android:layout_marginHorizontal="@dimen/main_margin"
+                android:layout_marginHorizontal="@dimen/margin_large_size"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,7 +12,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="@dimen/main_small_margin"
+            android:padding="@dimen/margin_small_size"
             >
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -20,7 +20,7 @@
                 style="@style/Widget.Material3.CardView.Filled"
                 app:layout_constraintTop_toTopOf="parent"
                 app:cardBackgroundColor="@color/transparent"
-                app:cardCornerRadius="@dimen/medium_corner_radius"
+                app:cardCornerRadius="@dimen/corner_radius_medium"
                 >
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/linear_cover_art_container"
@@ -58,8 +58,8 @@
                             android:ellipsize="end"
                             android:textAppearance="?attr/textAppearanceBody2"
                             android:textStyle="bold"
-                            android:layout_marginTop="@dimen/main_small_margin"
-                            android:layout_marginHorizontal="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_small_size"
+                            android:layout_marginHorizontal="@dimen/margin_medium_size"
                             />
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/text_subtitle"
@@ -80,13 +80,13 @@
                             app:layout_constraintTop_toBottomOf="@+id/text_subtitle"
                             app:layout_constraintStart_toStartOf="@+id/text_title"
                             app:layout_constraintEnd_toStartOf="@+id/text_now_playing"
-                            android:layout_marginEnd="@dimen/main_medium_margin"
+                            android:layout_marginEnd="@dimen/margin_medium_size"
                             android:textAppearance="?attr/textAppearanceLabelSmall"
                             android:alpha="0.5"
                             android:text=""
                             android:maxLines="1"
                             android:ellipsize="end"
-                            android:paddingBottom="@dimen/main_small_margin"
+                            android:paddingBottom="@dimen/margin_small_size"
                             />
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/text_now_playing"
@@ -117,7 +117,7 @@
             style="@style/Widget.Material3.CardView.Filled"
             app:cardElevation="0dp"
             app:cardBackgroundColor="@color/transparent"
-            app:cardCornerRadius="@dimen/medium_corner_radius"
+            app:cardCornerRadius="@dimen/corner_radius_medium"
             >
             <View
                 android:id="@+id/song_item_is_selected"

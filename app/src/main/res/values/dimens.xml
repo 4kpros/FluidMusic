@@ -1,29 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="very_large_corner_radius">25dp</dimen>
-    <dimen name="large_corner_radius">25dp</dimen>
-    <dimen name="medium_corner_radius">15dp</dimen>
-    <dimen name="small_corner_radius">5dp</dimen>
-    <dimen name="none_corner_radius">0dp</dimen>
 
-    <dimen name="main_small_margin">5dp</dimen>
-    <dimen name="main_medium_margin">10dp</dimen>
-    <dimen name="main_margin">16dp</dimen>
+    <dimen name="margin_small_size">5dp</dimen>
+    <dimen name="margin_medium_size">10dp</dimen>
+    <dimen name="margin_large_size">16dp</dimen>
+    <dimen name="margin_very_large_size">20dp</dimen>
+    <dimen name="margin_very_very_large_size">25dp</dimen>
+
+    <dimen name="corner_radius_very_large">25dp</dimen>
+    <dimen name="corner_radius_large">25dp</dimen>
+    <dimen name="corner_radius_medium">15dp</dimen>
+    <dimen name="corner_radius_small">5dp</dimen>
+    <dimen name="corner_radius_none">0dp</dimen>
+
+    <dimen name="organize_list_extra_small_image_size">56dp</dimen>
+    <dimen name="organize_list_small_image_size">75dp</dimen>
+    <dimen name="organize_list_medium_image_size">95dp</dimen>
+    <dimen name="organize_list_large_image_size">125dp</dimen>
 
     <dimen name="image_mini_player_size">56dp</dimen>
 
-    <dimen name="image_playlist_list_size">65dp</dimen>
-    <dimen name="image_playlist_grid_size">125dp</dimen>
+    <dimen name="chip_icon_size">25dp</dimen>
+    <dimen name="chip_height">35dp</dimen>
 
-    <dimen name="image_list_small_size">75dp</dimen>
-    <dimen name="image_list_medium_size">95dp</dimen>
-    <dimen name="image_list_big_size">125dp</dimen>
-
-    <dimen name="image_grid_small_size">85dp</dimen>
-    <dimen name="image_grid_medium_size">125dp</dimen>
-    <dimen name="image_grid_big_size">180dp</dimen>
-
-    <dimen name="setting_icon_size">30dp</dimen>
-    <dimen name="accent_color_chip_height">40dp</dimen>
-    <dimen name="accent_color_chip_icon_size">30dp</dimen>
+    <dimen name="setting_item_icon_size">40dp</dimen>
 </resources>

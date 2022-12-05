@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto"
+    motion:defaultDuration="0"
+    motion:layoutDuringTransition="honorRequest"
+    >
+
+    <Transition
+        android:id="@+id/motion_transition_list_to_grid"
+        motion:constraintSetStart="@id/motion_constraint_set_list"
+        motion:constraintSetEnd="@+id/motion_constraint_set_grid"
+        motion:duration="0"
+        >
+        <KeyFrameSet>
+        </KeyFrameSet>
+    </Transition>
+    <Transition
+        android:id="@+id/motion_transition_list_to_list_no_image"
+        motion:constraintSetStart="@id/motion_constraint_set_list"
+        motion:constraintSetEnd="@+id/motion_constraint_set_list_no_image"
+        motion:duration="0"
+        >
+        <KeyFrameSet>
+        </KeyFrameSet>
+    </Transition>
+
+    <ConstraintSet android:id="@+id/motion_constraint_set_list">
+    </ConstraintSet>
+    <ConstraintSet android:id="@+id/motion_constraint_set_grid">
+        <Constraint
+            android:id="@+id/linear_imageview_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            />
+        <Constraint
+            android:id="@+id/linear_text_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintTop_toBottomOf="@+id/linear_imageview_container"
+            />
+    </ConstraintSet>
+    <ConstraintSet android:id="@+id/motion_constraint_set_list_no_image">
+        <Constraint
+            android:id="@+id/linear_imageview_container"
+            android:visibility="gone"
+            />
+        <Constraint
+            android:id="@+id/linear_text_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintStart_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            />
+        <Constraint
+            android:id="@+id/linear_text_details"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            motion:layout_constraintTop_toBottomOf="@+id/linear_text_subtitle"
+            motion:layout_constraintStart_toStartOf="@+id/linear_text_title"
+            motion:layout_constraintEnd_toEndOf="@+id/linear_text_title"
+            />
+    </ConstraintSet>
+</MotionScene>
+

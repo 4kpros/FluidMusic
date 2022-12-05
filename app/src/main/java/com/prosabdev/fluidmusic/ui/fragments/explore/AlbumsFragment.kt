@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
@@ -22,12 +23,14 @@ import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.AlbumItemListAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentAlbumsBinding
-import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
-import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortItemsBottomSheetDialogFragment
+import com.prosabdev.fluidmusic.models.view.AlbumItem
+import com.prosabdev.fluidmusic.sharedprefs.SharedPreferenceManagerUtils
+import com.prosabdev.fluidmusic.sharedprefs.SortOrganizePrefsLoaderAndSetupViewModels
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AlbumsFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.explore.AlbumItemViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -40,8 +43,7 @@ class AlbumsFragment : Fragment() {
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 
-    private var mSortItemsBottomSheetDialogFragment: SortItemsBottomSheetDialogFragment = SortItemsBottomSheetDialogFragment.newInstance(ConstantValues.EXPLORE_ALBUMS)
-    private var mOrganizeItemBottomSheetDialogFragment: OrganizeItemBottomSheetDialogFragment = OrganizeItemBottomSheetDialogFragment.newInstance(ConstantValues.EXPLORE_ALBUMS)
+    private val mAlbumItemViewModel: AlbumItemViewModel by viewModels()
 
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
     private var mAlbumItemAdapter: AlbumItemListAdapter? = null
@@ -75,8 +77,21 @@ class AlbumsFragment : Fragment() {
 
         MainScope().launch {
             setupRecyclerViewAdapter()
-            observeLiveData()
+            loadPrefsAndInitViewModel()
             checkInteractions()
+            observeLiveData()
+        }
+    }
+
+    private suspend fun loadPrefsAndInitViewModel() {
+        context?.let { ctx ->
+            withContext(Dispatchers.Default) {
+                SortOrganizePrefsLoaderAndSetupViewModels.loadSortOrganizeItemsSettings(
+                    ctx,
+                    mAlbumsFragmentViewModel,
+                    SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SHARED_PREFERENCES_SORT_ORGANIZE_ALBUMS
+                )
+            }
         }
     }
 
@@ -134,8 +149,19 @@ class AlbumsFragment : Fragment() {
         mAlbumsFragmentViewModel.getAll().observe(viewLifecycleOwner){
             addDataToAdapter(it)
         }
+        mAlbumsFragmentViewModel.getSortBy().observe(viewLifecycleOwner){
+            listenDataChanges()
+        }
     }
-    private fun addDataToAdapter(albumList: ArrayList<Any>?) {
+    private fun listenDataChanges() {
+        MainScope().launch {
+            mAlbumsFragmentViewModel.listenAllData(
+                mAlbumItemViewModel,
+                viewLifecycleOwner
+            )
+        }
+    }
+    private fun addDataToAdapter(albumList: List<Any>?) {
         mAlbumItemAdapter?.submitList(albumList)
         if(mMainFragmentViewModel.getCurrentSelectablePage().value == ConstantValues.EXPLORE_ALBUMS){
             mMainFragmentViewModel.setTotalCount(albumList?.size ?: 0)
@@ -145,7 +171,7 @@ class AlbumsFragment : Fragment() {
     private suspend fun setupRecyclerViewAdapter() {
         withContext(Dispatchers.Default){
             val ctx : Context = context ?: return@withContext
-            val spanCount = 3
+            val spanCount = 6
             //Setup headline adapter
             val listHeadlines : ArrayList<Int> = ArrayList<Int>()
             listHeadlines.add(0)

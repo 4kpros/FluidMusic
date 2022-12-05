@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/main_margin"
+        android:paddingHorizontal="@dimen/margin_large_size"
         >
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_layout"
@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_margin="@dimen/main_margin"
+            android:layout_margin="@dimen/margin_large_size"
             android:hint="@string/playlist_name"
             app:errorEnabled="true"
             >

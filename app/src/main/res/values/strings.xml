@@ -174,4 +174,46 @@
     <string name="edit_tags">Edit tags</string>
     <string name="play_after">Play after</string>
     <string name="many_artists">Many artists</string>
+    <string name="track_number">Track number #</string>
+    <string name="disc_number">Disc number #</string>
+    <string name="added_date_to_library">Added date to library</string>
+    <string name="last_modified_date">Last modified date</string>
+    <string name="file_path_case_sensitive">File path case sensitive</string>
+    <string name="size">Size</string>
+    <string name="mime_type">Mime type</string>
+    <string name="rating">Rating</string>
+    <string name="author">Author</string>
+    <string name="writer">Writer</string>
+    <string name="language">Language</string>
+    <string name="sample_rate">Sample rate</string>
+    <string name="bitrate">Bitrate</string>
+    <string name="name">Name</string>
+    <string name="total_duration">Total duration</string>
+    <string name="song_count">Song count</string>
+    <string name="artist_count">Artist count</string>
+    <string name="album_artist_count">Album artist count</string>
+    <string name="composer_count">Composer count</string>
+    <string name="album_count">Album count</string>
+    <string name="album_name">Album name</string>
+    <string name="artist_name">Artist name</string>
+    <string name="composer_name">Composer name</string>
+    <string name="folder_name">Folder name</string>
+
+    <string name="list">List</string>
+    <string name="list_extra_small">List extra small</string>
+    <string name="list_small">List small</string>
+    <string name="list_medium">List medium</string>
+    <string name="list_large">List large</string>
+    <string name="list_small_no_image">List small no image</string>
+    <string name="list_medium_no_image">List medium no image</string>
+    <string name="list_large_no_image">List large no image</string>
+    <string name="grid">Grid</string>
+    <string name="grid_extra_small">Grid extra small</string>
+    <string name="grid_small">Grid small</string>
+    <string name="grid_medium">Grid medium</string>
+    <string name="grid_large">Grid large</string>
+    <string name="grid_extra_large">Grid extra large</string>
+    <string name="grid_small_no_image">Grid small no image</string>
+    <string name="grid_medium_no_image">Grid medium no image</string>
+
 </resources>

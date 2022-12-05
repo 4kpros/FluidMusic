@@ -12,15 +12,17 @@ interface ComposerItemDao {
 
     @Query(
         "SELECT * FROM ComposerItem " +
-            "ORDER BY " +
-                "CASE :order_by WHEN 'name' THEN COALESCE(ComposerItem.name, 'Unknown field') END COLLATE NOCASE, ComposerItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'lastUpdateDate' THEN ComposerItem.lastUpdateDate END DESC, COALESCE(ComposerItem.name, 'Unknown field') COLLATE NOCASE, ComposerItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN ComposerItem.lastAddedDateToLibrary END DESC, COALESCE(ComposerItem.name, 'Unknown field') COLLATE NOCASE," +
-                "CASE :order_by WHEN 'numberArtists' THEN ComposerItem.numberArtists END, COALESCE(ComposerItem.name, 'Unknown field') COLLATE NOCASE, ComposerItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'numberAlbums' THEN ComposerItem.numberAlbums END, COALESCE(ComposerItem.name, 'Unknown field') COLLATE NOCASE, ComposerItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'numberAlbumArtists' THEN ComposerItem.numberAlbumArtists END, COALESCE(ComposerItem.name, 'Unknown field') COLLATE NOCASE, ComposerItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'numberTracks' THEN ComposerItem.numberTracks END, COALESCE(ComposerItem.name, 'Unknown field') COLLATE NOCASE, ComposerItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'totalDuration' THEN ComposerItem.totalDuration END, COALESCE(ComposerItem.name, 'Unknown field') COLLATE NOCASE, ComposerItem.lastAddedDateToLibrary DESC"
+                "ORDER BY " +
+                "CASE :order_by WHEN 'name' THEN COALESCE(ComposerItem.name, 'Unknown field') END, ComposerItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'year' THEN COALESCE(ComposerItem.year, 'Unknown field') END COLLATE NOCASE, COALESCE(ComposerItem.name, 'Unknown field'), ComposerItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'lastUpdateDate' THEN ComposerItem.lastUpdateDate END DESC, COALESCE(ComposerItem.name, 'Unknown field'), ComposerItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN ComposerItem.lastAddedDateToLibrary END DESC, COALESCE(ComposerItem.name, 'Unknown field'), COALESCE(ComposerItem.name, 'Unknown field') DESC," +
+                "CASE :order_by WHEN 'totalDuration' THEN ComposerItem.totalDuration END, COALESCE(ComposerItem.name, 'Unknown field'), ComposerItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'numberTracks' THEN ComposerItem.numberTracks END, COALESCE(ComposerItem.name, 'Unknown field'), ComposerItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'numberArtists' THEN ComposerItem.numberArtists END , COALESCE(ComposerItem.name, 'Unknown field'), ComposerItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'numberAlbums' THEN ComposerItem.numberAlbums END, COALESCE(ComposerItem.name, 'Unknown field'), ComposerItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'numberAlbumArtists' THEN ComposerItem.numberAlbumArtists END, COALESCE(ComposerItem.name, 'Unknown field'), ComposerItem.lastAddedDateToLibrary DESC"
+//                "CASE :order_by WHEN 'numberComposers' THEN ComposerItem.numberComposers END, COALESCE(ComposerItem.name, 'Unknown field'), ComposerItem.lastAddedDateToLibrary DESC"
     )
     fun getAll(order_by: String): LiveData<List<ComposerItem>>?
 }

@@ -58,6 +58,11 @@ class SongItemRepository(ctx : Context) {
             mDao?.getAll(order_by)
         }
     }
+    suspend fun getAllDirectly(order_by: String) : List<SongItem>? {
+        return withContext(Dispatchers.IO){
+            mDao?.getAllDirectly(order_by)
+        }
+    }
     suspend fun getAllWhereEqual(whereColumn: String, columnValue: String?, order_by: String) : LiveData<List<SongItem>>? {
         return withContext(Dispatchers.IO){
             mDao?.getAllWhereEqual(whereColumn, columnValue, order_by)

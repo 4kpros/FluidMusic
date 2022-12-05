@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/main_margin"
+        android:paddingHorizontal="@dimen/margin_large_size"
         >
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/linear_container_1"
@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="@dimen/main_margin"
+            android:layout_marginTop="@dimen/margin_large_size"
             >
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"

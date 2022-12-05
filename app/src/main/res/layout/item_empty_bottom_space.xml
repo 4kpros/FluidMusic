@@ -10,7 +10,7 @@
         android:id="@+id/constraint_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/main_margin"
+        android:paddingTop="@dimen/margin_large_size"
         >
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/text_end"

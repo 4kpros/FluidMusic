@@ -22,7 +22,7 @@
                 android:layout_height="?actionBarSize"
                 app:layout_constraintTop_toTopOf="parent"
                 android:orientation="horizontal"
-                android:layout_marginHorizontal="@dimen/main_margin"
+                android:layout_marginHorizontal="@dimen/margin_large_size"
                 android:gravity="center_vertical"
                 >
                 <androidx.appcompat.widget.AppCompatImageView
@@ -40,7 +40,7 @@
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:layout_weight="1"
-                    android:layout_marginStart="@dimen/main_small_margin"
+                    android:layout_marginStart="@dimen/margin_small_size"
                     />
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_new_playlist"

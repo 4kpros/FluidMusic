@@ -24,7 +24,7 @@
             app:cardBackgroundColor="@color/transparent"
             android:clickable="true"
             android:focusable="true"
-            app:cardCornerRadius="@dimen/medium_corner_radius"
+            app:cardCornerRadius="@dimen/corner_radius_medium"
             >
         </com.google.android.material.card.MaterialCardView>
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -35,8 +35,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:gravity="center"
-            android:layout_marginStart="@dimen/main_margin"
-            android:layout_marginVertical="@dimen/main_small_margin"
+            android:layout_marginStart="@dimen/margin_large_size"
+            android:layout_marginVertical="@dimen/margin_small_size"
             >
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
@@ -52,18 +52,18 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:cardCornerRadius="@dimen/medium_corner_radius"
+                    app:cardCornerRadius="@dimen/corner_radius_medium"
                     />
                 <com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
                     android:id="@+id/imageview_cover_art"
-                    android:layout_width="@dimen/image_playlist_list_size"
+                    android:layout_width="@dimen/image_mini_player_size"
                     android:layout_height="wrap_content"
                     android:scaleType="centerCrop"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:cardCornerRadius="@dimen/medium_corner_radius"
+                    app:cardCornerRadius="@dimen/corner_radius_medium"
                     />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -76,7 +76,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_marginHorizontal="@dimen/main_margin"
+            android:layout_marginHorizontal="@dimen/margin_large_size"
             >
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/text_title"

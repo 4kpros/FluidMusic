@@ -25,8 +25,8 @@ class ExploreContentsForFragment : Fragment() {
         reenterTransition = MaterialFadeThrough()
 
         arguments?.let {
-            mLoadSongFromSource = it.getString(ConstantValues.ARGS_EXPLORE_MUSIC_LIBRARY)
-            mLoadSongFromSourceValue = it.getString(ConstantValues.ARGS_EXPLORE_MUSIC_LIBRARY_VALUE)
+            mLoadSongFromSource = it.getString(ConstantValues.ARGS_EXPLORE_MUSIC_CONTENT)
+            mLoadSongFromSourceValue = it.getString(ConstantValues.ARGS_EXPLORE_MUSIC_CONTENT_VALUE)
         }
     }
 
@@ -76,8 +76,8 @@ class ExploreContentsForFragment : Fragment() {
         fun newInstance(loadSongFromSource: String?, value : String?) =
             ExploreContentsForFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ConstantValues.ARGS_EXPLORE_MUSIC_LIBRARY, loadSongFromSource)
-                    putString(ConstantValues.ARGS_EXPLORE_MUSIC_LIBRARY_VALUE, value)
+                    putString(ConstantValues.ARGS_EXPLORE_MUSIC_CONTENT, loadSongFromSource)
+                    putString(ConstantValues.ARGS_EXPLORE_MUSIC_CONTENT_VALUE, value)
                 }
             }
     }

@@ -51,7 +51,7 @@
                 android:progress="50"
                 android:min="0"
                 android:max="100"
-                android:layout_marginTop="@dimen/main_small_margin" />
+                android:layout_marginTop="@dimen/margin_small_size" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/covert_art_card_container"
@@ -59,11 +59,11 @@
                 android:layout_height="wrap_content"
                 style="@style/Widget.Material3.CardView.Elevated"
                 app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="@dimen/main_margin"
+                android:layout_marginStart="@dimen/margin_large_size"
                 android:layout_marginEnd="1dp"
                 android:layout_marginBottom="1dp"
                 app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="@dimen/main_small_margin">
+                android:layout_marginTop="@dimen/margin_small_size">
 
                 <com.prosabdev.fluidmusic.ui.custom.CustomImageViewRatio11
                     android:id="@+id/imageview_mini_player"
@@ -82,7 +82,7 @@
                 app:layout_constraintEnd_toStartOf="@id/button_play_pause"
                 app:layout_constraintTop_toTopOf="@id/covert_art_card_container"
                 app:layout_constraintBottom_toBottomOf="@id/covert_art_card_container"
-                android:layout_marginStart="@dimen/main_small_margin"
+                android:layout_marginStart="@dimen/margin_small_size"
                 android:orientation="vertical"
                 android:gravity="center_horizontal|start">
 
@@ -148,7 +148,7 @@
                 android:scaleType="centerInside"
                 app:layout_constraintTop_toTopOf="@+id/button_play_pause"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginEnd="@dimen/main_margin" />
+                android:layout_marginEnd="@dimen/margin_large_size" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

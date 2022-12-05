@@ -57,7 +57,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginVertical="@dimen/main_small_margin"
+                    android:layout_marginVertical="@dimen/margin_small_size"
                     >
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:id="@+id/linear_items_container"
@@ -65,7 +65,7 @@
                         android:layout_height="wrap_content"
                         app:layout_constraintTop_toTopOf="parent"
                         android:orientation="vertical"
-                        android:paddingBottom="@dimen/main_small_margin"
+                        android:paddingBottom="@dimen/margin_small_size"
                         >
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/card_view_scan_device"
@@ -90,7 +90,7 @@
                                     android:layout_weight="1"
                                     android:layout_gravity="center"
                                     android:gravity="center"
-                                    android:layout_margin="@dimen/main_margin"
+                                    android:layout_margin="@dimen/margin_large_size"
                                     >
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -99,7 +99,7 @@
                                         android:text="Rescan"
                                         android:maxLines="1"
                                         android:ellipsize="end"
-                                        android:layout_marginBottom="@dimen/main_medium_margin"
+                                        android:layout_marginBottom="@dimen/margin_medium_size"
                                         />
                                     <androidx.appcompat.widget.LinearLayoutCompat
                                         android:layout_width="match_parent"
@@ -119,7 +119,7 @@
                                             android:text="@{`Folders : ` + folderCounter}"
                                             android:maxLines="1"
                                             android:ellipsize="end"
-                                            android:layout_marginStart="@dimen/main_small_margin"
+                                            android:layout_marginStart="@dimen/margin_small_size"
                                             />
                                     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -128,7 +128,7 @@
                                         android:layout_height="wrap_content"
                                         android:orientation="horizontal"
                                         android:gravity="center_vertical"
-                                        android:layout_marginVertical="@dimen/main_small_margin"
+                                        android:layout_marginVertical="@dimen/margin_small_size"
                                         >
                                         <androidx.appcompat.widget.AppCompatImageView
                                             android:layout_width="wrap_content"
@@ -142,7 +142,7 @@
                                             android:text="@{`Songs : ` + songsCounter}"
                                             android:maxLines="1"
                                             android:ellipsize="end"
-                                            android:layout_marginStart="@dimen/main_small_margin"
+                                            android:layout_marginStart="@dimen/margin_small_size"
                                             />
                                     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -164,7 +164,7 @@
                                             android:text="@{`Playlists : ` + playlistCounter}"
                                             android:maxLines="1"
                                             android:ellipsize="end"
-                                            android:layout_marginStart="@dimen/main_small_margin"
+                                            android:layout_marginStart="@dimen/margin_small_size"
                                             />
                                     </androidx.appcompat.widget.LinearLayoutCompat>
                                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -199,7 +199,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -211,8 +211,8 @@
                                 android:layout_weight="1"
                                 android:layout_gravity="center"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size"
                                 >
                                 <com.google.android.material.textview.MaterialTextView
                                     android:id="@+id/text_select_folders_title"
@@ -239,7 +239,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -251,8 +251,8 @@
                                 android:layout_weight="1"
                                 android:layout_gravity="center"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size"
                                 >
                                 <com.google.android.material.textview.MaterialTextView
                                     android:layout_width="match_parent"
@@ -277,7 +277,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -289,15 +289,15 @@
                                 android:layout_weight="1"
                                 android:layout_gravity="center"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size"
                                 >
                                 <androidx.appcompat.widget.LinearLayoutCompat
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginEnd="@dimen/main_medium_margin"
+                                    android:layout_marginEnd="@dimen/margin_medium_size"
                                     >
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -329,7 +329,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             >
                             <androidx.appcompat.widget.LinearLayoutCompat
@@ -339,8 +339,8 @@
                                 android:layout_weight="1"
                                 android:layout_gravity="center"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size"
                                 >
                                 <androidx.appcompat.widget.LinearLayoutCompat
                                     android:layout_width="match_parent"
@@ -377,7 +377,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -389,15 +389,15 @@
                                 android:layout_weight="1"
                                 android:layout_gravity="center"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size"
                                 >
                                 <androidx.appcompat.widget.LinearLayoutCompat
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginEnd="@dimen/main_medium_margin"
+                                    android:layout_marginEnd="@dimen/margin_medium_size"
                                     >
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -429,7 +429,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -441,15 +441,15 @@
                                 android:layout_weight="1"
                                 android:layout_gravity="center"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size"
                                 >
                                 <androidx.appcompat.widget.LinearLayoutCompat
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginEnd="@dimen/main_medium_margin"
+                                    android:layout_marginEnd="@dimen/margin_medium_size"
                                     >
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -481,7 +481,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -493,8 +493,8 @@
                                 android:layout_weight="1"
                                 android:layout_gravity="center"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size"
                                 >
                                 <com.google.android.material.textview.MaterialTextView
                                     android:layout_width="match_parent"

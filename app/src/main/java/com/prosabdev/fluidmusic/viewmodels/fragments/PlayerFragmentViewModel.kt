@@ -6,13 +6,14 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.prosabdev.fluidmusic.models.SongItem
-import com.prosabdev.fluidmusic.models.sharedpreference.SleepTimerSP
+import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
 
+    private val mMutablePlayerLoadSessionCount = MutableLiveData<Int>(0)
     private val mMutableCurrentPlayingSong = MutableLiveData<SongItem?>(null)
     private val mMutableIsPlaying = MutableLiveData<Boolean>(false)
     private val mMutablePlayingProgressValue = MutableLiveData<Long>(0)
@@ -24,10 +25,14 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mMutableSleepTimerStateStarted = MutableLiveData<Boolean>(false)
     private val mMutableSkipNextTrackCounter = MutableLiveData<Int>(0)
     private val mMutableSkipPrevTrackCounter = MutableLiveData<Int>(0)
+    private val mMutableUpdatePlaylistCounter = MutableLiveData<Int>(0)
+    private val mMutableIsQueueMusicUpdated = MutableLiveData<Boolean>(true)
+    private val mMutableSortBy = MutableLiveData<String>("id")
+    private val mMutableIsInverted = MutableLiveData<Boolean>(false)
+    private val mMutableCanScrollSmoothViewpager = MutableLiveData<Boolean>(false)
+    private val mMutableCanScrollCurrentPlayingSong = MutableLiveData<Boolean>(false)
 
-    private val mMutableShowEqualizerFragmentCounter = MutableLiveData<Int>(0)
-    private val mMutableShowMediaScannerFragmentCounter = MutableLiveData<Int>(0)
-
+    private val mPlayerLoadSessionCount: LiveData<Int> get() = mMutablePlayerLoadSessionCount
     private val mCurrentPlayingSong: LiveData<SongItem?> get() = mMutableCurrentPlayingSong
     private val mIsPlaying: LiveData<Boolean> get() = mMutableIsPlaying
     private val mPlayingProgressValue: LiveData<Long> get() = mMutablePlayingProgressValue
@@ -39,10 +44,25 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mSleepTimerStateStarted: LiveData<Boolean> get() = mMutableSleepTimerStateStarted
     private val mSkipNextTrackCounter: LiveData<Int> get() = mMutableSkipNextTrackCounter
     private val mSkipPrevTrackCounter: LiveData<Int> get() = mMutableSkipPrevTrackCounter
+    private val mUpdatePlaylistCounter: LiveData<Int> get() = mMutableUpdatePlaylistCounter
+    private val mIsQueueMusicUpdated: LiveData<Boolean> get() = mMutableIsQueueMusicUpdated
+    private val mSortBy: LiveData<String> get() = mMutableSortBy
+    private val mIsInverted: LiveData<Boolean> get() = mMutableIsInverted
+    private val mCanScrollSmoothViewpager: LiveData<Boolean> get() = mMutableCanScrollSmoothViewpager
+    private val mCanScrollCurrentPlayingSong: LiveData<Boolean> get() = mMutableCanScrollCurrentPlayingSong
 
-    private val mShowEqualizerFragmentCounter: LiveData<Int> get() = mMutableShowEqualizerFragmentCounter
-    private val mShowMediaScannerFragmentCounter: LiveData<Int> get() = mMutableShowMediaScannerFragmentCounter
-
+    fun setPlayerLoadSessionCounter(){
+        MainScope().launch {
+            var tempCounter: Int = mPlayerLoadSessionCount.value ?: 0
+            if(tempCounter >= 100)
+                tempCounter = 0
+            tempCounter++
+            mMutablePlayerLoadSessionCount.value = tempCounter
+        }
+    }
+    fun getPlayerLoadSessionCounter(): LiveData<Int> {
+        return mPlayerLoadSessionCount
+    }
     fun setCurrentPlayingSong(songItem : SongItem?){
         MainScope().launch {
             mMutableCurrentPlayingSong.value = songItem
@@ -148,16 +168,55 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
         return mSkipPrevTrackCounter
     }
 
-    fun setShowEqualizerFragmentCounter(){
+    fun setUpdatePlaylistCounter(){
         MainScope().launch {
-            var tempCounter: Int = mShowEqualizerFragmentCounter.value ?: 0
+            var tempCounter: Int = mUpdatePlaylistCounter.value ?: 0
             if(tempCounter >= 100)
                 tempCounter = 0
             tempCounter++
-            mMutableShowEqualizerFragmentCounter.value = tempCounter
+            mMutableIsQueueMusicUpdated.value = false
+            mMutableUpdatePlaylistCounter.value = tempCounter
         }
     }
-    fun getShowEqualizerFragmentCounter(): LiveData<Int> {
-        return mShowEqualizerFragmentCounter
+    fun getUpdatePlaylistCounter(): LiveData<Int> {
+        return mUpdatePlaylistCounter
+    }
+    fun setIsQueueMusicUpdated() {
+        mMutableIsQueueMusicUpdated.value = true
+    }
+    fun getIsQueueMusicUpdated(): LiveData<Boolean> {
+        return mIsQueueMusicUpdated
+    }
+    fun setSortBy(sortBy : String) {
+        if(sortBy == mSortBy.value) return
+        MainScope().launch {
+            mMutableSortBy.value = sortBy
+        }
+    }
+    fun getSortBy(): LiveData<String> {
+        return mSortBy
+    }
+    fun setIsInverted(isInverted : Boolean) {
+        if(isInverted == mIsInverted.value) return
+        MainScope().launch {
+            mMutableIsInverted.value = isInverted
+        }
+    }
+    fun getIsInverted(): LiveData<Boolean> {
+        return mIsInverted
+    }
+
+    fun setCanScrollCurrentPlayingSong(value: Boolean) {
+        mMutableCanScrollSmoothViewpager.value = value
+    }
+    fun getCanScrollCurrentPlayingSong(): LiveData<Boolean> {
+        return mCanScrollSmoothViewpager
+    }
+
+    fun setCanScrollSmoothViewpager(value: Boolean) {
+        mMutableCanScrollCurrentPlayingSong.value = value
+    }
+    fun getCanScrollSmoothViewpager(): LiveData<Boolean> {
+        return mCanScrollCurrentPlayingSong
     }
 }

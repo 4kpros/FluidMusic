@@ -5,6 +5,7 @@ import androidx.room.DatabaseView
 
 @DatabaseView(
     "SELECT songItem.genre as name, " +
+            "MAX(songItem.year) as year, " +
             "MAX(songItem.lastUpdateDate) as lastUpdateDate, " +
             "MAX(songItem.lastAddedDateToLibrary) as lastAddedDateToLibrary, " +
             "COUNT(DISTINCT songItem.artist) as numberArtists, " +
@@ -20,6 +21,7 @@ import androidx.room.DatabaseView
 )
 class GenreItem {
     var name: String? = null
+    var year: String? = null
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
     var numberArtists: Int = 0

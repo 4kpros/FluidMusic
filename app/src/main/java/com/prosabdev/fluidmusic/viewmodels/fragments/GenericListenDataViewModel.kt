@@ -9,20 +9,24 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 abstract class GenericListenDataViewModel (app: Application) : AndroidViewModel(app) {
-    protected val mMutableDataList = MutableLiveData<ArrayList<Any>>(null)
-    private val mMutableSortBy = MutableLiveData<String>("name")
-    private val mMutableOrganizeListGrid = MutableLiveData<Int>(ConstantValues.ORGANIZE_LIST)
+    protected val mMutableDataList = MutableLiveData<List<Any>>(null)
+    private val mMutableSortBy = MutableLiveData<String>("id")
+    private val mMutableOrganizeListGrid = MutableLiveData<Int>(ConstantValues.ORGANIZE_LIST_MEDIUM)
     private val mMutableIsInverted = MutableLiveData<Boolean>(false)
 
-    private val mDataList: LiveData<ArrayList<Any>> get() = mMutableDataList
+    private val mDataList: LiveData<List<Any>> get() = mMutableDataList
     private val mSortBy: LiveData<String> get() = mMutableSortBy
     private val mOrganizeListGrid: LiveData<Int> get() = mMutableOrganizeListGrid
     private val mIsInverted: LiveData<Boolean> get() = mMutableIsInverted
 
-    fun getAll(): LiveData<ArrayList<Any>> {
+    fun getAll(): LiveData<List<Any>> {
         return mDataList
     }
+    fun getAllDirectly(): List<Any>? {
+        return mDataList.value
+    }
     fun setSortBy(sortBy : String) {
+        if(sortBy == mSortBy.value) return
         MainScope().launch {
             mMutableSortBy.value = sortBy
         }
@@ -31,6 +35,7 @@ abstract class GenericListenDataViewModel (app: Application) : AndroidViewModel(
         return mSortBy
     }
     fun setOrganizeListGrid(organizeListGrid : Int) {
+        if(organizeListGrid == mOrganizeListGrid.value) return
         MainScope().launch {
             mMutableOrganizeListGrid.value = organizeListGrid
         }
@@ -39,6 +44,7 @@ abstract class GenericListenDataViewModel (app: Application) : AndroidViewModel(
         return mOrganizeListGrid
     }
     fun setIsInverted(isInverted : Boolean) {
+        if(isInverted == mIsInverted.value) return
         MainScope().launch {
             mMutableIsInverted.value = isInverted
         }

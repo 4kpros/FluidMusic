@@ -45,7 +45,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginVertical="@dimen/main_small_margin">
+                    android:layout_marginVertical="@dimen/margin_small_size">
 
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:id="@+id/linear_items_container"
@@ -53,7 +53,7 @@
                         android:layout_height="wrap_content"
                         app:layout_constraintTop_toTopOf="parent"
                         android:orientation="vertical"
-                        android:paddingBottom="@dimen/main_small_margin">
+                        android:paddingBottom="@dimen/margin_small_size">
 
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/card_view_language"
@@ -71,12 +71,12 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin">
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size">
 
                                 <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/setting_icon_size"
-                                    android:layout_height="@dimen/setting_icon_size"
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
                                     android:src="@drawable/language" />
 
                                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -84,7 +84,7 @@
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginStart="@dimen/main_margin">
+                                    android:layout_marginStart="@dimen/margin_large_size">
 
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -110,7 +110,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -121,12 +121,12 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin">
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size">
 
                                 <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/setting_icon_size"
-                                    android:layout_height="@dimen/setting_icon_size"
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
                                     android:src="@drawable/palette" />
 
                                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -134,7 +134,7 @@
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginStart="@dimen/main_margin">
+                                    android:layout_marginStart="@dimen/margin_large_size">
 
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -160,7 +160,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -171,12 +171,12 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin">
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size">
 
                                 <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/setting_icon_size"
-                                    android:layout_height="@dimen/setting_icon_size"
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
                                     android:src="@drawable/play_arrow" />
 
                                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -184,7 +184,7 @@
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginStart="@dimen/main_margin">
+                                    android:layout_marginStart="@dimen/margin_large_size">
 
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -210,7 +210,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -221,12 +221,12 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin">
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size">
 
                                 <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/setting_icon_size"
-                                    android:layout_height="@dimen/setting_icon_size"
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
                                     android:src="@drawable/volume_up" />
 
                                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -234,7 +234,7 @@
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginStart="@dimen/main_margin">
+                                    android:layout_marginStart="@dimen/margin_large_size">
 
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -260,7 +260,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -271,12 +271,12 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin">
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size">
 
                                 <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/setting_icon_size"
-                                    android:layout_height="@dimen/setting_icon_size"
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
                                     android:src="@drawable/library_music" />
 
                                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -284,7 +284,7 @@
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginStart="@dimen/main_margin">
+                                    android:layout_marginStart="@dimen/margin_large_size">
 
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -310,7 +310,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -321,12 +321,12 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin">
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size">
 
                                 <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/setting_icon_size"
-                                    android:layout_height="@dimen/setting_icon_size"
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
                                     android:src="@drawable/lyrics" />
 
                                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -334,7 +334,7 @@
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginStart="@dimen/main_margin">
+                                    android:layout_marginStart="@dimen/margin_large_size">
 
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -360,7 +360,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -371,12 +371,12 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin">
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size">
 
                                 <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/setting_icon_size"
-                                    android:layout_height="@dimen/setting_icon_size"
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
                                     android:src="@drawable/headphones" />
 
                                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -384,7 +384,7 @@
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginStart="@dimen/main_margin">
+                                    android:layout_marginStart="@dimen/margin_large_size">
 
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -410,7 +410,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -421,12 +421,12 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin">
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size">
 
                                 <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/setting_icon_size"
-                                    android:layout_height="@dimen/setting_icon_size"
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
                                     android:src="@drawable/notifications" />
 
                                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -434,7 +434,7 @@
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginStart="@dimen/main_margin">
+                                    android:layout_marginStart="@dimen/margin_large_size">
 
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -460,7 +460,7 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/main_medium_margin"
+                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -471,12 +471,12 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:gravity="center"
-                                android:paddingHorizontal="@dimen/main_margin"
-                                android:paddingVertical="@dimen/main_medium_margin">
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_medium_size">
 
                                 <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/setting_icon_size"
-                                    android:layout_height="@dimen/setting_icon_size"
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
                                     android:src="@drawable/info" />
 
                                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -484,7 +484,7 @@
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginStart="@dimen/main_margin">
+                                    android:layout_marginStart="@dimen/margin_large_size">
 
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"

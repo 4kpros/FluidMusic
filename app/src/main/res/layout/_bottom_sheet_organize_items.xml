@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/constraint_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linear_title"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            app:layout_constraintTop_toTopOf="parent"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="@dimen/margin_large_size"
+            android:gravity="center_vertical">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/table_view"
+                app:srcCompat="@drawable/table_view" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text_organize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:text="@string/organize"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_marginStart="@dimen/margin_small_size" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text_organize_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:text=""
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_weight="1"
+                android:layout_marginEnd="@dimen/margin_small_size" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <RadioGroup
+                android:id="@+id/radio_group_organize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_large_size"
+                android:layout_marginBottom="@dimen/margin_large_size"
+                >
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    >
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/TextAppearance.Material3.LabelLarge"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:text="@string/list"
+                        android:alpha="0.5"
+                        />
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_list_small"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:tooltipText="@string/list_small"
+                    android:text="@string/list_small" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_list_medium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:tooltipText="@string/list_medium"
+                    android:text="@string/list_medium" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_list_large"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:tooltipText="@string/list_large"
+                    android:text="@string/list_large" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_list_small_no_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:tooltipText="@string/list_small_no_image"
+                    android:text="@string/list_small_no_image" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_list_medium_no_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:tooltipText="@string/list_medium_no_image"
+                    android:text="@string/list_medium_no_image" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_list_large_no_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:tooltipText="@string/list_large_no_image"
+                    android:text="@string/list_large_no_image" />
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/TextAppearance.Material3.LabelLarge"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:text="@string/grid"
+                        android:alpha="0.5"
+                        />
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_grid_extra_small"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:tooltipText="@string/grid_extra_small"
+                    android:text="@string/grid_extra_small" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_grid_small"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:tooltipText="@string/grid_small"
+                    android:text="@string/grid_small" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_grid_medium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:tooltipText="@string/grid_medium"
+                    android:text="@string/grid_medium" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_grid_large"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:tooltipText="@string/grid_large"
+                    android:text="@string/grid_large" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_grid_extra_large"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:tooltipText="@string/grid_extra_large"
+                    android:text="@string/grid_extra_large" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_grid_small_no_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:tooltipText="@string/grid_small_no_image"
+                    android:text="@string/grid_small_no_image" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_grid_medium_no_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:tooltipText="@string/grid_medium_no_image"
+                    android:text="@string/grid_medium_no_image" />
+            </RadioGroup>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>

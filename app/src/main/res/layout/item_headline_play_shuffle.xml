@@ -15,8 +15,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginHorizontal="@dimen/main_margin"
-            android:paddingVertical="@dimen/main_medium_margin"
+            android:layout_marginHorizontal="@dimen/margin_large_size"
+            android:paddingVertical="@dimen/margin_medium_size"
             >
 
             <androidx.appcompat.widget.LinearLayoutCompat
@@ -73,19 +73,5 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <View
-            android:id="@+id/hover_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toTopOf="@+id/constraint_container_top_play_shuffle"
-            app:layout_constraintBottom_toBottomOf="@+id/constraint_container_top_play_shuffle"
-            app:layout_constraintStart_toStartOf="@+id/constraint_container_top_play_shuffle"
-            app:layout_constraintEnd_toEndOf="@+id/constraint_container_top_play_shuffle"
-            android:background="?android:colorBackground"
-            android:clickable="true"
-            android:focusable="false"
-            android:visibility="gone"
-            android:alpha="0" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

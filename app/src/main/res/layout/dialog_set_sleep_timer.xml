@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/main_margin"
+        android:paddingHorizontal="@dimen/margin_large_size"
         >
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/text_range_value"
@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             style="@style/TextAppearance.Material3.TitleMedium"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="@dimen/main_margin"
+            android:layout_marginTop="@dimen/margin_large_size"
             android:text="@string/disabled"
             android:gravity="center"
             />
@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/text_range_value"
-            android:layout_marginTop="@dimen/main_medium_margin"
+            android:layout_marginTop="@dimen/margin_medium_size"
             android:valueFrom="0"
             android:valueTo="180"
             android:stepSize="10"

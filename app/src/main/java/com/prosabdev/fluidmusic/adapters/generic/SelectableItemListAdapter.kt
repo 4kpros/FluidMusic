@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.utils.ConstantValues
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -102,7 +104,7 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
         }
     }
 
-    protected fun selectableItemOnSelectFromPosition(
+    protected fun selectableItemSelectFromPosition(
         position: Int,
         onSelectSelectableItemListener: OnSelectSelectableItemListener,
         layoutManager: GridLayoutManager? = null
@@ -176,10 +178,10 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
         }
     }
 
-    protected fun selectableItemOnSelectRange(mOnSelectSelectableItemListener: OnSelectSelectableItemListener, layoutManager : GridLayoutManager? = null) {
+    protected fun selectableItemSelectRange(mOnSelectSelectableItemListener: OnSelectSelectableItemListener, layoutManager : GridLayoutManager? = null) {
         val oldSize = mSelectedItems.size()
         MainScope().launch {
-            selectableItemSelectRange(layoutManager)
+            selectRange(layoutManager)
             if(mSelectedItems.size() != oldSize)
             {
                 mOnSelectSelectableItemListener.onTotalSelectedItemChange(mSelectedItems.size)
@@ -187,7 +189,7 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
             }
         }
     }
-    private suspend fun selectableItemSelectRange(layoutManager : GridLayoutManager? = null) {
+    private suspend fun selectRange(layoutManager : GridLayoutManager? = null) {
         withContext(Dispatchers.Default){
             if(mMinSelected >= 0 && mMaxSelected >= 0) {
                 if (mMinSelected in 0 until mMaxSelected) {

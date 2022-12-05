@@ -50,6 +50,12 @@ class SongItem {
     var cdTrackNumber: String? = null
     var numberTracks: String? = null
 
+    var comments: String? = null
+
+    var rating: Int = 0
+    var playCount: Int = 0
+    var lastPlayed: Long = 0
+
     var hashedCovertArtSignature: Int = -1
 
     @Ignore
@@ -64,7 +70,19 @@ class SongItem {
                 oldItem.id == newItem.id
 
             override fun areContentsTheSame(oldItem: SongItem, newItem: SongItem) =
-                oldItem.id == newItem.id && oldItem.uri == newItem.uri
+                oldItem.id == newItem.id &&
+                oldItem.uriTreeId == newItem.uriTreeId &&
+                oldItem.uri == newItem.uri
+        }
+        val diffCallbackViewPager = object : DiffUtil.ItemCallback<SongItem>() {
+            override fun areItemsTheSame(
+                oldItem: SongItem,
+                newItem: SongItem
+            ): Boolean =
+                false
+
+            override fun areContentsTheSame(oldItem: SongItem, newItem: SongItem) =
+                oldItem == newItem
         }
     }
 }

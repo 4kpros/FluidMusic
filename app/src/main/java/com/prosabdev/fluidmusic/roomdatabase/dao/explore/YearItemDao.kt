@@ -13,16 +13,16 @@ interface YearItemDao {
 
     @Query(
         "SELECT * FROM YearItem " +
-            "ORDER BY " +
+                "ORDER BY " +
                 "CASE :order_by WHEN 'name' THEN COALESCE(YearItem.name, 'Unknown field') END DESC, YearItem.lastAddedDateToLibrary DESC," +
                 "CASE :order_by WHEN 'lastUpdateDate' THEN YearItem.lastUpdateDate END DESC, COALESCE(YearItem.name, 'Unknown field') DESC, YearItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN YearItem.lastAddedDateToLibrary END DESC, COALESCE(YearItem.name, 'Unknown field') DESC," +
+                "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN YearItem.lastAddedDateToLibrary END DESC, COALESCE(YearItem.name, 'Unknown field') DESC, COALESCE(YearItem.name, 'Unknown field') DESC," +
+                "CASE :order_by WHEN 'totalDuration' THEN YearItem.totalDuration END, COALESCE(YearItem.name, 'Unknown field') DESC, YearItem.lastAddedDateToLibrary DESC," +
+                "CASE :order_by WHEN 'numberTracks' THEN YearItem.numberTracks END, COALESCE(YearItem.name, 'Unknown field') DESC, YearItem.lastAddedDateToLibrary DESC," +
                 "CASE :order_by WHEN 'numberArtists' THEN YearItem.numberArtists END , COALESCE(YearItem.name, 'Unknown field') DESC, YearItem.lastAddedDateToLibrary DESC," +
                 "CASE :order_by WHEN 'numberAlbums' THEN YearItem.numberAlbums END, COALESCE(YearItem.name, 'Unknown field') DESC, YearItem.lastAddedDateToLibrary DESC," +
                 "CASE :order_by WHEN 'numberAlbumArtists' THEN YearItem.numberAlbumArtists END, COALESCE(YearItem.name, 'Unknown field') DESC, YearItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'numberComposers' THEN YearItem.numberComposers END, COALESCE(YearItem.name, 'Unknown field') DESC, YearItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'numberTracks' THEN YearItem.numberTracks END, COALESCE(YearItem.name, 'Unknown field') DESC, YearItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'totalDuration' THEN YearItem.totalDuration END, COALESCE(YearItem.name, 'Unknown field') DESC, YearItem.lastAddedDateToLibrary DESC"
+                "CASE :order_by WHEN 'numberComposers' THEN YearItem.numberComposers END, COALESCE(YearItem.name, 'Unknown field') DESC, YearItem.lastAddedDateToLibrary DESC"
     )
     fun getAll(order_by: String): LiveData<List<YearItem>>?
 }

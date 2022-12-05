@@ -35,15 +35,15 @@
         <item name="cornerSize">50%</item>
     </style>
     <style name="ShapeFullRounded">
-        <item name="cornerSize">@dimen/medium_corner_radius</item>
+        <item name="cornerSize">@dimen/corner_radius_medium</item>
     </style>
     <style name="ShapeTopRounded">
-        <item name="cornerSizeTopLeft">@dimen/medium_corner_radius</item>
-        <item name="cornerSizeTopRight">@dimen/medium_corner_radius</item>
+        <item name="cornerSizeTopLeft">@dimen/corner_radius_medium</item>
+        <item name="cornerSizeTopRight">@dimen/corner_radius_medium</item>
     </style>
     <style name="ShapeBottomRounded">
-        <item name="cornerSizeBottomLeft">@dimen/medium_corner_radius</item>
-        <item name="cornerSizeBottomRight">@dimen/medium_corner_radius</item>
+        <item name="cornerSizeBottomLeft">@dimen/corner_radius_medium</item>
+        <item name="cornerSizeBottomRight">@dimen/corner_radius_medium</item>
     </style>
 
 
@@ -104,12 +104,11 @@
         <item name="colorOnSurfaceInverse">#F4F4F4</item>
         <item name="colorPrimaryInverse">#CFCFCF</item>
 
+
         <item name="colorAccent">@color/black</item>
         <item name="colorControlActivated">@color/black</item>
         <item name="colorControlNormal">@color/black</item>
         <item name="colorControlHighlight">@color/black</item>
-
-        <item name="android:buttonTint">@color/black</item>
 
         <item name="android:textColor">@color/black</item>
         <item name="android:textColorPrimary">@color/black</item>

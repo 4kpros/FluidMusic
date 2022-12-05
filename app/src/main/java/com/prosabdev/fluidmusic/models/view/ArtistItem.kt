@@ -5,6 +5,7 @@ import androidx.room.DatabaseView
 
 @DatabaseView(
     "SELECT songItem.artist as name, " +
+            "MAX(songItem.year) as year, " +
             "MAX(songItem.lastUpdateDate) as lastUpdateDate, " +
             "MAX(songItem.lastAddedDateToLibrary) as lastAddedDateToLibrary, " +
             "COUNT(DISTINCT songItem.artist) as numberArtists, " +
@@ -20,9 +21,9 @@ import androidx.room.DatabaseView
 )
 class ArtistItem {
     var name: String? = null
+    var year: String? = null
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
-    var numberArtists: Int = 0
     var numberAlbums: Int = 0
     var numberAlbumArtists: Int = 0
     var numberComposers: Int = 0
@@ -32,18 +33,17 @@ class ArtistItem {
     var uriImage: String? = null
 
     companion object {
-        val diffCallback = object : DiffUtil.ItemCallback<FolderItem>() {
+        val diffCallback = object : DiffUtil.ItemCallback<ArtistItem>() {
             override fun areItemsTheSame(
-                oldItem: FolderItem,
-                newItem: FolderItem
+                oldItem: ArtistItem,
+                newItem: ArtistItem
             ): Boolean =
                 oldItem.name == newItem.name
 
-            override fun areContentsTheSame(oldItem: FolderItem, newItem: FolderItem) =
+            override fun areContentsTheSame(oldItem: ArtistItem, newItem: ArtistItem) =
                 oldItem.name == newItem.name &&
-                        oldItem.parentFolder == newItem.parentFolder &&
+                        oldItem.year == newItem.year &&
                         oldItem.lastAddedDateToLibrary == newItem.lastAddedDateToLibrary &&
-                        oldItem.numberArtists == newItem.numberArtists &&
                         oldItem.numberAlbums == newItem.numberAlbums &&
                         oldItem.numberAlbumArtists == newItem.numberAlbumArtists &&
                         oldItem.numberComposers == newItem.numberComposers &&

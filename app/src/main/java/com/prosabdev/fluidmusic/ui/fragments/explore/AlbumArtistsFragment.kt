@@ -20,6 +20,8 @@ import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.explore.AlbumArtistItemListAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentAlbumArtistsBinding
+import com.prosabdev.fluidmusic.sharedprefs.SharedPreferenceManagerUtils
+import com.prosabdev.fluidmusic.sharedprefs.SortOrganizePrefsLoaderAndSetupViewModels
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
@@ -68,8 +70,21 @@ class AlbumArtistsFragment : Fragment() {
 
         MainScope().launch {
             setupRecyclerViewAdapter()
-            observeLiveData()
+            loadPrefsAndInitViewModel()
             checkInteractions()
+            observeLiveData()
+        }
+    }
+
+    private suspend fun loadPrefsAndInitViewModel() {
+        context?.let { ctx ->
+            withContext(Dispatchers.Default) {
+                SortOrganizePrefsLoaderAndSetupViewModels.loadSortOrganizeItemsSettings(
+                    ctx,
+                    mAlbumArtistsFragmentViewModel,
+                    SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SHARED_PREFERENCES_SORT_ORGANIZE_ALBUM_ARTISTS
+                )
+            }
         }
     }
 
@@ -128,7 +143,7 @@ class AlbumArtistsFragment : Fragment() {
             addDataToAdapter(it)
         }
     }
-    private fun addDataToAdapter(albumList: ArrayList<Any>?) {
+    private fun addDataToAdapter(albumList: List<Any>?) {
         mAlbumArtistItemListAdapter?.submitList(albumList)
         if(mMainFragmentViewModel.getCurrentSelectablePage().value == ConstantValues.EXPLORE_ALBUMS){
             mMainFragmentViewModel.setTotalCount(albumList?.size ?: 0)

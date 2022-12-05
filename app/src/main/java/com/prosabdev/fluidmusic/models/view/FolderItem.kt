@@ -7,6 +7,7 @@ import androidx.room.DatabaseView
     "SELECT songItem.folder as name, " +
             "folderUriTree.deviceName as deviceName, " +
             "MAX(songItem.folderParent) as parentFolder, " +
+            "MAX(songItem.year) as year, " +
             "MAX(songItem.lastUpdateDate) as lastUpdateDate, " +
             "MAX(songItem.lastAddedDateToLibrary) as lastAddedDateToLibrary, " +
             "COUNT(DISTINCT songItem.artist) as numberArtists, " +
@@ -25,6 +26,7 @@ class FolderItem {
     var name: String? = null
     var deviceName: String? = null
     var parentFolder: String? = null
+    var year: String? = null
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
     var numberArtists: Int = 0

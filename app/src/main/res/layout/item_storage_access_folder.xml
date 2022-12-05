@@ -14,12 +14,12 @@
         style="@style/Widget.Material3.CardView.Filled"
         android:layout_marginTop="2dp"
         android:backgroundTint="@color/transparent"
-        app:cardCornerRadius="@dimen/medium_corner_radius"
+        app:cardCornerRadius="@dimen/corner_radius_medium"
         >
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="@dimen/main_margin"
+            android:paddingHorizontal="@dimen/margin_large_size"
             >
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/image_folder"
@@ -39,8 +39,8 @@
                 app:layout_constraintStart_toEndOf="@+id/image_folder"
                 app:layout_constraintEnd_toStartOf="@+id/button_remove"
                 android:orientation="vertical"
-                android:layout_marginHorizontal="@dimen/main_small_margin"
-                android:layout_marginVertical="@dimen/main_medium_margin"
+                android:layout_marginHorizontal="@dimen/margin_small_size"
+                android:layout_marginVertical="@dimen/margin_medium_size"
                 >
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/text_folder"

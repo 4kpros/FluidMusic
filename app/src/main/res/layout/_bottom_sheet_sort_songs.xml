@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/constraint_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linear_title"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            app:layout_constraintTop_toTopOf="parent"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="@dimen/margin_large_size"
+            android:gravity="center_vertical">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/sort"
+                app:srcCompat="@drawable/sort" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text_sort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:text="@string/sort"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_marginStart="@dimen/margin_small_size" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text_sort_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:text=" for ALL SONGS"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_weight="1"
+                android:layout_marginEnd="@dimen/margin_small_size" />
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/checkbox_invert_items"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/invert" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <RadioGroup
+                android:id="@+id/radio_group_sort"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="@dimen/margin_large_size"
+                android:layout_marginBottom="@dimen/margin_large_size">
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/title"
+                    android:text="@string/title" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_file_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/file_name"
+                    android:text="@string/file_name" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_track_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/track_number"
+                    android:text="@string/track_number" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_disc_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/disc_number"
+                    android:text="@string/disc_number" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_artist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/artist"
+                    android:text="@string/artist" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_album"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/album"
+                    android:text="@string/album" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_album_artist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/album_artist"
+                    android:text="@string/album_artist" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_composer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/composer"
+                    android:text="@string/composer" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_year"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/year"
+                    android:text="@string/year" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_duration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/duration"
+                    android:text="@string/duration" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_last_added_date_to_library"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/added_date_to_library"
+                    android:text="@string/added_date_to_library" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_last_update_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/last_modified_date"
+                    android:text="@string/last_modified_date" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_path"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/file_path"
+                    android:text="@string/file_path" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_path_case_sensitive"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/file_path_case_sensitive"
+                    android:text="@string/file_path_case_sensitive" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_genre"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/genre"
+                    android:text="@string/genre" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_size"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/size"
+                    android:text="@string/size" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_type_mime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/mime_type"
+                    android:text="@string/mime_type" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_rating"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/rating"
+                    android:text="@string/rating" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_play_count"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/play_count"
+                    android:text="@string/play_count" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_last_played"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="Last played"
+                    android:text="Last played" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_author"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/author"
+                    android:text="@string/author" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_writer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/writer"
+                    android:text="@string/writer" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_language"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/language"
+                    android:text="@string/language" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_sample_rate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/sample_rate"
+                    android:text="@string/sample_rate" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_bitrate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:tooltipText="@string/bitrate"
+                    android:text="@string/bitrate" />
+            </RadioGroup>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>

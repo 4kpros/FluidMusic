@@ -34,7 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_constraintTop_toTopOf="parent"
-                android:padding="@dimen/main_margin"
+                android:padding="@dimen/margin_large_size"
                 android:outlineProvider="paddedBounds">
 
                 <com.google.android.material.textview.MaterialTextView
@@ -59,7 +59,7 @@
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:gravity="end"
-                    android:layout_marginStart="@dimen/main_medium_margin"
+                    android:layout_marginStart="@dimen/margin_medium_size"
                     android:text="5/192"
                     app:layout_constraintStart_toEndOf="@+id/text_selected_title"
                     app:layout_constraintEnd_toEndOf="parent"

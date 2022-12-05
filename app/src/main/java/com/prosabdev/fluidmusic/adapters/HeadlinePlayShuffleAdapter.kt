@@ -34,12 +34,14 @@ class HeadlinePlayShuffleAdapter(
             LayoutInflater.from(parent.context),
             R.layout.item_headline_play_shuffle, parent, false
         )
-        return HeadlinePlayShuffleHolder(tempItemHeadlinePlayShuffleBinding)
+        return HeadlinePlayShuffleHolder(
+            tempItemHeadlinePlayShuffleBinding,
+            mListener
+        )
     }
 
     override fun onBindViewHolder(holder: HeadlinePlayShuffleHolder, position: Int) {
 
-        holder.bindListener(mListener)
         holder.updateOnSelectModeEnabledUI(mIsSelectMode)
     }
 
@@ -47,29 +49,73 @@ class HeadlinePlayShuffleAdapter(
         return mHeadLines.size
     }
 
-    class HeadlinePlayShuffleHolder(private val mItemHeadlinePlayShuffleBinding: ItemHeadlinePlayShuffleBinding) : RecyclerView.ViewHolder(mItemHeadlinePlayShuffleBinding.root) {
-        fun bindListener(listener: OnItemClickListener) {
+    class HeadlinePlayShuffleHolder(
+        private val mItemHeadlinePlayShuffleBinding: ItemHeadlinePlayShuffleBinding,
+        private val mListener: OnItemClickListener
+    ) : RecyclerView.ViewHolder(mItemHeadlinePlayShuffleBinding.root) {
+        init {
             mItemHeadlinePlayShuffleBinding.buttonPlay.setOnClickListener {
-                listener.onPlayButtonClicked()
+                mListener.onPlayButtonClicked()
             }
             mItemHeadlinePlayShuffleBinding.buttonShuffle.setOnClickListener {
-                listener.onShuffleButtonClicked()
+                mListener.onShuffleButtonClicked()
             }
             mItemHeadlinePlayShuffleBinding.buttonSort.setOnClickListener {
-                listener.onSortButtonClicked()
+                mListener.onSortButtonClicked()
             }
             mItemHeadlinePlayShuffleBinding.buttonOrganize.setOnClickListener {
-                listener.onOrganizeButtonClicked()
+                mListener.onOrganizeButtonClicked()
             }
         }
 
         fun updateOnSelectModeEnabledUI(isSelectMode: Boolean) {
             if(isSelectMode){
-                if(mItemHeadlinePlayShuffleBinding.hoverView.visibility != VISIBLE)
-                    ViewAnimatorsUtils.crossFadeUp(mItemHeadlinePlayShuffleBinding.hoverView, true, 200, 0.8f)
-            }else{
-                if (mItemHeadlinePlayShuffleBinding.hoverView.visibility != GONE)
-                    ViewAnimatorsUtils.crossFadeDown(mItemHeadlinePlayShuffleBinding.hoverView, true, 200)
+                if(mItemHeadlinePlayShuffleBinding.buttonPlay.isClickable) {
+                    ViewAnimatorsUtils.crossFadeDownClickable(
+                        mItemHeadlinePlayShuffleBinding.buttonPlay,
+                        true,
+                        250
+                    )
+                    ViewAnimatorsUtils.crossFadeDownClickable(
+                        mItemHeadlinePlayShuffleBinding.buttonShuffle,
+                        true,
+                        250
+                    )
+                    ViewAnimatorsUtils.crossFadeDownClickable(
+                        mItemHeadlinePlayShuffleBinding.buttonSort,
+                        true,
+                        250
+                    )
+                    ViewAnimatorsUtils.crossFadeDownClickable(
+                        mItemHeadlinePlayShuffleBinding.buttonOrganize,
+                        true,
+                        250
+                    )
+                }
+            }
+            else{
+                if(!mItemHeadlinePlayShuffleBinding.buttonPlay.isClickable) {
+                    ViewAnimatorsUtils.crossFadeUpClickable(
+                        mItemHeadlinePlayShuffleBinding.buttonPlay,
+                        true,
+                        250
+                    )
+                    ViewAnimatorsUtils.crossFadeUpClickable(
+                        mItemHeadlinePlayShuffleBinding.buttonShuffle,
+                        true,
+                        250
+                    )
+                    ViewAnimatorsUtils.crossFadeUpClickable(
+                        mItemHeadlinePlayShuffleBinding.buttonSort,
+                        true,
+                        250
+                    )
+                    ViewAnimatorsUtils.crossFadeUpClickable(
+                        mItemHeadlinePlayShuffleBinding.buttonOrganize,
+                        true,
+                        250
+                    )
+                }
             }
         }
     }

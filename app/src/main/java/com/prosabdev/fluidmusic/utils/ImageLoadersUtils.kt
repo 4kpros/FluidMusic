@@ -29,11 +29,20 @@ abstract class ImageLoadersUtils {
         var uri: Uri? = null
         var hashedCovertArtSignature: Int = -1
         var isBlurred: Boolean = false
-        var widthHeight: Int = 500
+        var widthHeight: Int = 50
         var animate: Boolean = true
-        var animationDuration: Int = 200
+        var animationDuration: Int = 300
 
         companion object {
+
+            @JvmStatic
+            fun newLargeOriginalCardInstance() =
+                ImageRequestItem().apply {
+                    widthHeight = 1200
+                    isBlurred = false
+                    animate = true
+                    animationDuration = 200
+                }
 
             @JvmStatic
             fun newOriginalCardInstance() =
@@ -56,24 +65,37 @@ abstract class ImageLoadersUtils {
     }
 
     companion object{
-        private val mCachedHashmapImage: ConcurrentSkipListMap<Int, Bitmap> = ConcurrentSkipListMap()
-        private val mCachedHashmapBlurImage: ConcurrentSkipListMap<Int, Bitmap> = ConcurrentSkipListMap()
+        private val mCachedHashmapImage: ConcurrentSkipListMap<Int, Bitmap> = ConcurrentSkipListMap() //Images below 500px
+        private val mCachedHashmapLargeImage: ConcurrentSkipListMap<Int, Bitmap> = ConcurrentSkipListMap() //Images from 500px and more
+        private val mCachedHashmapBlurImage: ConcurrentSkipListMap<Int, Bitmap> = ConcurrentSkipListMap() //Images blurred(probably under 150px)
 
         private val mImageLoaderRequests: ArrayBlockingQueue<ImageRequestItem> = ArrayBlockingQueue(100)
 
-        private var mImageLoaderJobs : ArrayBlockingQueue<Job?> = ArrayBlockingQueue(10)
+        private var mImageLoaderJobs : ArrayBlockingQueue<Job?> = ArrayBlockingQueue(5)
 
         private var mCanLoadImages : Boolean = false
 
-        fun initializeJobWorker(){
-            mCanLoadImages = true
+        fun initializeJobWorker(ctx : Context){
+            stopAllJobsWorkers(ctx, true)
         }
-        fun stopAllJobsWorkers(){
-            mCanLoadImages = false
-            for (i in mImageLoaderJobs.indices){
-                mImageLoaderJobs.elementAt(i)?.cancel()
+        fun clearImageView(ctx : Context, imageView: ImageView?){
+            if(imageView == null) return
+            imageView.setImageBitmap(null)
+            Glide.with(ctx).clear(imageView)
+        }
+        fun stopAllJobsWorkers(ctx : Context, canLoadAtEnd: Boolean = false){
+            CoroutineScope(Dispatchers.IO).launch{
+                mCanLoadImages = false
+                mImageLoaderRequests.clear()
+                for (i in mImageLoaderRequests.indices){
+                    clearImageView(ctx, mImageLoaderRequests.poll()?.imageView)
+                }
+                mImageLoaderRequests.clear()
+                for (i in mImageLoaderJobs.indices){
+                    mImageLoaderJobs.poll()?.cancel()
+                }
+                mCanLoadImages = canLoadAtEnd
             }
-            mImageLoaderRequests.clear()
         }
 
         private suspend fun loadImageFromCachedHashMap(ctx: Context, imageRequest: ImageRequestItem?): Boolean {
@@ -90,13 +112,24 @@ abstract class ImageLoadersUtils {
                         return@withContext true
                     }
                 }else{
-                    if(mCachedHashmapImage.contains(imageRequest.hashedCovertArtSignature)){
-                        if(imageRequest.isBlurred){
-                            applyBlurry(ctx, imageRequest, mCachedHashmapImage[imageRequest.hashedCovertArtSignature])
-                        }else{
-                            applyBitmapImage(ctx, imageRequest, mCachedHashmapImage[imageRequest.hashedCovertArtSignature])
+                    if(imageRequest.widthHeight >= 500){
+                        if(mCachedHashmapLargeImage.contains(imageRequest.hashedCovertArtSignature)){
+                            if(imageRequest.isBlurred){
+                                applyBlurry(ctx, imageRequest, mCachedHashmapLargeImage[imageRequest.hashedCovertArtSignature])
+                            }else{
+                                applyBitmapImage(ctx, imageRequest, mCachedHashmapLargeImage[imageRequest.hashedCovertArtSignature])
+                            }
+                            return@withContext true
                         }
-                        return@withContext true
+                    }else{
+                        if(mCachedHashmapImage.contains(imageRequest.hashedCovertArtSignature)){
+                            if(imageRequest.isBlurred){
+                                applyBlurry(ctx, imageRequest, mCachedHashmapImage[imageRequest.hashedCovertArtSignature])
+                            }else{
+                                applyBitmapImage(ctx, imageRequest, mCachedHashmapImage[imageRequest.hashedCovertArtSignature])
+                            }
+                            return@withContext true
+                        }
                     }
                 }
 
@@ -114,17 +147,23 @@ abstract class ImageLoadersUtils {
                 return
             }
             if(imageRequest.isBlurred){
-                mCachedHashmapBlurImage
                 mCachedHashmapBlurImage[imageRequest.hashedCovertArtSignature] = bitmap
                 if(mCachedHashmapBlurImage.size >= 10)
                     mCachedHashmapBlurImage.pollFirstEntry()
                 Log.i(ConstantValues.TAG, "HASHED BINARY AND SAVED ON BLUR -----> ${mCachedHashmapBlurImage.size}")
             }else{
 
-                mCachedHashmapImage[imageRequest.hashedCovertArtSignature] = bitmap
-                if(mCachedHashmapImage.size >= 150)
-                    mCachedHashmapImage.pollFirstEntry()
-                Log.i(ConstantValues.TAG, "HASHED BINARY AND SAVED ON ORIGINAL -----> ${mCachedHashmapImage.size}")
+                if(imageRequest.widthHeight >= 500){
+                    mCachedHashmapLargeImage[imageRequest.hashedCovertArtSignature] = bitmap
+                    if(mCachedHashmapLargeImage.size >= 5)
+                        mCachedHashmapLargeImage.pollFirstEntry()
+                    Log.i(ConstantValues.TAG, "HASHED BINARY AND SAVED ON LARGE ORIGINAL -----> ${mCachedHashmapLargeImage.size}")
+                }else{
+                    mCachedHashmapImage[imageRequest.hashedCovertArtSignature] = bitmap
+                    if(mCachedHashmapImage.size >= 100)
+                        mCachedHashmapImage.pollFirstEntry()
+                    Log.i(ConstantValues.TAG, "HASHED BINARY AND SAVED ON ORIGINAL -----> ${mCachedHashmapImage.size}")
+                }
             }
         }
 
@@ -211,147 +250,40 @@ abstract class ImageLoadersUtils {
             if(imageRequest == null) return
             if(imageRequest.imageView == null) return
             if(imageRequest.hashedCovertArtSignature == -1) return
-            if(mImageLoaderJobs.remainingCapacity() == 0)
-                mImageLoaderJobs.poll()
-            mImageLoaderRequests.add(imageRequest)
-            mImageLoaderJobs.add(
-                CoroutineScope(Dispatchers.Default).launch {
-                    var tempCounter: Int = 0
-                    while (mImageLoaderRequests.size > 0 && mCanLoadImages){
-                        tempCounter++
-                        val tempImageRequest : ImageRequestItem? = mImageLoaderRequests.poll()
-                        extractBitmapImageAndSaveOnCachingHashmap(ctx, tempImageRequest)
-                    }
-                    for (i in mImageLoaderJobs.indices){
-                        if(mImageLoaderJobs.elementAtOrNull(i) != null && mImageLoaderJobs.elementAtOrNull(i)?.isActive == false)
-                            mImageLoaderJobs.remove(mImageLoaderJobs.elementAtOrNull(i))
-                    }
+            if(mImageLoaderRequests.remainingCapacity() <= 5)
+            {
+                try{
+                    mImageLoaderRequests.remove()
+                }catch (error: Throwable){
+                    error.printStackTrace()
                 }
-            )
-        }
-
-        fun startLoadCachedImageFromSignature(ctx: Context, imageRequest: ImageRequestItem?) {
-            if(imageRequest == null) return
-            if(imageRequest.imageView == null) return
-            if(imageRequest.hashedCovertArtSignature == -1) return
-            MainScope().launch {
-                loadImageFromCachedHashMap(ctx, imageRequest)
             }
-        }
-
-        suspend fun loadCovertArtFromSongUri(
-            context : Context,
-            imageView : ImageView?,
-            uri: Uri?,
-            hashedCovertArtSignature: Int,
-            widthHeight: Int = 500,
-            animate: Boolean = true
-        ) = withContext(Dispatchers.IO) {
-            if(imageView == null)
-                return@withContext
-
-            if (uri == null || uri.toString().isEmpty() || hashedCovertArtSignature == -1) {
-                loadWithResourceID(context, imageView, 0)
-                return@withContext
+            try{
+                mImageLoaderRequests.add(imageRequest)
+            }catch (error: Throwable){
+                error.printStackTrace()
             }
-
-            val byteArray: ByteArray? = AudioInfoExtractorUtils.extractImageBinaryDataFromAudioUri(context, uri)
-
-            if (byteArray == null) {
-                loadWithResourceID(context, imageView, 0)
-                return@withContext
-            }
-
-            MainScope().launch {
-                Glide.with(context.applicationContext)
-                    .load(byteArray)
-                    .centerCrop()
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .transition(DrawableTransitionOptions.withCrossFade(
-                        if(animate) 250 else 0
-                    ))
-                    .placeholder(
-                        if(animate)
-                            R.drawable.ic_fluid_music_icon_with_padding
-                        else
-                            -1
+            if(mImageLoaderJobs.remainingCapacity() > 0){
+                try {
+                    mImageLoaderJobs.add(
+                        CoroutineScope(Dispatchers.Default).launch {
+                            var tempCounter: Int = 0
+                            while (mImageLoaderRequests.size > 0 && mCanLoadImages){
+                                tempCounter++
+                                val tempImageRequest : ImageRequestItem? = mImageLoaderRequests.poll()
+                                extractBitmapImageAndSaveOnCachingHashmap(ctx, tempImageRequest)
+                            }
+                            launch {
+                                for (i in mImageLoaderJobs.indices){
+                                    if(mImageLoaderJobs.elementAtOrNull(i) != null && mImageLoaderJobs.elementAtOrNull(i)?.isActive == false)
+                                        mImageLoaderJobs.remove(mImageLoaderJobs.elementAtOrNull(i))
+                                }
+                            }
+                        }
                     )
-                    .apply(RequestOptions().override(widthHeight, widthHeight))
-                    .into(imageView)
-            }
-        }
-
-        suspend fun loadBlurredCovertArtFromSongUri(
-            context : Context,
-            imageView : ImageView?,
-            uri: Uri?,
-            hashedCovertArtSignature: Int,
-            widthHeight: Int = 50
-        ) = withContext(Dispatchers.IO) {
-            if (imageView == null)
-                return@withContext
-
-            if (uri == null || uri.toString().isEmpty() || hashedCovertArtSignature == -1){
-                MainScope().launch {
-                    imageView.setImageBitmap(null)
-                    Glide.with(context.applicationContext).clear(imageView)
+                }catch (error: Throwable){
+                    error.printStackTrace()
                 }
-                return@withContext
-            }
-
-            val byteArray: ByteArray? = AudioInfoExtractorUtils.extractImageBinaryDataFromAudioUri(context, uri)
-
-            if (byteArray == null) {
-                MainScope().launch {
-                    imageView.setImageBitmap(null)
-                    Glide.with(context.applicationContext).clear(imageView)
-                }
-                return@withContext
-            }
-            val customTarget: CustomTarget<Bitmap?> = object : CustomTarget<Bitmap?>() {
-                override fun onResourceReady(
-                    resource: Bitmap,
-                    transition: Transition<in Bitmap?>?
-                ) {
-                    MainScope().launch {
-                        Blurry.with(context.applicationContext)
-                            .radius(15)
-                            .sampling(2)
-                            .from(resource)
-                            .into(imageView)
-                    }
-                }
-
-                override fun onLoadCleared(placeholder: Drawable?) {
-                }
-            }
-            val factory =
-                DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-            MainScope().launch {
-                Glide.with(context.applicationContext)
-                    .asBitmap()
-                    .load(byteArray)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .override(widthHeight, widthHeight)
-                    .transition(withCrossFade(factory))
-                    .into(customTarget)
-            }
-
-        }
-
-        fun loadWithDefaultCoverArt(
-            context : Context,
-            imageView : ImageView?
-        ){
-            if(imageView == null)
-                return
-
-            MainScope().launch {
-                Glide.with(context.applicationContext)
-                    .load(R.drawable.ic_fluid_music_icon_with_padding)
-                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                    .placeholder(R.drawable.ic_fluid_music_icon_with_padding)
-                    .into(imageView)
             }
         }
 

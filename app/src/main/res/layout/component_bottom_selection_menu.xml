@@ -33,8 +33,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@+id/top_line"
-                android:paddingHorizontal="@dimen/main_margin"
-                android:paddingVertical="@dimen/main_medium_margin"
+                android:paddingHorizontal="@dimen/margin_large_size"
+                android:paddingVertical="@dimen/margin_medium_size"
                 >
 
                 <com.google.android.material.button.MaterialButton
