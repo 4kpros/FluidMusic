@@ -114,7 +114,7 @@ import kotlinx.coroutines.launch
             updateTotalSelectedTracksUI(it)
         }
         mMainFragmentViewModel.getScrollingState().observe(viewLifecycleOwner){
-            tryToUpdateScrollStateUI(it)
+            tryToUpdateMiniPlayerScrollStateUI(it)
         }
         mMainFragmentViewModel.getIsFastScrolling().observe(viewLifecycleOwner){
             tryToUpdateFastScrollStateUI(it)
@@ -137,7 +137,7 @@ import kotlinx.coroutines.launch
             updateMiniPlayerScrollingStateUI(1)
         }
     }
-    private fun tryToUpdateScrollStateUI(scrollState: Int, animate: Boolean = true) {
+    private fun tryToUpdateMiniPlayerScrollStateUI(scrollState: Int, animate: Boolean = true) {
         if(mMainFragmentViewModel.getIsFastScrolling().value == true) return
         updateMiniPlayerScrollingStateUI(scrollState, animate)
     }

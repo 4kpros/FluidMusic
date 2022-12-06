@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -108,7 +109,17 @@ class MusicLibraryFragment : Fragment() {
             updateSelectModeUI(it)
         }
         mMainFragmentViewModel.getTotalSelected().observe(viewLifecycleOwner
-        ) { totalSelected -> updateTotalSelectedItemsUI(totalSelected ?: 0) }
+        ) { totalSelected ->
+            updateTotalSelectedItemsUI(totalSelected ?: 0)
+        }
+        mMainFragmentViewModel.getIsFastScrolling().observe(viewLifecycleOwner){
+            tryToUpdateFastScrollStateUI(it)
+        }
+    }
+    private fun tryToUpdateFastScrollStateUI(isFastScrolling: Boolean = true) {
+        if(isFastScrolling){
+            mFragmentMusicLibraryBinding?.appBarLayout?.setExpanded(false)
+        }
     }
     private  fun updateTotalSelectedItemsUI(totalSelected : Int){
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->

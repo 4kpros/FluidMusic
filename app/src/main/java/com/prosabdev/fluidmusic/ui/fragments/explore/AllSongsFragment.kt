@@ -530,13 +530,6 @@ class AllSongsFragment : Fragment() {
     private fun initViews() {
         mFragmentAllSongsBinding?.recyclerView?.setHasFixedSize(true)
 //        mFragmentAllSongsBinding?.recyclerView?.setItemViewCacheSize(100)
-
-        mFragmentAllSongsBinding?.let { fragmentAllSongsBinding ->
-            val layoutParamsFastScroller: ConstraintLayout.LayoutParams = fragmentAllSongsBinding.fastScroller.layoutParams as ConstraintLayout.LayoutParams
-
-            context?.let { ctx ->
-            }
-        }
     }
 
     companion object {
