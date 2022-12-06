@@ -10,7 +10,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
-    private val mMutableCurrentSelectablePage = MutableLiveData<String>(ConstantValues.EXPLORE_ALL_SONGS)
+    private val mMutableCurrentSelectablePage = MutableLiveData<String>(null)
     private val mMutableSelectMode = MutableLiveData<Boolean>(false)
     private val mMutableToggleOnRange = MutableLiveData<Int>(0)
     private val mMutableTotalSelected = MutableLiveData<Int>(0)
@@ -23,8 +23,6 @@ class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mMutableScrollingState = MutableLiveData<Int>(-2)
     private val mMutableShowSlidingUpPanelCounter = MutableLiveData<Int>(0)
     private val mMutableHideSlidingUpPanelCounter = MutableLiveData<Int>(0)
-
-
 
     private val mCurrentSelectablePage: LiveData<String> get() = mMutableCurrentSelectablePage
     private val mSelectMode: LiveData<Boolean> get() = mMutableSelectMode
@@ -95,13 +93,13 @@ class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
     fun getScrollingState(): LiveData<Int> {
         return mScrollingState
     }
+    fun getSelectMode(): LiveData<Boolean> {
+        return mSelectMode
+    }
     fun setSelectMode(value : Boolean) {
         MainScope().launch {
             mMutableSelectMode.value = value
         }
-    }
-    fun getSelectMode(): LiveData<Boolean> {
-        return mSelectMode
     }
     fun setToggleRange() {
         MainScope().launch {

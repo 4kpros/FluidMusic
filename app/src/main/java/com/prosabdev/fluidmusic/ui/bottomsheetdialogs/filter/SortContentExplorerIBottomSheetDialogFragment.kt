@@ -11,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetSortContentExplorerBinding
+import com.prosabdev.fluidmusic.ui.fragments.explore.*
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 
@@ -124,7 +125,7 @@ class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment(
         //Update generic first radio button text title
         mBottomSheetSortContentExplorerBinding?.let { viewBiding ->
             when (mFromSource) {
-                ConstantValues.EXPLORE_ALBUMS -> {
+                AllSongsFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         viewBiding.radioName.tooltipText = context?.getString(R.string.album_name)
                     }
@@ -134,7 +135,7 @@ class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment(
                     viewBiding.radioAlbum.visibility = GONE
                     viewBiding.radioAlbumArtist.visibility = GONE
                 }
-                ConstantValues.EXPLORE_ALBUM_ARTISTS -> {
+                AlbumArtistsFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         viewBiding.radioName.tooltipText = context?.getString(R.string.album_artist)
                     }
@@ -144,7 +145,7 @@ class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment(
                     viewBiding.radioAlbum.visibility = GONE
                     viewBiding.radioAlbumArtist.visibility = GONE
                 }
-                ConstantValues.EXPLORE_ARTISTS -> {
+                ArtistsFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         viewBiding.radioName.tooltipText = context?.getString(R.string.artist_name)
                     }
@@ -152,7 +153,7 @@ class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment(
                     //Now hide non necessary radio buttons
                     viewBiding.radioArtist.visibility = GONE
                 }
-                ConstantValues.EXPLORE_COMPOSERS -> {
+                ComposersFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         viewBiding.radioName.tooltipText = context?.getString(R.string.composer_name)
                     }
@@ -160,19 +161,19 @@ class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment(
                     //Now hide non necessary radio buttons
                     viewBiding.radioNumberComposers.visibility = GONE
                 }
-                ConstantValues.EXPLORE_FOLDERS -> {
+                FoldersFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         viewBiding.radioName.tooltipText = context?.getString(R.string.folder_name)
                     }
                     viewBiding.radioName.text = context?.getString(R.string.folder_name)
                 }
-                ConstantValues.EXPLORE_GENRES -> {
+                GenresFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         viewBiding.radioName.tooltipText = context?.getString(R.string.genre)
                     }
                     viewBiding.radioName.text = context?.getString(R.string.genre)
                 }
-                ConstantValues.EXPLORE_YEARS -> {
+                YearsFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         viewBiding.radioName.tooltipText = context?.getString(R.string.year)
                     }

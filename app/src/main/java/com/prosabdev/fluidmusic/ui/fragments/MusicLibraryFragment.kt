@@ -1,7 +1,6 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -19,8 +18,11 @@ import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
-import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.ui.fragments.explore.AlbumsFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.AllSongsFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.ArtistsFragment
 import com.prosabdev.fluidmusic.utils.AnimatorsUtils
+import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -34,10 +36,8 @@ class MusicLibraryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         enterTransition = MaterialFadeThrough()
         exitTransition = MaterialFadeThrough()
-
         arguments?.let {
         }
     }
@@ -157,24 +157,24 @@ class MusicLibraryFragment : Fragment() {
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
             if (isSelectMode) {
                 fragmentMusicLibraryBinding.viewPager.isUserInputEnabled = false
-                if (fragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != VISIBLE)
+                if (fragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != VISIBLE){
                     AnimatorsUtils.crossTranslateInFromHorizontal(
                         fragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View,
                         1,
                         animate,
                         300
                     )
-//                fragmentMusicLibraryBinding.tabLayout.visibility = GONE
+                }
             } else {
                 fragmentMusicLibraryBinding.viewPager.isUserInputEnabled = true
-                if (fragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != GONE)
+                if (fragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != GONE){
                     AnimatorsUtils.crossTranslateOutFromHorizontal(
                         fragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View,
                         1,
                         animate,
                         300
                     )
-//                fragmentMusicLibraryBinding.tabLayout.visibility = VISIBLE
+                }
             }
         }
     }
@@ -188,11 +188,11 @@ class MusicLibraryFragment : Fragment() {
                 ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
-                    applyAppBarTitle(position)
+                    updateViewModelLibraryPage(position)
                     mMainFragmentViewModel.setSelectMode(false)
                     mMainFragmentViewModel.setTotalSelected(0)
-                    updateViewModelLibraryPage(position)
                     updateSelectModeUI(false)
+                    applyAppBarTitle(position)
                 }
             })
             fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter.setOnClickListener {
@@ -220,8 +220,19 @@ class MusicLibraryFragment : Fragment() {
     }
 
     private fun updateViewModelLibraryPage(position: Int) {
-        if (position == 0){
-            mMainFragmentViewModel.setCurrentSelectablePage(ConstantValues.EXPLORE_ALL_SONGS)
+        mMainFragmentViewModel.setTotalCount(0)
+        mMainFragmentViewModel.setTotalSelected(0)
+        mMainFragmentViewModel.setSelectMode(false)
+        when (position) {
+            0 -> {
+                mMainFragmentViewModel.setCurrentSelectablePage(AllSongsFragment.TAG)
+            }
+            1 -> {
+                mMainFragmentViewModel.setCurrentSelectablePage(AlbumsFragment.TAG)
+            }
+            3 -> {
+                mMainFragmentViewModel.setCurrentSelectablePage(ArtistsFragment.TAG)
+            }
         }
     }
 

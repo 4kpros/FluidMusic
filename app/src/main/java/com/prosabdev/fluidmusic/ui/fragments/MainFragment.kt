@@ -135,18 +135,20 @@ import kotlinx.coroutines.launch
         if(isFastScrolling){
             Log.i(ConstantValues.TAG, "FASSSSSSSSSSSSSST SCROLLING ---------------------->")
             updateMiniPlayerScrollingStateUI(1)
+        }else{
+            tryToUpdateMiniPlayerScrollStateUI(mMainFragmentViewModel.getScrollingState().value)
         }
     }
-    private fun tryToUpdateMiniPlayerScrollStateUI(scrollState: Int, animate: Boolean = true) {
+    private fun tryToUpdateMiniPlayerScrollStateUI(scrollState: Int?, animate: Boolean = true) {
         if(mMainFragmentViewModel.getIsFastScrolling().value == true) return
         updateMiniPlayerScrollingStateUI(scrollState, animate)
     }
     private var mIsAnimatingScroll1: Boolean = false
     private var mIsAnimatingScroll2: Boolean = false
-    private fun updateMiniPlayerScrollingStateUI(scrollState: Int, animate: Boolean = true) {
+    private fun updateMiniPlayerScrollingStateUI(scrollState: Int?, animate: Boolean = true) {
         mFragmentMainBinding?.let { fragmentMainBinding ->
             MainScope().launch {
-                if (scrollState >= 1) {
+                if (scrollState == null || scrollState >= 1) {
                     if(fragmentMainBinding.constraintMiniPlayerContainer.alpha < 1.0f) return@launch
 
                     if (mIsAnimatingScroll2) {
@@ -190,20 +192,20 @@ import kotlinx.coroutines.launch
         mFragmentMainBinding?.let { fragmentMainBinding ->
             MainScope().launch {
                 if(totalSelected > 0 && totalSelected >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
-                    fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = context?.let {
+                    fragmentMainBinding.includeBottomSelection.buttonSelectAll.icon = context?.let {
                         ContextCompat.getDrawable(
                             it,
                             R.drawable.check_box
                         )
                     }
-                    if(fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange.isClickable)
+                    if(fragmentMainBinding.includeBottomSelection.buttonSelectRange.isClickable)
                         AnimatorsUtils.crossFadeDownClickable(
-                            fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange,
+                            fragmentMainBinding.includeBottomSelection.buttonSelectRange,
                             animate,
                             200
                         )
                 }else{
-                    fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.icon = context?.let {
+                    fragmentMainBinding.includeBottomSelection.buttonSelectAll.icon = context?.let {
                         ContextCompat.getDrawable(
                             it,
                             R.drawable.check_box_outline_blank
@@ -211,18 +213,18 @@ import kotlinx.coroutines.launch
                     }
                     if (totalSelected >= 2)
                         AnimatorsUtils.crossFadeUpClickable(
-                            fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange,
+                            fragmentMainBinding.includeBottomSelection.buttonSelectRange,
                             animate,
                             200
                         )
                     else
                         AnimatorsUtils.crossFadeDownClickable(
-                            fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange,
+                            fragmentMainBinding.includeBottomSelection.buttonSelectRange,
                             animate,
                             200
                         )
                 }
-                fragmentMainBinding.constraintTopSelectionInclude.textSelectedCount.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
+                fragmentMainBinding.includeTopSelection.textSelectedCount.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
             }
         }
     }
@@ -245,6 +247,8 @@ import kotlinx.coroutines.launch
                             300
                         )
                 } else {
+                    //Clear old views
+                    mFragmentMainBinding?.includeBottomSelection?.buttonSelectAll?.isChecked = false
                     if (fragmentMainBinding.constraintBottomSelectionContainer.visibility != GONE)
                         AnimatorsUtils.crossTranslateOutFromVertical(
                             fragmentMainBinding.constraintBottomSelectionContainer as View,
@@ -296,6 +300,7 @@ import kotlinx.coroutines.launch
             MainScope().launch {
                 context?.let {
                     if (isPlaying == true) {
+                        updateMiniPlayerScrollingStateUI(-2)
                         fragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon =
                             AppCompatResources.getDrawable(it, R.drawable.pause)
                     } else {
@@ -376,13 +381,13 @@ import kotlinx.coroutines.launch
             fragmentMainBinding.constraintMiniPlayerInclude.buttonSkipNext.setOnClickListener {
                 onClickButtonSkipNextSong()
             }
-            fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectAll.setOnClickListener {
+            fragmentMainBinding.includeBottomSelection.buttonSelectAll.setOnClickListener {
                 onToggleButtonSelectAll()
             }
-            fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange.setOnClickListener {
+            fragmentMainBinding.includeBottomSelection.buttonSelectRange.setOnClickListener {
                 onToggleButtonSelectRange()
             }
-            fragmentMainBinding.constraintBottomSelectionInclude.buttonClose.setOnClickListener {
+            fragmentMainBinding.includeBottomSelection.buttonClose.setOnClickListener {
                 onClickButtonCloseSelectionMenu()
             }
             fragmentMainBinding.constraintMiniPlayerInclude.constraintMiniPlayer.setOnClickListener {
@@ -445,6 +450,8 @@ import kotlinx.coroutines.launch
     }
 
     private fun onClickButtonCloseSelectionMenu() {
+        mMainFragmentViewModel.setTotalSelected(0)
+        mMainFragmentViewModel.setTotalCount(0)
         mMainFragmentViewModel.setSelectMode(false)
     }
 
@@ -531,9 +538,9 @@ import kotlinx.coroutines.launch
             fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.isSelected = true
 
             InsetModifiersUtils.updateTopViewInsets(fragmentMainBinding.mainFragmentContainer)
-            InsetModifiersUtils.updateTopViewInsets(fragmentMainBinding.constraintTopSelectionInclude.constraintTopSelectionMenu)
+            InsetModifiersUtils.updateTopViewInsets(fragmentMainBinding.includeTopSelection.constraintTopSelectionMenu)
             InsetModifiersUtils.updateBottomViewInsets(fragmentMainBinding.constraintMiniPlayerInclude.constraintMiniPlayer)
-            InsetModifiersUtils.updateBottomViewInsets(fragmentMainBinding.constraintBottomSelectionInclude.constraintBottomSelectionMenu)
+            InsetModifiersUtils.updateBottomViewInsets(fragmentMainBinding.includeBottomSelection.constraintBottomSelectionMenu)
 
             fragmentMainBinding.navigationView.setCheckedItem(R.id.music_library)
         }

@@ -24,6 +24,7 @@ import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
 import com.prosabdev.fluidmusic.service.intents.IntentActionsManager
 import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.*
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
@@ -209,7 +210,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                         mMainFragmentViewModel.setHideSlidingPanelCounter()
                         tempFragmentManager.commit {
                             setReorderingAllowed(false)
-                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_ARTISTS, tempSongItem.artist ?: ""))
+                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ArtistsFragment.TAG, tempSongItem.artist ?: ""))
                             addToBackStack(null)
                         }
                     }
@@ -218,34 +219,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                         mMainFragmentViewModel.setHideSlidingPanelCounter()
                         tempFragmentManager.commit {
                             setReorderingAllowed(false)
-                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_ALBUMS, tempSongItem.album ?: ""))
-                            addToBackStack(null)
-                        }
-                    }
-                    mDialogGotoSongBinding.buttonFolder.setOnClickListener{
-                        this.dismiss()
-                        mMainFragmentViewModel.setHideSlidingPanelCounter()
-                        tempFragmentManager.commit {
-                            setReorderingAllowed(false)
-                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_FOLDERS, tempSongItem.folder ?: ""))
-                            addToBackStack(null)
-                        }
-                    }
-                    mDialogGotoSongBinding.buttonComposer.setOnClickListener{
-                        this.dismiss()
-                        mMainFragmentViewModel.setHideSlidingPanelCounter()
-                        tempFragmentManager.commit {
-                            setReorderingAllowed(false)
-                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_COMPOSERS, tempSongItem.composer ?: ""))
-                            addToBackStack(null)
-                        }
-                    }
-                    mDialogGotoSongBinding.buttonGenre.setOnClickListener{
-                        this.dismiss()
-                        mMainFragmentViewModel.setHideSlidingPanelCounter()
-                        tempFragmentManager.commit {
-                            setReorderingAllowed(false)
-                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_GENRES, tempSongItem.genre ?: ""))
+                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(AlbumsFragment.TAG, tempSongItem.album ?: ""))
                             addToBackStack(null)
                         }
                     }
@@ -254,7 +228,34 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                         mMainFragmentViewModel.setHideSlidingPanelCounter()
                         tempFragmentManager.commit {
                             setReorderingAllowed(false)
-                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ConstantValues.EXPLORE_ALBUM_ARTISTS, tempSongItem.albumArtist ?: ""))
+                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(AlbumArtistsFragment.TAG, tempSongItem.albumArtist ?: ""))
+                            addToBackStack(null)
+                        }
+                    }
+                    mDialogGotoSongBinding.buttonFolder.setOnClickListener{
+                        this.dismiss()
+                        mMainFragmentViewModel.setHideSlidingPanelCounter()
+                        tempFragmentManager.commit {
+                            setReorderingAllowed(false)
+                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(FoldersFragment.TAG, tempSongItem.folder ?: ""))
+                            addToBackStack(null)
+                        }
+                    }
+                    mDialogGotoSongBinding.buttonComposer.setOnClickListener{
+                        this.dismiss()
+                        mMainFragmentViewModel.setHideSlidingPanelCounter()
+                        tempFragmentManager.commit {
+                            setReorderingAllowed(false)
+                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ComposersFragment.TAG, tempSongItem.composer ?: ""))
+                            addToBackStack(null)
+                        }
+                    }
+                    mDialogGotoSongBinding.buttonGenre.setOnClickListener{
+                        this.dismiss()
+                        mMainFragmentViewModel.setHideSlidingPanelCounter()
+                        tempFragmentManager.commit {
+                            setReorderingAllowed(false)
+                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(GenresFragment.TAG, tempSongItem.genre ?: ""))
                             addToBackStack(null)
                         }
                     }

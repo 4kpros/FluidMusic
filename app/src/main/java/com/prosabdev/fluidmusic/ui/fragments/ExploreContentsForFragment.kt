@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentExploreContentsForBinding
+import com.prosabdev.fluidmusic.ui.fragments.explore.*
 import com.prosabdev.fluidmusic.utils.ConstantValues
 
 
@@ -25,8 +26,8 @@ class ExploreContentsForFragment : Fragment() {
         reenterTransition = MaterialFadeThrough()
 
         arguments?.let {
-            mLoadSongFromSource = it.getString(ConstantValues.ARGS_EXPLORE_MUSIC_CONTENT)
-            mLoadSongFromSourceValue = it.getString(ConstantValues.ARGS_EXPLORE_MUSIC_CONTENT_VALUE)
+            mLoadSongFromSource = it.getString(CONTENT_SOURCE)
+            mLoadSongFromSourceValue = it.getString(CONTENT_SOURCE_VALUE)
         }
     }
 
@@ -44,25 +45,25 @@ class ExploreContentsForFragment : Fragment() {
 
     private fun initViews() {
         when (mLoadSongFromSource) {
-            ConstantValues.EXPLORE_ARTISTS -> {
+            ArtistsFragment.TAG -> {
                 mFragmentExploreContentsForBinding.topAppBar.title = "Artist : ${mLoadSongFromSourceValue}"
             }
-            ConstantValues.EXPLORE_ALBUMS -> {
+            AlbumsFragment.TAG -> {
                 mFragmentExploreContentsForBinding.topAppBar.title = "Album : ${mLoadSongFromSourceValue}"
             }
-            ConstantValues.EXPLORE_FOLDERS -> {
+            FoldersFragment.TAG -> {
                 mFragmentExploreContentsForBinding.topAppBar.title = "Folder : ${mLoadSongFromSourceValue}"
             }
-            ConstantValues.EXPLORE_ALBUM_ARTISTS -> {
+            AlbumArtistsFragment.TAG -> {
                 mFragmentExploreContentsForBinding.topAppBar.title = "Album artist : ${mLoadSongFromSourceValue}"
             }
-            ConstantValues.EXPLORE_GENRES -> {
+            GenresFragment.TAG -> {
                 mFragmentExploreContentsForBinding.topAppBar.title = "Genre : ${mLoadSongFromSourceValue}"
             }
-            ConstantValues.EXPLORE_COMPOSERS -> {
+            ComposersFragment.TAG -> {
                 mFragmentExploreContentsForBinding.topAppBar.title = "Composer : ${mLoadSongFromSourceValue}"
             }
-            ConstantValues.EXPLORE_YEARS -> {
+            YearsFragment.TAG -> {
                 mFragmentExploreContentsForBinding.topAppBar.title = "Year : ${mLoadSongFromSourceValue}"
             }
         }
@@ -71,13 +72,15 @@ class ExploreContentsForFragment : Fragment() {
 
     companion object {
         const val TAG = "ExploreContentsForFragment"
+        const val CONTENT_SOURCE = "CONTENT_SOURCE"
+        const val CONTENT_SOURCE_VALUE = "CONTENT_SOURCE_VALUE"
 
         @JvmStatic
         fun newInstance(loadSongFromSource: String?, value : String?) =
             ExploreContentsForFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ConstantValues.ARGS_EXPLORE_MUSIC_CONTENT, loadSongFromSource)
-                    putString(ConstantValues.ARGS_EXPLORE_MUSIC_CONTENT_VALUE, value)
+                    putString(CONTENT_SOURCE, loadSongFromSource)
+                    putString(CONTENT_SOURCE_VALUE, value)
                 }
             }
     }

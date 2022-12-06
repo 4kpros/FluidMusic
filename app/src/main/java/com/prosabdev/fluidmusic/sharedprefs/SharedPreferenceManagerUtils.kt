@@ -11,6 +11,7 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
 import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
+import com.prosabdev.fluidmusic.ui.fragments.explore.AllSongsFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
 
 abstract class SharedPreferenceManagerUtils {
@@ -149,7 +150,7 @@ abstract class SharedPreferenceManagerUtils {
                     Log.i(ConstantValues.TAG, "Queue list source loaded !")
                     return sharedPreferences.getString(
                         SHARED_PREFERENCES_QUEUE_LIST_SOURCE,
-                        ConstantValues.EXPLORE_ALL_SONGS
+                        AllSongsFragment.TAG
                     )
                 }
                 val tempSP: SharedPreferences = ctx.getSharedPreferences(
@@ -158,7 +159,7 @@ abstract class SharedPreferenceManagerUtils {
                 Log.i(ConstantValues.TAG, "Queue list source loaded !")
                 return tempSP.getString(
                     SHARED_PREFERENCES_QUEUE_LIST_SOURCE,
-                    ConstantValues.EXPLORE_ALL_SONGS
+                    AllSongsFragment.TAG
                 )
             }
             fun saveQueueListSource(ctx: Context, value: String?) {

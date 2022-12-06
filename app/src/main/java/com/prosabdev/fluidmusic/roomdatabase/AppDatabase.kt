@@ -56,12 +56,14 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
+        const val FLUID_MUSIC_DATABASE_NAME = "${ConstantValues.PACKAGE_NAME}.main_database"
+
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context,
                     AppDatabase::class.java,
-                    ConstantValues.FLUID_MUSIC_DATABASE_NAME
+                    FLUID_MUSIC_DATABASE_NAME
                 )
                     .fallbackToDestructiveMigration()
                     .build()

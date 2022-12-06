@@ -18,7 +18,7 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mMutableCurrentPlayingSong = MutableLiveData<SongItem?>(null)
     private val mMutableIsPlaying = MutableLiveData<Boolean>(false)
     private val mMutablePlayingProgressValue = MutableLiveData<Long>(0)
-    private val mMutableQueueListSource = MutableLiveData<String>(ConstantValues.EXPLORE_ALL_SONGS)
+    private val mMutableQueueListSource = MutableLiveData<String>(null)
     private val mMutableQueueListSourceValue = MutableLiveData<String>("")
     private val mMutableShuffle = MutableLiveData<Int>(PlaybackStateCompat.SHUFFLE_MODE_NONE)
     private val mMutableRepeat = MutableLiveData<Int>(PlaybackStateCompat.REPEAT_MODE_NONE)

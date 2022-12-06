@@ -30,6 +30,7 @@ import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreFullBottomSheetDialog
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicBottomSheetDialog
+import com.prosabdev.fluidmusic.ui.fragments.explore.*
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
@@ -90,42 +91,59 @@ import kotlinx.coroutines.withContext
     }
 
     private fun loadDirectlyQueueMusicListFromDatabase() {
-        val queueListSource: String = mPlayerFragmentViewModel.getQueueListSource().value ?: ConstantValues.EXPLORE_ALL_SONGS
-        if(queueListSource == ConstantValues.EXPLORE_ALL_SONGS) {
-            MainScope().launch {
-                val tempIsInverted : Boolean = mAllSongsFragmentViewModel.getIsInverted().value ?: false
-                val songList =
-                    if(tempIsInverted)
-                        mSongItemViewModel.getAllDirectly(mPlayerFragmentViewModel.getSortBy().value ?: "title")
-                            ?.reversed()
-                    else
-                        mSongItemViewModel.getAllDirectly(mPlayerFragmentViewModel.getSortBy().value ?: "title")
-                updateEmptyListUI(songList?.size ?: 0)
-                mPlayerPagerAdapter?.submitList(songList)
-                mQueueMusicBottomSheetDialog?.updateQueueMusicList(songList)
+        when (mPlayerFragmentViewModel.getQueueListSource().value ?: AllSongsFragment.TAG) {
+            AllSongsFragment.TAG -> {
+                MainScope().launch {
+                    val tempIsInverted : Boolean = mAllSongsFragmentViewModel.getIsInverted().value ?: false
+                    val songList =
+                        if(tempIsInverted)
+                            mSongItemViewModel.getAllDirectly(mPlayerFragmentViewModel.getSortBy().value ?: "title")
+                                ?.reversed()
+                        else
+                            mSongItemViewModel.getAllDirectly(mPlayerFragmentViewModel.getSortBy().value ?: "title")
+                    updateEmptyListUI(songList?.size ?: 0)
+                    mPlayerPagerAdapter?.submitList(songList)
+                    mQueueMusicBottomSheetDialog.updateQueueMusicList(songList)
+                }
             }
-        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_CONTENT_FOR_ALBUMS){
-            //
-        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_CONTENT_FOR_ALBUM_ARTISTS){
-            //
-        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_CONTENT_FOR_ARTISTS){
-            //
-        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_CONTENT_FOR_COMPOSERS){
-            //
-        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_CONTENT_FOR_FOLDERS){
-            //
-        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_CONTENT_FOR_GENRES){
-            //
-        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_CONTENT_FOR_YEARS){
-            //
-        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_PLAYLIST_CONTENT){
-            //
-        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_FOLDER_HIERARCHY_FOR){
-            //
-        }else if(queueListSource == ConstantValues.EXPLORE_MUSIC_STREAMS_HIERARCHY_FOR){
-            //
-        }else{
-            //
+            AlbumsFragment.TAG -> {
+                //
+            }
+            AlbumArtistsFragment.TAG -> {
+                //
+            }
+            ArtistsFragment.TAG -> {
+                //
+            }
+            ComposersFragment.TAG -> {
+                //
+            }
+            FoldersFragment.TAG -> {
+                //
+            }
+            GenresFragment.TAG -> {
+                //
+            }
+            YearsFragment.TAG -> {
+                //
+            }
+
+            ExploreContentsForFragment.TAG -> {
+                //
+            }
+
+            FoldersHierarchyFragment.TAG -> {
+                //
+            }
+            PlaylistsFragment.TAG -> {
+                //
+            }
+            StreamsFragment.TAG -> {
+                //
+            }
+            else -> {
+                //
+            }
         }
     }
 
@@ -185,7 +203,7 @@ import kotlinx.coroutines.withContext
             val queueListSource: String? = SharedPreferenceManagerUtils.Player.loadQueueListSource(ctx)
             mPlayerFragmentViewModel.setSortBy(sortOrganize?.sortOrderBy ?: "title")
             mPlayerFragmentViewModel.setIsInverted(sortOrganize?.isInvertSort ?: false)
-            mPlayerFragmentViewModel.setQueueListSource(queueListSource ?: ConstantValues.EXPLORE_ALL_SONGS)
+            mPlayerFragmentViewModel.setQueueListSource(queueListSource ?: AllSongsFragment.TAG)
 
             val songItem: SongItem? = SharedPreferenceManagerUtils.Player.loadCurrentPlayingSong(ctx)
             val progressValue: Long = SharedPreferenceManagerUtils.Player.loadPlayingProgressValue(ctx)
@@ -228,7 +246,7 @@ import kotlinx.coroutines.withContext
                 mSongItemViewModel.getFirstSong().apply {
                     SharedPreferenceManagerUtils.Player.saveQueueListSource(
                         ctx,
-                        ConstantValues.EXPLORE_ALL_SONGS
+                        AllSongsFragment.TAG
                     )
                     SharedPreferenceManagerUtils.Player.saveQueueListSourceValue(ctx, "")
                     SharedPreferenceManagerUtils.Player.saveRepeat(
@@ -341,8 +359,8 @@ import kotlinx.coroutines.withContext
     }
 
     private fun updatePlayListData() {
-        val queueListSource: String = mPlayerFragmentViewModel.getQueueListSource().value ?: ConstantValues.EXPLORE_ALL_SONGS
-        if(queueListSource == ConstantValues.EXPLORE_ALL_SONGS) {
+        val queueListSource: String = mPlayerFragmentViewModel.getQueueListSource().value ?: AllSongsFragment.TAG
+        if(queueListSource == AllSongsFragment.TAG) {
             val tempSortBy : String = mAllSongsFragmentViewModel.getSortBy().value ?: "title"
             val tempIsInverted : Boolean = mAllSongsFragmentViewModel.getIsInverted().value ?: false
             mPlayerFragmentViewModel.setSortBy(tempSortBy)
