@@ -16,4 +16,7 @@ class AlbumItemViewModel(app: Application) : AndroidViewModel(app) {
     suspend fun getAll(order_by: String = "name") : LiveData<List<AlbumItem>>? {
         return repository?.getAll(order_by)
     }
+    suspend fun getAllDirectly(order_by: String = "name") : List<AlbumItem>? {
+        return repository?.getAllDirectly(order_by)
+    }
 }

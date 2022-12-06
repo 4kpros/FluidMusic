@@ -24,7 +24,7 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityMediaScannerSettingsBinding
 import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
+import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 import com.prosabdev.fluidmusic.viewmodels.activities.MediaScannerActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
 import kotlinx.coroutines.MainScope
@@ -269,8 +269,8 @@ import kotlinx.coroutines.launch
     }
 
     private fun initViews() {
-        ViewInsetModifiersUtils.updateTopViewInsets(mActivityMediaScannerSettingsBinding.coordinatorLayout)
-        ViewInsetModifiersUtils.updateBottomViewInsets(mActivityMediaScannerSettingsBinding.container)
+        InsetModifiersUtils.updateTopViewInsets(mActivityMediaScannerSettingsBinding.coordinatorLayout)
+        InsetModifiersUtils.updateBottomViewInsets(mActivityMediaScannerSettingsBinding.container)
     }
 
     companion object {

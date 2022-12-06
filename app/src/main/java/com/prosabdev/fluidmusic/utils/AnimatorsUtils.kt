@@ -2,12 +2,12 @@ package com.prosabdev.fluidmusic.utils
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.TimeInterpolator
 import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
@@ -15,7 +15,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-abstract class ViewAnimatorsUtils {
+abstract class AnimatorsUtils {
 
     companion object{
         var defaultTranslationPosition: Float = 500.0f
@@ -47,7 +47,7 @@ abstract class ViewAnimatorsUtils {
                         contentView.isClickable = true
                         animate()
                             .alpha(maxAlpha)
-                            .setInterpolator(DecelerateInterpolator())
+                            .setInterpolator(AccelerateDecelerateInterpolator())
                             .setDuration(duration.toLong())
                             .setListener(null)
                     }
@@ -86,7 +86,8 @@ abstract class ViewAnimatorsUtils {
         fun crossFadeUp(
             contentView: View, animate: Boolean = false,
             duration: Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime),
-            maxAlpha: Float = 1.0f
+            maxAlpha: Float = 1.0f,
+            animator: TimeInterpolator? = null
         ) {
             MainScope().launch {
                 if(animate){
@@ -95,7 +96,7 @@ abstract class ViewAnimatorsUtils {
                         visibility = VISIBLE
                         animate()
                             .alpha(maxAlpha)
-                            .setInterpolator(DecelerateInterpolator())
+                            .setInterpolator(animator ?: AccelerateDecelerateInterpolator())
                             .setDuration(duration.toLong())
                             .setListener(null)
                     }
@@ -108,14 +109,15 @@ abstract class ViewAnimatorsUtils {
         fun crossFadeDown(
             contentView : View,
             animate : Boolean = false,
-            duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)
+            duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime),
+            animator: TimeInterpolator? = null
         ) {
             MainScope().launch {
                 if(animate){
                     contentView.apply {
                         animate()
                             .alpha(0.0f)
-                            .setInterpolator(AccelerateDecelerateInterpolator())
+                            .setInterpolator(animator ?: AccelerateDecelerateInterpolator())
                             .setDuration(duration.toLong())
                             .setListener(object : AnimatorListenerAdapter() {
                                 override fun onAnimationEnd(animation: Animator) {
@@ -141,7 +143,7 @@ abstract class ViewAnimatorsUtils {
                         animate()
                             .translationY(0.0f)
                             .alpha(1.0f)
-                            .setInterpolator(DecelerateInterpolator())
+                            .setInterpolator(AccelerateDecelerateInterpolator())
                             .setDuration(duration.toLong())
                             .setListener(null)
                     }
@@ -189,7 +191,7 @@ abstract class ViewAnimatorsUtils {
                         animate()
                             .translationX(0.0f)
                             .alpha(1.0f)
-                            .setInterpolator(DecelerateInterpolator())
+                            .setInterpolator(AccelerateDecelerateInterpolator())
                             .setDuration(duration.toLong())
                             .setListener(null)
                     }
@@ -230,7 +232,7 @@ abstract class ViewAnimatorsUtils {
                         scaleY = 0.0f
                         animate()
                             .scaleY(1.0f)
-                            .setInterpolator(DecelerateInterpolator())
+                            .setInterpolator(AccelerateDecelerateInterpolator())
                             .setDuration(duration.toLong())
                             .setListener(null)
                     }

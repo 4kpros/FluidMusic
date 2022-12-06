@@ -26,8 +26,8 @@ import com.prosabdev.fluidmusic.adapters.FolderUriTreeAdapter
 import com.prosabdev.fluidmusic.databinding.ActivityStorageAccessSettingsBinding
 import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.DeviceInfoAndParserUtils
-import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
+import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
+import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 import com.prosabdev.fluidmusic.viewmodels.activities.StorageAccessActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
 import kotlinx.coroutines.Dispatchers
@@ -179,8 +179,8 @@ import kotlinx.coroutines.withContext
     }
 
     private fun initViews() {
-        ViewInsetModifiersUtils.updateTopViewInsets(mActivityStorageAccessSettingsBinding.coordinatorLayout)
-        ViewInsetModifiersUtils.updateBottomViewInsets(mActivityStorageAccessSettingsBinding.container)
+        InsetModifiersUtils.updateTopViewInsets(mActivityStorageAccessSettingsBinding.coordinatorLayout)
+        InsetModifiersUtils.updateBottomViewInsets(mActivityStorageAccessSettingsBinding.container)
     }
 
     private var treeUri: String?
@@ -198,7 +198,7 @@ import kotlinx.coroutines.withContext
             this.contentResolver.takePersistableUriPermission(uri, takeFlags)
 
             MainScope().launch {
-                addToFolderList(DeviceInfoAndParserUtils.formatAndReturnFolderUriSAF(this@StorageAccessSettingsActivity, uri))
+                addToFolderList(FormattersAndParsersUtils.formatAndReturnFolderUriSAF(this@StorageAccessSettingsActivity, uri))
             }
         }
     }

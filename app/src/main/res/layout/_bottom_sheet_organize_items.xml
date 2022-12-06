@@ -83,6 +83,15 @@
                         />
                 </androidx.appcompat.widget.LinearLayoutCompat>
                 <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_list_extra_small"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CompoundButton.RadioButton"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:tooltipText="@string/list_extra_small"
+                    android:text="@string/list_extra_small" />
+                <com.google.android.material.radiobutton.MaterialRadioButton
                     android:id="@+id/radio_list_small"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

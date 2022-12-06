@@ -19,7 +19,7 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
+import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -128,14 +128,14 @@ class MusicLibraryFragment : Fragment() {
         }
     }
     private fun disableSideSelectionActions(view : View) {
-        ViewAnimatorsUtils.crossFadeDownClickable(
+        AnimatorsUtils.crossFadeDownClickable(
             view,
             true,
             200
         )
     }
     private fun enableSideSelectionActions(view : View) {
-        ViewAnimatorsUtils.crossFadeUpClickable(
+        AnimatorsUtils.crossFadeUpClickable(
             view,
             true,
             200
@@ -147,7 +147,7 @@ class MusicLibraryFragment : Fragment() {
             if (isSelectMode) {
                 fragmentMusicLibraryBinding.viewPager.isUserInputEnabled = false
                 if (fragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != VISIBLE)
-                    ViewAnimatorsUtils.crossTranslateInFromHorizontal(
+                    AnimatorsUtils.crossTranslateInFromHorizontal(
                         fragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View,
                         1,
                         animate,
@@ -157,7 +157,7 @@ class MusicLibraryFragment : Fragment() {
             } else {
                 fragmentMusicLibraryBinding.viewPager.isUserInputEnabled = true
                 if (fragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != GONE)
-                    ViewAnimatorsUtils.crossTranslateOutFromHorizontal(
+                    AnimatorsUtils.crossTranslateOutFromHorizontal(
                         fragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View,
                         1,
                         animate,

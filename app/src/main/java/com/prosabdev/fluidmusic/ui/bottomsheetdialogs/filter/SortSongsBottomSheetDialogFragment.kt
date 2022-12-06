@@ -249,6 +249,18 @@ class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
         const val TAG = "SortItemsBottomSheetDialogFragment"
 
         @JvmStatic
+        fun newInstance(
+            genericListenDataViewModel: GenericListenDataViewModel?,
+            fromSource: String?,
+            fromSourceValue: String? = null
+        ) =
+            SortSongsBottomSheetDialogFragment().apply {
+                mGenericListenDataViewModel = genericListenDataViewModel
+                mFromSource = fromSource
+                mFromSourceValue = fromSourceValue
+            }
+
+        @JvmStatic
         fun newInstance() =
             SortSongsBottomSheetDialogFragment().apply {
             }

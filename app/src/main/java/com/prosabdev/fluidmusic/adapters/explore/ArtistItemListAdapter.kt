@@ -17,9 +17,9 @@ import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.ItemGenericExploreGridRoundedBinding
 import com.prosabdev.fluidmusic.models.view.ArtistItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.FormattersUtils
+import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
-import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
+import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 
 class ArtistItemListAdapter(
     private val mContext: Context,
@@ -129,7 +129,7 @@ class ArtistItemListAdapter(
         fun updateCovertArtAndTitleUI(ctx: Context, artistItem: ArtistItem) {
             val tempTitle : String = artistItem.name ?: ctx.getString(R.string.unknown_artist)
             val tempSubtitle : String = ""
-            val tempDetails : String = "${artistItem.numberTracks} song(s) | ${FormattersUtils.formatSongDurationToString(artistItem.totalDuration)} min"
+            val tempDetails : String = "${artistItem.numberTracks} song(s) | ${FormattersAndParsersUtils.formatSongDurationToString(artistItem.totalDuration)} min"
             mItemGenericExploreGridBinding.textTitle.text = tempTitle
             mItemGenericExploreGridBinding.textSubtitle.visibility = GONE
             mItemGenericExploreGridBinding.textDetails.text = tempDetails
@@ -148,7 +148,7 @@ class ArtistItemListAdapter(
                     mItemGenericExploreGridBinding.songItemIsSelected.visibility != View.VISIBLE
                 ) {
                     mItemGenericExploreGridBinding.songItemIsSelected.clearAnimation()
-                    ViewAnimatorsUtils.crossFadeUp(
+                    AnimatorsUtils.crossFadeUp(
                         mItemGenericExploreGridBinding.songItemIsSelected,
                         true,
                         250,
@@ -157,7 +157,7 @@ class ArtistItemListAdapter(
                 }
             }
             else {
-                ViewAnimatorsUtils.crossFadeDown(
+                AnimatorsUtils.crossFadeDown(
                     mItemGenericExploreGridBinding.songItemIsSelected,
                     true,
                     250
@@ -166,7 +166,7 @@ class ArtistItemListAdapter(
         }
         fun updateSelectedStateUI(selectableIsSelected: Boolean) {
             if(selectableIsSelected) {
-                ViewAnimatorsUtils.crossFadeUp(
+                AnimatorsUtils.crossFadeUp(
                     mItemGenericExploreGridBinding.songItemIsSelected,
                     false,
                     0,
@@ -174,7 +174,7 @@ class ArtistItemListAdapter(
                 )
             }
             else {
-                ViewAnimatorsUtils.crossFadeDown(
+                AnimatorsUtils.crossFadeDown(
                     mItemGenericExploreGridBinding.songItemIsSelected,
                     false,
                     0

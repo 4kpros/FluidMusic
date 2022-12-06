@@ -5,6 +5,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.prosabdev.fluidmusic.models.PlaySongAtRequest
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
 import com.prosabdev.fluidmusic.utils.ConstantValues
@@ -31,6 +32,8 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mMutableIsInverted = MutableLiveData<Boolean>(false)
     private val mMutableCanScrollSmoothViewpager = MutableLiveData<Boolean>(false)
     private val mMutableCanScrollCurrentPlayingSong = MutableLiveData<Boolean>(false)
+    private val mMutablePlaySongAtRequest = MutableLiveData<PlaySongAtRequest>(null)
+    private val mMutableRequestPlaySongShuffleCounter = MutableLiveData<Int>(null)
 
     private val mPlayerLoadSessionCount: LiveData<Int> get() = mMutablePlayerLoadSessionCount
     private val mCurrentPlayingSong: LiveData<SongItem?> get() = mMutableCurrentPlayingSong
@@ -50,6 +53,8 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mIsInverted: LiveData<Boolean> get() = mMutableIsInverted
     private val mCanScrollSmoothViewpager: LiveData<Boolean> get() = mMutableCanScrollSmoothViewpager
     private val mCanScrollCurrentPlayingSong: LiveData<Boolean> get() = mMutableCanScrollCurrentPlayingSong
+    private val mPlaySongAtRequest: LiveData<PlaySongAtRequest> get() = mMutablePlaySongAtRequest
+    private val mRequestPlaySongShuffleCounter: LiveData<Int> get() = mMutableRequestPlaySongShuffleCounter
 
     fun setPlayerLoadSessionCounter(){
         MainScope().launch {
@@ -182,7 +187,9 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
         return mUpdatePlaylistCounter
     }
     fun setIsQueueMusicUpdated() {
-        mMutableIsQueueMusicUpdated.value = true
+        MainScope().launch {
+            mMutableIsQueueMusicUpdated.value = true
+        }
     }
     fun getIsQueueMusicUpdated(): LiveData<Boolean> {
         return mIsQueueMusicUpdated
@@ -207,16 +214,40 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun setCanScrollCurrentPlayingSong(value: Boolean) {
-        mMutableCanScrollSmoothViewpager.value = value
+        MainScope().launch {
+            mMutableCanScrollSmoothViewpager.value = value
+        }
     }
     fun getCanScrollCurrentPlayingSong(): LiveData<Boolean> {
         return mCanScrollSmoothViewpager
     }
 
     fun setCanScrollSmoothViewpager(value: Boolean) {
-        mMutableCanScrollCurrentPlayingSong.value = value
+        MainScope().launch {
+            mMutableCanScrollCurrentPlayingSong.value = value
+        }
     }
     fun getCanScrollSmoothViewpager(): LiveData<Boolean> {
         return mCanScrollCurrentPlayingSong
+    }
+    fun setRequestPlaySongAt(playSongAtRequest: PlaySongAtRequest) {
+        MainScope().launch {
+            mMutablePlaySongAtRequest.value = playSongAtRequest
+        }
+    }
+    fun getRequestPlaySongAt(): LiveData<PlaySongAtRequest> {
+        return mPlaySongAtRequest
+    }
+    fun setRequestPlaySongShuffleCounter() {
+        MainScope().launch {
+            var tempCounter: Int = mUpdatePlaylistCounter.value ?: 0
+            if(tempCounter >= 100)
+                tempCounter = 0
+            tempCounter++
+            mMutableRequestPlaySongShuffleCounter.value = tempCounter
+        }
+    }
+    fun getRequestPlaySongShuffleCounter(): LiveData<Int> {
+        return mRequestPlaySongShuffleCounter
     }
 }

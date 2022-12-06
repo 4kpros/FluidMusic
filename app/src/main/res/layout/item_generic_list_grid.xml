@@ -16,17 +16,19 @@
             android:id="@+id/linear_imageview_container"
             android:layout_width="@dimen/organize_list_medium_image_size"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_small_size"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
             >
             <com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
                 android:id="@+id/imageview_cover_art"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_fluid_music_icon_with_padding"
                 app:shapeAppearanceOverlay="@style/ShapeFullRounded"
                 app:strokeWidth="0dp"
                 app:strokeColor="@color/transparent"
+                android:layout_margin="@dimen/margin_small_size"
                 />
         </androidx.appcompat.widget.LinearLayoutCompat>
         <com.google.android.material.imageview.ShapeableImageView
@@ -41,11 +43,12 @@
             android:scaleType="centerCrop"
             app:strokeWidth="0dp"
             app:strokeColor="@color/transparent"
-            android:alpha="0.5"
-            android:background="?colorPrimary"
+            android:alpha="0.65"
+            android:background="?android:colorBackground"
+            android:visibility="gone"
             />
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/linear_playing_anim"
+            android:id="@+id/linear_is_playing_anim_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignTop="@+id/imageview_background_is_playing"
@@ -56,6 +59,7 @@
             android:weightSum="1"
             android:orientation="horizontal"
             android:baselineAligned="false"
+            android:visibility="gone"
             >
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/imageview_is_playing_anim"
@@ -64,7 +68,7 @@
                 android:scaleType="fitCenter"
                 android:layout_weight=".7"
                 android:src="@drawable/ic_fluid_music_icon"
-                app:tint="?colorOnPrimary"
+                app:tint="?colorPrimary"
                 android:layout_margin="@dimen/margin_medium_size"
                 />
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -77,8 +81,7 @@
             android:layout_toEndOf="@+id/linear_imageview_container"
             android:orientation="vertical"
             android:gravity="center_vertical"
-            android:layout_marginHorizontal="@dimen/margin_large_size"
-            android:layout_marginVertical="@dimen/margin_small_size"
+            android:paddingVertical="@dimen/margin_small_size"
             >
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/text_title"
@@ -112,6 +115,10 @@
             android:id="@+id/card_view_clickable"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignBottom="@+id/linear_imageview_container"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
             android:clickable="true"
             android:focusable="true"
             app:cardBackgroundColor="@color/transparent"

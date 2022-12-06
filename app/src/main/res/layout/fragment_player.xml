@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="?android:colorBackground"
-            android:alpha="0.35"
+            android:alpha="0"
             />
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linear_viewpager"
@@ -197,7 +197,7 @@
                     android:layout_gravity="center_vertical"
                     android:padding="0dp"
                     app:icon="@drawable/play_circle"
-                    app:iconSize="60dp" />
+                    app:iconSize="70dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_skip_next"

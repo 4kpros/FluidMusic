@@ -1,7 +1,12 @@
 package com.prosabdev.fluidmusic.models.view
 
+import android.content.Context
+import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.DatabaseView
+import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.models.generic.GenericItemListGrid
+import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
 
 @DatabaseView(
     "SELECT songItem.album as name, " +
@@ -34,6 +39,38 @@ class AlbumItem {
     var uriImage: String? = null
 
     companion object {
+        fun getStringIndexRequestFastScroller(ctx: Context, dataItem: Any): String {
+            if(dataItem is AlbumItem) {
+                return dataItem.name ?: ctx.getString(R.string.unknown_album)
+            }
+            return "#"
+        }
+        fun castDataItemToGeneric(ctx: Context, dataItem: Any): GenericItemListGrid? {
+            var tempResult : GenericItemListGrid? = null
+            if(dataItem is AlbumItem) {
+                tempResult = GenericItemListGrid()
+                val tempTitle : String = dataItem.name ?: ctx.getString(R.string.unknown_album)
+                val tempSubtitle : String = dataItem.artist ?: ctx.getString(R.string.unknown_artists)
+                val tempDetails : String = "${dataItem.numberTracks} song(s) | ${FormattersAndParsersUtils.formatSongDurationToString(dataItem.totalDuration)} min"
+                tempResult.title = tempTitle
+                tempResult.subtitle =
+                    if (tempTitle != ctx.getString(R.string.unknown_album))
+                        if (dataItem.numberArtists <= 1)
+                            tempSubtitle
+                        else
+                            "${dataItem.numberArtists} artist(s)"
+                    else
+                        if(tempSubtitle == ctx.getString(R.string.unknown_artists))
+                            tempSubtitle
+                        else
+                            "${dataItem.numberArtists} artist(s)"
+                tempResult.details = tempDetails
+                tempResult.imageUri = Uri.parse(dataItem.uriImage)
+                tempResult.imageHashedSignature = dataItem.hashedCovertArtSignature
+            }
+            return tempResult
+        }
+
         val diffCallback = object : DiffUtil.ItemCallback<AlbumItem>() {
             override fun areItemsTheSame(
                 oldItem: AlbumItem,

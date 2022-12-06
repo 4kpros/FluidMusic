@@ -157,12 +157,12 @@ abstract class AudioInfoExtractorUtils {
                 ""
             else
                 when (storageId) {
-                    DeviceInfoAndParserUtils.STORAGE_ID_PRIMARY -> {
+                    DeviceInfoUtils.STORAGE_ID_PRIMARY -> {
                         "${Environment.getExternalStorageDirectory().absolutePath}/$basePath".trimEnd(
                             '/'
                         )
                     }
-                    DeviceInfoAndParserUtils.STORAGE_ID_DATA -> {
+                    DeviceInfoUtils.STORAGE_ID_DATA -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             "${context.dataDir.path}/$basePath".trimEnd('/')
                         } else {

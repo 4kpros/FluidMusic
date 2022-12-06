@@ -11,7 +11,7 @@ import com.google.android.material.transition.platform.MaterialArcMotion
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityInterfaceSettingsBinding
-import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
+import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 
 @BuildCompat.PrereleaseSdkCheck class InterfaceSettingsActivity : AppCompatActivity() {
 
@@ -69,8 +69,8 @@ import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
     }
 
     private fun initViews() {
-        ViewInsetModifiersUtils.updateTopViewInsets(mActivityInterfaceSettingsBinding.coordinatorSettingsActivity)
-        ViewInsetModifiersUtils.updateBottomViewInsets(mActivityInterfaceSettingsBinding.emptyView)
+        InsetModifiersUtils.updateTopViewInsets(mActivityInterfaceSettingsBinding.coordinatorSettingsActivity)
+        InsetModifiersUtils.updateBottomViewInsets(mActivityInterfaceSettingsBinding.emptyView)
     }
 
     companion object {

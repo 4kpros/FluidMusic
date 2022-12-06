@@ -11,7 +11,7 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentEqualizerBinding
-import com.prosabdev.fluidmusic.utils.ViewInsetModifiersUtils
+import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 
@@ -59,22 +59,22 @@ import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 
     private fun observeLiveData() {
         mFragmentEqualizerBinding?.let { fragmentEqualizerBinding ->
-            ViewInsetModifiersUtils.updateTopViewInsets(fragmentEqualizerBinding.container)
-            ViewInsetModifiersUtils.updateBottomViewInsets(fragmentEqualizerBinding.container)
+            InsetModifiersUtils.updateTopViewInsets(fragmentEqualizerBinding.container)
+            InsetModifiersUtils.updateBottomViewInsets(fragmentEqualizerBinding.container)
         }
     }
 
     private fun setupRecyclerViewAdapter() {
         mFragmentEqualizerBinding?.let { fragmentEqualizerBinding ->
-            ViewInsetModifiersUtils.updateTopViewInsets(fragmentEqualizerBinding.container)
-            ViewInsetModifiersUtils.updateBottomViewInsets(fragmentEqualizerBinding.container)
+            InsetModifiersUtils.updateTopViewInsets(fragmentEqualizerBinding.container)
+            InsetModifiersUtils.updateBottomViewInsets(fragmentEqualizerBinding.container)
         }
     }
 
     private fun initViews() {
         mFragmentEqualizerBinding?.let { fragmentEqualizerBinding ->
-            ViewInsetModifiersUtils.updateTopViewInsets(fragmentEqualizerBinding.container)
-            ViewInsetModifiersUtils.updateBottomViewInsets(fragmentEqualizerBinding.container)
+            InsetModifiersUtils.updateTopViewInsets(fragmentEqualizerBinding.container)
+            InsetModifiersUtils.updateBottomViewInsets(fragmentEqualizerBinding.container)
         }
     }
 

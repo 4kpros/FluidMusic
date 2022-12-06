@@ -1,11 +1,12 @@
-package com.prosabdev.fluidmusic.utils
+package com.prosabdev.fluidmusic.service.intents
 
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import com.prosabdev.fluidmusic.utils.StorageUtils
 
-abstract class IntentActionsUtils {
+abstract class IntentActionsManager {
 
     companion object {
 

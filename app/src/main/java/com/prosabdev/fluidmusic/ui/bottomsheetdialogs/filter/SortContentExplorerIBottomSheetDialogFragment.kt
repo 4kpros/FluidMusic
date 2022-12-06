@@ -263,6 +263,13 @@ class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment(
         const val TAG = "SortContentExplorerIBottomSheetDialogFragment"
 
         @JvmStatic
+        fun newInstance(genericListenDataViewModel: GenericListenDataViewModel?, fromSource: String?, fromSourceValue: String? = null) =
+            SortContentExplorerIBottomSheetDialogFragment().apply {
+                mGenericListenDataViewModel = genericListenDataViewModel
+                mFromSource = fromSource
+                mFromSourceValue = fromSourceValue
+            }
+        @JvmStatic
         fun newInstance() =
             SortContentExplorerIBottomSheetDialogFragment().apply {
             }

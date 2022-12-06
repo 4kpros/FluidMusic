@@ -16,9 +16,9 @@ import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.ItemGenericExploreGridBinding
 import com.prosabdev.fluidmusic.models.view.FolderItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.FormattersUtils
+import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
-import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
+import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 
 class FolderItemListAdapter(
     private val mContext: Context,
@@ -128,7 +128,7 @@ class FolderItemListAdapter(
         fun updateCovertArtAndTitleUI(ctx: Context, folderItem: FolderItem) {
             val tempTitle : String = "/${folderItem.name ?: ctx.getString(R.string.unknown_folder)}"
             val tempSubtitle : String = folderItem.parentFolder ?: folderItem.deviceName ?: "/"
-            val tempDetails : String = "${folderItem.numberTracks} song(s) | ${FormattersUtils.formatSongDurationToString(folderItem.totalDuration)} min"
+            val tempDetails : String = "${folderItem.numberTracks} song(s) | ${FormattersAndParsersUtils.formatSongDurationToString(folderItem.totalDuration)} min"
             mItemGenericExploreGridBinding.textTitle.text = tempTitle
             mItemGenericExploreGridBinding.textSubtitle.visibility = View.GONE
             mItemGenericExploreGridBinding.textDetails.text = tempSubtitle
@@ -147,7 +147,7 @@ class FolderItemListAdapter(
                     mItemGenericExploreGridBinding.songItemIsSelected.visibility != View.VISIBLE
                 ) {
                     mItemGenericExploreGridBinding.songItemIsSelected.clearAnimation()
-                    ViewAnimatorsUtils.crossFadeUp(
+                    AnimatorsUtils.crossFadeUp(
                         mItemGenericExploreGridBinding.songItemIsSelected,
                         true,
                         250,
@@ -156,7 +156,7 @@ class FolderItemListAdapter(
                 }
             }
             else {
-                ViewAnimatorsUtils.crossFadeDown(
+                AnimatorsUtils.crossFadeDown(
                     mItemGenericExploreGridBinding.songItemIsSelected,
                     true,
                     250
@@ -165,7 +165,7 @@ class FolderItemListAdapter(
         }
         fun updateSelectedStateUI(selectableIsSelected: Boolean) {
             if(selectableIsSelected) {
-                ViewAnimatorsUtils.crossFadeUp(
+                AnimatorsUtils.crossFadeUp(
                     mItemGenericExploreGridBinding.songItemIsSelected,
                     false,
                     0,
@@ -173,7 +173,7 @@ class FolderItemListAdapter(
                 )
             }
             else {
-                ViewAnimatorsUtils.crossFadeDown(
+                AnimatorsUtils.crossFadeDown(
                     mItemGenericExploreGridBinding.songItemIsSelected,
                     false,
                     0

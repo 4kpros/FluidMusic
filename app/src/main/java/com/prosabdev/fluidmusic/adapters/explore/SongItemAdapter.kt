@@ -1,26 +1,5 @@
 package com.prosabdev.fluidmusic.adapters.explore
 
-import android.content.Context
-import android.graphics.Typeface
-import android.net.Uri
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.View.*
-import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.color.MaterialColors
-import com.l4digital.fastscroll.FastScroller
-import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapter
-import com.prosabdev.fluidmusic.models.SongItem
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.FormattersUtils
-import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
-import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
-
 
 class SongItemAdapter(
 //    private val mContext: Context,

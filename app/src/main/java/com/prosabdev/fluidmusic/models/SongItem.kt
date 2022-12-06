@@ -1,7 +1,11 @@
 package com.prosabdev.fluidmusic.models
 
+import android.content.Context
+import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.*
+import com.prosabdev.fluidmusic.models.generic.GenericItemListGrid
+import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
 
 @Entity(
     foreignKeys = [
@@ -62,6 +66,30 @@ class SongItem {
     var position: Int = -1
 
     companion object {
+        fun getStringIndexRequestFastScroller(ctx: Context, dataItem: Any): String {
+            if(dataItem is SongItem) {
+                return dataItem.title ?: dataItem.fileName ?: "#"
+            }
+            return "#"
+        }
+        fun castDataItemToGeneric(ctx: Context, dataItem: Any): GenericItemListGrid? {
+            var tempResult : GenericItemListGrid? = null
+            if(dataItem is SongItem) {
+                tempResult = GenericItemListGrid()
+                tempResult.title = dataItem.title ?: dataItem.fileName ?: ctx.getString(
+                    com.prosabdev.fluidmusic.R.string.unknown_title)
+                tempResult.subtitle = dataItem.artist ?: ctx.getString(com.prosabdev.fluidmusic.R.string.unknown_artist)
+                tempResult.details = ctx.getString(
+                    com.prosabdev.fluidmusic.R.string.item_song_card_text_details,
+                    FormattersAndParsersUtils.formatSongDurationToString(dataItem.duration),
+                    dataItem.fileExtension
+                )
+                tempResult.imageUri = Uri.parse(dataItem.uri)
+                tempResult.imageHashedSignature = dataItem.hashedCovertArtSignature
+            }
+            return tempResult
+        }
+
         val diffCallback = object : DiffUtil.ItemCallback<SongItem>() {
             override fun areItemsTheSame(
                 oldItem: SongItem,

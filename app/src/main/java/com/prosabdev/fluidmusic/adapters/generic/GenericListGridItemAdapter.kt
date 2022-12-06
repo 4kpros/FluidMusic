@@ -8,42 +8,35 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.widget.ImageView
-import android.widget.LinearLayout
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.RelativeLayout
 import android.widget.RelativeLayout.LayoutParams
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
-import com.google.android.material.textview.MaterialTextView
 import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemGenericListGridBinding
 import com.prosabdev.fluidmusic.models.generic.GenericItemListGrid
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.DeviceDimensions
-import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
-import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
+import com.prosabdev.fluidmusic.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
 class GenericListGridItemAdapter (
-        private val mContext: Context,
-        private val mOnItemRequestDataInfo: OnItemRequestDataInfo,
-        private val mOnItemClickListener: OnItemClickListener,
-        private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener,
-        diffCallback: DiffUtil.ItemCallback<Any>,
-        private var mOrganizeListGrid: Int = ConstantValues.ORGANIZE_GRID_MEDIUM,
-        private var mIsSelectable: Boolean = true,
-        private var mHavePlaybackState: Boolean = false,
-    ) : SelectablePlayingItemListAdapter<GenericListGridItemAdapter.GenericListGridItemHolder>(diffCallback),
-     FastScroller.SectionIndexer
+    private val mContext: Context,
+    private val mOnItemRequestDataInfo: OnItemRequestDataInfo,
+    private val mOnItemClickListener: OnItemClickListener,
+    private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener,
+    diffCallback: DiffUtil.ItemCallback<Any>,
+    private var mOrganizeListGrid: Int = ConstantValues.ORGANIZE_GRID_MEDIUM,
+    private var mIsSelectable: Boolean = true,
+    private var mHavePlaybackState: Boolean = false,
+) : SelectablePlayingItemListAdapter<GenericListGridItemAdapter.GenericListGridItemHolder>(diffCallback),
+    FastScroller.SectionIndexer
 {
 
     interface OnItemClickListener {
@@ -146,6 +139,10 @@ class GenericListGridItemAdapter (
         if (payloads.isNotEmpty()) {
             for (payload in payloads) {
                 when (payload) {
+                    PAYLOAD_IS_COVERT_ART_TEXT -> {
+                        Log.i(ConstantValues.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
+                        holder.updateTextAndImageViewUI(mContext, getItem(position), mOrganizeListGrid)
+                    }
                     PAYLOAD_IS_ORGANIZE_LIST_GRID -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_ORGANIZE_LIST_GRID")
                         holder.updateOrganizeListGridMotion(mContext, mOrganizeListGrid)
@@ -156,11 +153,7 @@ class GenericListGridItemAdapter (
                     }
                     PAYLOAD_PLAYBACK_STATE -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_PLAYBACK_STATE")
-                        holder.updateIsPlayingStateUI(mContext, getPlayingPosition(), getIsPlaying(), mHavePlaybackState, mOrganizeListGrid)
-                    }
-                    PAYLOAD_IS_COVERT_ART_TEXT -> {
-                        Log.i(ConstantValues.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
-                        holder.updateTextAndImageViewUI(mContext, getItem(position), mOrganizeListGrid)
+                        holder.updateIsPlayingStateUI(mContext, getPlayingPosition(), getIsPlaying(), mHavePlaybackState, mOrganizeListGrid, true)
                     }
                     else -> {
                         super.onBindViewHolder(holder, position, payloads)
@@ -169,10 +162,17 @@ class GenericListGridItemAdapter (
             }
         } else {
             //If the is no payload specified on notify adapter, refresh all UI to be safe
+            holder.updateTextAndImageViewUI(mContext, getItem(position), mOrganizeListGrid)
             holder.updateOrganizeListGridMotion(mContext, mOrganizeListGrid)
             holder.updateSelectedStateUI(selectableIsSelected(position), mIsSelectable)
-            holder.updateIsPlayingStateUI(mContext, getPlayingPosition(), getIsPlaying(), mHavePlaybackState, mOrganizeListGrid)
-            holder.updateTextAndImageViewUI(mContext, getItem(position), mOrganizeListGrid)
+            holder.updateIsPlayingStateUI(
+                mContext,
+                getPlayingPosition(),
+                getIsPlaying(),
+                mHavePlaybackState,
+                mOrganizeListGrid,
+                false
+            )
         }
     }
 
@@ -192,7 +192,12 @@ class GenericListGridItemAdapter (
         }
         fun updateOrganizeListGridMotion(ctx: Context, organizeListGrid: Int) {
             val marginLarge = ctx.resources.getDimensionPixelSize(R.dimen.margin_large_size)
-            val marginSmall = ctx.resources.getDimensionPixelSize(R.dimen.margin_small_size)
+            val marginMedium = ctx.resources.getDimensionPixelSize(R.dimen.margin_medium_size)
+            val widthForListSize = FormattersAndParsersUtils.getSpecificWidthSizeForListType(ctx, organizeListGrid)
+
+            val layoutParamsLinearImageviewContainer : LayoutParams = mDataBinding.linearImageviewContainer.layoutParams as LayoutParams
+            val layoutParamsLinearTextContainer : LayoutParams = mDataBinding.linearTextContainer.layoutParams as LayoutParams
+            val layoutParamsLinearCardViewClickable : LayoutParams = mDataBinding.cardViewClickable.layoutParams as LayoutParams
             if(
                 organizeListGrid == ConstantValues.ORGANIZE_LIST_SMALL_NO_IMAGE ||
                 organizeListGrid == ConstantValues.ORGANIZE_LIST_MEDIUM_NO_IMAGE ||
@@ -205,12 +210,33 @@ class GenericListGridItemAdapter (
                 organizeListGrid == ConstantValues.ORGANIZE_LIST_MEDIUM ||
                 organizeListGrid == ConstantValues.ORGANIZE_LIST_LARGE
             ){
-                //Add margin to all sides of image view
-                val lpV : LayoutParams = mDataBinding.linearImageviewContainer.layoutParams as LayoutParams
-                lpV.setMargins(marginLarge, marginSmall, marginSmall, marginSmall)
-                mDataBinding.linearImageviewContainer.layoutParams = lpV
+                if(
+                    organizeListGrid == ConstantValues.ORGANIZE_LIST_EXTRA_SMALL ||
+                    organizeListGrid == ConstantValues.ORGANIZE_LIST_SMALL ||
+                    organizeListGrid == ConstantValues.ORGANIZE_LIST_MEDIUM ||
+                    organizeListGrid == ConstantValues.ORGANIZE_LIST_LARGE
+                ){
+                    //Add left margin
+                    layoutParamsLinearImageviewContainer.setMargins(marginLarge, 0, 0, 0)
+                    //Setup margins for linear text container
+                    layoutParamsLinearTextContainer.setMargins(marginMedium, 0, marginLarge, 0)
+                    //Resize imageview to specific size
+                    mDataBinding.linearImageviewContainer.layoutParams.width = widthForListSize
+                    //Show image view
+                    mDataBinding.linearImageviewContainer.visibility = View.VISIBLE
+                    //Align clickable view to cover all view
+                    layoutParamsLinearCardViewClickable.removeRule(RelativeLayout.ALIGN_BOTTOM)
+                    layoutParamsLinearCardViewClickable.addRule(RelativeLayout.ALIGN_BOTTOM, mDataBinding.linearImageviewContainer.id)
+                }else {
+                    //Setup margins for linear text container
+                    layoutParamsLinearTextContainer.setMargins(marginLarge, 0, marginLarge, 0)
+                    //Hide image view
+                    mDataBinding.linearImageviewContainer.visibility = View.GONE
+                    //Align clickable view to cover all view
+                    layoutParamsLinearCardViewClickable.removeRule(RelativeLayout.ALIGN_BOTTOM)
+                    layoutParamsLinearCardViewClickable.addRule(RelativeLayout.ALIGN_BOTTOM, mDataBinding.linearTextContainer.id)
+                }
                 //Align linear text container on top of imageview cover
-                val layoutParamsLinearTextContainer : LayoutParams = mDataBinding.linearTextContainer.layoutParams as LayoutParams
                 layoutParamsLinearTextContainer.removeRule(RelativeLayout.ALIGN_TOP)
                 layoutParamsLinearTextContainer.removeRule(RelativeLayout.ALIGN_BOTTOM)
                 layoutParamsLinearTextContainer.removeRule(RelativeLayout.END_OF)
@@ -220,29 +246,16 @@ class GenericListGridItemAdapter (
                 layoutParamsLinearTextContainer.addRule(RelativeLayout.ALIGN_TOP, mDataBinding.linearImageviewContainer.id)
                 layoutParamsLinearTextContainer.addRule(RelativeLayout.ALIGN_BOTTOM, mDataBinding.linearImageviewContainer.id)
                 layoutParamsLinearTextContainer.addRule(RelativeLayout.END_OF, mDataBinding.linearImageviewContainer.id)
-                mDataBinding.linearTextContainer.layoutParams = layoutParamsLinearTextContainer
-                if(
-                    organizeListGrid == ConstantValues.ORGANIZE_LIST_EXTRA_SMALL ||
-                    organizeListGrid == ConstantValues.ORGANIZE_LIST_SMALL ||
-                    organizeListGrid == ConstantValues.ORGANIZE_LIST_MEDIUM ||
-                    organizeListGrid == ConstantValues.ORGANIZE_LIST_LARGE
-                ){
-                    //Show image view
-                    mDataBinding.linearImageviewContainer.visibility = View.VISIBLE
-                    //Resize imageview to specific size
-                    val width = DeviceDimensions.getSpecificWithForOrganizeListGridType(ctx, organizeListGrid)
-                    mDataBinding.linearImageviewContainer.layoutParams.width = width
-                }else {
-                    //Hide image view
-                    mDataBinding.linearImageviewContainer.visibility = View.GONE
-                }
             }else{
-                //Add margin to all sides of image view
-                val lpV : LayoutParams = mDataBinding.linearImageviewContainer.layoutParams as LayoutParams
-                lpV.setMargins(marginSmall, marginSmall, marginSmall, marginSmall)
-                mDataBinding.linearImageviewContainer.layoutParams = lpV
+                //Remove all margins for linear image view container
+                layoutParamsLinearImageviewContainer.setMargins(0, 0, 0, 0)
+                //Setup margins for linear text container
+                layoutParamsLinearTextContainer.setMargins(marginLarge, 0, marginLarge, 0)
+                //Resize imageview to match parent
+                mDataBinding.linearImageviewContainer.layoutParams.width = MATCH_PARENT
+                //Show image view
+                mDataBinding.linearImageviewContainer.visibility = View.VISIBLE
                 //Align linear text container on bottom of imageview cover
-                val layoutParamsLinearTextContainer : LayoutParams = mDataBinding.linearTextContainer.layoutParams as LayoutParams
                 layoutParamsLinearTextContainer.removeRule(RelativeLayout.ALIGN_TOP)
                 layoutParamsLinearTextContainer.removeRule(RelativeLayout.ALIGN_BOTTOM)
                 layoutParamsLinearTextContainer.removeRule(RelativeLayout.END_OF)
@@ -252,12 +265,13 @@ class GenericListGridItemAdapter (
                 layoutParamsLinearTextContainer.addRule(RelativeLayout.BELOW, mDataBinding.linearImageviewContainer.id)
                 layoutParamsLinearTextContainer.addRule(RelativeLayout.ALIGN_PARENT_START, RelativeLayout.TRUE)
                 layoutParamsLinearTextContainer.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
-                mDataBinding.linearTextContainer.layoutParams = layoutParamsLinearTextContainer
-                //Show image view
-                mDataBinding.linearImageviewContainer.visibility = View.VISIBLE
-                //Resize imageview to match parent
-                mDataBinding.linearImageviewContainer.layoutParams.width = MATCH_PARENT
+                //Align clickable view to cover all view
+                layoutParamsLinearCardViewClickable.removeRule(RelativeLayout.ALIGN_BOTTOM)
+                layoutParamsLinearCardViewClickable.addRule(RelativeLayout.ALIGN_BOTTOM, mDataBinding.linearTextContainer.id)
             }
+            mDataBinding.linearImageviewContainer.layoutParams = layoutParamsLinearImageviewContainer
+            mDataBinding.linearTextContainer.layoutParams = layoutParamsLinearTextContainer
+            mDataBinding.cardViewClickable.layoutParams = layoutParamsLinearCardViewClickable
 
             when (organizeListGrid) {
                 ConstantValues.ORGANIZE_LIST_SMALL_NO_IMAGE -> {
@@ -393,14 +407,29 @@ class GenericListGridItemAdapter (
             }
         }
 
-        fun updateIsPlayingStateUI(ctx: Context, playingPosition : Int, isPlaying: Boolean, havePlaybackState: Boolean, organizeListGrid: Int) {
+        fun updateIsPlayingStateUI(
+            ctx: Context,
+            playingPosition: Int,
+            isPlaying: Boolean,
+            havePlaybackState: Boolean,
+            organizeListGrid: Int,
+            animate: Boolean
+        ) {
             if(!havePlaybackState){
                 mDataBinding.imageviewBackgroundIsPlaying.visibility = View.GONE
-                mDataBinding.imageviewIsPlayingAnim.visibility = View.GONE
+                mDataBinding.linearIsPlayingAnimContainer.visibility = View.GONE
                 val colorValue = MaterialColors.getColor(mDataBinding.textTitle  as View, com.google.android.material.R.attr.colorOnBackground)
-                changeColorAndFaceType(Typeface.NORMAL, colorValue, View.GONE)
+                changeColorAndFaceType(Typeface.NORMAL, colorValue, false)
                 return
             }
+            if(playingPosition == bindingAdapterPosition){
+                val colorValue = MaterialColors.getColor(mDataBinding.textTitle  as View, com.google.android.material.R.attr.colorPrimary)
+                changeColorAndFaceType(Typeface.BOLD, colorValue, true)
+            }else{
+                val colorValue = MaterialColors.getColor(mDataBinding.textTitle as View, com.google.android.material.R.attr.colorOnBackground)
+                changeColorAndFaceType(Typeface.NORMAL, colorValue, false)
+            }
+
             if(
                 organizeListGrid == ConstantValues.ORGANIZE_LIST_SMALL_NO_IMAGE ||
                 organizeListGrid == ConstantValues.ORGANIZE_LIST_MEDIUM_NO_IMAGE ||
@@ -409,25 +438,44 @@ class GenericListGridItemAdapter (
                 organizeListGrid == ConstantValues.ORGANIZE_GRID_MEDIUM_NO_IMAGE
             ){
                 mDataBinding.imageviewBackgroundIsPlaying.visibility = View.GONE
-                mDataBinding.imageviewIsPlayingAnim.visibility = View.GONE
+                mDataBinding.linearIsPlayingAnimContainer.visibility = View.GONE
             }else{
                 if(playingPosition == bindingAdapterPosition){
-                    mDataBinding.imageviewBackgroundIsPlaying.visibility = View.VISIBLE
-                    mDataBinding.imageviewIsPlayingAnim.visibility = View.VISIBLE
+                    if(mDataBinding.imageviewBackgroundIsPlaying.visibility != View.VISIBLE){
+                        AnimatorsUtils.crossFadeUp(
+                            mDataBinding.imageviewBackgroundIsPlaying,
+                            animate,
+                            200,
+                            0.65f,
+                            AccelerateDecelerateInterpolator()
+                        )
+                        AnimatorsUtils.crossFadeUp(
+                            mDataBinding.linearIsPlayingAnimContainer,
+                            animate,
+                            200,
+                            1.0f,
+                            AccelerateDecelerateInterpolator()
+                        )
+                    }
                 }else{
-                    mDataBinding.imageviewBackgroundIsPlaying.visibility = View.GONE
-                    mDataBinding.imageviewIsPlayingAnim.visibility = View.GONE
+                    if(mDataBinding.imageviewBackgroundIsPlaying.visibility != View.GONE){
+                        AnimatorsUtils.crossFadeDown(
+                            mDataBinding.imageviewBackgroundIsPlaying,
+                            animate,
+                            200,
+                            AccelerateDecelerateInterpolator()
+                        )
+                        AnimatorsUtils.crossFadeDown(
+                            mDataBinding.linearIsPlayingAnimContainer,
+                            animate,
+                            200,
+                            AccelerateDecelerateInterpolator()
+                        )
+                    }
                 }
             }
-            if(playingPosition == bindingAdapterPosition){
-                val colorValue = MaterialColors.getColor(mDataBinding.textTitle  as View, com.google.android.material.R.attr.colorPrimary)
-                changeColorAndFaceType(Typeface.BOLD, colorValue, View.VISIBLE)
-            }else{
-                val colorValue = MaterialColors.getColor(mDataBinding.textTitle as View, com.google.android.material.R.attr.colorOnBackground)
-                changeColorAndFaceType(Typeface.NORMAL, colorValue, View.GONE)
-            }
         }
-        private fun changeColorAndFaceType(typeface: Int, textColorRes: Int, visibility: Int){
+        private fun changeColorAndFaceType(typeface: Int, textColorRes: Int, isUnderlined: Boolean){
             mDataBinding.textTitle.setTypeface(null, typeface)
             mDataBinding.textSubtitle.setTypeface(null, typeface)
             mDataBinding.textDetails.setTypeface(null, typeface)
@@ -435,6 +483,19 @@ class GenericListGridItemAdapter (
             mDataBinding.textTitle.setTextColor(textColorRes)
             mDataBinding.textSubtitle.setTextColor(textColorRes)
             mDataBinding.textDetails.setTextColor(textColorRes)
+
+            UpdateUnderlinedPlaying(isUnderlined)
+        }
+        fun UpdateUnderlinedPlaying(isUnderlined: Boolean){
+            if(isUnderlined){
+                mDataBinding.textTitle.text = FormattersAndParsersUtils.getUnderLinedWord(mDataBinding.textTitle.text.toString())
+                mDataBinding.textSubtitle.text = FormattersAndParsersUtils.getUnderLinedWord(mDataBinding.textSubtitle.text.toString())
+                mDataBinding.textDetails.text = FormattersAndParsersUtils.getUnderLinedWord(mDataBinding.textDetails.text.toString())
+            }else{
+                mDataBinding.textTitle.text = mDataBinding.textTitle.text.toString()
+                mDataBinding.textSubtitle.text = mDataBinding.textSubtitle.text.toString()
+                mDataBinding.textDetails.text = mDataBinding.textDetails.text.toString()
+            }
         }
 
         fun updateWithAnimationSelectedStateUI(selectableIsSelected: Boolean, isSelectable: Boolean) {
@@ -463,7 +524,7 @@ class GenericListGridItemAdapter (
                     mDataBinding.backgroundSelected.visibility != View.VISIBLE
                 ) {
                     mDataBinding.backgroundSelected.clearAnimation()
-                    ViewAnimatorsUtils.crossFadeUp(
+                    AnimatorsUtils.crossFadeUp(
                         mDataBinding.backgroundSelected,
                         true,
                         duration,
@@ -472,7 +533,7 @@ class GenericListGridItemAdapter (
                 }
             }
             else {
-                ViewAnimatorsUtils.crossFadeDown(
+                AnimatorsUtils.crossFadeDown(
                     mDataBinding.backgroundSelected,
                     true,
                     duration

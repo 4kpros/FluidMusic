@@ -158,7 +158,7 @@ import kotlinx.coroutines.launch
                     if (mIsAnimatingScroll1)
                         return@launch
                     mIsAnimatingScroll1 = true
-                    ViewAnimatorsUtils.crossTranslateOutFromVertical(
+                    AnimatorsUtils.crossTranslateOutFromVertical(
                         fragmentMainBinding.constraintMiniPlayerContainer,
                         1,
                         animate,
@@ -176,7 +176,7 @@ import kotlinx.coroutines.launch
                     if (mIsAnimatingScroll2)
                         return@launch
                     mIsAnimatingScroll2 = true
-                    ViewAnimatorsUtils.crossTranslateInFromVertical(
+                    AnimatorsUtils.crossTranslateInFromVertical(
                         fragmentMainBinding.constraintMiniPlayerContainer,
                         1, animate,
                         150,
@@ -197,7 +197,7 @@ import kotlinx.coroutines.launch
                         )
                     }
                     if(fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange.isClickable)
-                        ViewAnimatorsUtils.crossFadeDownClickable(
+                        AnimatorsUtils.crossFadeDownClickable(
                             fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange,
                             animate,
                             200
@@ -210,13 +210,13 @@ import kotlinx.coroutines.launch
                         )
                     }
                     if (totalSelected >= 2)
-                        ViewAnimatorsUtils.crossFadeUpClickable(
+                        AnimatorsUtils.crossFadeUpClickable(
                             fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange,
                             animate,
                             200
                         )
                     else
-                        ViewAnimatorsUtils.crossFadeDownClickable(
+                        AnimatorsUtils.crossFadeDownClickable(
                             fragmentMainBinding.constraintBottomSelectionInclude.buttonSelectRange,
                             animate,
                             200
@@ -231,14 +231,14 @@ import kotlinx.coroutines.launch
             MainScope().launch {
                 if (selectMode) {
                     if (fragmentMainBinding.constraintBottomSelectionContainer.visibility != VISIBLE)
-                        ViewAnimatorsUtils.crossTranslateInFromVertical(
+                        AnimatorsUtils.crossTranslateInFromVertical(
                             fragmentMainBinding.constraintBottomSelectionContainer as View,
                             1,
                             animate,
                             300
                         )
                     if (fragmentMainBinding.constraintTopSelectionContainer.visibility != VISIBLE)
-                        ViewAnimatorsUtils.crossTranslateInFromVertical(
+                        AnimatorsUtils.crossTranslateInFromVertical(
                             fragmentMainBinding.constraintTopSelectionContainer as View,
                             -1,
                             animate,
@@ -246,14 +246,14 @@ import kotlinx.coroutines.launch
                         )
                 } else {
                     if (fragmentMainBinding.constraintBottomSelectionContainer.visibility != GONE)
-                        ViewAnimatorsUtils.crossTranslateOutFromVertical(
+                        AnimatorsUtils.crossTranslateOutFromVertical(
                             fragmentMainBinding.constraintBottomSelectionContainer as View,
                             1,
                             animate,
                             300
                         )
                     if (fragmentMainBinding.constraintTopSelectionContainer.visibility != GONE)
-                        ViewAnimatorsUtils.crossTranslateOutFromVertical(
+                        AnimatorsUtils.crossTranslateOutFromVertical(
                             fragmentMainBinding.constraintTopSelectionContainer as View,
                             -1,
                             animate,
@@ -313,7 +313,7 @@ import kotlinx.coroutines.launch
                 val totalDuration: Long =
                     mPlayerFragmentViewModel.getCurrentPlayingSong().value?.duration ?: 0
                 fragmentMainBinding.constraintMiniPlayerInclude.progressMiniPlayerIndicator.progress =
-                    (FormattersUtils.formatSongDurationToSliderProgress(
+                    (FormattersAndParsersUtils.formatSongDurationToSliderProgress(
                         currentDuration,
                         totalDuration
                     )).toInt()
@@ -530,10 +530,10 @@ import kotlinx.coroutines.launch
             fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.isSelected = true
             fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.isSelected = true
 
-            ViewInsetModifiersUtils.updateTopViewInsets(fragmentMainBinding.mainFragmentContainer)
-            ViewInsetModifiersUtils.updateTopViewInsets(fragmentMainBinding.constraintTopSelectionInclude.constraintTopSelectionMenu)
-            ViewInsetModifiersUtils.updateBottomViewInsets(fragmentMainBinding.constraintMiniPlayerInclude.constraintMiniPlayer)
-            ViewInsetModifiersUtils.updateBottomViewInsets(fragmentMainBinding.constraintBottomSelectionInclude.constraintBottomSelectionMenu)
+            InsetModifiersUtils.updateTopViewInsets(fragmentMainBinding.mainFragmentContainer)
+            InsetModifiersUtils.updateTopViewInsets(fragmentMainBinding.constraintTopSelectionInclude.constraintTopSelectionMenu)
+            InsetModifiersUtils.updateBottomViewInsets(fragmentMainBinding.constraintMiniPlayerInclude.constraintMiniPlayer)
+            InsetModifiersUtils.updateBottomViewInsets(fragmentMainBinding.constraintBottomSelectionInclude.constraintBottomSelectionMenu)
 
             fragmentMainBinding.navigationView.setCheckedItem(R.id.music_library)
         }

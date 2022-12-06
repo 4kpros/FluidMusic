@@ -13,18 +13,32 @@ interface AlbumItemDao {
     @Query(
         "SELECT * FROM AlbumItem " +
                 "ORDER BY " +
-                "CASE :order_by WHEN 'name' THEN COALESCE(AlbumItem.name, 'Unknown field') END, AlbumItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'artist' THEN COALESCE(AlbumItem.artist, 'Unknown field') END COLLATE NOCASE, COALESCE(AlbumItem.name, 'Unknown field'), AlbumItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'albumArtist' THEN COALESCE(AlbumItem.albumArtist, 'Unknown field') END COLLATE NOCASE, COALESCE(AlbumItem.name, 'Unknown field'), AlbumItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'year' THEN COALESCE(AlbumItem.year, 'Unknown field') END COLLATE NOCASE, COALESCE(AlbumItem.name, 'Unknown field'), AlbumItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'lastUpdateDate' THEN AlbumItem.lastUpdateDate END DESC, COALESCE(AlbumItem.name, 'Unknown field'), AlbumItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN AlbumItem.lastAddedDateToLibrary END DESC, COALESCE(AlbumItem.name, 'Unknown field'), COALESCE(AlbumItem.name, 'Unknown field') DESC," +
-                "CASE :order_by WHEN 'totalDuration' THEN AlbumItem.totalDuration END, COALESCE(AlbumItem.name, 'Unknown field'), AlbumItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'numberTracks' THEN AlbumItem.numberTracks END, COALESCE(AlbumItem.name, 'Unknown field'), AlbumItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'numberArtists' THEN AlbumItem.numberArtists END , COALESCE(AlbumItem.name, 'Unknown field'), AlbumItem.lastAddedDateToLibrary DESC," +
-//                "CASE :order_by WHEN 'numberAlbums' THEN AlbumItem.numberAlbums END, COALESCE(AlbumItem.name, 'Unknown field'), AlbumItem.lastAddedDateToLibrary DESC," +
-//                "CASE :order_by WHEN 'numberAlbumArtists' THEN AlbumItem.numberAlbumArtists END, COALESCE(AlbumItem.name, 'Unknown field'), AlbumItem.lastAddedDateToLibrary DESC," +
-                "CASE :order_by WHEN 'numberComposers' THEN AlbumItem.numberComposers END, COALESCE(AlbumItem.name, 'Unknown field'), AlbumItem.lastAddedDateToLibrary DESC"
+                "CASE :order_by WHEN 'name' THEN COALESCE(AlbumItem.name, 'Unknown field') END COLLATE NOCASE," +
+                "CASE :order_by WHEN 'artist' THEN COALESCE(AlbumItem.artist, 'Unknown field') END COLLATE NOCASE," +
+                "CASE :order_by WHEN 'albumArtist' THEN COALESCE(AlbumItem.albumArtist, 'Unknown field') END COLLATE NOCASE," +
+                "CASE :order_by WHEN 'year' THEN COALESCE(AlbumItem.year, 'Unknown field') END COLLATE NOCASE," +
+                "CASE :order_by WHEN 'lastUpdateDate' THEN AlbumItem.lastUpdateDate END DESC," +
+                "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN AlbumItem.lastAddedDateToLibrary END DESC," +
+                "CASE :order_by WHEN 'totalDuration' THEN AlbumItem.totalDuration END," +
+                "CASE :order_by WHEN 'numberTracks' THEN AlbumItem.numberTracks END," +
+                "CASE :order_by WHEN 'numberArtists' THEN AlbumItem.numberArtists END," +
+                "CASE :order_by WHEN 'numberComposers' THEN AlbumItem.numberComposers END"
     )
     fun getAll(order_by: String): LiveData<List<AlbumItem>>?
+
+    @Query(
+        "SELECT * FROM AlbumItem " +
+                "ORDER BY " +
+                "CASE :order_by WHEN 'name' THEN COALESCE(AlbumItem.name, 'Unknown field') END COLLATE NOCASE," +
+                "CASE :order_by WHEN 'artist' THEN COALESCE(AlbumItem.artist, 'Unknown field') END COLLATE NOCASE," +
+                "CASE :order_by WHEN 'albumArtist' THEN COALESCE(AlbumItem.albumArtist, 'Unknown field') END COLLATE NOCASE," +
+                "CASE :order_by WHEN 'year' THEN COALESCE(AlbumItem.year, 'Unknown field') END COLLATE NOCASE," +
+                "CASE :order_by WHEN 'lastUpdateDate' THEN AlbumItem.lastUpdateDate END DESC," +
+                "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN AlbumItem.lastAddedDateToLibrary END DESC," +
+                "CASE :order_by WHEN 'totalDuration' THEN AlbumItem.totalDuration END," +
+                "CASE :order_by WHEN 'numberTracks' THEN AlbumItem.numberTracks END," +
+                "CASE :order_by WHEN 'numberArtists' THEN AlbumItem.numberArtists END," +
+                "CASE :order_by WHEN 'numberComposers' THEN AlbumItem.numberComposers END"
+    )
+    fun getAllDirectly(order_by: String): List<AlbumItem>?
 }

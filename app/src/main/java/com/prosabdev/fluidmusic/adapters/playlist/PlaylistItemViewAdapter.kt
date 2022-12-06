@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemPlaylistBinding
 import com.prosabdev.fluidmusic.models.playlist.PlaylistItemView
-import com.prosabdev.fluidmusic.utils.FormattersUtils
+import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
 
 class PlaylistItemViewAdapter(
     private val mListener: OnItemClickListener
@@ -50,7 +50,7 @@ class PlaylistItemViewAdapter(
 
         fun updateUI(playlistItemView: PlaylistItemView){
             mItemPlaylistBinding.textTitle.text = playlistItemView.playlistName
-            mItemPlaylistBinding.textSubtitle.text = "${playlistItemView.numberTracks} songs | ${FormattersUtils.formatSongDurationToString(playlistItemView.totalDuration)} min"
+            mItemPlaylistBinding.textSubtitle.text = "${playlistItemView.numberTracks} songs | ${FormattersAndParsersUtils.formatSongDurationToString(playlistItemView.totalDuration)} min"
 
         }
     }

@@ -8,12 +8,11 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemPlayerCardViewBinding
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
-import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
+import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -75,11 +74,11 @@ class PlayerPageAdapter(
         }
 
         private suspend fun animateButtons() {
-            ViewAnimatorsUtils.crossFadeUp(mItemPlayerCardViewBinding.buttonLyrics as View, true)
-            ViewAnimatorsUtils.crossFadeUp(mItemPlayerCardViewBinding.buttonFullscreen as View, true)
+            AnimatorsUtils.crossFadeUp(mItemPlayerCardViewBinding.buttonLyrics as View, true)
+            AnimatorsUtils.crossFadeUp(mItemPlayerCardViewBinding.buttonFullscreen as View, true)
             delay(2000)
-            ViewAnimatorsUtils.crossFadeDown(mItemPlayerCardViewBinding.buttonLyrics as View, true)
-            ViewAnimatorsUtils.crossFadeDown(mItemPlayerCardViewBinding.buttonFullscreen as View, true)
+            AnimatorsUtils.crossFadeDown(mItemPlayerCardViewBinding.buttonLyrics as View, true)
+            AnimatorsUtils.crossFadeDown(mItemPlayerCardViewBinding.buttonFullscreen as View, true)
         }
 
         fun loadCovertArt(ctx: Context, songItem: SongItem) {

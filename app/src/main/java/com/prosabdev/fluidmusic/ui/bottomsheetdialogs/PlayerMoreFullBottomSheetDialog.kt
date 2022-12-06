@@ -21,6 +21,7 @@ import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
+import com.prosabdev.fluidmusic.service.intents.IntentActionsManager
 import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
 import com.prosabdev.fluidmusic.utils.*
@@ -99,7 +100,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                 mBottomSheetPlayerMoreBinding.textDescription.text =
                     ctx.getString(
                         R.string.item_song_card_text_details,
-                        FormattersUtils.formatSongDurationToString(songItem.duration ),
+                        FormattersAndParsersUtils.formatSongDurationToString(songItem.duration ),
                         songItem.typeMime
                     )
 
@@ -331,7 +332,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                                         ctx.getString(R.string._music_content_by, tempSongItem.title, tempSongItem.artist ?: "")
                                     else
                                         "${tempSongItem.fileName}"
-                                IntentActionsUtils.shareSongFile(ctx, tempUri, tempDesc)
+                                IntentActionsManager.shareSongFile(ctx, tempUri, tempDesc)
                             }
                         }
                         this@apply.dismiss()
@@ -344,7 +345,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                             withContext(Dispatchers.Default){
                                 val tempBitmap = getScreenShotOfView(mScreenShotPlayerView)
                                 val tempDesc = ctx.getString(R.string.currently_listening_icon)
-                                IntentActionsUtils.shareBitmapImage(ctx, tempBitmap, tempDesc)
+                                IntentActionsManager.shareBitmapImage(ctx, tempBitmap, tempDesc)
                                 MainScope().launch {
                                     dialogShareSongBinding.buttonShareScreenshot.alpha = 1.0f
                                     dialogShareSongBinding.buttonShareScreenshot.isClickable = true

@@ -1,14 +1,12 @@
 package com.prosabdev.fluidmusic.adapters
 
 import android.view.LayoutInflater
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemHeadlinePlayShuffleBinding
-import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
+import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 
 class HeadlinePlayShuffleAdapter(
     private val mHeadLines: ArrayList<Int>,
@@ -71,22 +69,22 @@ class HeadlinePlayShuffleAdapter(
         fun updateOnSelectModeEnabledUI(isSelectMode: Boolean) {
             if(isSelectMode){
                 if(mItemHeadlinePlayShuffleBinding.buttonPlay.isClickable) {
-                    ViewAnimatorsUtils.crossFadeDownClickable(
+                    AnimatorsUtils.crossFadeDownClickable(
                         mItemHeadlinePlayShuffleBinding.buttonPlay,
                         true,
                         250
                     )
-                    ViewAnimatorsUtils.crossFadeDownClickable(
+                    AnimatorsUtils.crossFadeDownClickable(
                         mItemHeadlinePlayShuffleBinding.buttonShuffle,
                         true,
                         250
                     )
-                    ViewAnimatorsUtils.crossFadeDownClickable(
+                    AnimatorsUtils.crossFadeDownClickable(
                         mItemHeadlinePlayShuffleBinding.buttonSort,
                         true,
                         250
                     )
-                    ViewAnimatorsUtils.crossFadeDownClickable(
+                    AnimatorsUtils.crossFadeDownClickable(
                         mItemHeadlinePlayShuffleBinding.buttonOrganize,
                         true,
                         250
@@ -95,22 +93,22 @@ class HeadlinePlayShuffleAdapter(
             }
             else{
                 if(!mItemHeadlinePlayShuffleBinding.buttonPlay.isClickable) {
-                    ViewAnimatorsUtils.crossFadeUpClickable(
+                    AnimatorsUtils.crossFadeUpClickable(
                         mItemHeadlinePlayShuffleBinding.buttonPlay,
                         true,
                         250
                     )
-                    ViewAnimatorsUtils.crossFadeUpClickable(
+                    AnimatorsUtils.crossFadeUpClickable(
                         mItemHeadlinePlayShuffleBinding.buttonShuffle,
                         true,
                         250
                     )
-                    ViewAnimatorsUtils.crossFadeUpClickable(
+                    AnimatorsUtils.crossFadeUpClickable(
                         mItemHeadlinePlayShuffleBinding.buttonSort,
                         true,
                         250
                     )
-                    ViewAnimatorsUtils.crossFadeUpClickable(
+                    AnimatorsUtils.crossFadeUpClickable(
                         mItemHeadlinePlayShuffleBinding.buttonOrganize,
                         true,
                         250

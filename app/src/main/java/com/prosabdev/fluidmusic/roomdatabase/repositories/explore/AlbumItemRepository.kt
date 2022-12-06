@@ -22,4 +22,9 @@ class AlbumItemRepository(ctx : Context) {
             mDao?.getAll(order_by)
         }
     }
+    suspend fun getAllDirectly(order_by: String) : List<AlbumItem>? {
+        return withContext(Dispatchers.IO){
+            mDao?.getAllDirectly(order_by)
+        }
+    }
 }

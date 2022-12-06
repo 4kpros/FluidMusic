@@ -1,9 +1,10 @@
-package com.prosabdev.fluidmusic.utils
+package com.prosabdev.fluidmusic.ui.custom
 
 import android.content.Context
 import android.util.DisplayMetrics
 import android.util.Log
 import androidx.recyclerview.widget.LinearSmoothScroller
+import com.prosabdev.fluidmusic.utils.ConstantValues
 
 class CenterSmoothScroller(
     ctx : Context

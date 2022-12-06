@@ -41,7 +41,7 @@ abstract class ImageLoadersUtils {
                     widthHeight = 1200
                     isBlurred = false
                     animate = true
-                    animationDuration = 200
+                    animationDuration = 300
                 }
 
             @JvmStatic
@@ -50,16 +50,16 @@ abstract class ImageLoadersUtils {
                     widthHeight = 200
                     isBlurred = false
                     animate = true
-                    animationDuration = 200
+                    animationDuration = 300
                 }
 
             @JvmStatic
             fun newBlurInstance() =
                 ImageRequestItem().apply {
-                    widthHeight = 100
+                    widthHeight = 50
                     isBlurred = true
                     animate = true
-                    animationDuration = 200
+                    animationDuration = 100
                 }
         }
     }
@@ -172,8 +172,8 @@ abstract class ImageLoadersUtils {
             imageRequest.imageView?.let { imgView ->
                 MainScope().launch {
                     Blurry.with(ctx.applicationContext)
-                        .radius(15)
-                        .sampling(4)
+                        .radius(25)
+                        .sampling(1)
                         .animate(
                             if(imageRequest.animate) imageRequest.animationDuration else 0
                         )

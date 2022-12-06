@@ -6,11 +6,10 @@ import android.view.View
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 
-abstract class ViewInsetModifiersUtils {
+abstract class InsetModifiersUtils {
     companion object{
 
         fun updateTopViewInsets(view: View) {
-            Log.i(ConstantValues.TAG, "APPPPPPPPPPPPLY INSETSSSSSSSSSSSSSSSSSSS ------------->")
             view.setOnApplyWindowInsetsListener { v, insets ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     val finalInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())

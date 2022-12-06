@@ -22,6 +22,7 @@ import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentPlayerBinding
+import com.prosabdev.fluidmusic.models.PlaySongAtRequest
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.sharedprefs.SharedPreferenceManagerUtils
 import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
@@ -298,6 +299,45 @@ import kotlinx.coroutines.withContext
         mPlayerFragmentViewModel.getSleepTimerStateStarted().observe(viewLifecycleOwner){
             //
         }
+        mPlayerFragmentViewModel.getRequestPlaySongAt().observe(viewLifecycleOwner){
+            tryToPlaySongAtFromRequest(it)
+        }
+        mPlayerFragmentViewModel.getRequestPlaySongShuffleCounter().observe(viewLifecycleOwner){
+            tryToShuffleSongFromRequest(it)
+        }
+    }
+
+    private fun tryToShuffleSongFromRequest(requestCounter: Int?) {
+        if (requestCounter == null || requestCounter <= 0) return
+        if((mPlayerPagerAdapter?.currentList?.size ?: 0) <= 0) return
+        val tempSongPosition = MathComputationsUtils.randomExcluded(mFragmentPlayerBinding?.viewPagerPlayer?.currentItem ?: -1, mPlayerPagerAdapter?.itemCount ?: 0)
+        if(tempSongPosition >= (mPlayerPagerAdapter?.itemCount ?: 0) || tempSongPosition < 0)return
+        val tempSongItem : SongItem = getCurrentPlayingSongFromPosition((tempSongPosition))
+            ?: return
+        mPlayerFragmentViewModel.setCanScrollSmoothViewpager(false)
+        mPlayerFragmentViewModel.setPlayingProgressValue(0)
+        mPlayerFragmentViewModel.setShuffle(PlaybackStateCompat.SHUFFLE_MODE_ALL)
+        mPlayerFragmentViewModel.setRepeat(PlaybackStateCompat.REPEAT_MODE_NONE)
+        mPlayerFragmentViewModel.setCurrentPlayingSong(tempSongItem)
+    }
+    private fun tryToPlaySongAtFromRequest(playSongAtRequest: PlaySongAtRequest?) {
+        if (playSongAtRequest == null) return
+        if(playSongAtRequest.position < 0 || playSongAtRequest.position > (mPlayerPagerAdapter?.currentList?.size ?: 0)) return
+
+        val tempCurrentSongRequest = mPlayerPagerAdapter?.currentList?.get(playSongAtRequest.position)
+        if(tempCurrentSongRequest != null){
+            tempCurrentSongRequest.position = playSongAtRequest.position
+            val tempShuffle : Int = if(playSongAtRequest.shuffle != null && (playSongAtRequest.shuffle ?: -1) >= 0) playSongAtRequest.shuffle ?: -1 else -1
+            val tempRepeat : Int = if(playSongAtRequest.repeat != null && (playSongAtRequest.repeat ?: -1) >= 0) playSongAtRequest.repeat ?: -1 else -1
+            if(tempRepeat > 0){
+                mPlayerFragmentViewModel.setShuffle(tempShuffle)
+            }
+            if(tempRepeat > 0){
+                mPlayerFragmentViewModel.setRepeat(tempRepeat)
+            }
+            mPlayerFragmentViewModel.setIsPlaying(playSongAtRequest.playDirectly)
+            mPlayerFragmentViewModel.setCurrentPlayingSong(tempCurrentSongRequest)
+        }
     }
 
     private fun updatePlayListData() {
@@ -381,12 +421,12 @@ import kotlinx.coroutines.withContext
                     val totalDuration: Long =
                         mPlayerFragmentViewModel.getCurrentPlayingSong().value?.duration ?: 0
                     fragmentPlayerBinding.slider.value =
-                        FormattersUtils.formatSongDurationToSliderProgress(
+                        FormattersAndParsersUtils.formatSongDurationToSliderProgress(
                             currentDuration,
                             totalDuration
                         )
                     fragmentPlayerBinding.textDurationCurrent.text =
-                        FormattersUtils.formatSongDurationToString(currentDuration)
+                        FormattersAndParsersUtils.formatSongDurationToString(currentDuration)
                 }
             }
         }
@@ -463,7 +503,7 @@ import kotlinx.coroutines.withContext
                         else
                             it.getString(R.string.unknown_artist)
                     fragmentPlayerBinding.textDuration.text =
-                        FormattersUtils.formatSongDurationToString(
+                        FormattersAndParsersUtils.formatSongDurationToString(
                             songItem?.duration ?: 0
                         )
                 }
@@ -490,7 +530,7 @@ import kotlinx.coroutines.withContext
                 fragmentPlayerBinding.viewPagerPlayer.offscreenPageLimit = 3
                 fragmentPlayerBinding.viewPagerPlayer.getChildAt(0)?.overScrollMode =
                     View.OVER_SCROLL_NEVER
-                ViewAnimatorsUtils.transformScaleViewPager(fragmentPlayerBinding.viewPagerPlayer)
+                AnimatorsUtils.transformScaleViewPager(fragmentPlayerBinding.viewPagerPlayer)
             }
         }
     }
@@ -619,7 +659,7 @@ import kotlinx.coroutines.withContext
     private fun updateOnStopTrackingTouch(value: Float) {
         if((mPlayerPagerAdapter?.currentList?.size ?: 0) <= 0) return
         val totalDuration : Long = mPlayerFragmentViewModel.getCurrentPlayingSong().value?.duration ?: 0
-        val tempProgress : Long = FormattersUtils.formatSliderProgressToLongDuration(value, totalDuration)
+        val tempProgress : Long = FormattersAndParsersUtils.formatSliderProgressToLongDuration(value, totalDuration)
         mPlayerFragmentViewModel.setPlayingProgressValue(tempProgress)
     }
     private fun onViewpagerPageChanged(position: Int) {
@@ -635,11 +675,11 @@ import kotlinx.coroutines.withContext
             fragmentPlayerBinding.textTitle.isSelected = true
             fragmentPlayerBinding.textArtist.isSelected = true
 
-            ViewInsetModifiersUtils.updateTopViewInsets(fragmentPlayerBinding.linearRescanDeviceContainer)
-            ViewInsetModifiersUtils.updateTopViewInsets(fragmentPlayerBinding.linearViewpager)
+            InsetModifiersUtils.updateTopViewInsets(fragmentPlayerBinding.linearRescanDeviceContainer)
+            InsetModifiersUtils.updateTopViewInsets(fragmentPlayerBinding.linearViewpager)
 
-            ViewInsetModifiersUtils.updateBottomViewInsets(fragmentPlayerBinding.dragHandleViewContainer)
-            ViewInsetModifiersUtils.updateBottomViewInsets(fragmentPlayerBinding.constraintBottomButtonsContainer)
+            InsetModifiersUtils.updateBottomViewInsets(fragmentPlayerBinding.dragHandleViewContainer)
+            InsetModifiersUtils.updateBottomViewInsets(fragmentPlayerBinding.constraintBottomButtonsContainer)
 
             mPlayerMoreBottomSheetDialog.updateData(
                 mPlayerFragmentViewModel,

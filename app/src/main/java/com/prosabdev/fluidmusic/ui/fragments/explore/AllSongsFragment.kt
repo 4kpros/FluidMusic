@@ -1,13 +1,14 @@
 package com.prosabdev.fluidmusic.ui.fragments.explore
 
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout.LayoutParams
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -29,11 +30,11 @@ import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.models.generic.GenericItemListGrid
 import com.prosabdev.fluidmusic.sharedprefs.SharedPreferenceManagerUtils
 import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
-import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.BottomSheetFilterDialogManager
-import com.prosabdev.fluidmusic.utils.CenterSmoothScroller
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.FormattersUtils
-import com.prosabdev.fluidmusic.utils.MathComputationsUtils
+import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
+import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortSongsBottomSheetDialogFragment
+import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
+import com.prosabdev.fluidmusic.ui.fragments.commonmethods.FragmentCommonMediaPlaybackAction
+import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AllSongsFragmentViewModel
@@ -47,13 +48,16 @@ import kotlinx.coroutines.withContext
 class AllSongsFragment : Fragment() {
     private var mPageIndex: Int? = -1
 
-    private lateinit var mFragmentAllSongsBinding: FragmentAllSongsBinding
+    private var mFragmentAllSongsBinding: FragmentAllSongsBinding? = null
 
     private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by activityViewModels()
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 
     private val mSongItemViewModel: SongItemViewModel by activityViewModels()
+
+    private var mOrganizeDialog: OrganizeItemBottomSheetDialogFragment = OrganizeItemBottomSheetDialogFragment.newInstance()
+    private val mSortSongDialog: SortSongsBottomSheetDialogFragment = SortSongsBottomSheetDialogFragment.newInstance()
 
     private var mConcatAdapter: ConcatAdapter? = null
     private var mEmptyBottomAdapter: EmptyBottomAdapter? = null
@@ -66,22 +70,20 @@ class AllSongsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         exitTransition = MaterialFadeThrough()
         reenterTransition = MaterialFadeThrough()
+        arguments?.let {
+        }
 
         loadPrefsAndInitViewModel()
-        arguments?.let {
-            mPageIndex = it.getInt(ConstantValues.EXPLORE_ALL_SONGS)
-        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         mFragmentAllSongsBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_all_songs,container,false)
-        val view = mFragmentAllSongsBinding.root
+        val view = mFragmentAllSongsBinding?.root
 
         initViews()
         setupRecyclerViewAdapter()
@@ -96,16 +98,16 @@ class AllSongsFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        saveDataFroThisFragment()
+        saveAllDataToPref()
         super.onDestroyView()
     }
 
-    private fun saveDataFroThisFragment(){
+    private fun saveAllDataToPref(){
         context?.let { ctx ->
             val tempSortOrganize: SortOrganizeItemSP = SortOrganizeItemSP()
-            tempSortOrganize.sortOrderBy = mAllSongsFragmentViewModel.getSortBy().value ?: "title"
+            tempSortOrganize.sortOrderBy = mAllSongsFragmentViewModel.getSortBy().value ?: SORT_LIST_GRID_DEFAULT_VALUE
             tempSortOrganize.organizeListGrid = mAllSongsFragmentViewModel.getOrganizeListGrid().value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
-            tempSortOrganize.isInvertSort = mAllSongsFragmentViewModel.getIsInverted().value ?: false
+            tempSortOrganize.isInvertSort = mAllSongsFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
             SharedPreferenceManagerUtils
                 .SortAnOrganizeForExploreContents
                 .saveSortOrganizeItemsFor(
@@ -130,16 +132,16 @@ class AllSongsFragment : Fragment() {
                 mAllSongsFragmentViewModel.setIsInverted(sortOrganize.isInvertSort)
             }
             if(tempSortOrganize == null){
-                mAllSongsFragmentViewModel.setSortBy("title")
+                mAllSongsFragmentViewModel.setSortBy(SORT_LIST_GRID_DEFAULT_VALUE)
                 mAllSongsFragmentViewModel.setOrganizeListGrid(ORGANIZE_LIST_GRID_DEFAULT_VALUE)
-                mAllSongsFragmentViewModel.setIsInverted(false)
+                mAllSongsFragmentViewModel.setIsInverted(IS_INVERTED_LIST_GRID_DEFAULT_VALUE)
             }
         }
     }
 
     private fun observeLiveData() {
         mAllSongsFragmentViewModel.getAll().observe(viewLifecycleOwner){
-            addSongListToAdapter(it)
+            addDataToGenericAdapter(it)
         }
         mAllSongsFragmentViewModel.getSortBy().observe(viewLifecycleOwner){
             requestNewDataFromDatabase()
@@ -175,7 +177,7 @@ class AllSongsFragment : Fragment() {
     }
     private fun updateOrganizeListGrid(organizeValue: Int?) {
         context?.let { ctx ->
-            val tempSpanCount : Int = BottomSheetFilterDialogManager.getSpanCount(ctx, organizeValue)
+            val tempSpanCount : Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, organizeValue)
             mGenericListGridItemAdapter?.setOrganizeListGrid(mAllSongsFragmentViewModel.getOrganizeListGrid().value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE)
             mLayoutManager?.spanCount = tempSpanCount
         }
@@ -199,14 +201,14 @@ class AllSongsFragment : Fragment() {
             mGenericListGridItemAdapter?.setIsPlaying(false)
         }
     }
-    private fun addSongListToAdapter(songList: List<Any>?) {
+    private fun addDataToGenericAdapter(dataList: List<Any>?) {
         if(mAllSongsFragmentViewModel.getIsInverted().value == true){
-            mGenericListGridItemAdapter?.submitList(songList?.reversed())
+            mGenericListGridItemAdapter?.submitList(dataList?.reversed())
         }else{
-            mGenericListGridItemAdapter?.submitList(songList)
+            mGenericListGridItemAdapter?.submitList(dataList)
         }
         if(mMainFragmentViewModel.getCurrentSelectablePage().value == ConstantValues.EXPLORE_ALL_SONGS){
-            mMainFragmentViewModel.setTotalCount(songList?.size ?: 0)
+            mMainFragmentViewModel.setTotalCount(dataList?.size ?: 0)
         }
     }
 
@@ -289,7 +291,7 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun checkInteractions() {
-        mFragmentAllSongsBinding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        mFragmentAllSongsBinding?.recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if(mIsDraggingToScroll){
                     if(dy < 0){
@@ -345,16 +347,22 @@ class AllSongsFragment : Fragment() {
         listHeadlines.add(0)
         mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
             override fun onPlayButtonClicked() {
-                playSongAtPosition(0)
+
+                FragmentCommonMediaPlaybackAction.playSongAtPosition(
+                    mPlayerFragmentViewModel,
+                    mAllSongsFragmentViewModel,
+                    mGenericListGridItemAdapter,
+                    0
+                )
             }
             override fun onShuffleButtonClicked() {
-                playSongsShuffle()
+                playSongOnShuffle()
             }
             override fun onSortButtonClicked() {
-                showSortSongsDialog()
+                showSortDialog()
             }
             override fun onOrganizeButtonClicked() {
-                showOrganizeSongsDialog()
+                showOrganizeDialog()
             }
         })
 
@@ -362,14 +370,14 @@ class AllSongsFragment : Fragment() {
         mGenericListGridItemAdapter = GenericListGridItemAdapter(
             ctx,
             object : GenericListGridItemAdapter.OnItemRequestDataInfo{
-                override fun onRequestDataInfo(dataItem: Any, position: Int): GenericItemListGrid {
-                    return castAndPerformRequestedData(dataItem)
+                override fun onRequestDataInfo(dataItem: Any, position: Int): GenericItemListGrid? {
+                    return SongItem.castDataItemToGeneric(ctx, dataItem)
                 }
                 override fun onRequestTextIndexForFastScroller(
                     dataItem: Any,
                     position: Int
                 ): String {
-                    return getStringIndexRequestFastScroller(dataItem)
+                    return SongItem.getStringIndexRequestFastScroller(ctx, dataItem)
                 }
             },
             object : GenericListGridItemAdapter.OnItemClickListener{
@@ -377,7 +385,12 @@ class AllSongsFragment : Fragment() {
                     if(mGenericListGridItemAdapter?.selectableGetSelectionMode() == true){
                         mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
                     }else{
-                        playSongAtPosition(position)
+                        FragmentCommonMediaPlaybackAction.playSongAtPosition(
+                            mPlayerFragmentViewModel,
+                            mAllSongsFragmentViewModel,
+                            mGenericListGridItemAdapter,
+                            position
+                        )
                     }
                 }
                 override fun onItemLongPressed(position: Int) {
@@ -416,85 +429,73 @@ class AllSongsFragment : Fragment() {
         }
 
         //Add Layout manager
-        val initialSpanCount : Int = BottomSheetFilterDialogManager.getSpanCount(ctx, mAllSongsFragmentViewModel.getOrganizeListGrid().value)
+        val initialSpanCount : Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, mAllSongsFragmentViewModel.getOrganizeListGrid().value)
         val initialReverseLayout : Boolean = mAllSongsFragmentViewModel.getIsInverted().value ?: false
         mLayoutManager = GridLayoutManager(ctx, initialSpanCount, GridLayoutManager.VERTICAL, initialReverseLayout)
         mLayoutManager?.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                val newSpanCount : Int = BottomSheetFilterDialogManager.getSpanCount(ctx, mAllSongsFragmentViewModel.getOrganizeListGrid().value)
+                val newSpanCount : Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, mAllSongsFragmentViewModel.getOrganizeListGrid().value)
+                val updatedSpan : Int = if(mLayoutManager?.spanCount == newSpanCount) newSpanCount else mLayoutManager?.spanCount ?: 1
                 return when (position) {
-                    0 -> newSpanCount
-                    ((mLayoutManager?.itemCount ?: 0) - 1) -> newSpanCount
+                    0 -> updatedSpan
+                    ((mLayoutManager?.itemCount ?: 0) - 1) -> updatedSpan
                     else -> 1
                 }
             }
         }
-        mFragmentAllSongsBinding.recyclerView.adapter = mConcatAdapter
-        mFragmentAllSongsBinding.recyclerView.layoutManager = mLayoutManager
-        val newSpanCount : Int = BottomSheetFilterDialogManager.getSpanCount(ctx, mAllSongsFragmentViewModel.getOrganizeListGrid().value)
-        mItemDecoration = GridSpacingItemDecoration(newSpanCount)
-        mItemDecoration?.let {
-            mFragmentAllSongsBinding.recyclerView.addItemDecoration(it)
-        }
-
-        mFragmentAllSongsBinding.fastScroller.setSectionIndexer(mGenericListGridItemAdapter)
-        mFragmentAllSongsBinding.fastScroller.attachRecyclerView(mFragmentAllSongsBinding.recyclerView)
-        mFragmentAllSongsBinding.fastScroller.setFastScrollListener(object : FastScrollListener{
-            override fun onFastScrollStart(fastScroller: FastScroller) {
-                mMainFragmentViewModel.setIsFastScrolling(true)
-                println("FAST SCROLLING STARTED")
+        mFragmentAllSongsBinding?.let { fragmentAllSongsBinding ->
+            fragmentAllSongsBinding.recyclerView.adapter = mConcatAdapter
+            fragmentAllSongsBinding.recyclerView.layoutManager = mLayoutManager
+            val newSpanCount : Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, mAllSongsFragmentViewModel.getOrganizeListGrid().value)
+            val updatedSpan : Int = if(mLayoutManager?.spanCount == newSpanCount) newSpanCount else mLayoutManager?.spanCount ?: 1
+            mItemDecoration = GridSpacingItemDecoration(updatedSpan)
+            mItemDecoration?.let {
+                fragmentAllSongsBinding.recyclerView.addItemDecoration(it)
             }
 
-            override fun onFastScrollStop(fastScroller: FastScroller) {
-                mMainFragmentViewModel.setIsFastScrolling(false)
-                println("FAST SCROLLING STOPPED")
-            }
+            fragmentAllSongsBinding.fastScroller.setSectionIndexer(mGenericListGridItemAdapter)
+            fragmentAllSongsBinding.fastScroller.attachRecyclerView(fragmentAllSongsBinding.recyclerView)
+            fragmentAllSongsBinding.fastScroller.setFastScrollListener(object : FastScrollListener{
+                override fun onFastScrollStart(fastScroller: FastScroller) {
+                    mMainFragmentViewModel.setIsFastScrolling(true)
+                    println("FAST SCROLLING STARTED")
+                }
 
-        })
-    }
-    private fun getStringIndexRequestFastScroller(dataItem: Any): String {
-        val temSongItem: SongItem = dataItem as SongItem
-        return temSongItem.title ?: temSongItem.fileName ?: "#"
-    }
-    private fun castAndPerformRequestedData(dataItem: Any): GenericItemListGrid {
-        val tempGenericItemListGrid: GenericItemListGrid = GenericItemListGrid()
-        context?.let { ctx ->
-            val temSongItem: SongItem = dataItem as SongItem
-            tempGenericItemListGrid.title = temSongItem.title ?: temSongItem.fileName ?: ctx.getString(R.string.unknown_title)
-            tempGenericItemListGrid.subtitle = temSongItem.artist ?: ctx.getString(R.string.unknown_artist)
-            tempGenericItemListGrid.details = ctx.getString(
-                R.string.item_song_card_text_details,
-                FormattersUtils.formatSongDurationToString(temSongItem.duration),
-                temSongItem.fileExtension
-            )
-            tempGenericItemListGrid.imageUri = Uri.parse(temSongItem.uri)
-            tempGenericItemListGrid.imageHashedSignature = temSongItem.hashedCovertArtSignature
+                override fun onFastScrollStop(fastScroller: FastScroller) {
+                    mMainFragmentViewModel.setIsFastScrolling(false)
+                    println("FAST SCROLLING STOPPED")
+                }
+
+            })
         }
-        return tempGenericItemListGrid
     }
 
     private fun checkMultipleSelection(position: Int) {
         mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
     }
-    private fun showSortSongsDialog() {
-        BottomSheetFilterDialogManager.showSongsSortBottomSheetDialog(
-            childFragmentManager,
+    private fun showSortDialog() {
+        if(mSortSongDialog.isVisible) return
+
+        mSortSongDialog.updateBottomSheetData(
             mAllSongsFragmentViewModel,
-            ConstantValues.EXPLORE_ALL_SONGS,
+            ConstantValues.EXPLORE_ALBUMS,
             null
         )
+        mSortSongDialog.show(childFragmentManager, SortSongsBottomSheetDialogFragment.TAG)
     }
 
-    private fun showOrganizeSongsDialog() {
-        BottomSheetFilterDialogManager.showOrganizeBottomSheetDialog(
-            childFragmentManager,
+    private fun showOrganizeDialog() {
+        if(mOrganizeDialog.isVisible) return
+
+        mOrganizeDialog.updateBottomSheetData(
             mAllSongsFragmentViewModel,
-            ConstantValues.EXPLORE_ALL_SONGS,
+            ConstantValues.EXPLORE_ALBUMS,
             null
         )
+        mOrganizeDialog.show(childFragmentManager, OrganizeItemBottomSheetDialogFragment.TAG)
     }
 
-    private fun playSongsShuffle() {
+    private fun playSongOnShuffle() {
         if((mGenericListGridItemAdapter?.currentList?.size ?: 0) <= 0) return
         MainScope().launch {
             withContext(Dispatchers.Default){
@@ -503,45 +504,46 @@ class AllSongsFragment : Fragment() {
                         mGenericListGridItemAdapter?.getPlayingPosition() ?: -1,
                         (mGenericListGridItemAdapter?.currentList?.size ?: 0) -1
                     )
-                playSongAtPosition(randomExcludedNumber, PlaybackStateCompat.REPEAT_MODE_NONE, PlaybackStateCompat.SHUFFLE_MODE_NONE)
+                mGenericListGridItemAdapter?.let { genericListGridItemAdapter ->
+                    FragmentCommonMediaPlaybackAction.playSongAtPosition(
+                        mPlayerFragmentViewModel,
+                        mAllSongsFragmentViewModel,
+                        genericListGridItemAdapter,
+                        randomExcludedNumber,
+                        false,
+                        PlaybackStateCompat.REPEAT_MODE_NONE,
+                        PlaybackStateCompat.SHUFFLE_MODE_NONE
+                    )
+                }
+                updateRecyclerViewScrollingSate()
             }
         }
     }
-    private fun playSongAtPosition(position: Int, repeat: Int? = null, shuffle: Int? = null) {
-        if((mGenericListGridItemAdapter?.currentList?.size ?: 0) <= 0) return
-        if(
-            mPlayerFragmentViewModel.getSortBy().value != mAllSongsFragmentViewModel.getSortBy().value ||
-            mPlayerFragmentViewModel.getIsInverted().value != mAllSongsFragmentViewModel.getIsInverted().value ||
-            mPlayerFragmentViewModel.getQueueListSource().value != ConstantValues.EXPLORE_ALL_SONGS
-        ){
-            mPlayerFragmentViewModel.setQueueListSource(ConstantValues.EXPLORE_ALL_SONGS)
-            mPlayerFragmentViewModel.setUpdatePlaylistCounter()
-        }
-        mPlayerFragmentViewModel.setCurrentPlayingSong(getCurrentPlayingSongFromPosition(position))
-        mPlayerFragmentViewModel.setIsPlaying(true)
-        mPlayerFragmentViewModel.setPlayingProgressValue(0)
-        mPlayerFragmentViewModel.setRepeat(repeat ?: mPlayerFragmentViewModel.getRepeat().value ?: PlaybackStateCompat.REPEAT_MODE_NONE)
-        mPlayerFragmentViewModel.setShuffle(shuffle ?: mPlayerFragmentViewModel.getShuffle().value ?: PlaybackStateCompat.SHUFFLE_MODE_NONE)
-        if(mFragmentAllSongsBinding.recyclerView.scrollState == RecyclerView.SCROLL_STATE_SETTLING){
+    private fun updateRecyclerViewScrollingSate(){
+        if(mFragmentAllSongsBinding?.recyclerView?.scrollState == RecyclerView.SCROLL_STATE_SETTLING){
             mIsDraggingToScroll = false
         }
         mMainFragmentViewModel.setScrollingState(-1)
     }
-    private fun getCurrentPlayingSongFromPosition(position: Int): SongItem? {
-        if (position < 0 || position >= (mGenericListGridItemAdapter?.currentList?.size ?: 0)) return null
-        val tempSongItem: SongItem = mGenericListGridItemAdapter?.currentList?.get(position) as SongItem? ?: return null
-        tempSongItem.position = position
-        return tempSongItem
-    }
 
 
     private fun initViews() {
-//        mFragmentAllSongsBinding.recyclerView.setHasFixedSize(true)
-//        mFragmentAllSongsBinding.recyclerView.setItemViewCacheSize(100)
+        mFragmentAllSongsBinding?.recyclerView?.setHasFixedSize(true)
+//        mFragmentAllSongsBinding?.recyclerView?.setItemViewCacheSize(100)
+
+        mFragmentAllSongsBinding?.let { fragmentAllSongsBinding ->
+            val layoutParamsFastScroller: ConstraintLayout.LayoutParams = fragmentAllSongsBinding.fastScroller.layoutParams as ConstraintLayout.LayoutParams
+
+            context?.let { ctx ->
+            }
+        }
     }
 
     companion object {
         const val TAG = "AllSongsFragment"
+        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = ConstantValues.ORGANIZE_LIST_SMALL
+        private const val SORT_LIST_GRID_DEFAULT_VALUE: String = "title"
+        private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 
         @JvmStatic
         fun newInstance(pageIndex: Int) =
@@ -550,7 +552,5 @@ class AllSongsFragment : Fragment() {
                     putInt(ConstantValues.EXPLORE_ALL_SONGS, pageIndex)
                 }
             }
-
-        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = ConstantValues.ORGANIZE_LIST_SMALL
     }
 }

@@ -21,9 +21,9 @@ import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapte
 import com.prosabdev.fluidmusic.databinding.ItemQueueMusicBinding
 import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.FormattersUtils
+import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
-import com.prosabdev.fluidmusic.utils.ViewAnimatorsUtils
+import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 import java.util.*
 
 class QueueMusicItemListAdapter(
@@ -151,7 +151,7 @@ class QueueMusicItemListAdapter(
             mItemQueueMusicBinding.textDetails.text =
                 ctx.getString(
                     R.string.item_song_card_text_details,
-                    FormattersUtils.formatSongDurationToString(songItem.duration),
+                    FormattersAndParsersUtils.formatSongDurationToString(songItem.duration),
                     songItem.fileExtension
                 )
 
@@ -197,7 +197,7 @@ class QueueMusicItemListAdapter(
         fun updateItemTouchHelper(isDragging : Boolean, animated: Boolean = true){
             if(isDragging) {
                 if (mItemQueueMusicBinding.songItemIsSelected.visibility != VISIBLE) {
-                    ViewAnimatorsUtils.crossFadeUp(
+                    AnimatorsUtils.crossFadeUp(
                         mItemQueueMusicBinding.songItemIsSelected,
                         animated,
                         150,
@@ -206,7 +206,7 @@ class QueueMusicItemListAdapter(
                 }
             }
             else {
-                ViewAnimatorsUtils.crossFadeDown(
+                AnimatorsUtils.crossFadeDown(
                     mItemQueueMusicBinding.songItemIsSelected,
                     animated,
                     150

@@ -1,7 +1,12 @@
 package com.prosabdev.fluidmusic.models.view
 
+import android.content.Context
+import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.DatabaseView
+import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.models.generic.GenericItemListGrid
+import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
 
 @DatabaseView(
     "SELECT songItem.year as name, " +
@@ -32,6 +37,28 @@ class YearItem {
     var uriImage: String? = null
 
     companion object {
+        fun getStringIndexRequestFastScroller(ctx: Context, dataItem: Any): String {
+            if(dataItem is YearItem) {
+                return dataItem.name ?: ctx.getString(R.string.unknown_year)
+            }
+            return "#"
+        }
+        fun castDataItemToGeneric(ctx: Context, dataItem: Any): GenericItemListGrid? {
+            var tempResult : GenericItemListGrid? = null
+            if(dataItem is YearItem) {
+                tempResult = GenericItemListGrid()
+                val tempTitle : String = dataItem.name ?: ctx.getString(R.string.unknown_year)
+                val tempSubtitle : String = ""
+                val tempDetails : String = "${dataItem.numberTracks} song(s) | ${FormattersAndParsersUtils.formatSongDurationToString(dataItem.totalDuration)} min"
+                tempResult.title = tempTitle
+                tempResult.subtitle = tempSubtitle
+                tempResult.details = tempDetails
+                tempResult.imageUri = Uri.parse(dataItem.uriImage)
+                tempResult.imageHashedSignature = dataItem.hashedCovertArtSignature
+            }
+            return tempResult
+        }
+
         val diffCallback = object : DiffUtil.ItemCallback<YearItem>() {
             override fun areItemsTheSame(
                 oldItem: YearItem,

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.LifecycleOwner
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.explore.AlbumItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -15,5 +16,8 @@ class AlbumsFragmentViewModel(app: Application) : GenericListenDataViewModel(app
                 mMutableDataList.value = it as ArrayList<Any>?
             }
         }
+    }
+    suspend fun requestDataDirectlyFromDatabase(viewModel: AlbumItemViewModel){
+        mMutableDataList.value = viewModel.getAllDirectly(getSortBy().value ?: "name")
     }
 }
