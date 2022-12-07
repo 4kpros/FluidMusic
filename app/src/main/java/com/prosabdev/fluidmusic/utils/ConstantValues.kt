@@ -7,15 +7,6 @@ abstract class ConstantValues {
         const val TAG = "Fluid Music"
         const val PACKAGE_NAME = "com.prosabdev.fluidmusic"
 
-        //Database strings
-
-        //Media scanner flags
-        const val MEDIA_SCANNER_WORKER_NAME = "${PACKAGE_NAME}.MEDIA_SCANNER_WORKER_NAME"
-        const val MEDIA_SCANNER_WORKER_SCAN_METHOD = "${PACKAGE_NAME}.MEDIA_SCANNER_WORKER_SCAN_METHOD"
-        const val MEDIA_SCANNER_WORKER_OUTPUT = "${PACKAGE_NAME}.MEDIA_SCANNER_WORKER_OUTPUT"
-        const val MEDIA_SCANNER_WORKER_METHOD_CLEAR_ALL = "${PACKAGE_NAME}.MEDIA_SCANNER_WORKER_METHOD_CLEAR_ALL"
-        const val MEDIA_SCANNER_WORKER_METHOD_ADD_NEW = "${PACKAGE_NAME}.MEDIA_SCANNER_WORKER_METHOD_ADD_NEW"
-
         //List
         const val ORGANIZE_LIST_SMALL_NO_IMAGE : Int = 101
         const val ORGANIZE_LIST_MEDIUM_NO_IMAGE : Int = 102

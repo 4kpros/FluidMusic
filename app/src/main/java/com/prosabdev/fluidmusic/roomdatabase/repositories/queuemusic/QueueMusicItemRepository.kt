@@ -17,18 +17,28 @@ class QueueMusicItemRepository(ctx : Context) {
             mDao?.insert(queueMusicItem)
         }
     }
-    suspend fun update(queueMusicItem: QueueMusicItem?) {
-        withContext(Dispatchers.IO){
+    suspend fun update(queueMusicItem: QueueMusicItem?): Int? {
+        return withContext(Dispatchers.IO){
             mDao?.update(queueMusicItem)
         }
     }
     suspend fun delete(queueMusicItem: QueueMusicItem?) {
-        withContext(Dispatchers.IO){
+        return withContext(Dispatchers.IO){
             mDao?.delete(queueMusicItem)
         }
     }
-    suspend fun deleteAll() {
-        withContext(Dispatchers.IO){
+    suspend fun deleteAtId(id: Long): Int? {
+        return withContext(Dispatchers.IO){
+            mDao?.deleteAtId(id)
+        }
+    }
+    suspend fun deleteMultiple(queueMusicItem: List<QueueMusicItem>?): Int? {
+        return withContext(Dispatchers.IO){
+            mDao?.deleteMultiple(queueMusicItem)
+        }
+    }
+    suspend fun deleteAll(): Int? {
+        return withContext(Dispatchers.IO){
             mDao?.deleteAll()
         }
     }
@@ -38,9 +48,9 @@ class QueueMusicItemRepository(ctx : Context) {
             mDao?.getAtId(id)
         }
     }
-    suspend fun getAll(order_by: String) : LiveData<List<QueueMusicItem>>? {
+    suspend fun getAll() : LiveData<List<QueueMusicItem>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAll(order_by)
+            mDao?.getAll()
         }
     }
 }

@@ -1,12 +1,9 @@
 package com.prosabdev.fluidmusic.sharedprefs
 
 import android.content.Context
-import android.util.Log
 import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 abstract class SortOrganizePrefsLoaderAndSetupViewModels {
     companion object {

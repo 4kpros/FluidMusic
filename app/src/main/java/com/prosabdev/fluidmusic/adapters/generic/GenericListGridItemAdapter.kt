@@ -20,7 +20,10 @@ import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemGenericListGridBinding
 import com.prosabdev.fluidmusic.models.generic.GenericItemListGrid
-import com.prosabdev.fluidmusic.utils.*
+import com.prosabdev.fluidmusic.utils.AnimatorsUtils
+import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
+import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

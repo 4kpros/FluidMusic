@@ -13,38 +13,38 @@ interface PlaylistSongItemDao {
     fun insertMultiple(playlistSongItems: List<PlaylistSongItem>?) : List<Long>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(playlistSongItem: PlaylistSongItem?)
+    fun update(playlistSongItem: PlaylistSongItem?) : Int
 
     @Delete
-    fun delete(playlistSongItem: PlaylistSongItem?) : Long
+    fun delete(playlistSongItem: PlaylistSongItem?) : Int
 
     @Delete
-    fun deleteMultiple(playlistSongItem: List<PlaylistSongItem>?) : List<Long>
+    fun deleteMultiple(playlistSongItem: List<PlaylistSongItem>?) : Int
 
     @Query("DELETE FROM PlaylistSongItem")
-    fun deleteAll()
+    fun deleteAll() : Int
 
     @Query("DELETE FROM PlaylistSongItem WHERE songUri = :songUri")
-    fun deleteAtSongUri(songUri: String) : Long
+    fun deleteAtSongUri(songUri: String) : Int
 
     @Query("SELECT * FROM PlaylistSongItem WHERE id = :id LIMIT 1")
     fun getAtId(id: Long): PlaylistSongItem?
 
     @Query("SELECT * FROM PlaylistSongItem " +
             "ORDER BY " +
-            "CASE :order_by WHEN 'songUri' THEN PlaylistSongItem.songUri END ASC," +
-            "CASE :order_by WHEN 'playlistId' THEN PlaylistSongItem.playlistId END ASC," +
-            "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN PlaylistSongItem.lastAddedDateToLibrary END ASC," +
-            "CASE :order_by WHEN 'id' THEN PlaylistSongItem.id END ASC"
+            "CASE :orderBy WHEN 'songUri' THEN PlaylistSongItem.songUri END ASC," +
+            "CASE :orderBy WHEN 'playlistId' THEN PlaylistSongItem.playlistId END ASC," +
+            "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN PlaylistSongItem.lastAddedDateToLibrary END ASC," +
+            "CASE :orderBy WHEN 'id' THEN PlaylistSongItem.id END ASC"
     )
-    fun getAll(order_by: String): LiveData<List<PlaylistSongItem>?>
+    fun getAll(orderBy: String): LiveData<List<PlaylistSongItem>?>
 
     @Query("SELECT * FROM PlaylistSongItem " +
             "ORDER BY " +
-            "CASE :order_by WHEN 'songId' THEN PlaylistSongItem.songUri END ASC," +
-            "CASE :order_by WHEN 'playlistId' THEN PlaylistSongItem.playlistId END ASC," +
-            "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN PlaylistSongItem.lastAddedDateToLibrary END ASC," +
-            "CASE :order_by WHEN 'id' THEN PlaylistSongItem.id END ASC"
+            "CASE :orderBy WHEN 'songId' THEN PlaylistSongItem.songUri END ASC," +
+            "CASE :orderBy WHEN 'playlistId' THEN PlaylistSongItem.playlistId END ASC," +
+            "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN PlaylistSongItem.lastAddedDateToLibrary END ASC," +
+            "CASE :orderBy WHEN 'id' THEN PlaylistSongItem.id END ASC"
     )
-    fun getAllDirectly(order_by: String): List<PlaylistSongItem>?
+    fun getAllDirectly(orderBy: String): List<PlaylistSongItem>?
 }

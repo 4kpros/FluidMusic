@@ -49,7 +49,7 @@ class PlaylistItemViewAdapter(
         }
 
         fun updateUI(playlistItemView: PlaylistItemView){
-            mItemPlaylistBinding.textTitle.text = playlistItemView.playlistName
+            mItemPlaylistBinding.textTitle.text = playlistItemView.name
             mItemPlaylistBinding.textSubtitle.text = "${playlistItemView.numberTracks} songs | ${FormattersAndParsersUtils.formatSongDurationToString(playlistItemView.totalDuration)} min"
 
         }

@@ -18,14 +18,17 @@ import com.prosabdev.fluidmusic.databinding.BottomSheetPlayerMoreBinding
 import com.prosabdev.fluidmusic.databinding.DialogGotoSongBinding
 import com.prosabdev.fluidmusic.databinding.DialogSetSleepTimerBinding
 import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
-import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.service.intents.IntentActionsManager
 import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
-import com.prosabdev.fluidmusic.utils.*
+import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
+import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
+import com.prosabdev.fluidmusic.utils.PermissionsManagerUtils
+import com.prosabdev.fluidmusic.utils.SystemSettingsUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistItemViewModel
@@ -373,8 +376,8 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
 
         val songsToAddOnPlaylist : ArrayList<PlaylistSongItem> = ArrayList()
         val psI = PlaylistSongItem()
-        psI.songId = tempSongItem.id
-        psI.addedDate = SystemSettingsUtils.getCurrentDateInMilli()
+        psI.songUri = tempSongItem.uri
+        psI.lastAddedDateToLibrary = SystemSettingsUtils.getCurrentDateInMilli()
         songsToAddOnPlaylist.add(psI)
 
         val playlistAddBottomSheetDialog = PlaylistAddFullBottomSheetDialogFragment.newInstance(

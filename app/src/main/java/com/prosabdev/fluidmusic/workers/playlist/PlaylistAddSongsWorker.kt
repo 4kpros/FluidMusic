@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.utils.SystemSettingsUtils
 import com.prosabdev.fluidmusic.workers.WorkerConstantValues
@@ -19,15 +19,11 @@ class PlaylistAddSongsWorker(
 ) : CoroutineWorker(ctx, params) {
 
     override suspend fun doWork(): Result {
-        var isUpdating: Boolean?
-        var dataResult: List<Long>?
+        var dataResult: List<Long> = ArrayList()
         return withContext(Dispatchers.IO) {
             try {
                 Log.i(TAG, "WORKER $TAG : started")
 
-                //Init output results
-                isUpdating = true
-                dataResult = ArrayList()
                 //Extract worker params
                 val playlistId = inputData.getInt(PLAYLIST_ID, -1)
                 val modelType = inputData.getString(ITEM_LIST_MODEL_TYPE)
@@ -52,12 +48,10 @@ class PlaylistAddSongsWorker(
                 //Insert to database
                 dataResult = AppDatabase.getDatabase(applicationContext).playlistSongItemDao().insertMultiple(playlistItemList)
 
-                isUpdating = false
                 Log.i(TAG, "WORKER $TAG : ended")
 
                 Result.success(
                     workDataOf(
-                        WorkerConstantValues.WORKER_OUTPUT_IS_UPDATING to isUpdating,
                         WorkerConstantValues.WORKER_OUTPUT_DATA to dataResult,
                     )
                 )

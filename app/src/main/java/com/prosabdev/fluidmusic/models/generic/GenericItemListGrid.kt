@@ -1,7 +1,6 @@
 package com.prosabdev.fluidmusic.models.generic
 
 import android.net.Uri
-import androidx.recyclerview.widget.DiffUtil
 
 class GenericItemListGrid {
     var title: String? = null

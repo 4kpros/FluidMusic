@@ -1,7 +1,6 @@
 package com.prosabdev.fluidmusic.utils
 
 import android.os.Build
-import android.util.Log
 import android.view.View
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding

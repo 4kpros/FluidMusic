@@ -5,12 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.*
-import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.workers.mediascanner.MediaScannerWorker
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.LinkedBlockingQueue
 
 class MediaScannerActivityViewModel(app: Application) : AndroidViewModel(app) {
 

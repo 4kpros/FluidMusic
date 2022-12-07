@@ -12,7 +12,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetSortContentExplorerBinding
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
-import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 
 class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment() {

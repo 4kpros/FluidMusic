@@ -3,9 +3,7 @@ package com.prosabdev.fluidmusic.roomdatabase.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.prosabdev.fluidmusic.models.songitem.SongItem
-import com.prosabdev.fluidmusic.models.songitem.SongItemUriView
-import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.LinkedBlockingQueue
+import com.prosabdev.fluidmusic.models.songitem.SongItemUri
 
 @Dao
 interface SongItemDao {
@@ -13,39 +11,40 @@ interface SongItemDao {
     fun insert(songItem: SongItem?) : Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(songItem: SongItem?) : Long
+    fun update(songItem: SongItem?) : Int
 
     @Delete
-    fun delete(songItem: SongItem?) : Long
+    fun delete(songItem: SongItem?) : Int
 
     @Delete
-    fun deleteMultiple(songItem: ArrayList<SongItem>?) : List<Long>
+    fun deleteMultiple(songItem: ArrayList<SongItem>?) : Int
 
     @Query("DELETE FROM SongItem")
-    fun deleteAll()
+    fun deleteAll() : Int
 
     @Query("UPDATE SongItem SET " +
             "isValid = :isValid " +
             "WHERE uri = :uri"
     )
-    fun updateValidityAtUri(uri: String, isValid: Boolean): Long
+    fun updateValidityAtUri(uri: String, isValid: Boolean): Int
 
     @Query("UPDATE SongItem SET " +
             "lastAddedDateToLibrary = :lastAddedDateToLibrary " +
             "WHERE uri = :uri"
     )
-    fun updateLastAddedToLibraryAtUri(uri: String, lastAddedDateToLibrary: Long): Long
+    fun updateLastAddedToLibraryAtUri(uri: String, lastAddedDateToLibrary: Long): Int
 
     @Query("UPDATE SongItem SET " +
             "playCount = :playCount," +
             "lastPlayed = :lastPlayed " +
             "WHERE uri = :uri"
     )
-    fun updatePlayCountAtUri(uri: String, playCount: Int, lastPlayed: Long): Long
+    fun updatePlayCountAtUri(uri: String, playCount: Int, lastPlayed: Long): Int
 
     @Query("UPDATE SongItem SET " +
             "uriTreeId = :uriTreeId," +
             "fileName = :fileName," +
+            "title = :title," +
             "artist = :artist," +
             "albumArtist = :albumArtist," +
             "composer = :composer," +
@@ -55,6 +54,7 @@ interface SongItemDao {
             "folder = :folder," +
             "folderParent = :folderParent," +
             "folderUri = :folderUri," +
+            "year = :year," +
             "duration = :duration," +
             "language = :language," +
             "typeMime = :typeMime," +
@@ -101,7 +101,6 @@ interface SongItemDao {
         fileExtension: String?,
         bitPerSample: String?,
         lastUpdateDate: Long,
-        lastAddedDateToLibrary: Long,
         author: String?,
         diskNumber: String?,
         writer: String?,
@@ -109,11 +108,9 @@ interface SongItemDao {
         numberTracks: String?,
         comments: String?,
         rating: Int,
-        playCount: Int,
-        lastPlayed: Long,
         hashedCovertArtSignature: Int,
         isValid: Boolean
-    ): Long
+    ): Int
 
     @Query("SELECT * FROM SongItem LIMIT 1")
     fun getFirstSong(): SongItem?
@@ -126,218 +123,222 @@ interface SongItemDao {
 
     @Query("SELECT * FROM SongItem " +
             "ORDER BY " +
-            "CASE :order_by WHEN 'title' THEN COALESCE(SongItem.title, SongItem.fileName) END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'fileName' THEN SongItem.fileName END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'cdTrackNumber' THEN SongItem.cdTrackNumber END ASC," +
-            "CASE :order_by WHEN 'diskNumber' THEN SongItem.diskNumber END ASC," +
-            "CASE :order_by WHEN 'artist' THEN COALESCE(SongItem.artist, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'album' THEN COALESCE(SongItem.album, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'albumArtist' THEN COALESCE(SongItem.albumArtist, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'year' THEN COALESCE(SongItem.year, 'Unknown field') END COLLATE NOCASE DESC," +
-            "CASE :order_by WHEN 'duration' THEN SongItem.duration END ASC," +
-            "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN SongItem.lastAddedDateToLibrary END DESC," +
-            "CASE :order_by WHEN 'lastUpdateDate' THEN SongItem.lastUpdateDate END DESC," +
-            "CASE :order_by WHEN 'path' THEN SongItem.uriPath END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'pathCaseSensitive' THEN SongItem.uriPath END ASC," +
-            "CASE :order_by WHEN 'genre' THEN COALESCE(SongItem.genre, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'size' THEN SongItem.size END ASC," +
-            "CASE :order_by WHEN 'typeMime' THEN COALESCE(SongItem.typeMime, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'rating' THEN SongItem.rating END ASC," +
-            "CASE :order_by WHEN 'playCount' THEN SongItem.playCount END ASC," +
-            "CASE :order_by WHEN 'lastPlayed' THEN SongItem.lastPlayed END ASC," +
-            "CASE :order_by WHEN 'author' THEN COALESCE(SongItem.author, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'writer' THEN COALESCE(SongItem.writer, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'language' THEN COALESCE(SongItem.language, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'sampleRate' THEN SongItem.sampleRate END ASC," +
-            "CASE :order_by WHEN 'bitrate' THEN SongItem.bitrate END ASC," +
-            "CASE :order_by WHEN 'id' THEN SongItem.id END ASC LIMIT :limit"
+            "CASE :orderBy WHEN 'title' THEN COALESCE(SongItem.title, SongItem.fileName) END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'fileName' THEN SongItem.fileName END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'cdTrackNumber' THEN SongItem.cdTrackNumber END ASC," +
+            "CASE :orderBy WHEN 'diskNumber' THEN SongItem.diskNumber END ASC," +
+            "CASE :orderBy WHEN 'artist' THEN COALESCE(SongItem.artist, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'album' THEN COALESCE(SongItem.album, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'albumArtist' THEN COALESCE(SongItem.albumArtist, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'year' THEN COALESCE(SongItem.year, 'Unknown field') END COLLATE NOCASE DESC," +
+            "CASE :orderBy WHEN 'duration' THEN SongItem.duration END ASC," +
+            "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN SongItem.lastAddedDateToLibrary END DESC," +
+            "CASE :orderBy WHEN 'lastUpdateDate' THEN SongItem.lastUpdateDate END DESC," +
+            "CASE :orderBy WHEN 'path' THEN SongItem.uriPath END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'pathCaseSensitive' THEN SongItem.uriPath END ASC," +
+            "CASE :orderBy WHEN 'genre' THEN COALESCE(SongItem.genre, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'size' THEN SongItem.size END ASC," +
+            "CASE :orderBy WHEN 'typeMime' THEN COALESCE(SongItem.typeMime, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'rating' THEN SongItem.rating END ASC," +
+            "CASE :orderBy WHEN 'playCount' THEN SongItem.playCount END ASC," +
+            "CASE :orderBy WHEN 'lastPlayed' THEN SongItem.lastPlayed END ASC," +
+            "CASE :orderBy WHEN 'author' THEN COALESCE(SongItem.author, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'writer' THEN COALESCE(SongItem.writer, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'language' THEN COALESCE(SongItem.language, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'sampleRate' THEN SongItem.sampleRate END ASC," +
+            "CASE :orderBy WHEN 'bitrate' THEN SongItem.bitrate END ASC," +
+            "CASE :orderBy WHEN 'id' THEN SongItem.id END ASC LIMIT :limit"
     )
-    fun getAllLimit(order_by: String, limit: Int = 50): LiveData<List<SongItem>>?
+    fun getAllLimit(orderBy: String, limit: Int = 50): LiveData<List<SongItem>>?
 
     @Query("SELECT * FROM SongItem " +
             "ORDER BY " +
-            "CASE :order_by WHEN 'title' THEN COALESCE(SongItem.title, SongItem.fileName) END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'fileName' THEN SongItem.fileName END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'cdTrackNumber' THEN SongItem.cdTrackNumber END ASC," +
-            "CASE :order_by WHEN 'diskNumber' THEN SongItem.diskNumber END ASC," +
-            "CASE :order_by WHEN 'artist' THEN COALESCE(SongItem.artist, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'album' THEN COALESCE(SongItem.album, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'albumArtist' THEN COALESCE(SongItem.albumArtist, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'year' THEN COALESCE(SongItem.year, 'Unknown field') END COLLATE NOCASE DESC," +
-            "CASE :order_by WHEN 'duration' THEN SongItem.duration END ASC," +
-            "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN SongItem.lastAddedDateToLibrary END DESC," +
-            "CASE :order_by WHEN 'lastUpdateDate' THEN SongItem.lastUpdateDate END DESC," +
-            "CASE :order_by WHEN 'path' THEN SongItem.uriPath END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'pathCaseSensitive' THEN SongItem.uriPath END ASC," +
-            "CASE :order_by WHEN 'genre' THEN COALESCE(SongItem.genre, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'size' THEN SongItem.size END ASC," +
-            "CASE :order_by WHEN 'typeMime' THEN COALESCE(SongItem.typeMime, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'rating' THEN SongItem.rating END ASC," +
-            "CASE :order_by WHEN 'playCount' THEN SongItem.playCount END ASC," +
-            "CASE :order_by WHEN 'lastPlayed' THEN SongItem.lastPlayed END ASC," +
-            "CASE :order_by WHEN 'author' THEN COALESCE(SongItem.author, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'writer' THEN COALESCE(SongItem.writer, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'language' THEN COALESCE(SongItem.language, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'sampleRate' THEN SongItem.sampleRate END ASC," +
-            "CASE :order_by WHEN 'bitrate' THEN SongItem.bitrate END ASC," +
-            "CASE :order_by WHEN 'id' THEN SongItem.id END ASC"
+            "CASE :orderBy WHEN 'title' THEN COALESCE(SongItem.title, SongItem.fileName) END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'fileName' THEN SongItem.fileName END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'cdTrackNumber' THEN SongItem.cdTrackNumber END ASC," +
+            "CASE :orderBy WHEN 'diskNumber' THEN SongItem.diskNumber END ASC," +
+            "CASE :orderBy WHEN 'artist' THEN COALESCE(SongItem.artist, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'album' THEN COALESCE(SongItem.album, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'albumArtist' THEN COALESCE(SongItem.albumArtist, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'year' THEN COALESCE(SongItem.year, 'Unknown field') END COLLATE NOCASE DESC," +
+            "CASE :orderBy WHEN 'duration' THEN SongItem.duration END ASC," +
+            "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN SongItem.lastAddedDateToLibrary END DESC," +
+            "CASE :orderBy WHEN 'lastUpdateDate' THEN SongItem.lastUpdateDate END DESC," +
+            "CASE :orderBy WHEN 'path' THEN SongItem.uriPath END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'pathCaseSensitive' THEN SongItem.uriPath END ASC," +
+            "CASE :orderBy WHEN 'genre' THEN COALESCE(SongItem.genre, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'size' THEN SongItem.size END ASC," +
+            "CASE :orderBy WHEN 'typeMime' THEN COALESCE(SongItem.typeMime, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'rating' THEN SongItem.rating END ASC," +
+            "CASE :orderBy WHEN 'playCount' THEN SongItem.playCount END ASC," +
+            "CASE :orderBy WHEN 'lastPlayed' THEN SongItem.lastPlayed END ASC," +
+            "CASE :orderBy WHEN 'author' THEN COALESCE(SongItem.author, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'writer' THEN COALESCE(SongItem.writer, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'language' THEN COALESCE(SongItem.language, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'sampleRate' THEN SongItem.sampleRate END ASC," +
+            "CASE :orderBy WHEN 'bitrate' THEN SongItem.bitrate END ASC," +
+            "CASE :orderBy WHEN 'id' THEN SongItem.id END ASC"
     )
-    fun getAll(order_by: String): LiveData<List<SongItem>>?
+    fun getAll(orderBy: String): LiveData<List<SongItem>>?
 
     @Query("SELECT * FROM SongItem " +
             "ORDER BY " +
-            "CASE :order_by WHEN 'title' THEN COALESCE(SongItem.title, SongItem.fileName) END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'fileName' THEN SongItem.fileName END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'cdTrackNumber' THEN SongItem.cdTrackNumber END ASC," +
-            "CASE :order_by WHEN 'diskNumber' THEN SongItem.diskNumber END ASC," +
-            "CASE :order_by WHEN 'artist' THEN COALESCE(SongItem.artist, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'album' THEN COALESCE(SongItem.album, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'albumArtist' THEN COALESCE(SongItem.albumArtist, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'year' THEN COALESCE(SongItem.year, 'Unknown field') END COLLATE NOCASE DESC," +
-            "CASE :order_by WHEN 'duration' THEN SongItem.duration END ASC," +
-            "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN SongItem.lastAddedDateToLibrary END DESC," +
-            "CASE :order_by WHEN 'lastUpdateDate' THEN SongItem.lastUpdateDate END DESC," +
-            "CASE :order_by WHEN 'path' THEN SongItem.uriPath END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'pathCaseSensitive' THEN SongItem.uriPath END ASC," +
-            "CASE :order_by WHEN 'genre' THEN COALESCE(SongItem.genre, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'size' THEN SongItem.size END ASC," +
-            "CASE :order_by WHEN 'typeMime' THEN COALESCE(SongItem.typeMime, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'rating' THEN SongItem.rating END ASC," +
-            "CASE :order_by WHEN 'playCount' THEN SongItem.playCount END ASC," +
-            "CASE :order_by WHEN 'lastPlayed' THEN SongItem.lastPlayed END ASC," +
-            "CASE :order_by WHEN 'author' THEN COALESCE(SongItem.author, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'writer' THEN COALESCE(SongItem.writer, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'language' THEN COALESCE(SongItem.language, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'sampleRate' THEN SongItem.sampleRate END ASC," +
-            "CASE :order_by WHEN 'bitrate' THEN SongItem.bitrate END ASC," +
-            "CASE :order_by WHEN 'id' THEN SongItem.id END ASC"
+            "CASE :orderBy WHEN 'title' THEN COALESCE(SongItem.title, SongItem.fileName) END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'fileName' THEN SongItem.fileName END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'cdTrackNumber' THEN SongItem.cdTrackNumber END ASC," +
+            "CASE :orderBy WHEN 'diskNumber' THEN SongItem.diskNumber END ASC," +
+            "CASE :orderBy WHEN 'artist' THEN COALESCE(SongItem.artist, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'album' THEN COALESCE(SongItem.album, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'albumArtist' THEN COALESCE(SongItem.albumArtist, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'year' THEN COALESCE(SongItem.year, 'Unknown field') END COLLATE NOCASE DESC," +
+            "CASE :orderBy WHEN 'duration' THEN SongItem.duration END ASC," +
+            "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN SongItem.lastAddedDateToLibrary END DESC," +
+            "CASE :orderBy WHEN 'lastUpdateDate' THEN SongItem.lastUpdateDate END DESC," +
+            "CASE :orderBy WHEN 'path' THEN SongItem.uriPath END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'pathCaseSensitive' THEN SongItem.uriPath END ASC," +
+            "CASE :orderBy WHEN 'genre' THEN COALESCE(SongItem.genre, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'size' THEN SongItem.size END ASC," +
+            "CASE :orderBy WHEN 'typeMime' THEN COALESCE(SongItem.typeMime, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'rating' THEN SongItem.rating END ASC," +
+            "CASE :orderBy WHEN 'playCount' THEN SongItem.playCount END ASC," +
+            "CASE :orderBy WHEN 'lastPlayed' THEN SongItem.lastPlayed END ASC," +
+            "CASE :orderBy WHEN 'author' THEN COALESCE(SongItem.author, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'writer' THEN COALESCE(SongItem.writer, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'language' THEN COALESCE(SongItem.language, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'sampleRate' THEN SongItem.sampleRate END ASC," +
+            "CASE :orderBy WHEN 'bitrate' THEN SongItem.bitrate END ASC," +
+            "CASE :orderBy WHEN 'id' THEN SongItem.id END ASC"
     )
-    fun getAllDirectly(order_by: String): List<SongItem>?
+    fun getAllDirectly(orderBy: String): List<SongItem>?
 
     @Query("SELECT * FROM SongItem WHERE :whereColumn = :columnValue " +
             "ORDER BY " +
-            "CASE :order_by WHEN 'title' THEN COALESCE(SongItem.title, SongItem.fileName) END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'fileName' THEN SongItem.fileName END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'cdTrackNumber' THEN SongItem.cdTrackNumber END ASC," +
-            "CASE :order_by WHEN 'diskNumber' THEN SongItem.diskNumber END ASC," +
-            "CASE :order_by WHEN 'artist' THEN COALESCE(SongItem.artist, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'album' THEN COALESCE(SongItem.album, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'albumArtist' THEN COALESCE(SongItem.albumArtist, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'year' THEN COALESCE(SongItem.year, 'Unknown field') END COLLATE NOCASE DESC," +
-            "CASE :order_by WHEN 'duration' THEN SongItem.duration END ASC," +
-            "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN SongItem.lastAddedDateToLibrary END DESC," +
-            "CASE :order_by WHEN 'lastUpdateDate' THEN SongItem.lastUpdateDate END DESC," +
-            "CASE :order_by WHEN 'path' THEN SongItem.uriPath END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'pathCaseSensitive' THEN SongItem.uriPath END ASC," +
-            "CASE :order_by WHEN 'genre' THEN COALESCE(SongItem.genre, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'size' THEN SongItem.size END ASC," +
-            "CASE :order_by WHEN 'typeMime' THEN COALESCE(SongItem.typeMime, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'rating' THEN SongItem.rating END ASC," +
-            "CASE :order_by WHEN 'playCount' THEN SongItem.playCount END ASC," +
-            "CASE :order_by WHEN 'lastPlayed' THEN SongItem.lastPlayed END ASC," +
-            "CASE :order_by WHEN 'author' THEN COALESCE(SongItem.author, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'writer' THEN COALESCE(SongItem.writer, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'language' THEN COALESCE(SongItem.language, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'sampleRate' THEN SongItem.sampleRate END ASC," +
-            "CASE :order_by WHEN 'bitrate' THEN SongItem.bitrate END ASC," +
-            "CASE :order_by WHEN 'id' THEN SongItem.id END ASC"
+            "CASE :orderBy WHEN 'title' THEN COALESCE(SongItem.title, SongItem.fileName) END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'fileName' THEN SongItem.fileName END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'cdTrackNumber' THEN SongItem.cdTrackNumber END ASC," +
+            "CASE :orderBy WHEN 'diskNumber' THEN SongItem.diskNumber END ASC," +
+            "CASE :orderBy WHEN 'artist' THEN COALESCE(SongItem.artist, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'album' THEN COALESCE(SongItem.album, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'albumArtist' THEN COALESCE(SongItem.albumArtist, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'year' THEN COALESCE(SongItem.year, 'Unknown field') END COLLATE NOCASE DESC," +
+            "CASE :orderBy WHEN 'duration' THEN SongItem.duration END ASC," +
+            "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN SongItem.lastAddedDateToLibrary END DESC," +
+            "CASE :orderBy WHEN 'lastUpdateDate' THEN SongItem.lastUpdateDate END DESC," +
+            "CASE :orderBy WHEN 'path' THEN SongItem.uriPath END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'pathCaseSensitive' THEN SongItem.uriPath END ASC," +
+            "CASE :orderBy WHEN 'genre' THEN COALESCE(SongItem.genre, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'size' THEN SongItem.size END ASC," +
+            "CASE :orderBy WHEN 'typeMime' THEN COALESCE(SongItem.typeMime, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'rating' THEN SongItem.rating END ASC," +
+            "CASE :orderBy WHEN 'playCount' THEN SongItem.playCount END ASC," +
+            "CASE :orderBy WHEN 'lastPlayed' THEN SongItem.lastPlayed END ASC," +
+            "CASE :orderBy WHEN 'author' THEN COALESCE(SongItem.author, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'writer' THEN COALESCE(SongItem.writer, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'language' THEN COALESCE(SongItem.language, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'sampleRate' THEN SongItem.sampleRate END ASC," +
+            "CASE :orderBy WHEN 'bitrate' THEN SongItem.bitrate END ASC," +
+            "CASE :orderBy WHEN 'id' THEN SongItem.id END ASC"
     )
-    fun getAllWhereEqual(whereColumn: String, columnValue: String?, order_by: String): LiveData<List<SongItem>>?
+    fun getAllWhereEqual(whereColumn: String, columnValue: String?, orderBy: String): LiveData<List<SongItem>>?
 
     @Query("SELECT * FROM SongItem WHERE :whereColumn GLOB '*' || :columnValue || '*' " +
             "ORDER BY " +
-            "CASE :order_by WHEN 'title' THEN COALESCE(SongItem.title, SongItem.fileName) END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'fileName' THEN SongItem.fileName END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'cdTrackNumber' THEN SongItem.cdTrackNumber END ASC," +
-            "CASE :order_by WHEN 'diskNumber' THEN SongItem.diskNumber END ASC," +
-            "CASE :order_by WHEN 'artist' THEN COALESCE(SongItem.artist, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'album' THEN COALESCE(SongItem.album, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'albumArtist' THEN COALESCE(SongItem.albumArtist, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'year' THEN COALESCE(SongItem.year, 'Unknown field') END COLLATE NOCASE DESC," +
-            "CASE :order_by WHEN 'duration' THEN SongItem.duration END ASC," +
-            "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN SongItem.lastAddedDateToLibrary END DESC," +
-            "CASE :order_by WHEN 'lastUpdateDate' THEN SongItem.lastUpdateDate END DESC," +
-            "CASE :order_by WHEN 'path' THEN SongItem.uriPath END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'pathCaseSensitive' THEN SongItem.uriPath END ASC," +
-            "CASE :order_by WHEN 'genre' THEN COALESCE(SongItem.genre, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'size' THEN SongItem.size END ASC," +
-            "CASE :order_by WHEN 'typeMime' THEN COALESCE(SongItem.typeMime, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'rating' THEN SongItem.rating END ASC," +
-            "CASE :order_by WHEN 'playCount' THEN SongItem.playCount END ASC," +
-            "CASE :order_by WHEN 'lastPlayed' THEN SongItem.lastPlayed END ASC," +
-            "CASE :order_by WHEN 'author' THEN COALESCE(SongItem.author, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'writer' THEN COALESCE(SongItem.writer, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'language' THEN COALESCE(SongItem.language, 'Unknown field') END COLLATE NOCASE ASC," +
-            "CASE :order_by WHEN 'sampleRate' THEN SongItem.sampleRate END ASC," +
-            "CASE :order_by WHEN 'bitrate' THEN SongItem.bitrate END ASC," +
-            "CASE :order_by WHEN 'id' THEN SongItem.id END ASC"
+            "CASE :orderBy WHEN 'title' THEN COALESCE(SongItem.title, SongItem.fileName) END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'fileName' THEN SongItem.fileName END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'cdTrackNumber' THEN SongItem.cdTrackNumber END ASC," +
+            "CASE :orderBy WHEN 'diskNumber' THEN SongItem.diskNumber END ASC," +
+            "CASE :orderBy WHEN 'artist' THEN COALESCE(SongItem.artist, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'album' THEN COALESCE(SongItem.album, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'albumArtist' THEN COALESCE(SongItem.albumArtist, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'year' THEN COALESCE(SongItem.year, 'Unknown field') END COLLATE NOCASE DESC," +
+            "CASE :orderBy WHEN 'duration' THEN SongItem.duration END ASC," +
+            "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN SongItem.lastAddedDateToLibrary END DESC," +
+            "CASE :orderBy WHEN 'lastUpdateDate' THEN SongItem.lastUpdateDate END DESC," +
+            "CASE :orderBy WHEN 'path' THEN SongItem.uriPath END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'pathCaseSensitive' THEN SongItem.uriPath END ASC," +
+            "CASE :orderBy WHEN 'genre' THEN COALESCE(SongItem.genre, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'size' THEN SongItem.size END ASC," +
+            "CASE :orderBy WHEN 'typeMime' THEN COALESCE(SongItem.typeMime, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'rating' THEN SongItem.rating END ASC," +
+            "CASE :orderBy WHEN 'playCount' THEN SongItem.playCount END ASC," +
+            "CASE :orderBy WHEN 'lastPlayed' THEN SongItem.lastPlayed END ASC," +
+            "CASE :orderBy WHEN 'author' THEN COALESCE(SongItem.author, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'writer' THEN COALESCE(SongItem.writer, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'language' THEN COALESCE(SongItem.language, 'Unknown field') END COLLATE NOCASE ASC," +
+            "CASE :orderBy WHEN 'sampleRate' THEN SongItem.sampleRate END ASC," +
+            "CASE :orderBy WHEN 'bitrate' THEN SongItem.bitrate END ASC," +
+            "CASE :orderBy WHEN 'id' THEN SongItem.id END ASC"
     )
-    fun getAllWhereLike(whereColumn: String, columnValue: String?, order_by: String): LiveData<List<SongItem>>?
+    fun getAllWhereLike(whereColumn: String, columnValue: String?, orderBy: String): LiveData<List<SongItem>>?
 
 
     @Query(
-        "SELECT * FROM SongItemUriView " +
-                "INNER JOIN SongItem ON SongItemUriView.id = SongItem.id " +
+        "SELECT songItem.id as id, " +
+                "SongItem.uriTreeId as uriTreeId, " +
+                "SongItem.uri as uri " +
+                "FROM SongItem " +
                 "WHERE :whereColumn = :columnValue " +
                 "ORDER BY " +
-                "CASE :order_by WHEN 'title' THEN COALESCE(SongItem.title, SongItem.fileName) END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'fileName' THEN SongItem.fileName END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'cdTrackNumber' THEN SongItem.cdTrackNumber END ASC," +
-                "CASE :order_by WHEN 'diskNumber' THEN SongItem.diskNumber END ASC," +
-                "CASE :order_by WHEN 'artist' THEN COALESCE(SongItem.artist, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'album' THEN COALESCE(SongItem.album, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'albumArtist' THEN COALESCE(SongItem.albumArtist, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'year' THEN COALESCE(SongItem.year, 'Unknown field') END COLLATE NOCASE DESC," +
-                "CASE :order_by WHEN 'duration' THEN SongItem.duration END ASC," +
-                "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN SongItem.lastAddedDateToLibrary END DESC," +
-                "CASE :order_by WHEN 'lastUpdateDate' THEN SongItem.lastUpdateDate END DESC," +
-                "CASE :order_by WHEN 'path' THEN SongItem.uriPath END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'pathCaseSensitive' THEN SongItem.uriPath END ASC," +
-                "CASE :order_by WHEN 'genre' THEN COALESCE(SongItem.genre, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'size' THEN SongItem.size END ASC," +
-                "CASE :order_by WHEN 'typeMime' THEN COALESCE(SongItem.typeMime, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'rating' THEN SongItem.rating END ASC," +
-                "CASE :order_by WHEN 'playCount' THEN SongItem.playCount END ASC," +
-                "CASE :order_by WHEN 'lastPlayed' THEN SongItem.lastPlayed END ASC," +
-                "CASE :order_by WHEN 'author' THEN COALESCE(SongItem.author, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'writer' THEN COALESCE(SongItem.writer, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'language' THEN COALESCE(SongItem.language, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'sampleRate' THEN SongItem.sampleRate END ASC," +
-                "CASE :order_by WHEN 'bitrate' THEN SongItem.bitrate END ASC," +
-                "CASE :order_by WHEN 'id' THEN SongItem.id END ASC"
+                "CASE :orderBy WHEN 'title' THEN COALESCE(SongItem.title, SongItem.fileName) END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'fileName' THEN SongItem.fileName END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'cdTrackNumber' THEN SongItem.cdTrackNumber END ASC," +
+                "CASE :orderBy WHEN 'diskNumber' THEN SongItem.diskNumber END ASC," +
+                "CASE :orderBy WHEN 'artist' THEN COALESCE(SongItem.artist, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'album' THEN COALESCE(SongItem.album, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'albumArtist' THEN COALESCE(SongItem.albumArtist, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'year' THEN COALESCE(SongItem.year, 'Unknown field') END COLLATE NOCASE DESC," +
+                "CASE :orderBy WHEN 'duration' THEN SongItem.duration END ASC," +
+                "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN SongItem.lastAddedDateToLibrary END DESC," +
+                "CASE :orderBy WHEN 'lastUpdateDate' THEN SongItem.lastUpdateDate END DESC," +
+                "CASE :orderBy WHEN 'path' THEN SongItem.uriPath END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'pathCaseSensitive' THEN SongItem.uriPath END ASC," +
+                "CASE :orderBy WHEN 'genre' THEN COALESCE(SongItem.genre, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'size' THEN SongItem.size END ASC," +
+                "CASE :orderBy WHEN 'typeMime' THEN COALESCE(SongItem.typeMime, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'rating' THEN SongItem.rating END ASC," +
+                "CASE :orderBy WHEN 'playCount' THEN SongItem.playCount END ASC," +
+                "CASE :orderBy WHEN 'lastPlayed' THEN SongItem.lastPlayed END ASC," +
+                "CASE :orderBy WHEN 'author' THEN COALESCE(SongItem.author, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'writer' THEN COALESCE(SongItem.writer, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'language' THEN COALESCE(SongItem.language, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'sampleRate' THEN SongItem.sampleRate END ASC," +
+                "CASE :orderBy WHEN 'bitrate' THEN SongItem.bitrate END ASC," +
+                "CASE :orderBy WHEN 'id' THEN SongItem.id END ASC"
     )
-    fun getAllOnlyUriDirectlyWhereEqual(whereColumn: String, columnValue: String?, order_by: String): List<SongItemUriView>?
+    fun getAllOnlyUriDirectlyWhereEqual(whereColumn: String, columnValue: String?, orderBy: String): List<SongItemUri>?
 
     @Query(
-        "SELECT * FROM SongItemUriView " +
-                "INNER JOIN SongItem ON SongItemUriView.id = SongItem.id " +
+        "SELECT songItem.id, " +
+                "SongItem.uriTreeId, " +
+                "SongItem.uri " +
+                "FROM SongItem " +
                 "WHERE :whereColumn GLOB '*' || :columnValue || '*' " +
                 "ORDER BY " +
-                "CASE :order_by WHEN 'title' THEN COALESCE(SongItem.title, SongItem.fileName) END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'fileName' THEN SongItem.fileName END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'cdTrackNumber' THEN SongItem.cdTrackNumber END ASC," +
-                "CASE :order_by WHEN 'diskNumber' THEN SongItem.diskNumber END ASC," +
-                "CASE :order_by WHEN 'artist' THEN COALESCE(SongItem.artist, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'album' THEN COALESCE(SongItem.album, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'albumArtist' THEN COALESCE(SongItem.albumArtist, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'year' THEN COALESCE(SongItem.year, 'Unknown field') END COLLATE NOCASE DESC," +
-                "CASE :order_by WHEN 'duration' THEN SongItem.duration END ASC," +
-                "CASE :order_by WHEN 'lastAddedDateToLibrary' THEN SongItem.lastAddedDateToLibrary END DESC," +
-                "CASE :order_by WHEN 'lastUpdateDate' THEN SongItem.lastUpdateDate END DESC," +
-                "CASE :order_by WHEN 'path' THEN SongItem.uriPath END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'pathCaseSensitive' THEN SongItem.uriPath END ASC," +
-                "CASE :order_by WHEN 'genre' THEN COALESCE(SongItem.genre, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'size' THEN SongItem.size END ASC," +
-                "CASE :order_by WHEN 'typeMime' THEN COALESCE(SongItem.typeMime, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'rating' THEN SongItem.rating END ASC," +
-                "CASE :order_by WHEN 'playCount' THEN SongItem.playCount END ASC," +
-                "CASE :order_by WHEN 'lastPlayed' THEN SongItem.lastPlayed END ASC," +
-                "CASE :order_by WHEN 'author' THEN COALESCE(SongItem.author, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'writer' THEN COALESCE(SongItem.writer, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'language' THEN COALESCE(SongItem.language, 'Unknown field') END COLLATE NOCASE ASC," +
-                "CASE :order_by WHEN 'sampleRate' THEN SongItem.sampleRate END ASC," +
-                "CASE :order_by WHEN 'bitrate' THEN SongItem.bitrate END ASC," +
-                "CASE :order_by WHEN 'id' THEN SongItem.id END ASC"
+                "CASE :orderBy WHEN 'title' THEN COALESCE(SongItem.title, SongItem.fileName) END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'fileName' THEN SongItem.fileName END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'cdTrackNumber' THEN SongItem.cdTrackNumber END ASC," +
+                "CASE :orderBy WHEN 'diskNumber' THEN SongItem.diskNumber END ASC," +
+                "CASE :orderBy WHEN 'artist' THEN COALESCE(SongItem.artist, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'album' THEN COALESCE(SongItem.album, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'albumArtist' THEN COALESCE(SongItem.albumArtist, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'year' THEN COALESCE(SongItem.year, 'Unknown field') END COLLATE NOCASE DESC," +
+                "CASE :orderBy WHEN 'duration' THEN SongItem.duration END ASC," +
+                "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN SongItem.lastAddedDateToLibrary END DESC," +
+                "CASE :orderBy WHEN 'lastUpdateDate' THEN SongItem.lastUpdateDate END DESC," +
+                "CASE :orderBy WHEN 'path' THEN SongItem.uriPath END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'pathCaseSensitive' THEN SongItem.uriPath END ASC," +
+                "CASE :orderBy WHEN 'genre' THEN COALESCE(SongItem.genre, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'size' THEN SongItem.size END ASC," +
+                "CASE :orderBy WHEN 'typeMime' THEN COALESCE(SongItem.typeMime, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'rating' THEN SongItem.rating END ASC," +
+                "CASE :orderBy WHEN 'playCount' THEN SongItem.playCount END ASC," +
+                "CASE :orderBy WHEN 'lastPlayed' THEN SongItem.lastPlayed END ASC," +
+                "CASE :orderBy WHEN 'author' THEN COALESCE(SongItem.author, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'writer' THEN COALESCE(SongItem.writer, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'language' THEN COALESCE(SongItem.language, 'Unknown field') END COLLATE NOCASE ASC," +
+                "CASE :orderBy WHEN 'sampleRate' THEN SongItem.sampleRate END ASC," +
+                "CASE :orderBy WHEN 'bitrate' THEN SongItem.bitrate END ASC," +
+                "CASE :orderBy WHEN 'id' THEN SongItem.id END ASC"
     )
-    fun getAllOnlyUriDirectlyWhereLike(whereColumn: String, columnValue: String?, order_by: String): List<SongItemUriView>?
+    fun getAllOnlyUriDirectlyWhereLike(whereColumn: String, columnValue: String?, orderBy: String): List<SongItemUri>?
 }

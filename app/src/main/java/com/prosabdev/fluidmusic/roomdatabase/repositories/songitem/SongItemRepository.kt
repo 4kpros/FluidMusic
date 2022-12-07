@@ -48,29 +48,29 @@ class SongItemRepository(ctx : Context) {
             mDao?.getAtUri(uri)
         }
     }
-    suspend fun getAllLimit(order_by: String, limit: Int) : LiveData<List<SongItem>>? {
+    suspend fun getAllLimit(orderBy: String, limit: Int) : LiveData<List<SongItem>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAllLimit(order_by, limit)
+            mDao?.getAllLimit(orderBy, limit)
         }
     }
-    suspend fun getAll(order_by: String) : LiveData<List<SongItem>>? {
+    suspend fun getAll(orderBy: String) : LiveData<List<SongItem>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAll(order_by)
+            mDao?.getAll(orderBy)
         }
     }
-    suspend fun getAllDirectly(order_by: String) : List<SongItem>? {
+    suspend fun getAllDirectly(orderBy: String) : List<SongItem>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAllDirectly(order_by)
+            mDao?.getAllDirectly(orderBy)
         }
     }
-    suspend fun getAllWhereEqual(whereColumn: String, columnValue: String?, order_by: String) : LiveData<List<SongItem>>? {
+    suspend fun getAllWhereEqual(whereColumn: String, columnValue: String?, orderBy: String) : LiveData<List<SongItem>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAllWhereEqual(whereColumn, columnValue, order_by)
+            mDao?.getAllWhereEqual(whereColumn, columnValue, orderBy)
         }
     }
-    suspend fun getAllWhereLike(whereColumn: String, columnValue: String?, order_by: String) : LiveData<List<SongItem>>? {
+    suspend fun getAllWhereLike(whereColumn: String, columnValue: String?, orderBy: String) : LiveData<List<SongItem>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAllWhereLike(whereColumn, columnValue, order_by)
+            mDao?.getAllWhereLike(whereColumn, columnValue, orderBy)
         }
     }
 }

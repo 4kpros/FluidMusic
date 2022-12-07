@@ -64,76 +64,78 @@ abstract class AudioInfoExtractorUtils {
             if(tempFFF == null || tempFFF.uri == Uri.EMPTY) return null
 
             val tempSong = SongItem()
-            ctx.contentResolver.openAssetFileDescriptor(
-                tempFFF.uri,
-                "r"
-            ).use { afD ->
-                try {
-                    val mediaMetadataRetriever = MediaMetadataRetriever()
-                    val fileDescriptor = afD?.fileDescriptor ?: return null
-                    mediaMetadataRetriever.setDataSource(fileDescriptor)
-                    mediaMetadataRetriever.use { mdr ->
-                        tempSong.uri = tempFFF.uri.toString()
-                        tempSong.fileName = tempFFF.name
-                        tempSong.uriPath = tempFFF.uri.lastPathSegment
-                        val extension: String =
-                            tempFFF.uri.lastPathSegment.toString().substringAfterLast(".").uppercase()
-                        tempSong.fileExtension = extension
-                        tempSong.size = tempFFF.length() ?: 0
-                        tempSong.title = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
-                        tempSong.artist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
-                        tempSong.composer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER)
-                        tempSong.album = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
-                        tempSong.albumArtist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST)
-                        tempSong.genre = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
+            withContext(Dispatchers.IO){
+                ctx.contentResolver.openAssetFileDescriptor(
+                    tempFFF.uri,
+                    "r"
+                ).use { afD ->
+                    try {
+                        val mediaMetadataRetriever = MediaMetadataRetriever()
+                        val fileDescriptor = afD?.fileDescriptor ?: return@withContext
+                        mediaMetadataRetriever.setDataSource(fileDescriptor)
+                        mediaMetadataRetriever.use { mdr ->
+                            tempSong.uri = tempFFF.uri.toString()
+                            tempSong.fileName = tempFFF.name
+                            tempSong.uriPath = tempFFF.uri.lastPathSegment
+                            val extension: String =
+                                tempFFF.uri.lastPathSegment.toString().substringAfterLast(".").uppercase()
+                            tempSong.fileExtension = extension
+                            tempSong.size = tempFFF.length() ?: 0
+                            tempSong.title = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+                            tempSong.artist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+                            tempSong.composer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER)
+                            tempSong.album = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
+                            tempSong.albumArtist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST)
+                            tempSong.genre = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
 
-                        tempSong.year = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
-                        tempSong.duration = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0
-                        tempSong.typeMime = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
-                        tempSong.bitrate = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)?.toDouble() ?: 0.0
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { //For versions under 31, checkout at the end of this block
-                            tempSong.bitPerSample = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITS_PER_SAMPLE)
-                        }
-                        tempSong.author = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR)
-                        tempSong.diskNumber = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DISC_NUMBER)
-                        tempSong.cdTrackNumber = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER)
-                        tempSong.writer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_WRITER)
-                        tempSong.numberTracks = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS)
+                            tempSong.year = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
+                            tempSong.duration = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0
+                            tempSong.typeMime = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
+                            tempSong.bitrate = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)?.toDouble() ?: 0.0
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { //For versions under 31, checkout at the end of this block
+                                tempSong.bitPerSample = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITS_PER_SAMPLE)
+                            }
+                            tempSong.author = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR)
+                            tempSong.diskNumber = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DISC_NUMBER)
+                            tempSong.cdTrackNumber = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER)
+                            tempSong.writer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_WRITER)
+                            tempSong.numberTracks = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS)
 
-                        val tempUpdatedDate: Long = tempFFF.lastModified()
-                        tempSong.lastUpdateDate = tempUpdatedDate
-                        tempSong.lastAddedDateToLibrary = SystemSettingsUtils.getCurrentDateInMilli()
+                            val tempUpdatedDate: Long = tempFFF.lastModified()
+                            tempSong.lastUpdateDate = tempUpdatedDate
+                            tempSong.lastAddedDateToLibrary = SystemSettingsUtils.getCurrentDateInMilli()
 
-                        val tempBinary : ByteArray? = extractImageBinaryDataFromAudioUri(ctx,
-                            tempFFF.uri
-                        )
-                        if(tempBinary != null){
-                            val tempHashedImage: Int = tempBinary.decodeToString().hashCode()
-                            tempSong.hashedCovertArtSignature = if (tempHashedImage < 0) tempHashedImage * -1 else tempHashedImage
+                            val tempBinary : ByteArray? = extractImageBinaryDataFromAudioUri(ctx,
+                                tempFFF.uri
+                            )
+                            if(tempBinary != null){
+                                val tempHashedImage: Int = tempBinary.decodeToString().hashCode()
+                                tempSong.hashedCovertArtSignature = if (tempHashedImage < 0) tempHashedImage * -1 else tempHashedImage
 
-                        }else{
-                            tempSong.hashedCovertArtSignature = -1
-                        }
+                            }else{
+                                tempSong.hashedCovertArtSignature = -1
+                            }
 
-                        val mediaExtractor = MediaExtractor()
-                        mediaExtractor.setDataSource(fileDescriptor)
-                        val numTracks : Int = mediaExtractor.trackCount
-                        for (i in 0 until numTracks) {
-                            val format : MediaFormat = mediaExtractor.getTrackFormat(i)
-                            tempSong.sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
-                            tempSong.language = format.getString(MediaFormat.KEY_LANGUAGE)
-                            tempSong.channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-                                try {
-                                    tempSong.bitPerSample = "${format.getInteger("bits-per-sample")}bit"
-                                }catch (error: Throwable) {
-                                    error.printStackTrace()
-                                }
+                            val mediaExtractor = MediaExtractor()
+                            mediaExtractor.setDataSource(fileDescriptor)
+                            val numTracks : Int = mediaExtractor.trackCount
+                            for (i in 0 until numTracks) {
+                                val format : MediaFormat = mediaExtractor.getTrackFormat(i)
+                                tempSong.sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
+                                tempSong.language = format.getString(MediaFormat.KEY_LANGUAGE)
+                                tempSong.channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
+//                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+//                                try {
+//                                    tempSong.bitPerSample = "${format.getInteger("bits-per-sample")}bit"
+//                                }catch (error: Throwable) {
+//                                    error.printStackTrace()
+//                                }
+//                            }
                             }
                         }
+                    } catch (error: Throwable) {
+                        error.printStackTrace()
                     }
-                } catch (error: Throwable) {
-                    error.printStackTrace()
                 }
             }
             return tempSong

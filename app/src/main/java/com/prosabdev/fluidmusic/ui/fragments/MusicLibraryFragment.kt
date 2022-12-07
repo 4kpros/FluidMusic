@@ -22,7 +22,6 @@ import com.prosabdev.fluidmusic.ui.fragments.explore.AlbumsFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.AllSongsFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.ArtistsFragment
 import com.prosabdev.fluidmusic.utils.AnimatorsUtils
-import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch

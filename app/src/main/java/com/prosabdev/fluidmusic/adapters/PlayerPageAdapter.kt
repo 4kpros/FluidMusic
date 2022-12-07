@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemPlayerCardViewBinding
 import com.prosabdev.fluidmusic.models.songitem.SongItem
-import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
 import com.prosabdev.fluidmusic.utils.AnimatorsUtils
+import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay

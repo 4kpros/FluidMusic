@@ -5,10 +5,7 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.SystemSettingsUtils
 import com.prosabdev.fluidmusic.workers.WorkerConstantValues
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,33 +16,26 @@ class PlaylistRemoveWorker(
 ) : CoroutineWorker(ctx, params) {
 
     override suspend fun doWork(): Result {
-        var isUpdating: Boolean?
-        var dataResult: List<Long>?
+        var dataResult: Int = 0
         return withContext(Dispatchers.IO) {
             try {
                 Log.i(TAG, "WORKER $TAG : started")
 
-                //Init output results
-                isUpdating = true
-                dataResult = ArrayList()
                 //Extract worker params
                 val playlistIdArray = inputData.getIntArray(PLAYLIST_ID_ARRAY)
                 if(playlistIdArray != null && playlistIdArray.isNotEmpty()){
                     for(i in playlistIdArray.indices){
                         if(playlistIdArray[i] > 0){
                             //Remove playlist from database
-                            val deleteResult = AppDatabase.getDatabase(applicationContext).playlistItemDao().deleteAtId(playlistIdArray[i].toLong())
-                            (dataResult as ArrayList<Long>).add(deleteResult)
+                            dataResult = AppDatabase.getDatabase(applicationContext).playlistItemDao().deleteAtId(playlistIdArray[i].toLong())
                         }
                     }
                 }
 
-                isUpdating = false
                 Log.i(TAG, "WORKER $TAG : ended")
 
                 Result.success(
                     workDataOf(
-                        WorkerConstantValues.WORKER_OUTPUT_IS_UPDATING to isUpdating,
                         WorkerConstantValues.WORKER_OUTPUT_DATA to dataResult,
                     )
                 )

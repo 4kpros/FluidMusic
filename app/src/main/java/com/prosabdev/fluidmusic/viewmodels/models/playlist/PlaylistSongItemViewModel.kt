@@ -30,7 +30,7 @@ class PlaylistSongItemViewModel(app: Application) : AndroidViewModel(app) {
     suspend fun getAtId(id: Long) : PlaylistSongItem? {
         return repository?.getAtId(id)
     }
-    suspend fun getAll(order_by: String = "id") : LiveData<List<PlaylistSongItem>>? {
-        return repository?.getAll(order_by)
+    suspend fun getAll(orderBy: String = "id") : LiveData<List<PlaylistSongItem>?>? {
+        return repository?.getAll(orderBy)
     }
 }

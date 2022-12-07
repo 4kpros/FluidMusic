@@ -17,9 +17,9 @@ class ArtistItemRepository(ctx : Context) {
             mDao?.getAtName(name)
         }
     }
-    suspend fun getAll(order_by: String) : LiveData<List<ArtistItem>>? {
+    suspend fun getAll(orderBy: String) : LiveData<List<ArtistItem>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAll(order_by)
+            mDao?.getAll(orderBy)
         }
     }
 }

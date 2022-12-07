@@ -1,5 +1,4 @@
-
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <style name="BaseThemeDark" parent="BaseTheme">
         <item name="android:statusBarColor">@color/semiBlack</item>

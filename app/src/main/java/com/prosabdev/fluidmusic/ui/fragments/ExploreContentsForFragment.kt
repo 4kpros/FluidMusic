@@ -10,7 +10,6 @@ import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentExploreContentsForBinding
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
-import com.prosabdev.fluidmusic.utils.ConstantValues
 
 
 class ExploreContentsForFragment : Fragment() {

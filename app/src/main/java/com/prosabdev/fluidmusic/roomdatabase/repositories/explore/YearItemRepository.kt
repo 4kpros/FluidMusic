@@ -17,9 +17,9 @@ class YearItemRepository(ctx : Context) {
             mDao?.getAtName(name)
         }
     }
-    suspend fun getAll(order_by: String) : LiveData<List<YearItem>>? {
+    suspend fun getAll(orderBy: String) : LiveData<List<YearItem>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAll(order_by)
+            mDao?.getAll(orderBy)
         }
     }
 }

@@ -17,14 +17,14 @@ class AlbumItemRepository(ctx : Context) {
             mDao?.getAtName(name)
         }
     }
-    suspend fun getAll(order_by: String) : LiveData<List<AlbumItem>>? {
+    suspend fun getAll(orderBy: String) : LiveData<List<AlbumItem>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAll(order_by)
+            mDao?.getAll(orderBy)
         }
     }
-    suspend fun getAllDirectly(order_by: String) : List<AlbumItem>? {
+    suspend fun getAllDirectly(orderBy: String) : List<AlbumItem>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAllDirectly(order_by)
+            mDao?.getAllDirectly(orderBy)
         }
     }
 }

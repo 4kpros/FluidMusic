@@ -3,8 +3,6 @@ package com.prosabdev.fluidmusic.models.playlist
 import android.content.Context
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.DatabaseView
-import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.models.view.AlbumItem
 
 @DatabaseView(
     "SELECT " +

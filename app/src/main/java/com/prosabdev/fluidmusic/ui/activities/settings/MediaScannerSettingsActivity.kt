@@ -184,9 +184,9 @@ import kotlinx.coroutines.launch
         }
         val workInfo = it[0]
 
+        mMediaScannerActivityViewModel.updateWorkInfoData(workInfo)
         if(workInfo.state.isFinished){
             Log.i(ConstantValues.TAG, "Device scan finished.")
-            mMediaScannerActivityViewModel.updateWorkInfoData(workInfo)
             mMediaScannerActivityViewModel.setIsLoadingInBackground(false)
         }else{
             Log.i(ConstantValues.TAG, "Working on background ...")

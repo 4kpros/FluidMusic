@@ -161,7 +161,7 @@ class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFra
         return withContext(Dispatchers.Default){
             val pI = PlaylistItem()
             pI.name = playlistName
-            pI.addedDate = SystemSettingsUtils.getCurrentDateInMilli()
+            pI.lastAddedDateToLibrary = SystemSettingsUtils.getCurrentDateInMilli()
             val insertedPlaylistResult : Long = mPlaylistItemViewModel.insert(pI) ?: -1
             if(insertedPlaylistResult > 0){
                 insertMultiplesSongsToPlaylist(ctx, insertedPlaylistResult, playlistName)

@@ -10,32 +10,28 @@ interface QueueMusicItemDao {
     fun insert(queueMusicItem: QueueMusicItem?) : Long
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertMultiple(queueMusicItems: ArrayList<QueueMusicItem>?) : List<Long>
+    fun insertMultiple(queueMusicItems: List<QueueMusicItem>?) : List<Long>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(queueMusicItem: QueueMusicItem?)
+    fun update(queueMusicItem: QueueMusicItem?) : Int
 
     @Delete
-    fun delete(queueMusicItem: QueueMusicItem?)
+    fun delete(queueMusicItem: QueueMusicItem?) : Int
 
     @Delete
-    fun deleteMultiple(queueMusicItem: ArrayList<QueueMusicItem>?)
+    fun deleteMultiple(queueMusicItem: List<QueueMusicItem>?) : Int
 
     @Query("DELETE FROM QueueMusicItem")
-    fun deleteAll()
+    fun deleteAll() : Int
 
     @Query("DELETE FROM QueueMusicItem WHERE id = :id")
-    fun deleteAtId(id: Long)
+    fun deleteAtId(id: Long) : Int
 
     @Query("SELECT * FROM QueueMusicItem WHERE id = :id LIMIT 1")
     fun getAtId(id: Long): QueueMusicItem?
 
     @Query(
-        "SELECT * FROM QueueMusicItem " +
-            "ORDER BY " +
-                "CASE :order_by WHEN 'uriTree' THEN QueueMusicItem.songId END ASC," +
-                "CASE :order_by WHEN 'path' THEN QueueMusicItem.addedDate END ASC," +
-                "CASE :order_by WHEN 'id' THEN QueueMusicItem.id END ASC"
+        "SELECT * FROM QueueMusicItem "
     )
-    fun getAll(order_by: String): LiveData<List<QueueMusicItem>>?
+    fun getAll(): LiveData<List<QueueMusicItem>>?
 }

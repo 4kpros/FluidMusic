@@ -1,12 +1,6 @@
 package com.prosabdev.fluidmusic.utils
 
-import android.app.Activity
-import android.graphics.Insets
-import android.os.Build
-import android.util.DisplayMetrics
 import android.view.View
-import android.view.WindowInsets
-import android.view.WindowMetrics
 import kotlin.math.floor
 import kotlin.math.sin
 
