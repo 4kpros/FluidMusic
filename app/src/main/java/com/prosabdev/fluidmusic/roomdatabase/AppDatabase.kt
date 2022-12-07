@@ -5,13 +5,14 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.models.QueueMusicItem
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.queuemusic.QueueMusicItem
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
 import com.prosabdev.fluidmusic.models.view.*
 import com.prosabdev.fluidmusic.roomdatabase.dao.FolderUriTreeDao
-import com.prosabdev.fluidmusic.roomdatabase.dao.QueueMusicItemDao
+import com.prosabdev.fluidmusic.roomdatabase.dao.SongItemDao
+import com.prosabdev.fluidmusic.roomdatabase.dao.queuemusic.QueueMusicItemDao
 import com.prosabdev.fluidmusic.roomdatabase.dao.explore.*
 import com.prosabdev.fluidmusic.roomdatabase.dao.playlist.PlaylistItemDao
 import com.prosabdev.fluidmusic.roomdatabase.dao.playlist.PlaylistSongItemDao

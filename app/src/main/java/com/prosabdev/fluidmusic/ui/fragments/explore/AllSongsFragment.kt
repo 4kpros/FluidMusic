@@ -24,7 +24,7 @@ import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.generic.GenericListGridItemAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentAllSongsBinding
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.models.generic.GenericItemListGrid
 import com.prosabdev.fluidmusic.sharedprefs.SharedPreferenceManagerUtils
 import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
@@ -37,7 +37,7 @@ import com.prosabdev.fluidmusic.utils.MathComputationsUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AllSongsFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.SongItemViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch

@@ -10,7 +10,7 @@ import androidx.databinding.DataBindingUtil
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetDialogSongInfoBinding
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch

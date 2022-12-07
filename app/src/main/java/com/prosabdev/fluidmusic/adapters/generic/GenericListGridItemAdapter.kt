@@ -48,13 +48,14 @@ class GenericListGridItemAdapter (
         fun onRequestTextIndexForFastScroller(dataItem: Any, position: Int): String?
     }
 
-    //Methods for organize
+    //Methods for organize list grid
     fun getOrganizeListGrid(): Int {
         return mOrganizeListGrid
     }
     fun setOrganizeListGrid(organizeListGrid: Int) {
         mOrganizeListGrid = organizeListGrid
 //        notifyItemRangeChanged(0, itemCount, PAYLOAD_IS_ORGANIZE_LIST_GRID)
+        //Not good but we have chance now
         notifyDataSetChanged()
     }
 

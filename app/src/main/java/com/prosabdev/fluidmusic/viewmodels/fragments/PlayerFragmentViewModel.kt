@@ -6,9 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.prosabdev.fluidmusic.models.PlaySongAtRequest
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
-import com.prosabdev.fluidmusic.utils.ConstantValues
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 

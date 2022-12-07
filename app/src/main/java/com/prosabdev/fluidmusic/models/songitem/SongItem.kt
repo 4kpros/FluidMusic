@@ -1,9 +1,10 @@
-package com.prosabdev.fluidmusic.models
+package com.prosabdev.fluidmusic.models.songitem
 
 import android.content.Context
 import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.*
+import com.prosabdev.fluidmusic.models.FolderUriTree
 import com.prosabdev.fluidmusic.models.generic.GenericItemListGrid
 import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
 
@@ -33,7 +34,6 @@ class SongItem {
     var duration: Long = 0
     var language: String? = null
 
-    //
     var typeMime: String? = null
     var sampleRate: Int = 0
     var bitrate: Double = 0.0
@@ -44,7 +44,6 @@ class SongItem {
     var fileExtension: String? = null
     var bitPerSample: String? = null
 
-    //
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
 
@@ -61,11 +60,14 @@ class SongItem {
     var lastPlayed: Long = 0
 
     var hashedCovertArtSignature: Int = -1
+    var isValid: Boolean = true
 
     @Ignore
     var position: Int = -1
 
     companion object {
+        const val TAG = "SongItem"
+
         fun getStringIndexRequestFastScroller(ctx: Context, dataItem: Any): String {
             if(dataItem is SongItem) {
                 return dataItem.title ?: dataItem.fileName ?: "#"

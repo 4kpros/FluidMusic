@@ -2,7 +2,7 @@ package com.prosabdev.fluidmusic.viewmodels.fragments
 
 import android.app.Application
 import androidx.lifecycle.LifecycleOwner
-import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.SongItemViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 

@@ -18,4 +18,8 @@ class FolderUriTree {
     var deviceName: String? = null
 
     var lastModified: Long = 0
+
+    companion object {
+        const val TAG = "FolderUriTree"
+    }
 }

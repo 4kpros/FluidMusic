@@ -19,7 +19,7 @@ import com.prosabdev.fluidmusic.adapters.callbacks.QueueMusicItemCallback
 import com.prosabdev.fluidmusic.adapters.explore.SongItemAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectablePlayingItemListAdapter
 import com.prosabdev.fluidmusic.databinding.ItemQueueMusicBinding
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils

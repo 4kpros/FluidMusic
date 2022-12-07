@@ -9,31 +9,19 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.color.DynamicColors
 import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
-import com.prosabdev.fluidmusic.models.SongItem
 import com.prosabdev.fluidmusic.service.MediaPlaybackService
-import com.prosabdev.fluidmusic.sharedprefs.SharedPreferenceManagerUtils
-import com.prosabdev.fluidmusic.sharedprefs.SortOrganizePrefsLoaderAndSetupViewModels
-import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
-import com.prosabdev.fluidmusic.ui.fragments.EqualizerFragment
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
-import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.fragments.explore.*
-import com.prosabdev.fluidmusic.viewmodels.models.explore.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 @BuildCompat.PrereleaseSdkCheck class MainActivity : AppCompatActivity(){

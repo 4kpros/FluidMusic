@@ -1,0 +1,13 @@
+package com.prosabdev.fluidmusic.workers
+
+class WorkerConstantValues {
+    companion object {
+        const val WORKER_OUTPUT_IS_UPDATING = "WORKER_OUTPUT_IS_UPDATING"
+        const val WORKER_OUTPUT_DATA = "WORKER_OUTPUT_DATA"
+
+        const val WORKER_OUTPUT_RESULT_CODE = "WORKER_OUTPUT_RESULT_CODE"
+        const val WORKER_OUTPUT_RESULT_CODE_EMPTY = "WORKER_OUTPUT_RESULT_CODE_EMPTY"
+        const val WORKER_OUTPUT_RESULT_CODE_ERROR = "WORKER_OUTPUT_RESULT_CODE_ERROR"
+        const val WORKER_OUTPUT_RESULT_CODE_SUCCESS = "WORKER_OUTPUT_RESULT_CODE_SUCCESS"
+    }
+}

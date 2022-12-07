@@ -37,6 +37,10 @@ class YearItem {
     var uriImage: String? = null
 
     companion object {
+        const val TAG = "YearItem"
+        const val DEFAULT_INDEX = "name"
+        const val INDEX_COLUM_TO_SONG_ITEM = "year"
+
         fun getStringIndexRequestFastScroller(ctx: Context, dataItem: Any): String {
             if(dataItem is YearItem) {
                 return dataItem.name ?: ctx.getString(R.string.unknown_year)

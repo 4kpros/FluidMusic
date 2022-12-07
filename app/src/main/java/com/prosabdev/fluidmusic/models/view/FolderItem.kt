@@ -44,6 +44,10 @@ class FolderItem {
     var uriImage: String? = null
 
     companion object {
+        const val TAG = "FolderItem"
+        const val DEFAULT_INDEX = "name"
+        const val INDEX_COLUM_TO_SONG_ITEM = "folder"
+
         fun getStringIndexRequestFastScroller(ctx: Context, dataItem: Any): String {
             if(dataItem is FolderItem) {
                 return dataItem.name ?: ctx.getString(R.string.unknown_folder)

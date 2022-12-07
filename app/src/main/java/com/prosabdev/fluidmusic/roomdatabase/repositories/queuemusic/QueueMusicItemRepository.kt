@@ -1,10 +1,10 @@
-package com.prosabdev.fluidmusic.roomdatabase.repositories
+package com.prosabdev.fluidmusic.roomdatabase.repositories.queuemusic
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import com.prosabdev.fluidmusic.models.QueueMusicItem
+import com.prosabdev.fluidmusic.models.queuemusic.QueueMusicItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
-import com.prosabdev.fluidmusic.roomdatabase.dao.QueueMusicItemDao
+import com.prosabdev.fluidmusic.roomdatabase.dao.queuemusic.QueueMusicItemDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

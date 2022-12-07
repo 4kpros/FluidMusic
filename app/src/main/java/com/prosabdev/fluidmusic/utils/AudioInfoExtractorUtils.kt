@@ -10,7 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import androidx.documentfile.provider.DocumentFile
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.FileDescriptor
@@ -45,9 +45,9 @@ abstract class AudioInfoExtractorUtils {
                     try {
                         ctx.contentResolver.openAssetFileDescriptor(uri, "r").use { afd ->
                             if (afd != null) {
-                                val mdr = MediaMetadataRetriever()
-                                mdr.setDataSource(afd.fileDescriptor)
-                                result = mdr.embeddedPicture
+                                val mmdr = MediaMetadataRetriever()
+                                mmdr.setDataSource(afd.fileDescriptor)
+                                result = mmdr.embeddedPicture
                             }
                         }
 
@@ -60,33 +60,26 @@ abstract class AudioInfoExtractorUtils {
             }
         }
 
-        suspend fun extractAudioInfoFromUri(ctx : Context, uri : Uri?): SongItem? {
-            if(uri == null)
-                return null
+        suspend fun extractAudioInfoFromUri(ctx : Context, tempFFF : DocumentFile?): SongItem? {
+            if(tempFFF == null || tempFFF.uri == Uri.EMPTY) return null
 
-            val tempSong : SongItem = SongItem()
-
-            withContext(Dispatchers.IO){
-                ctx.contentResolver.openAssetFileDescriptor(
-                    uri,
-                    "r"
-                ).use { afD ->
-                    try {
-                        val mdr = MediaMetadataRetriever()
-                        mdr.setDataSource(afD?.fileDescriptor)
-
-                        val tempDocFile: DocumentFile? =
-                            DocumentFile.fromTreeUri(ctx, uri)
-
-                        tempSong.uri = uri.toString()
-                        if (tempDocFile != null) {
-                            tempSong.fileName = tempDocFile.name
-                            tempSong.uriPath = tempDocFile.uri.lastPathSegment
-                        }
+            val tempSong = SongItem()
+            ctx.contentResolver.openAssetFileDescriptor(
+                tempFFF.uri,
+                "r"
+            ).use { afD ->
+                try {
+                    val mediaMetadataRetriever = MediaMetadataRetriever()
+                    val fileDescriptor = afD?.fileDescriptor ?: return null
+                    mediaMetadataRetriever.setDataSource(fileDescriptor)
+                    mediaMetadataRetriever.use { mdr ->
+                        tempSong.uri = tempFFF.uri.toString()
+                        tempSong.fileName = tempFFF.name
+                        tempSong.uriPath = tempFFF.uri.lastPathSegment
                         val extension: String =
-                            uri.lastPathSegment.toString().substringAfterLast(".").uppercase()
+                            tempFFF.uri.lastPathSegment.toString().substringAfterLast(".").uppercase()
                         tempSong.fileExtension = extension
-                        tempSong.size = tempDocFile?.length() ?: 0
+                        tempSong.size = tempFFF.length() ?: 0
                         tempSong.title = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
                         tempSong.artist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
                         tempSong.composer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER)
@@ -98,7 +91,7 @@ abstract class AudioInfoExtractorUtils {
                         tempSong.duration = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0
                         tempSong.typeMime = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
                         tempSong.bitrate = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)?.toDouble() ?: 0.0
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { //For versions under 31, checkout at the end of this block
                             tempSong.bitPerSample = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITS_PER_SAMPLE)
                         }
                         tempSong.author = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR)
@@ -107,46 +100,42 @@ abstract class AudioInfoExtractorUtils {
                         tempSong.writer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_WRITER)
                         tempSong.numberTracks = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS)
 
-                        val tempUpdatedDate: Long = tempDocFile?.lastModified() ?: 0
+                        val tempUpdatedDate: Long = tempFFF.lastModified()
                         tempSong.lastUpdateDate = tempUpdatedDate
                         tempSong.lastAddedDateToLibrary = SystemSettingsUtils.getCurrentDateInMilli()
 
                         val tempBinary : ByteArray? = extractImageBinaryDataFromAudioUri(ctx,
-                            tempDocFile?.uri
+                            tempFFF.uri
                         )
                         if(tempBinary != null){
                             val tempHashedImage: Int = tempBinary.decodeToString().hashCode()
-                            tempSong.hashedCovertArtSignature = if(tempHashedImage < 0) tempHashedImage * -1 else tempHashedImage
+                            tempSong.hashedCovertArtSignature = if (tempHashedImage < 0) tempHashedImage * -1 else tempHashedImage
 
                         }else{
                             tempSong.hashedCovertArtSignature = -1
                         }
 
-                        val extractor : MediaExtractor = MediaExtractor()
-                        extractor.setDataSource(afD?.fileDescriptor!!)
-                        val numTracks : Int = extractor.trackCount
+                        val mediaExtractor = MediaExtractor()
+                        mediaExtractor.setDataSource(fileDescriptor)
+                        val numTracks : Int = mediaExtractor.trackCount
                         for (i in 0 until numTracks) {
-                            val format : MediaFormat = extractor.getTrackFormat(i)
+                            val format : MediaFormat = mediaExtractor.getTrackFormat(i)
                             tempSong.sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
                             tempSong.language = format.getString(MediaFormat.KEY_LANGUAGE)
                             tempSong.channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                                 try {
                                     tempSong.bitPerSample = "${format.getInteger("bits-per-sample")}bit"
-                                }finally {
-                                    //
+                                }catch (error: Throwable) {
+                                    error.printStackTrace()
                                 }
                             }
                         }
-                        extractor.release()
-                    } catch (error: Throwable) {
-                        //
-                    }finally {
-                        //
                     }
+                } catch (error: Throwable) {
+                    error.printStackTrace()
                 }
             }
-
             return tempSong
         }
 

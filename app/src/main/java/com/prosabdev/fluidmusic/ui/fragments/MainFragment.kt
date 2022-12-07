@@ -18,7 +18,7 @@ import androidx.fragment.app.commit
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentMainBinding
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.ui.activities.SettingsActivity
 import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel

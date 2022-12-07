@@ -1,10 +1,10 @@
-package com.prosabdev.fluidmusic.roomdatabase.repositories.explore
+package com.prosabdev.fluidmusic.roomdatabase.repositories.songitem
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
-import com.prosabdev.fluidmusic.roomdatabase.dao.explore.SongItemDao
+import com.prosabdev.fluidmusic.roomdatabase.dao.SongItemDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

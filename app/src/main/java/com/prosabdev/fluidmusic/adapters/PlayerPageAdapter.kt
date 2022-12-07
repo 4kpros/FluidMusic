@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemPlayerCardViewBinding
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
 import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 import kotlinx.coroutines.Job

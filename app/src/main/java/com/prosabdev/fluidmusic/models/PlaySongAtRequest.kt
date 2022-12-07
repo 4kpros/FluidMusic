@@ -6,4 +6,8 @@ class PlaySongAtRequest {
     var playProgress: Int = 0
     var repeat: Int? = -1
     var shuffle: Int? = -1
+
+    companion object {
+        const val TAG = "PlaySongAtRequest"
+    }
 }

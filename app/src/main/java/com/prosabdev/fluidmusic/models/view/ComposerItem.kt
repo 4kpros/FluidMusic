@@ -37,6 +37,10 @@ class ComposerItem {
     var uriImage: String? = null
 
     companion object {
+        const val TAG = "ComposerItem"
+        const val DEFAULT_INDEX = "name"
+        const val INDEX_COLUM_TO_SONG_ITEM = "composer"
+
         fun getStringIndexRequestFastScroller(ctx: Context, dataItem: Any): String {
             if(dataItem is ComposerItem) {
                 return dataItem.name ?: ctx.getString(R.string.unknown_composer)

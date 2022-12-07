@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.QueueMusicItemListAdapter
 import com.prosabdev.fluidmusic.databinding.BottomSheetQueueMusicBinding
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 
 class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {

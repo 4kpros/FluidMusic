@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.models.SongItem
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
 import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
 import com.prosabdev.fluidmusic.ui.fragments.explore.AllSongsFragment

@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.LifecycleOwner
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.explore.AlbumItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.explore.SongItemViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 

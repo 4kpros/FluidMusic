@@ -6,10 +6,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.*
 import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.workers.DatabaseUpdateEntriesWorker
-import com.prosabdev.fluidmusic.workers.MediaScannerWorker
+import com.prosabdev.fluidmusic.workers.mediascanner.MediaScannerWorker
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.LinkedBlockingQueue
 
 class MediaScannerActivityViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -28,34 +29,27 @@ class MediaScannerActivityViewModel(app: Application) : AndroidViewModel(app) {
     private val outputWorkInfoItems : LiveData<List<WorkInfo>>
     private val workManager : WorkManager = WorkManager.getInstance(app.applicationContext)
     init {
-        outputWorkInfoItems = workManager.getWorkInfosByTagLiveData(ConstantValues.MEDIA_SCANNER_WORKER_OUTPUT)
+        outputWorkInfoItems = workManager.getWorkInfosByTagLiveData(MediaScannerWorker.TAG)
     }
-    internal fun scanDevice(scannerMethod : String = ConstantValues.MEDIA_SCANNER_WORKER_METHOD_ADD_NEW){
-
-        val scanDeviceWorkRequest: OneTimeWorkRequest =
-            OneTimeWorkRequestBuilder<MediaScannerWorker>()
-                .setInputData(workDataOf(ConstantValues.MEDIA_SCANNER_WORKER_SCAN_METHOD to scannerMethod))
-                .addTag(ConstantValues.MEDIA_SCANNER_WORKER_OUTPUT)
-                .build()
-
-        val updateDatabaseEntriesWorkRequest: OneTimeWorkRequest =
-            OneTimeWorkRequest.from(DatabaseUpdateEntriesWorker::class.java)
-
-        workManager
-            .beginUniqueWork(
-                ConstantValues.MEDIA_SCANNER_WORKER_NAME,
+    internal fun scanDevice(){
+        val scanDeviceWorkRequest: OneTimeWorkRequest = OneTimeWorkRequestBuilder<MediaScannerWorker>()
+//            .setInputData(workDataOf(ConstantValues.MEDIA_SCANNER_WORKER_SCAN_METHOD to scannerMethod))
+            .addTag(MediaScannerWorker.TAG)
+            .build()
+        workManager.beginUniqueWork(
+                MediaScannerWorker.TAG,
                 ExistingWorkPolicy.REPLACE,
                 scanDeviceWorkRequest
             ).enqueue()
     }
 
     fun updateWorkInfoData(workInfo : WorkInfo){
-        val outputData = workInfo.outputData.getIntArray(ConstantValues.MEDIA_SCANNER_WORKER_OUTPUT)
-        if(outputData != null && outputData.isNotEmpty()){
-            setFoldersCounter(outputData[0])
-            setSongsCounter(outputData[1])
-            setPlaylistsCounter(outputData[2])
-        }
+        val outputFolderCount = workInfo.outputData.getInt(MediaScannerWorker.OUTPUT_FOLDER_COUNT, 0)
+        val outputSongCount = workInfo.outputData.getInt(MediaScannerWorker.OUTPUT_SONG_COUNT, 0)
+        val outputPlaylistCount = workInfo.outputData.getInt(MediaScannerWorker.OUTPUT_PLAYLIST_COUNT, 0)
+        setFoldersCounter(outputFolderCount)
+        setSongsCounter(outputSongCount)
+        setPlaylistsCounter(outputPlaylistCount)
     }
     fun getOutputWorkInfoList(): LiveData<List<WorkInfo>> {
         return outputWorkInfoItems

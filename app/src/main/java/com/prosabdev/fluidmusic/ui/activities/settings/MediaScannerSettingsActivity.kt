@@ -151,7 +151,7 @@ import kotlinx.coroutines.launch
         if(mMediaScannerActivityViewModel.getIsLoadingInBackground().value == true)
             return
         mMediaScannerActivityViewModel.setIsLoadingInBackground(true)
-        mMediaScannerActivityViewModel.scanDevice(ConstantValues.MEDIA_SCANNER_WORKER_METHOD_ADD_NEW)
+        mMediaScannerActivityViewModel.scanDevice()
     }
 
     private suspend fun observeLiveData() {

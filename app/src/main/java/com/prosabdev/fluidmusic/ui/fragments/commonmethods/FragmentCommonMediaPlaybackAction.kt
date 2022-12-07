@@ -1,18 +1,56 @@
 package com.prosabdev.fluidmusic.ui.fragments.commonmethods
 
+import android.content.Context
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.SparseBooleanArray
 import com.prosabdev.fluidmusic.adapters.generic.GenericListGridItemAdapter
-import com.prosabdev.fluidmusic.models.PlaySongAtRequest
-import com.prosabdev.fluidmusic.models.SongItem
-import com.prosabdev.fluidmusic.ui.fragments.explore.AllSongsFragment
-import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 
 abstract class FragmentCommonMediaPlaybackAction {
     companion object{
 
+        fun playAfterToQueueMusic(
+            ctx : Context,
+            selectedItems: SparseBooleanArray,
+            genericListGridItemAdapter: GenericListGridItemAdapter,
+            fragmentSource: String,
+            currentSongPosition: Int,
+        ){
+            updateQueueMusicAndSaveToDatabase(
+                ctx,
+                selectedItems,
+                genericListGridItemAdapter,
+                fragmentSource,
+                currentSongPosition
+            )
+        }
+        fun addToQueueMusic(
+            ctx : Context,
+            selectedItems: SparseBooleanArray,
+            genericListGridItemAdapter: GenericListGridItemAdapter,
+            fragmentSource: String,
+        ){
+            updateQueueMusicAndSaveToDatabase(
+                ctx,
+                selectedItems,
+                genericListGridItemAdapter,
+                fragmentSource
+            )
+        }
 
+        private fun updateQueueMusicAndSaveToDatabase(
+            ctx : Context,
+            selectedItems: SparseBooleanArray,
+            genericListGridItemAdapter: GenericListGridItemAdapter,
+            fragmentSource: String,
+            currentSongPosition: Int = -1,
+            ){
+            //Get all songs
+            //Attach to adapter
+            //Save new queue music to database on background
+        }
 
         fun playSongAtPosition(
             playerFragmentViewModel : PlayerFragmentViewModel?,

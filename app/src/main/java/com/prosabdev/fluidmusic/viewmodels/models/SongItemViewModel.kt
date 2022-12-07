@@ -1,10 +1,10 @@
-package com.prosabdev.fluidmusic.viewmodels.models.explore
+package com.prosabdev.fluidmusic.viewmodels.models
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.prosabdev.fluidmusic.models.SongItem
-import com.prosabdev.fluidmusic.roomdatabase.repositories.explore.SongItemRepository
+import com.prosabdev.fluidmusic.models.songitem.SongItem
+import com.prosabdev.fluidmusic.roomdatabase.repositories.songitem.SongItemRepository
 
 
 class SongItemViewModel(app: Application) : AndroidViewModel(app) {

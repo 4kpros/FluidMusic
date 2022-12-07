@@ -1,10 +1,10 @@
-package com.prosabdev.fluidmusic.viewmodels.models
+package com.prosabdev.fluidmusic.viewmodels.models.queuemusic
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.prosabdev.fluidmusic.models.QueueMusicItem
-import com.prosabdev.fluidmusic.roomdatabase.repositories.QueueMusicItemRepository
+import com.prosabdev.fluidmusic.models.queuemusic.QueueMusicItem
+import com.prosabdev.fluidmusic.roomdatabase.repositories.queuemusic.QueueMusicItemRepository
 
 class QueueMusicItemViewModel(app: Application) : AndroidViewModel(app) {
 

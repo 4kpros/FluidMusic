@@ -1,8 +1,8 @@
-package com.prosabdev.fluidmusic.roomdatabase.dao
+package com.prosabdev.fluidmusic.roomdatabase.dao.queuemusic
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.prosabdev.fluidmusic.models.QueueMusicItem
+import com.prosabdev.fluidmusic.models.queuemusic.QueueMusicItem
 
 @Dao
 interface QueueMusicItemDao {
@@ -30,11 +30,12 @@ interface QueueMusicItemDao {
     @Query("SELECT * FROM QueueMusicItem WHERE id = :id LIMIT 1")
     fun getAtId(id: Long): QueueMusicItem?
 
-    @Query("SELECT * FROM QueueMusicItem " +
+    @Query(
+        "SELECT * FROM QueueMusicItem " +
             "ORDER BY " +
-            "CASE :order_by WHEN 'uriTree' THEN QueueMusicItem.songId END ASC," +
-            "CASE :order_by WHEN 'path' THEN QueueMusicItem.addedDate END ASC," +
-            "CASE :order_by WHEN 'id' THEN QueueMusicItem.id END ASC"
+                "CASE :order_by WHEN 'uriTree' THEN QueueMusicItem.songId END ASC," +
+                "CASE :order_by WHEN 'path' THEN QueueMusicItem.addedDate END ASC," +
+                "CASE :order_by WHEN 'id' THEN QueueMusicItem.id END ASC"
     )
     fun getAll(order_by: String): LiveData<List<QueueMusicItem>>?
 }
