@@ -13,12 +13,8 @@ import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.utils.AudioInfoExtractorUtils
 import com.prosabdev.fluidmusic.utils.SystemSettingsUtils
-import com.prosabdev.fluidmusic.workers.WorkerConstantValues
 import com.prosabdev.fluidmusic.workers.playlist.PlaylistAddSongsWorker
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -58,11 +54,12 @@ class MediaScannerWorker(
         scannedFolders: ConcurrentHashMap<String, String>,
         scannedSongs: ConcurrentLinkedQueue<String>,
         scannedPlaylists: ConcurrentLinkedQueue<String>
-    ) = withContext(Dispatchers.IO){
+    ) {
         //Get all folder uri trees
         val tempFolderSelected: List<FolderUriTree>? = AppDatabase.getDatabase(applicationContext).folderUriTreeDao().getAllDirectly()
-        if (tempFolderSelected == null || tempFolderSelected.isEmpty()) return@withContext
+        if (tempFolderSelected == null || tempFolderSelected.isEmpty()) return
         //Fetch song and playlists
+
         for (i in tempFolderSelected.indices) {
             val tempDocFile: DocumentFile? =
                 DocumentFile.fromTreeUri(applicationContext, Uri.parse(tempFolderSelected[i].uriTree ?: ""))
@@ -83,60 +80,62 @@ class MediaScannerWorker(
         uriTree: Uri?,
         folderUriTreeId : Long?,
         parentFolder : String? = null
-    ) : Unit = supervisorScope {
-        if(uriTree != null) {
-            launch mainScope@ {
-                val tempDocFile: DocumentFile? =
-                    DocumentFile.fromTreeUri(applicationContext, uriTree)
-                if (tempDocFile != null) {
-                    val foreachEnd = tempDocFile.listFiles().size
-                    for (i in 0 until foreachEnd) {
-                        launch {
-                            if (tempDocFile.listFiles()[i].isDirectory) {
-                                launch folderScanScope@ {
-                                    val tempNextUri = tempDocFile.listFiles()[i].uri
-                                    scanDocumentUriContent(
-                                        scannedFolders,
-                                        scannedSongs,
-                                        scannedPlaylists,
-                                        tempNextUri,
-                                        folderUriTreeId,
-                                        tempDocFile.name
-                                    )
-                                }
-                            } else {
-                                launch fileInfoExtractorScope@ {
-                                    val tempFFF = tempDocFile.listFiles()[i]
-                                    val tempMimeType: String = tempFFF.type ?: ""
-                                    if (tempMimeType.contains("audio/") && !tempMimeType.contains("x-mpegurl")) {
-                                        Log.i(TAG, "SONG FOUND : ${tempFFF.type}")
-                                        applicationContext.contentResolver.openAssetFileDescriptor(
-                                            tempFFF.uri,
-                                            "r"
-                                        ).use {
-                                            launch {
-                                                scannedFolders[tempDocFile.uri.toString()] = tempDocFile.name ?: ""
-                                                val tempSong : SongItem? = AudioInfoExtractorUtils.extractAudioInfoFromUri(applicationContext, tempFFF)
-                                                tempSong?.let {
-                                                    scannedSongs.add(tempFFF.name)
-                                                    it.folder = tempDocFile.name
-                                                    it.folderUri = uriTree.toString()
-                                                    it.folderParent = parentFolder
-                                                    it.uriTreeId = folderUriTreeId ?: -1
-                                                    saveSongToDatabase(it)
-                                                }
-                                            }
+    ) : Unit = supervisorScope{
+        if(uriTree == null || uriTree == Uri.EMPTY) return@supervisorScope
+
+        val tempDocFile: DocumentFile? =
+            DocumentFile.fromTreeUri(applicationContext, uriTree)
+        if (tempDocFile != null) {
+            val foreachEnd = tempDocFile.listFiles().size
+            for (i in 0 until foreachEnd) {
+                if (tempDocFile.listFiles()[i].isDirectory) {
+                    launch {
+                        val tempNextUri = tempDocFile.listFiles()[i].uri
+                        scanDocumentUriContent(
+                            scannedFolders,
+                            scannedSongs,
+                            scannedPlaylists,
+                            tempNextUri,
+                            folderUriTreeId,
+                            tempDocFile.name
+                        )
+                    }
+                } else {
+                    launch {
+                        val tempFFF = tempDocFile.listFiles()[i]
+                        val tempMimeType: String = tempFFF.type ?: ""
+                        if (tempMimeType.startsWith("audio/")) {
+                            if(!tempMimeType.contains("x-mpegurl")){
+                                applicationContext.contentResolver.openAssetFileDescriptor(
+                                    tempFFF.uri,
+                                    "r"
+                                ).use { afd ->
+                                    if(afd != null){
+                                        scannedFolders[tempDocFile.uri.toString()] = tempDocFile.name ?: ""
+                                        val tempSong = AudioInfoExtractorUtils.extractAudioInfoFromUri(
+                                            applicationContext,
+                                            tempFFF,
+                                            afd.fileDescriptor
+                                        )
+                                        if(tempSong != null){
+                                            scannedSongs.add(tempFFF.name)
+                                            tempSong.folder = tempDocFile.name
+                                            tempSong.folderUri = uriTree.toString()
+                                            tempSong.folderParent = parentFolder
+                                            tempSong.uriTreeId = folderUriTreeId ?: -1
+                                            Log.i(TAG, "SONG FOUND : ${tempSong.fileName}")
+                                            saveSongToDatabase(tempSong)
                                         }
-                                    } else if (tempMimeType.contains("x-mpegurl")) {
-                                        scannedPlaylists.add(tempFFF.name)
-                                        val playlistItem = PlaylistItem()
-                                        playlistItem.isRealFile = true
-                                        playlistItem.lastAddedDateToLibrary = SystemSettingsUtils.getCurrentDateInMilli()
-                                        playlistItem.lastUpdateDate = tempFFF.lastModified()
-                                        playlistItem.uri = tempFFF.uri.toString()
-                                        savePlaylistToDatabase(playlistItem)
                                     }
                                 }
+                            }else{
+                                scannedPlaylists.add(tempFFF.name)
+                                val playlistItem = PlaylistItem()
+                                playlistItem.isRealFile = true
+                                playlistItem.lastAddedDateToLibrary = SystemSettingsUtils.getCurrentDateInMilli()
+                                playlistItem.lastUpdateDate = tempFFF.lastModified()
+                                playlistItem.uri = tempFFF.uri.toString()
+                                savePlaylistToDatabase(playlistItem)
                             }
                         }
                     }

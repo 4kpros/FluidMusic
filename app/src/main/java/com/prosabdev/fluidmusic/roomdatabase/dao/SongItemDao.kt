@@ -16,8 +16,11 @@ interface SongItemDao {
     @Delete
     fun delete(songItem: SongItem?) : Int
 
+    @Query("DELETE FROM SongItem WHERE uri = :uri")
+    fun deleteAtUri(uri: String?) : Int
+
     @Delete
-    fun deleteMultiple(songItem: ArrayList<SongItem>?) : Int
+    fun deleteMultiple(songItem: List<SongItem>?) : Int
 
     @Query("DELETE FROM SongItem")
     fun deleteAll() : Int

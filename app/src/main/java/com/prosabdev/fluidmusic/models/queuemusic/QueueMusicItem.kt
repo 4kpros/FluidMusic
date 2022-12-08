@@ -15,4 +15,5 @@ class QueueMusicItem {
     var id: Long = 0
     var songUri: String? = null
     var addedDate: Long = 0
+    var playOrder: Int = 0
 }

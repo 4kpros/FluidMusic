@@ -51,6 +51,5 @@ class PlaylistRemoveWorker(
         const val TAG = "PlaylistAddWorker"
 
         const val PLAYLIST_ID_ARRAY = "PLAYLIST_ID_ARRAY"
-
     }
 }

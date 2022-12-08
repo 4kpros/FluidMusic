@@ -1,6 +1,5 @@
-package com.prosabdev.fluidmusic.workers.queuemusic
+package com.prosabdev.fluidmusic.workers.delete
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -15,12 +14,11 @@ import com.prosabdev.fluidmusic.workers.WorkerConstantValues
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class QueueMusicRemoveSongsWorker(
+class DeleteSongsWorker(
     ctx: Context,
     params: WorkerParameters
 ) : CoroutineWorker(ctx, params) {
 
-    @SuppressLint("LongLogTag")
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
             try {
@@ -32,15 +30,16 @@ class QueueMusicRemoveSongsWorker(
                 val orderBy = inputData.getString(WorkerConstantValues.ITEM_LIST_ORDER_BY)
                 val whereClause = inputData.getString(WorkerConstantValues.ITEM_LIST_WHERE)
                 val indexColum = inputData.getString(WorkerConstantValues.INDEX_COLUM)
-                //Delete songs from queue music
+                //Delete songs from database and on device
                 val dataResult = tryToDeleteSongsFromSource(
                     modelType,
                     itemsList,
                     indexColum,
                     orderBy,
-                    whereClause,
+                    whereClause
                 )
-                Log.i(TAG, "WORKER $TAG : DELETED SONGS ON QUEUE MUSIC : ${dataResult} ")
+                Log.i(TAG, "WORKER $TAG : DELETED SONGS ON DATABASE : ${dataResult[0]} ")
+                Log.i(TAG, "WORKER $TAG : DELETED SONGS ON DEVICE : ${dataResult[1]}")
 
                 Log.i(TAG, "WORKER $TAG : ended")
 
@@ -57,25 +56,50 @@ class QueueMusicRemoveSongsWorker(
         }
     }
 
-    private fun removeSongsFromQueueMusic(stringUriList: Array<String>?): Int {
+    private fun deleteSongsFromDevice(stringUriList: Array<String>?): Int {
         if(stringUriList == null) return 0
         var deleteResult = 0
         for (i in stringUriList.indices){
-            deleteResult += deleteQueueMusicItemAtUri(stringUriList[i])
+            deleteResult += deleteSongItemAtUriOnDevice(stringUriList[i])
         }
         return deleteResult
     }
-    private fun removeSongsFromQueueMusic(songUriList: List<SongItemUri>?): Int {
-        if(songUriList == null || songUriList.isEmpty()) return 0
+    private fun deleteSongsFromDevice(stringUriList: List<SongItemUri>?): Int {
+        if(stringUriList == null) return 0
+        var deleteResult = 0
+        for (i in stringUriList.indices){
+            deleteResult += deleteSongItemAtUriOnDevice(stringUriList[i].uri)
+        }
+        return deleteResult
+    }
+    private fun deleteSongItemAtUriOnDevice(uri: String?): Int {
+        if(uri == null || uri.isEmpty()) return 0
+        val uriTree = Uri.parse(uri)
+        val tempDocFile: DocumentFile? =
+            DocumentFile.fromTreeUri(applicationContext, uriTree)
+        val deleteResult = tempDocFile?.delete() ?: false
+        return if(deleteResult) 1 else 0
+    }
+
+    private fun deleteSongsFromDatabase(stringUriList: Array<String>?): Int {
+        if(stringUriList == null) return 0
+        var deleteResult = 0
+        for (i in stringUriList.indices){
+            deleteResult += deleteSongItemAtUriOnDatabase(stringUriList[i])
+        }
+        return deleteResult
+    }
+    private fun deleteSongsFromDatabase(songUriList: List<SongItemUri>?): Int {
+        if(songUriList == null) return 0
         var deleteResult = 0
         for (i in songUriList.indices){
-            deleteResult += deleteQueueMusicItemAtUri(songUriList[i].uri)
+            deleteResult += deleteSongItemAtUriOnDatabase(songUriList[i].uri)
         }
         return deleteResult
     }
-    private fun deleteQueueMusicItemAtUri(uri: String?): Int {
+    private fun deleteSongItemAtUriOnDatabase(uri: String?): Int {
         if(uri == null || uri.isEmpty()) return 0
-        return AppDatabase.getDatabase(applicationContext).queueMusicItemDao().deleteAtSongUri(uri)
+        return AppDatabase.getDatabase(applicationContext).songItemDao().deleteAtUri(uri)
     }
 
     private fun tryToDeleteSongsFromSource(
@@ -84,21 +108,22 @@ class QueueMusicRemoveSongsWorker(
         indexColum: String?,
         orderBy: String?,
         whereClause: String?
-    ): Int {
-        var resultList = 0
+    ): Array<Int> {
+        val resultList = Array(2){0}
         if(
             itemsList == null || itemsList.isEmpty() ||
             modelType == null || modelType.isEmpty()
-        ) return 0
+        ) return resultList
 
         if(modelType == SongItem.TAG){
-            resultList = removeSongsFromQueueMusic(itemsList)
+            resultList[0] = deleteSongsFromDatabase(itemsList)
+            resultList[1] = deleteSongsFromDevice(itemsList)
         }else{
             if(
                 indexColum == null || indexColum.isEmpty() ||
                 orderBy == null || orderBy.isEmpty() ||
                 whereClause == null || whereClause.isEmpty()
-            ) return 0
+            ) return resultList
 
             for (i in itemsList.indices){
                 val tempSongUriList =
@@ -120,7 +145,8 @@ class QueueMusicRemoveSongsWorker(
                         else -> null
                     }
                 if(tempSongUriList != null && tempSongUriList.isNotEmpty()){
-                    resultList += removeSongsFromQueueMusic(tempSongUriList)
+                    resultList[0] += deleteSongsFromDatabase(tempSongUriList)
+                    resultList[1] += deleteSongsFromDevice(tempSongUriList)
                     return resultList
                 }
             }
@@ -129,6 +155,6 @@ class QueueMusicRemoveSongsWorker(
     }
 
     companion object {
-        const val TAG = "QueueMusicRemoveSongsWorker"
+        const val TAG = "DeleteSongsWorker"
     }
 }

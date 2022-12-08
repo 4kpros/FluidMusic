@@ -99,7 +99,7 @@
                                         android:text="Rescan"
                                         android:maxLines="1"
                                         android:ellipsize="end"
-                                        android:layout_marginBottom="@dimen/margin_medium_size"
+                                        android:layout_marginBottom="@dimen/margin_large_size"
                                         />
                                     <androidx.appcompat.widget.LinearLayoutCompat
                                         android:layout_width="match_parent"
@@ -175,7 +175,8 @@
                                     app:layout_constraintTop_toTopOf="@+id/linear_card_container"
                                     app:layout_constraintBottom_toBottomOf="@+id/linear_card_container"
                                     app:layout_constraintEnd_toEndOf="@+id/linear_card_container"
-                                    android:alpha="0.25"
+                                    android:alpha="1"
+                                    app:tint="?colorOutline"
                                     />
                                 <com.google.android.material.progressindicator.LinearProgressIndicator
                                     android:layout_width="match_parent"
@@ -199,10 +200,10 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
+                            android:layout_marginTop="@dimen/margin_small_size"
                             >
                             <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
@@ -212,7 +213,7 @@
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:paddingHorizontal="@dimen/margin_large_size"
-                                android:paddingVertical="@dimen/margin_medium_size"
+                                android:paddingVertical="@dimen/margin_large_size"
                                 >
                                 <com.google.android.material.textview.MaterialTextView
                                     android:id="@+id/text_select_folders_title"
@@ -239,7 +240,6 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -252,7 +252,7 @@
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:paddingHorizontal="@dimen/margin_large_size"
-                                android:paddingVertical="@dimen/margin_medium_size"
+                                android:paddingVertical="@dimen/margin_large_size"
                                 >
                                 <com.google.android.material.textview.MaterialTextView
                                     android:layout_width="match_parent"
@@ -277,7 +277,6 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -290,14 +289,14 @@
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:paddingHorizontal="@dimen/margin_large_size"
-                                android:paddingVertical="@dimen/margin_medium_size"
+                                android:paddingVertical="@dimen/margin_large_size"
                                 >
                                 <androidx.appcompat.widget.LinearLayoutCompat
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginEnd="@dimen/margin_medium_size"
+                                    android:layout_marginEnd="@dimen/margin_large_size"
                                     >
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -319,6 +318,7 @@
                                     android:id="@+id/switch_m3u_playlists"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:checked="true"
                                     style="@style/Widget.Material3.CompoundButton.MaterialSwitch"
                                     />
                             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -329,7 +329,6 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             >
                             <androidx.appcompat.widget.LinearLayoutCompat
@@ -340,7 +339,7 @@
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:paddingHorizontal="@dimen/margin_large_size"
-                                android:paddingVertical="@dimen/margin_medium_size"
+                                android:paddingVertical="@dimen/margin_large_size"
                                 >
                                 <androidx.appcompat.widget.LinearLayoutCompat
                                     android:layout_width="match_parent"
@@ -377,7 +376,6 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -390,14 +388,14 @@
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:paddingHorizontal="@dimen/margin_large_size"
-                                android:paddingVertical="@dimen/margin_medium_size"
+                                android:paddingVertical="@dimen/margin_large_size"
                                 >
                                 <androidx.appcompat.widget.LinearLayoutCompat
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginEnd="@dimen/margin_medium_size"
+                                    android:layout_marginEnd="@dimen/margin_large_size"
                                     >
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -429,7 +427,6 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -442,14 +439,14 @@
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:paddingHorizontal="@dimen/margin_large_size"
-                                android:paddingVertical="@dimen/margin_medium_size"
+                                android:paddingVertical="@dimen/margin_large_size"
                                 >
                                 <androidx.appcompat.widget.LinearLayoutCompat
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1"
-                                    android:layout_marginEnd="@dimen/margin_medium_size"
+                                    android:layout_marginEnd="@dimen/margin_large_size"
                                     >
                                     <com.google.android.material.textview.MaterialTextView
                                         android:layout_width="match_parent"
@@ -481,7 +478,6 @@
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.CardView.Filled"
                             android:orientation="vertical"
-                            android:layout_marginTop="@dimen/margin_medium_size"
                             android:backgroundTint="@color/transparent"
                             android:clickable="true"
                             android:focusable="true"
@@ -494,7 +490,7 @@
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:paddingHorizontal="@dimen/margin_large_size"
-                                android:paddingVertical="@dimen/margin_medium_size"
+                                android:paddingVertical="@dimen/margin_large_size"
                                 >
                                 <com.google.android.material.textview.MaterialTextView
                                     android:layout_width="match_parent"
