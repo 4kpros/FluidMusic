@@ -130,9 +130,9 @@
                 android:id="@+id/background_selected"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:alpha="0.125"
-                android:background="?colorPrimary"
+                android:alpha="0"
                 android:visibility="gone"
+                android:background="?colorPrimary"
                 />
         </com.google.android.material.card.MaterialCardView>
     </RelativeLayout>

@@ -7,9 +7,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
 import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -164,8 +164,8 @@ import kotlinx.coroutines.launch
                         fragmentMainBinding.constraintMiniPlayerContainer,
                         1,
                         animate,
-                        150,
-                        300.0f
+                        200,
+                        300f
                     )
                 } else {
                     if(fragmentMainBinding.constraintMiniPlayerContainer.visibility == VISIBLE) return@launch
@@ -180,9 +180,8 @@ import kotlinx.coroutines.launch
                     mIsAnimatingScroll2 = true
                     AnimatorsUtils.crossTranslateInFromVertical(
                         fragmentMainBinding.constraintMiniPlayerContainer,
-                        1, animate,
-                        150,
-                        300.0f
+                        animate,
+                        200
                     )
                 }
             }
@@ -192,37 +191,16 @@ import kotlinx.coroutines.launch
         mFragmentMainBinding?.let { fragmentMainBinding ->
             MainScope().launch {
                 if(totalSelected > 0 && totalSelected >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
-                    fragmentMainBinding.includeBottomSelection.buttonSelectAll.icon = context?.let {
-                        ContextCompat.getDrawable(
-                            it,
-                            R.drawable.check_box
-                        )
-                    }
-                    if(fragmentMainBinding.includeBottomSelection.buttonSelectRange.isClickable)
-                        AnimatorsUtils.crossFadeDownClickable(
-                            fragmentMainBinding.includeBottomSelection.buttonSelectRange,
-                            animate,
-                            200
-                        )
+                    if(fragmentMainBinding.includeBottomSelection.buttonSelectRange.isEnabled)
+                        fragmentMainBinding.includeBottomSelection.buttonSelectRange.isEnabled = false
                 }else{
-                    fragmentMainBinding.includeBottomSelection.buttonSelectAll.icon = context?.let {
-                        ContextCompat.getDrawable(
-                            it,
-                            R.drawable.check_box_outline_blank
-                        )
+                    if(totalSelected >= 2){
+                        if(!fragmentMainBinding.includeBottomSelection.buttonSelectRange.isEnabled)
+                            fragmentMainBinding.includeBottomSelection.buttonSelectRange.isEnabled = true
+                    }else{
+                        if(fragmentMainBinding.includeBottomSelection.buttonSelectRange.isEnabled)
+                            fragmentMainBinding.includeBottomSelection.buttonSelectRange.isEnabled = false
                     }
-                    if (totalSelected >= 2)
-                        AnimatorsUtils.crossFadeUpClickable(
-                            fragmentMainBinding.includeBottomSelection.buttonSelectRange,
-                            animate,
-                            200
-                        )
-                    else
-                        AnimatorsUtils.crossFadeDownClickable(
-                            fragmentMainBinding.includeBottomSelection.buttonSelectRange,
-                            animate,
-                            200
-                        )
                 }
                 fragmentMainBinding.includeTopSelection.textSelectedCount.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
             }
@@ -232,37 +210,33 @@ import kotlinx.coroutines.launch
         mFragmentMainBinding?.let { fragmentMainBinding ->
             MainScope().launch {
                 if (selectMode) {
-                    if (fragmentMainBinding.constraintBottomSelectionContainer.visibility != VISIBLE)
-                        AnimatorsUtils.crossTranslateInFromVertical(
-                            fragmentMainBinding.constraintBottomSelectionContainer as View,
-                            1,
-                            animate,
-                            300
-                        )
-                    if (fragmentMainBinding.constraintTopSelectionContainer.visibility != VISIBLE)
-                        AnimatorsUtils.crossTranslateInFromVertical(
-                            fragmentMainBinding.constraintTopSelectionContainer as View,
-                            -1,
-                            animate,
-                            300
-                        )
+                    AnimatorsUtils.crossTranslateInFromVertical(
+                        fragmentMainBinding.constraintBottomSelectionContainer as View,
+                        animate,
+                        200
+                    )
+                    AnimatorsUtils.crossTranslateInFromVertical(
+                        fragmentMainBinding.constraintTopSelectionContainer as View,
+                        animate,
+                        200
+                    )
                 } else {
                     //Clear old views
-                    mFragmentMainBinding?.includeBottomSelection?.buttonSelectAll?.isChecked = false
-                    if (fragmentMainBinding.constraintBottomSelectionContainer.visibility != GONE)
-                        AnimatorsUtils.crossTranslateOutFromVertical(
-                            fragmentMainBinding.constraintBottomSelectionContainer as View,
-                            1,
-                            animate,
-                            300
-                        )
-                    if (fragmentMainBinding.constraintTopSelectionContainer.visibility != GONE)
-                        AnimatorsUtils.crossTranslateOutFromVertical(
-                            fragmentMainBinding.constraintTopSelectionContainer as View,
-                            -1,
-                            animate,
-                            300
-                        )
+                    fragmentMainBinding.includeBottomSelection.checkboxSelectAll.isChecked = false
+                    AnimatorsUtils.crossTranslateOutFromVertical(
+                        fragmentMainBinding.constraintBottomSelectionContainer as View,
+                        1,
+                        animate,
+                        200,
+                        300f
+                    )
+                    AnimatorsUtils.crossTranslateOutFromVertical(
+                        fragmentMainBinding.constraintTopSelectionContainer as View,
+                        -1,
+                        animate,
+                        200,
+                        300f
+                    )
                 }
             }
         }
@@ -381,8 +355,10 @@ import kotlinx.coroutines.launch
             fragmentMainBinding.constraintMiniPlayerInclude.buttonSkipNext.setOnClickListener {
                 onClickButtonSkipNextSong()
             }
-            fragmentMainBinding.includeBottomSelection.buttonSelectAll.setOnClickListener {
-                onToggleButtonSelectAll()
+            fragmentMainBinding.includeBottomSelection.checkboxSelectAll.setOnCheckedChangeListener { buttonView, isChecked ->
+                onCheckboxSelectAllChanged(
+                    isChecked
+                )
             }
             fragmentMainBinding.includeBottomSelection.buttonSelectRange.setOnClickListener {
                 onToggleButtonSelectRange()
@@ -459,13 +435,14 @@ import kotlinx.coroutines.launch
         mMainFragmentViewModel.setToggleRange()
     }
 
-    private fun onToggleButtonSelectAll() {
-        val tempTotalSelected: Int = mMainFragmentViewModel.getTotalSelected().value ?: 0
+    private fun onCheckboxSelectAllChanged(state: Boolean) {
+        if(mMainFragmentViewModel.getSelectMode().value == false) return
+
         val tempTotalCount : Int = mMainFragmentViewModel.getTotalCount().value ?: 0
-        if(tempTotalSelected >= tempTotalCount) {
-            mMainFragmentViewModel.setTotalSelected(0)
-        }else {
+        if(state){
             mMainFragmentViewModel.setTotalSelected(tempTotalCount)
+        }else{
+            mMainFragmentViewModel.setTotalSelected(0)
         }
     }
     private fun onClickButtonSkipNextSong() {

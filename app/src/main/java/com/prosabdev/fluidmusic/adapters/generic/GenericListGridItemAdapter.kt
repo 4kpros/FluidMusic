@@ -445,37 +445,29 @@ class GenericListGridItemAdapter (
                 mDataBinding.linearIsPlayingAnimContainer.visibility = View.GONE
             }else{
                 if(playingPosition == bindingAdapterPosition){
-                    if(mDataBinding.imageviewBackgroundIsPlaying.visibility != View.VISIBLE){
-                        AnimatorsUtils.crossFadeUp(
-                            mDataBinding.imageviewBackgroundIsPlaying,
-                            animate,
-                            200,
-                            0.65f,
-                            AccelerateDecelerateInterpolator()
-                        )
-                        AnimatorsUtils.crossFadeUp(
-                            mDataBinding.linearIsPlayingAnimContainer,
-                            animate,
-                            200,
-                            1.0f,
-                            AccelerateDecelerateInterpolator()
-                        )
-                    }
+                    AnimatorsUtils.crossFadeUp(
+                        mDataBinding.imageviewBackgroundIsPlaying,
+                        animate,
+                        150,
+                        0.65f
+                    )
+                    AnimatorsUtils.crossFadeUp(
+                        mDataBinding.linearIsPlayingAnimContainer,
+                        animate,
+                        200,
+                        1.0f
+                    )
                 }else{
-                    if(mDataBinding.imageviewBackgroundIsPlaying.visibility != View.GONE){
-                        AnimatorsUtils.crossFadeDown(
-                            mDataBinding.imageviewBackgroundIsPlaying,
-                            animate,
-                            200,
-                            AccelerateDecelerateInterpolator()
-                        )
-                        AnimatorsUtils.crossFadeDown(
-                            mDataBinding.linearIsPlayingAnimContainer,
-                            animate,
-                            200,
-                            AccelerateDecelerateInterpolator()
-                        )
-                    }
+                    AnimatorsUtils.crossFadeDown(
+                        mDataBinding.imageviewBackgroundIsPlaying,
+                        animate,
+                        200
+                    )
+                    AnimatorsUtils.crossFadeDown(
+                        mDataBinding.linearIsPlayingAnimContainer,
+                        animate,
+                        150
+                    )
                 }
             }
         }
@@ -488,9 +480,9 @@ class GenericListGridItemAdapter (
             mDataBinding.textSubtitle.setTextColor(textColorRes)
             mDataBinding.textDetails.setTextColor(textColorRes)
 
-            UpdateUnderlinedPlaying(isUnderlined)
+            updateUnderlinedPlaying(isUnderlined)
         }
-        fun UpdateUnderlinedPlaying(isUnderlined: Boolean){
+        private fun updateUnderlinedPlaying(isUnderlined: Boolean){
             if(isUnderlined){
                 mDataBinding.textTitle.text = FormattersAndParsersUtils.getUnderLinedWord(mDataBinding.textTitle.text.toString())
                 mDataBinding.textSubtitle.text = FormattersAndParsersUtils.getUnderLinedWord(mDataBinding.textSubtitle.text.toString())
@@ -507,7 +499,7 @@ class GenericListGridItemAdapter (
                 hideDirectlySelectedItemBackground()
                 return
             }
-            startAnimationForSelectedItemBackground(selectableIsSelected, 250)
+            startAnimationForSelectedItemBackground(selectableIsSelected, 200)
         }
         fun updateSelectedStateUI(selectableIsSelected: Boolean, isSelectable: Boolean) {
             if(!isSelectable){
@@ -517,24 +509,17 @@ class GenericListGridItemAdapter (
             startAnimationForSelectedItemBackground(selectableIsSelected, 0)
         }
         private fun hideDirectlySelectedItemBackground() {
-            if(mDataBinding.backgroundSelected.visibility != View.GONE)
-                mDataBinding.backgroundSelected.visibility = View.GONE
-            if(mDataBinding.backgroundSelected.alpha > 0.0f)
-                mDataBinding.backgroundSelected.alpha = 0.0f
+            mDataBinding.backgroundSelected.visibility = View.GONE
+            mDataBinding.backgroundSelected.alpha = 0.0f
         }
         private fun startAnimationForSelectedItemBackground(selectableIsSelected: Boolean, duration: Int) {
             if(selectableIsSelected) {
-                if (
-                    mDataBinding.backgroundSelected.visibility != View.VISIBLE
-                ) {
-                    mDataBinding.backgroundSelected.clearAnimation()
-                    AnimatorsUtils.crossFadeUp(
-                        mDataBinding.backgroundSelected,
-                        true,
-                        duration,
-                        0.125f
-                    )
-                }
+                AnimatorsUtils.crossFadeUp(
+                    mDataBinding.backgroundSelected,
+                    true,
+                    duration,
+                    0.125f
+                )
             }
             else {
                 AnimatorsUtils.crossFadeDown(

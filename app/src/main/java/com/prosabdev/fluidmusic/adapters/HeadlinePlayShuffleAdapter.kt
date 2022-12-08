@@ -68,52 +68,48 @@ class HeadlinePlayShuffleAdapter(
 
         fun updateOnSelectModeEnabledUI(isSelectMode: Boolean) {
             if(isSelectMode){
-                if(mItemHeadlinePlayShuffleBinding.buttonPlay.isClickable) {
-                    AnimatorsUtils.crossFadeDownClickable(
-                        mItemHeadlinePlayShuffleBinding.buttonPlay,
-                        true,
-                        250
-                    )
-                    AnimatorsUtils.crossFadeDownClickable(
-                        mItemHeadlinePlayShuffleBinding.buttonShuffle,
-                        true,
-                        250
-                    )
-                    AnimatorsUtils.crossFadeDownClickable(
-                        mItemHeadlinePlayShuffleBinding.buttonSort,
-                        true,
-                        250
-                    )
-                    AnimatorsUtils.crossFadeDownClickable(
-                        mItemHeadlinePlayShuffleBinding.buttonOrganize,
-                        true,
-                        250
-                    )
-                }
+                AnimatorsUtils.crossFadeDownClickable(
+                    mItemHeadlinePlayShuffleBinding.buttonPlay,
+                    true,
+                    200
+                )
+                AnimatorsUtils.crossFadeDownClickable(
+                    mItemHeadlinePlayShuffleBinding.buttonShuffle,
+                    true,
+                    200
+                )
+                AnimatorsUtils.crossFadeDownClickable(
+                    mItemHeadlinePlayShuffleBinding.buttonSort,
+                    true,
+                    200
+                )
+                AnimatorsUtils.crossFadeDownClickable(
+                    mItemHeadlinePlayShuffleBinding.buttonOrganize,
+                    true,
+                    200
+                )
             }
             else{
-                if(!mItemHeadlinePlayShuffleBinding.buttonPlay.isClickable) {
-                    AnimatorsUtils.crossFadeUpClickable(
-                        mItemHeadlinePlayShuffleBinding.buttonPlay,
-                        true,
-                        250
-                    )
-                    AnimatorsUtils.crossFadeUpClickable(
-                        mItemHeadlinePlayShuffleBinding.buttonShuffle,
-                        true,
-                        250
-                    )
-                    AnimatorsUtils.crossFadeUpClickable(
-                        mItemHeadlinePlayShuffleBinding.buttonSort,
-                        true,
-                        250
-                    )
-                    AnimatorsUtils.crossFadeUpClickable(
-                        mItemHeadlinePlayShuffleBinding.buttonOrganize,
-                        true,
-                        250
-                    )
-                }
+                AnimatorsUtils.crossFadeUpClickable(
+                    mItemHeadlinePlayShuffleBinding.buttonPlay,
+                    true,
+                    200
+                )
+                AnimatorsUtils.crossFadeUpClickable(
+                    mItemHeadlinePlayShuffleBinding.buttonShuffle,
+                    true,
+                    200
+                )
+                AnimatorsUtils.crossFadeUpClickable(
+                    mItemHeadlinePlayShuffleBinding.buttonSort,
+                    true,
+                    200
+                )
+                AnimatorsUtils.crossFadeUpClickable(
+                    mItemHeadlinePlayShuffleBinding.buttonOrganize,
+                    true,
+                    200
+                )
             }
         }
     }

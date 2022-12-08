@@ -18,7 +18,7 @@ import kotlin.math.abs
 abstract class AnimatorsUtils {
 
     companion object{
-        var defaultTranslationPosition: Float = 500.0f
+        var mDefaultTranslationPosition: Float = 500.0f
 
         fun transformScaleViewPager(viewPager: ViewPager2?) {
             if(viewPager == null)
@@ -42,14 +42,18 @@ abstract class AnimatorsUtils {
             maxAlpha: Float = 1.0f
         ) {
             MainScope().launch {
+                contentView.clearAnimation()
                 if(animate){
                     contentView.apply {
-                        contentView.isClickable = true
                         animate()
                             .alpha(maxAlpha)
                             .setInterpolator(AccelerateDecelerateInterpolator())
                             .setDuration(duration.toLong())
-                            .setListener(null)
+                            .setListener(object : AnimatorListenerAdapter() {
+                                override fun onAnimationEnd(animation: Animator) {
+                                    contentView.isClickable = true
+                                }
+                            })
                     }
                 }else{
                     contentView.isClickable = true
@@ -59,23 +63,20 @@ abstract class AnimatorsUtils {
         }
         fun crossFadeDownClickable(
             contentView : View,
-            animate : Boolean = false,
+            animate : Boolean = true,
             duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime),
             minAlpha: Float = 0.35f
         ) {
             MainScope().launch {
+                contentView.clearAnimation()
                 if(animate){
                     contentView.apply {
-                        alpha = 1.0f
+                        isClickable = false
                         animate()
                             .alpha(minAlpha)
                             .setInterpolator(AccelerateDecelerateInterpolator())
                             .setDuration(duration.toLong())
-                            .setListener(object : AnimatorListenerAdapter() {
-                                override fun onAnimationEnd(animation: Animator) {
-                                    contentView.isClickable = false
-                                }
-                            })
+                            .setListener(null)
                     }
                 }else{
                     contentView.isClickable = false
@@ -86,17 +87,16 @@ abstract class AnimatorsUtils {
         fun crossFadeUp(
             contentView: View, animate: Boolean = false,
             duration: Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime),
-            maxAlpha: Float = 1.0f,
-            animator: TimeInterpolator? = null
+            maxAlpha: Float = 1.0f
         ) {
             MainScope().launch {
+                contentView.clearAnimation()
                 if(animate){
                     contentView.apply {
-                        alpha = 0f
                         visibility = VISIBLE
                         animate()
                             .alpha(maxAlpha)
-                            .setInterpolator(animator ?: AccelerateDecelerateInterpolator())
+                            .setInterpolator(AccelerateDecelerateInterpolator())
                             .setDuration(duration.toLong())
                             .setListener(null)
                     }
@@ -109,36 +109,32 @@ abstract class AnimatorsUtils {
         fun crossFadeDown(
             contentView : View,
             animate : Boolean = false,
-            duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime),
-            animator: TimeInterpolator? = null
+            duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)
         ) {
             MainScope().launch {
+                contentView.clearAnimation()
                 if(animate){
                     contentView.apply {
                         animate()
                             .alpha(0.0f)
-                            .setInterpolator(animator ?: AccelerateDecelerateInterpolator())
+                            .setInterpolator(AccelerateDecelerateInterpolator())
                             .setDuration(duration.toLong())
-                            .setListener(object : AnimatorListenerAdapter() {
-                                override fun onAnimationEnd(animation: Animator) {
-                                    contentView.visibility = GONE
-                                }
-                            })
+                            .setListener(null)
                     }
                 }else{
-                    contentView.visibility = GONE
                     contentView.alpha = 0.0f
                 }
             }
         }
-        fun crossTranslateInFromVertical(contentView : View, direction : Int, animate : Boolean = false, duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime), translationDistance: Float = defaultTranslationPosition) {
-            val tempDirection = if(direction > 0) 1 else -1
-            Log.i(ConstantValues.TAG, "Show")
+        fun crossTranslateInFromVertical(
+            contentView : View,
+            animate : Boolean = false,
+            duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)
+        ) {
             MainScope().launch {
+                contentView.clearAnimation()
                 if(animate){
                     contentView.apply {
-                        translationY = tempDirection * translationDistance
-                        alpha = 0.0f
                         visibility = VISIBLE
                         animate()
                             .translationY(0.0f)
@@ -154,39 +150,40 @@ abstract class AnimatorsUtils {
                 }
             }
         }
-        fun crossTranslateOutFromVertical(contentView : View, direction : Int, animate : Boolean = false, duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime), translationDistance: Float = defaultTranslationPosition) {
+        fun crossTranslateOutFromVertical(
+            contentView : View,
+            direction : Int,
+            animate : Boolean = false,
+            duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime),
+            translationDistance: Float = mDefaultTranslationPosition
+        ) {
             val tempDirection = if(direction > 0) 1 else -1
             MainScope().launch {
+                contentView.clearAnimation()
                 if(animate){
                     contentView.apply {
-                        translationY = 0.0f
-                        alpha = 1.0f
-                        visibility = VISIBLE
                         animate()
                             .translationY(tempDirection * translationDistance)
                             .alpha(0.0f)
                             .setInterpolator(AccelerateDecelerateInterpolator())
                             .setDuration(duration.toLong())
-                            .setListener(object : AnimatorListenerAdapter() {
-                                override fun onAnimationEnd(animation: Animator) {
-                                    contentView.visibility = GONE
-                                }
-                            })
+                            .setListener(null)
                     }
                 }else{
                     contentView.translationY = tempDirection * translationDistance
                     contentView.alpha = 0.0f
-                    contentView.visibility = GONE
                 }
             }
         }
-        fun crossTranslateInFromHorizontal(contentView : View, direction : Int, animate : Boolean = false, duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime), translationDistance: Float = defaultTranslationPosition) {
-            val tempDirection = if(direction > 0) 1 else -1
+        fun crossTranslateInFromHorizontal(
+            contentView : View,
+            animate : Boolean = false,
+            duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)
+        ) {
             MainScope().launch {
+                contentView.clearAnimation()
                 if(animate){
                     contentView.apply {
-                        translationX = tempDirection * translationDistance
-                        alpha = 0.0f
                         visibility = VISIBLE
                         animate()
                             .translationX(0.0f)
@@ -202,9 +199,16 @@ abstract class AnimatorsUtils {
                 }
             }
         }
-        fun crossTranslateOutFromHorizontal(contentView : View, direction : Int, animate : Boolean = false, duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime), translationDistance: Float = defaultTranslationPosition) {
+        fun crossTranslateOutFromHorizontal(
+            contentView : View,
+            direction : Int,
+            animate : Boolean = false,
+            duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime),
+            translationDistance: Float = mDefaultTranslationPosition
+        ) {
             val tempDirection = if(direction > 0) 1 else -1
             MainScope().launch {
+                contentView.clearAnimation()
                 if(animate){
                     contentView.apply {
                         animate()
@@ -212,50 +216,11 @@ abstract class AnimatorsUtils {
                             .alpha(0.0f)
                             .setInterpolator(AccelerateDecelerateInterpolator())
                             .setDuration(duration.toLong())
-                            .setListener(object : AnimatorListenerAdapter() {
-                                override fun onAnimationEnd(animation: Animator) {
-                                    contentView.visibility = GONE
-                                }
-                            })
+                            .setListener(null)
                     }
                 }else{
                     contentView.translationX = tempDirection * translationDistance
                     contentView.alpha = 0.0f
-                    contentView.visibility = GONE
-                }
-            }
-        }
-        fun crossScaleYUp(contentView : View, animate : Boolean = false, duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)) {
-            MainScope().launch {
-                if(animate){
-                    contentView.apply {
-                        scaleY = 0.0f
-                        animate()
-                            .scaleY(1.0f)
-                            .setInterpolator(AccelerateDecelerateInterpolator())
-                            .setDuration(duration.toLong())
-                            .setListener(null)
-                    }
-                }else{
-                    contentView.scaleY = 1.0f
-                }
-            }
-        }
-        fun crossScaleYDown(
-            contentView: View, animate: Boolean = false,
-            duration: Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)
-        ) {
-            MainScope().launch {
-                if(animate){
-                    contentView.apply {
-                        animate()
-                            .scaleY(0.0f)
-                            .setInterpolator(AccelerateDecelerateInterpolator())
-                            .setDuration(duration.toLong())
-                            .setListener(null)
-                    }
-                }else{
-                    contentView.scaleY = 0.0f
                 }
             }
         }

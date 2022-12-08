@@ -54,23 +54,23 @@ class PlayerPageAdapter(
 
         var mAnimateButtonsJob : Job? = null
         init {
-            mItemPlayerCardViewBinding.playerViewpagerContainer.setOnClickListener(View.OnClickListener {
-                if(mAnimateButtonsJob != null)
+            mItemPlayerCardViewBinding.playerViewpagerContainer.setOnClickListener {
+                if (mAnimateButtonsJob != null)
                     mAnimateButtonsJob?.cancel()
                 mAnimateButtonsJob = MainScope().launch {
                     animateButtons()
                 }
-            })
-            mItemPlayerCardViewBinding.buttonLyrics.setOnClickListener(View.OnClickListener {
+            }
+            mItemPlayerCardViewBinding.buttonLyrics.setOnClickListener {
                 listener.onButtonLyricsClicked(
                     bindingAdapterPosition
                 )
-            })
-            mItemPlayerCardViewBinding.buttonFullscreen.setOnClickListener(View.OnClickListener {
+            }
+            mItemPlayerCardViewBinding.buttonFullscreen.setOnClickListener {
                 listener.onButtonFullscreenClicked(
                     bindingAdapterPosition
                 )
-            })
+            }
         }
 
         private suspend fun animateButtons() {

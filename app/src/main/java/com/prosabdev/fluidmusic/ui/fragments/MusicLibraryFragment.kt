@@ -140,15 +140,13 @@ class MusicLibraryFragment : Fragment() {
     private fun disableSideSelectionActions(view : View) {
         AnimatorsUtils.crossFadeDownClickable(
             view,
-            true,
-            200
+            true
         )
     }
     private fun enableSideSelectionActions(view : View) {
         AnimatorsUtils.crossFadeUpClickable(
             view,
-            true,
-            200
+            true
         )
     }
 
@@ -156,24 +154,20 @@ class MusicLibraryFragment : Fragment() {
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
             if (isSelectMode) {
                 fragmentMusicLibraryBinding.viewPager.isUserInputEnabled = false
-                if (fragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != VISIBLE){
-                    AnimatorsUtils.crossTranslateInFromHorizontal(
-                        fragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View,
-                        1,
-                        animate,
-                        300
-                    )
-                }
+                AnimatorsUtils.crossTranslateInFromHorizontal(
+                    fragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View,
+                    animate,
+                    200
+                )
             } else {
                 fragmentMusicLibraryBinding.viewPager.isUserInputEnabled = true
-                if (fragmentMusicLibraryBinding.constraintSideMenuHoverContainer.visibility != GONE){
-                    AnimatorsUtils.crossTranslateOutFromHorizontal(
-                        fragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View,
-                        1,
-                        animate,
-                        300
-                    )
-                }
+                AnimatorsUtils.crossTranslateOutFromHorizontal(
+                    fragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View,
+                    1,
+                    animate,
+                    200,
+                    200f
+                )
             }
         }
     }

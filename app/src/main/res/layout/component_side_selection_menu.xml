@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Widget.Material3.CardView.Elevated"
-        app:cardElevation="3dp"
+        app:cardElevation="5dp"
         android:layout_margin="2dp"
         app:strokeWidth="0dp"
         app:strokeColor="?attr/colorOutline"

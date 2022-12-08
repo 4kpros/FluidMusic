@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/Widget.Material3.CardView.Elevated"
-        app:cardElevation="3dp"
+        app:cardElevation="5dp"
         app:cardCornerRadius="0dp"
         android:layout_marginTop="2dp"
         >
@@ -21,44 +21,36 @@
             android:focusable="false"
             >
 
-            <View
-                android:id="@+id/top_line"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:visibility="gone"
-                android:background="?attr/colorOutline"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/top_line"
+                app:layout_constraintTop_toTopOf="parent"
                 android:paddingHorizontal="@dimen/margin_large_size"
                 android:paddingVertical="@dimen/margin_medium_size"
                 >
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_select_all"
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/checkbox_select_all"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/Widget.Material3.Button.IconButton"
-                    app:layout_constraintStart_toStartOf="parent"
+                    style="@style/Widget.Material3.CompoundButton.CheckBox"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:icon="@drawable/check_box_outline_blank"
-                    app:iconPadding="2dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     android:text="@string/all" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_select_range"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/Widget.Material3.Button.IconButton"
+                    style="@style/Widget.Material3.Button.TextButton.Icon"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/button_select_all"
+                    app:layout_constraintStart_toEndOf="@+id/checkbox_select_all"
                     app:icon="@drawable/expand"
-                    app:iconPadding="2dp"
-                    android:text="@string/range" />
+                    android:text="@string/range"
+                    android:layout_marginStart="@dimen/margin_large_size"
+                    />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_close"

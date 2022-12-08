@@ -196,14 +196,12 @@ class QueueMusicItemListAdapter(
         }
         fun updateItemTouchHelper(isDragging : Boolean, animated: Boolean = true){
             if(isDragging) {
-                if (mItemQueueMusicBinding.songItemIsSelected.visibility != VISIBLE) {
-                    AnimatorsUtils.crossFadeUp(
-                        mItemQueueMusicBinding.songItemIsSelected,
-                        animated,
-                        150,
-                        0.15f
-                    )
-                }
+                AnimatorsUtils.crossFadeUp(
+                    mItemQueueMusicBinding.songItemIsSelected,
+                    animated,
+                    150,
+                    0.15f
+                )
             }
             else {
                 AnimatorsUtils.crossFadeDown(
