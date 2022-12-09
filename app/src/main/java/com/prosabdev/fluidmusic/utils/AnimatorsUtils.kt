@@ -36,6 +36,54 @@ abstract class AnimatorsUtils {
             viewPager.setPageTransformer(compositePageTransformer)
         }
 
+        fun crossScaleLeftUp(
+            contentView: View, animate: Boolean = false,
+            duration: Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime),
+            maxAlpha: Float = 1.0f
+        ) {
+            MainScope().launch {
+                contentView.clearAnimation()
+                if(animate){
+                    contentView.apply {
+                        visibility = VISIBLE
+                        pivotX = 0f
+                        animate()
+                            .alpha(maxAlpha)
+                            .scaleX(1.0f)
+                            .setInterpolator(AccelerateDecelerateInterpolator())
+                            .setDuration(duration.toLong())
+                            .setListener(null)
+                    }
+                }else{
+                    contentView.visibility = VISIBLE
+                    contentView.alpha = maxAlpha
+                }
+            }
+        }
+        fun crossScaleLeftDown(
+            contentView : View,
+            animate : Boolean = false,
+            duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime)
+        ) {
+            MainScope().launch {
+                contentView.clearAnimation()
+                if(animate){
+                    contentView.apply {
+                        pivotX = 0f
+                        animate()
+                            .alpha(0.0f)
+                            .scaleX(0.0f)
+                            .setInterpolator(AccelerateDecelerateInterpolator())
+                            .setDuration(duration.toLong())
+                            .setListener(null)
+                    }
+                }else{
+                    contentView.alpha = 0.0f
+                }
+            }
+        }
+
+
         fun crossFadeUpClickable(
             contentView: View, animate: Boolean = false,
             duration: Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime),

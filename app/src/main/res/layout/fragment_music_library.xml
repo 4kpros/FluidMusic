@@ -90,7 +90,7 @@
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/constraint_side_menu_hover_container"
+                android:id="@+id/side_selection_menu_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
@@ -101,10 +101,10 @@
                 android:layout_marginTop="70dp"
                 android:visibility="gone"
                 android:alpha="0"
-                android:translationX="500dp">
+                >
 
                 <include
-                    android:id="@+id/constraint_side_menu_hover_include"
+                    android:id="@+id/include_side_selection_menu"
                     layout="@layout/component_side_selection_menu" />
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.constraintlayout.widget.ConstraintLayout>

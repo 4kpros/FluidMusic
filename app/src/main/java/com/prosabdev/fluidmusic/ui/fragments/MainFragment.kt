@@ -133,14 +133,39 @@ import kotlinx.coroutines.launch
     }
     private fun tryToUpdateFastScrollStateUI(isFastScrolling: Boolean = true) {
         if(isFastScrolling){
-            Log.i(ConstantValues.TAG, "FASSSSSSSSSSSSSST SCROLLING ---------------------->")
+            hideBottomSelectionMenu()
             updateMiniPlayerScrollingStateUI(1)
         }else{
+            showBottomSelectionMenu()
             tryToUpdateMiniPlayerScrollStateUI(mMainFragmentViewModel.getScrollingState().value)
         }
     }
+    private fun showBottomSelectionMenu(animate: Boolean = true) {
+        mFragmentMainBinding?.let { fragmentMainBinding ->
+            AnimatorsUtils.crossTranslateInFromVertical(
+                fragmentMainBinding.constraintBottomSelectionContainer as View,
+                animate,
+                200
+            )
+        }
+    }
+    private fun hideBottomSelectionMenu(animate: Boolean = true) {
+        mFragmentMainBinding?.let { fragmentMainBinding ->
+            AnimatorsUtils.crossTranslateOutFromVertical(
+                fragmentMainBinding.constraintBottomSelectionContainer as View,
+                1,
+                animate,
+                100,
+                500f
+            )
+        }
+    }
+
     private fun tryToUpdateMiniPlayerScrollStateUI(scrollState: Int?, animate: Boolean = true) {
-        if(mMainFragmentViewModel.getIsFastScrolling().value == true) return
+        if(
+            mMainFragmentViewModel.getIsFastScrolling().value == true ||
+            mMainFragmentViewModel.getSelectMode().value == true
+        ) return
         updateMiniPlayerScrollingStateUI(scrollState, animate)
     }
     private var mIsAnimatingScroll1: Boolean = false
@@ -165,10 +190,10 @@ import kotlinx.coroutines.launch
                         1,
                         animate,
                         200,
-                        300f
+                        500f
                     )
                 } else {
-                    if(fragmentMainBinding.constraintMiniPlayerContainer.visibility == VISIBLE) return@launch
+                    if(fragmentMainBinding.constraintMiniPlayerContainer.alpha > 0.0f) return@launch
                     if (mIsAnimatingScroll1) {
                         fragmentMainBinding.constraintMiniPlayerContainer.apply {
                             mIsAnimatingScroll1 = false
@@ -210,37 +235,51 @@ import kotlinx.coroutines.launch
         mFragmentMainBinding?.let { fragmentMainBinding ->
             MainScope().launch {
                 if (selectMode) {
-                    AnimatorsUtils.crossTranslateInFromVertical(
-                        fragmentMainBinding.constraintBottomSelectionContainer as View,
-                        animate,
-                        200
-                    )
-                    AnimatorsUtils.crossTranslateInFromVertical(
-                        fragmentMainBinding.constraintTopSelectionContainer as View,
-                        animate,
-                        200
-                    )
+                    updateMiniPlayerScrollingStateUI(1)
+                    showTopBottomSelectionMenu()
                 } else {
+                    tryToUpdateMiniPlayerScrollStateUI(mMainFragmentViewModel.getScrollingState().value)
                     //Clear old views
                     fragmentMainBinding.includeBottomSelection.checkboxSelectAll.isChecked = false
-                    AnimatorsUtils.crossTranslateOutFromVertical(
-                        fragmentMainBinding.constraintBottomSelectionContainer as View,
-                        1,
-                        animate,
-                        200,
-                        300f
-                    )
-                    AnimatorsUtils.crossTranslateOutFromVertical(
-                        fragmentMainBinding.constraintTopSelectionContainer as View,
-                        -1,
-                        animate,
-                        200,
-                        300f
-                    )
+                    hideTopBottomSelectionMenu()
                 }
             }
         }
     }
+    private fun hideTopBottomSelectionMenu(animate: Boolean = true) {
+        mFragmentMainBinding?.let { fragmentMainBinding ->
+            AnimatorsUtils.crossTranslateOutFromVertical(
+                fragmentMainBinding.constraintBottomSelectionContainer as View,
+                1,
+                animate,
+                200,
+                500f
+            )
+            AnimatorsUtils.crossTranslateOutFromVertical(
+                fragmentMainBinding.constraintTopSelectionContainer as View,
+                -1,
+                animate,
+                200,
+                500f
+            )
+        }
+    }
+    private fun showTopBottomSelectionMenu(animate: Boolean = true) {
+        mFragmentMainBinding?.let { fragmentMainBinding ->
+            AnimatorsUtils.crossTranslateInFromVertical(
+                fragmentMainBinding.constraintBottomSelectionContainer as View,
+                animate,
+                200
+            )
+            AnimatorsUtils.crossTranslateInFromVertical(
+                fragmentMainBinding.constraintTopSelectionContainer as View,
+                animate,
+                200
+            )
+        }
+    }
+
+
     private fun updateSlidingUpPanelStateUI(counter: Int?, showPanel: Boolean) {
         if(showPanel){
             showSlidingUpPanel(counter)
@@ -274,7 +313,7 @@ import kotlinx.coroutines.launch
             MainScope().launch {
                 context?.let {
                     if (isPlaying == true) {
-                        updateMiniPlayerScrollingStateUI(-2)
+                        tryToUpdateMiniPlayerScrollStateUI(-2)
                         fragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon =
                             AppCompatResources.getDrawable(it, R.drawable.pause)
                     } else {

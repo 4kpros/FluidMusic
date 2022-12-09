@@ -118,22 +118,53 @@ class MusicLibraryFragment : Fragment() {
     private fun tryToUpdateFastScrollStateUI(isFastScrolling: Boolean = true) {
         if(isFastScrolling){
             mFragmentMusicLibraryBinding?.appBarLayout?.setExpanded(false)
+            hideSideSelectionMenu()
+        }else{
+            showSideSelectionMenu()
+        }
+    }
+    private fun showSideSelectionMenu(animate: Boolean = true) {
+        mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
+            AnimatorsUtils.crossFadeUp(
+                fragmentMusicLibraryBinding.includeSideSelectionMenu.constraintCard as View,
+                animate,
+                50
+            )
+            AnimatorsUtils.crossFadeUp(
+                fragmentMusicLibraryBinding.includeSideSelectionMenu.cardViewContainer as View,
+                animate,
+                200
+            )
+        }
+    }
+    private fun hideSideSelectionMenu(animate: Boolean = true) {
+        mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
+            AnimatorsUtils.crossFadeDown(
+                fragmentMusicLibraryBinding.includeSideSelectionMenu.constraintCard as View,
+                animate,
+                25
+            )
+            AnimatorsUtils.crossFadeDown(
+                fragmentMusicLibraryBinding.includeSideSelectionMenu.cardViewContainer as View,
+                animate,
+                100
+            )
         }
     }
     private  fun updateTotalSelectedItemsUI(totalSelected : Int){
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
             if (totalSelected > 0) {
-                enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter)
-                enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlaylistAdd)
-                enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonEditTags)
-                enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonShare)
-                enableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonDelete)
+                enableSideSelectionActions(fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonPlayAfter)
+                enableSideSelectionActions(fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonPlaylistAdd)
+                enableSideSelectionActions(fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonEditTags)
+                enableSideSelectionActions(fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonShare)
+                enableSideSelectionActions(fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonDelete)
             }else{
-                disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter)
-                disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlaylistAdd)
-                disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonEditTags)
-                disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonShare)
-                disableSideSelectionActions(fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonDelete)
+                disableSideSelectionActions(fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonPlayAfter)
+                disableSideSelectionActions(fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonPlaylistAdd)
+                disableSideSelectionActions(fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonEditTags)
+                disableSideSelectionActions(fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonShare)
+                disableSideSelectionActions(fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonDelete)
             }
         }
     }
@@ -150,23 +181,23 @@ class MusicLibraryFragment : Fragment() {
         )
     }
 
-    private  fun updateSelectModeUI(isSelectMode: Boolean, animate : Boolean = true){
+    private fun updateSelectModeUI(isSelectMode: Boolean, animate : Boolean = true){
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
             if (isSelectMode) {
                 fragmentMusicLibraryBinding.viewPager.isUserInputEnabled = false
                 AnimatorsUtils.crossTranslateInFromHorizontal(
-                    fragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View,
+                    fragmentMusicLibraryBinding.sideSelectionMenuContainer as View,
                     animate,
                     200
                 )
             } else {
                 fragmentMusicLibraryBinding.viewPager.isUserInputEnabled = true
                 AnimatorsUtils.crossTranslateOutFromHorizontal(
-                    fragmentMusicLibraryBinding.constraintSideMenuHoverContainer as View,
+                    fragmentMusicLibraryBinding.sideSelectionMenuContainer as View,
                     1,
                     animate,
                     200,
-                    200f
+                    500f
                 )
             }
         }
@@ -188,19 +219,19 @@ class MusicLibraryFragment : Fragment() {
                     applyAppBarTitle(position)
                 }
             })
-            fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlayAfter.setOnClickListener {
+            fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonPlayAfter.setOnClickListener {
                 addToPlayAfter()
             }
-            fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonPlaylistAdd.setOnClickListener {
+            fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonPlaylistAdd.setOnClickListener {
                 openPlaylistAddDialog()
             }
-            fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonEditTags.setOnClickListener {
+            fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonEditTags.setOnClickListener {
                 openTagEditorDialog()
             }
-            fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonShare.setOnClickListener {
+            fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonShare.setOnClickListener {
                 openShareSelectionDialog()
             }
-            fragmentMusicLibraryBinding.constraintSideMenuHoverInclude.buttonDelete.setOnClickListener {
+            fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonDelete.setOnClickListener {
                 openDeleteSelectionDialog()
             }
         }
