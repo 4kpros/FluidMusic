@@ -18,20 +18,30 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />
-        <com.l4digital.fastscroll.FastScroller
-            android:id="@+id/fast_scroller"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_fast_scroller_container"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:hideScrollbar="true"
-            app:bubbleSize="small"
-            app:showBubble="true"
-            app:showBubbleAlways="false"
-            app:bubbleTextColor="?colorOnPrimary"
-            app:bubbleColor="?colorPrimary"
-            app:handleColor="?colorPrimary"
-            app:trackColor="?colorOutline"
-            />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            >
+            <com.l4digital.fastscroll.FastScroller
+                android:id="@+id/fast_scroller"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:hideScrollbar="false"
+                app:showTrack="false"
+                app:bubbleSize="small"
+                app:showBubble="true"
+                app:showBubbleAlways="false"
+                app:bubbleTextColor="?colorOnPrimary"
+                app:bubbleColor="?colorPrimary"
+                app:handleColor="?colorOutline"
+                app:trackColor="?colorOutline"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

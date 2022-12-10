@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
-import com.prosabdev.fluidmusic.adapters.explore.ComposerItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentComposersBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
@@ -27,7 +26,6 @@ class ComposersFragment : Fragment() {
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
-    private var mComposerItemAdapter: ComposerItemListAdapter? = null
     private var mEmptyBottomAdapter: EmptyBottomAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
 

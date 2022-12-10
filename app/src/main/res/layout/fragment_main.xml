@@ -78,8 +78,8 @@
                         android:backgroundTint="?colorPrimary"
                         android:visibility="gone"
                         android:alpha="0"
-                        android:translationY="0dp">
-
+                        android:translationY="0dp"
+                        >
                         <include
                             android:id="@+id/include_top_selection"
                             layout="@layout/component_top_selection_menu" />

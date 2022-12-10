@@ -18,53 +18,43 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/constraint_top_selection_menu"
-            android:clickable="true"
-            android:focusable="false">
-
-            <View
-                android:id="@+id/top_line"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:visibility="gone"
-                android:background="?attr/colorOutline"
-                app:layout_constraintBottom_toBottomOf="@+id/constraint_container_selection_top" />
-
+            >
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraint_container_selection_top"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_constraintTop_toTopOf="parent"
-                android:padding="@dimen/margin_large_size"
-                android:outlineProvider="paddedBounds">
+                android:paddingHorizontal="@dimen/margin_large_size"
+                >
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/text_selected_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     style="@style/TextAppearance.Material3.TitleMedium"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     android:textStyle="bold"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:maxLength="10"
-                    android:text="@string/selection"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:text="@string/selection" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/text_selected_count"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     style="?attr/textAppearanceTitleMedium"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:gravity="end"
-                    android:layout_marginStart="@dimen/margin_medium_size"
-                    android:text="5/192"
                     app:layout_constraintStart_toEndOf="@+id/text_selected_title"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent" />
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:gravity="end"
+                    android:text=""
+                    android:layout_marginStart="@dimen/margin_medium_size"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

@@ -33,6 +33,7 @@ import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortSongsBottomShee
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
 import com.prosabdev.fluidmusic.ui.fragments.commonmethods.FragmentCommonMediaPlaybackAction
 import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 import com.prosabdev.fluidmusic.utils.MathComputationsUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
@@ -379,7 +380,6 @@ class AllSongsFragment : Fragment() {
         listHeadlines.add(0)
         mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
             override fun onPlayButtonClicked() {
-
                 FragmentCommonMediaPlaybackAction.playSongAtPosition(
                     mPlayerFragmentViewModel,
                     mAllSongsFragmentViewModel,
@@ -415,7 +415,7 @@ class AllSongsFragment : Fragment() {
             },
             object : GenericListGridItemAdapter.OnItemClickListener{
                 override fun onItemClicked(position: Int) {
-                    if(mGenericListGridItemAdapter?.selectableGetSelectionMode() == true){
+                    if(mMainFragmentViewModel.getSelectMode().value == true){
                         mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
                     }else{
                         FragmentCommonMediaPlaybackAction.playSongAtPosition(
@@ -428,7 +428,7 @@ class AllSongsFragment : Fragment() {
                     }
                 }
                 override fun onItemLongPressed(position: Int) {
-                    checkMultipleSelection(position)
+                    mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
                 }
             },
             object : SelectableItemListAdapter.OnSelectSelectableItemListener{
@@ -511,9 +511,6 @@ class AllSongsFragment : Fragment() {
         }
     }
 
-    private fun checkMultipleSelection(position: Int) {
-        mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
-    }
     private fun showSortDialog() {
         if(mSortSongDialog.isVisible) return
 
@@ -571,6 +568,12 @@ class AllSongsFragment : Fragment() {
     private fun initViews() {
         mFragmentAllSongsBinding?.recyclerView?.setHasFixedSize(true)
 //        mFragmentAllSongsBinding?.recyclerView?.setItemViewCacheSize(100)
+
+        mFragmentAllSongsBinding?.constraintFastScrollerContainer?.let {
+            InsetModifiersUtils.updateBottomViewInsets(
+                it
+            )
+        }
     }
 
     companion object {

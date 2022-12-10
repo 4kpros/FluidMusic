@@ -1,4 +1,4 @@
-package com.prosabdev.fluidmusic.adapters.explore
+package com.prosabdev.fluidmusic.adapters
 
 
 class SongItemAdapter(

@@ -6,72 +6,64 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
+        android:id="@+id/constraint_container_top_play_shuffle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_container_top_play_shuffle"
-            android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginHorizontal="@dimen/margin_large_size"
+        android:layout_marginTop="@dimen/margin_large_size"
+        android:layout_marginBottom="@dimen/margin_small_size"
+        >
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linear_buttons_container"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginHorizontal="@dimen/margin_large_size"
-            android:paddingVertical="@dimen/margin_medium_size"
+            android:orientation="horizontal"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/button_sort"
+            android:layout_centerVertical="true"
             >
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/button_sort"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                >
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_play"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="16dp"
-                    style="@style/Widget.Material3.Button.IconButton.Filled"
-                    android:text="@string/play"
-                    app:icon="@drawable/play_arrow"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_shuffle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="16dp"
-                    style="@style/Widget.Material3.Button.IconButton.Outlined"
-                    android:text="@string/shuffle"
-                    app:icon="@drawable/shuffle"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    />
-            </androidx.appcompat.widget.LinearLayoutCompat>
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_sort"
+                android:id="@+id/button_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/sort"
-                android:layout_marginStart="10dp"
-                style="?attr/materialIconButtonStyle"
-                app:layout_constraintEnd_toStartOf="@+id/button_organize"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                android:paddingHorizontal="16dp"
+                style="@style/Widget.Material3.Button.IconButton.Filled"
+                android:text="@string/play"
+                app:icon="@drawable/play_arrow"
+                android:maxLines="1"
+                android:ellipsize="end"
+                />
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_organize"
+                android:id="@+id/button_shuffle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/table_view"
-                android:layout_marginStart="10dp"
-                style="?attr/materialIconButtonStyle"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                android:paddingHorizontal="16dp"
+                style="@style/Widget.Material3.Button.IconButton.Outlined"
+                android:text="@string/shuffle"
+                app:icon="@drawable/shuffle"
+                android:maxLines="1"
+                android:ellipsize="end"
+                />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_sort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?attr/materialIconButtonStyle"
+            app:icon="@drawable/sort"
+            android:layout_toStartOf="@+id/button_organize"
+            android:layout_centerVertical="true"
+            />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_organize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?attr/materialIconButtonStyle"
+            app:icon="@drawable/table_view"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            />
+    </RelativeLayout>
 </layout>

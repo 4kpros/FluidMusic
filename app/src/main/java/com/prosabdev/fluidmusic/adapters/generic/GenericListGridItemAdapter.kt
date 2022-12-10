@@ -11,6 +11,7 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.RelativeLayout
 import android.widget.RelativeLayout.LayoutParams
+import android.widget.RelativeLayout.VISIBLE
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -499,34 +500,46 @@ class GenericListGridItemAdapter (
                 hideDirectlySelectedItemBackground()
                 return
             }
-            startAnimationForSelectedItemBackground(selectableIsSelected, 200)
+            startAnimationForSelectedItemBackground(selectableIsSelected, true)
         }
         fun updateSelectedStateUI(selectableIsSelected: Boolean, isSelectable: Boolean) {
             if(!isSelectable){
                 hideDirectlySelectedItemBackground()
                 return
             }
-            startAnimationForSelectedItemBackground(selectableIsSelected, 0)
+            startAnimationForSelectedItemBackground(selectableIsSelected, false)
         }
         private fun hideDirectlySelectedItemBackground() {
             mDataBinding.backgroundSelected.visibility = View.GONE
             mDataBinding.backgroundSelected.alpha = 0.0f
         }
-        private fun startAnimationForSelectedItemBackground(selectableIsSelected: Boolean, duration: Int) {
-            if(selectableIsSelected) {
-                AnimatorsUtils.crossFadeUp(
-                    mDataBinding.backgroundSelected,
-                    true,
-                    duration,
-                    0.125f
-                )
-            }
-            else {
-                AnimatorsUtils.crossFadeDown(
-                    mDataBinding.backgroundSelected,
-                    true,
-                    duration
-                )
+        private fun startAnimationForSelectedItemBackground(selectableIsSelected: Boolean, animate: Boolean) {
+            if(animate){
+                if(selectableIsSelected) {
+                    AnimatorsUtils.crossFadeUp(
+                        mDataBinding.backgroundSelected,
+                        true,
+                        150,
+                        0.125f
+                    )
+                }
+                else {
+                    AnimatorsUtils.crossFadeDown(
+                        mDataBinding.backgroundSelected,
+                        true,
+                        150
+                    )
+                }
+            }else{
+                if(selectableIsSelected) {
+                    mDataBinding.backgroundSelected.clearAnimation()
+                    mDataBinding.backgroundSelected.alpha = 0.125f
+                    mDataBinding.backgroundSelected.visibility = VISIBLE
+                }
+                else {
+                    mDataBinding.backgroundSelected.clearAnimation()
+                    mDataBinding.backgroundSelected.alpha = 0.0f
+                }
             }
         }
     }

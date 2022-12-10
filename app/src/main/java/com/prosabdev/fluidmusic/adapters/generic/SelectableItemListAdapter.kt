@@ -1,5 +1,6 @@
 package com.prosabdev.fluidmusic.adapters.generic
 
+import android.util.Log
 import android.util.SparseBooleanArray
 import androidx.core.util.contains
 import androidx.core.util.remove
@@ -8,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.prosabdev.fluidmusic.utils.ConstantValues
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -17,7 +19,7 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
     diffCallback
 ) {
     private val mTAG: String = SelectableItemListAdapter::class.java.simpleName
-    private var mSelectedItems: SparseBooleanArray = SparseBooleanArray()
+    private var mSelectedItems: ArrayList<Int> = ArrayList()
     private var mMinSelected: Int = -1
     private var mMaxSelected: Int = -1
     private var mSelectionMode: Boolean = false
@@ -27,46 +29,33 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
         fun onTotalSelectedItemChange(totalSelected : Int)
     }
 
-    private suspend fun onNotifyVisibleItemChanged(layoutManager : GridLayoutManager?){
-        withContext(Dispatchers.Default){
-            val tempItemCount : Int = layoutManager?.itemCount ?: -1
-            var tempFirstPos = (layoutManager?.findFirstVisibleItemPosition() ?: 0) - 5
-            var tempLastPos = (layoutManager?.findLastVisibleItemPosition() ?: 0) + 5
-            if(tempFirstPos < 0) tempFirstPos = 0
-            if(tempLastPos > tempItemCount) tempLastPos = tempItemCount
+    private fun onNotifyVisibleItemChanged(layoutManager : GridLayoutManager?){
+        val tempItemCount : Int = layoutManager?.itemCount ?: -1
+        var tempFirstPos = (layoutManager?.findFirstVisibleItemPosition() ?: 0) - 5
+        var tempLastPos = (layoutManager?.findLastVisibleItemPosition() ?: 0) + 5
+        if(tempFirstPos < 0) tempFirstPos = 0
+        if(tempLastPos > tempItemCount) tempLastPos = tempItemCount
 
-            MainScope().launch {
-                notifyItemRangeChanged(tempFirstPos, tempLastPos-tempFirstPos, PAYLOAD_IS_SELECTED)
-            }
-        }
-
+        notifyItemRangeChanged(tempFirstPos, tempLastPos-tempFirstPos, PAYLOAD_IS_SELECTED)
     }
-    private suspend fun onNotifyItemChanged(position : Int, layoutManager : GridLayoutManager?, checkVisibility: Boolean = false){
+    private fun onNotifyItemChanged(position : Int, layoutManager : GridLayoutManager?, checkVisibility: Boolean = false){
         if(checkVisibility){
             if(layoutManager != null){
                 if(isItemPositionVisible(position, layoutManager))
-                    MainScope().launch {
-                        notifyItemChanged(position, PAYLOAD_IS_SELECTED)
-                    }
-            }else{
-                MainScope().launch {
                     notifyItemChanged(position, PAYLOAD_IS_SELECTED)
-                }
-            }
-        }else{
-            MainScope().launch {
+            }else{
                 notifyItemChanged(position, PAYLOAD_IS_SELECTED)
             }
+        }else{
+            notifyItemChanged(position, PAYLOAD_IS_SELECTED)
         }
     }
-    private suspend fun isItemPositionVisible(position : Int, layoutManager : GridLayoutManager?): Boolean {
-        return withContext(Dispatchers.Default){
-            val tempFirstVisiblePosition = (layoutManager?.findFirstVisibleItemPosition() ?: 0) - 5
-            val tempLastVisiblePosition = (layoutManager?.findLastVisibleItemPosition() ?: 0) + 5
-            if(position in tempFirstVisiblePosition ..  tempLastVisiblePosition)
-                return@withContext true
-            return@withContext false
-        }
+    private fun isItemPositionVisible(position : Int, layoutManager : GridLayoutManager?): Boolean {
+        val tempFirstVisiblePosition = (layoutManager?.findFirstVisibleItemPosition() ?: 0) - 5
+        val tempLastVisiblePosition = (layoutManager?.findLastVisibleItemPosition() ?: 0) + 5
+        if(position in tempFirstVisiblePosition ..  tempLastVisiblePosition)
+            return true
+        return false
     }
 
     protected fun selectableItemGetSelectedItemCount(): Int {
@@ -91,14 +80,12 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
     ) {
         if(value == mSelectionMode)
             return
-        MainScope().launch {
-            if(!value){
-                mSelectedItems.clear()
-                mMinSelected = -1
-                mMaxSelected = -1
-                mSelectionMode = false
-                onNotifyVisibleItemChanged(layoutManager)
-            }
+        if(!value){
+            mSelectedItems.clear()
+            mMinSelected = -1
+            mMaxSelected = -1
+            mSelectionMode = false
+            onNotifyVisibleItemChanged(layoutManager)
         }
     }
 
@@ -107,102 +94,65 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
         onSelectSelectableItemListener: OnSelectSelectableItemListener,
         layoutManager: GridLayoutManager? = null
     ) {
-        MainScope().launch {
-            withContext(Dispatchers.Default){
-                if(mSelectionMode){
-                    if(mSelectedItems.contains(position)){
-                        mSelectedItems.remove(position, true)
-                        onSelectSelectableItemListener.onTotalSelectedItemChange(mSelectedItems.size())
-                        onNotifyItemChanged(position, layoutManager)
-                        findNewMinMaxSelected(position)
-                    }else{
-                        mSelectedItems.put(position, true)
-                        onSelectSelectableItemListener.onTotalSelectedItemChange(mSelectedItems.size())
-                        onNotifyItemChanged(position, layoutManager)
-                        compareAndSetMinMax(position)
-                    }
-                }else{
-                    mSelectionMode = true
-                    mMinSelected = position
-                    mMaxSelected = position
-                    mSelectedItems.clear()
-                    mSelectedItems.put(position, true)
-                    onSelectSelectableItemListener.onSelectModeChange(mSelectionMode)
-                    onSelectSelectableItemListener.onTotalSelectedItemChange(1)
-                    onNotifyItemChanged(position, layoutManager)
-                }
+        if(mSelectionMode){
+            if(mSelectedItems.contains(position)){
+                mSelectedItems.remove(position)
+                onSelectSelectableItemListener.onTotalSelectedItemChange(mSelectedItems.size)
+                onNotifyItemChanged(position, layoutManager, false)
+                findNewMinMaxSelected()
+            }else{
+                mSelectedItems.add(position)
+                onSelectSelectableItemListener.onTotalSelectedItemChange(mSelectedItems.size)
+                onNotifyItemChanged(position, layoutManager, false)
+                compareAndSetMinMax(position)
             }
+        }else{
+            mSelectionMode = true
+            mMinSelected = position
+            mMaxSelected = position
+            mSelectedItems.clear()
+            mSelectedItems.add(position)
+            onSelectSelectableItemListener.onSelectModeChange(mSelectionMode)
+            onSelectSelectableItemListener.onTotalSelectedItemChange(1)
+            onNotifyItemChanged(position, layoutManager, false)
         }
     }
 
-    protected fun selectableItemUpdateSelection(position: Int, value : Boolean, layoutManager : GridLayoutManager? = null) {
-        MainScope().launch {
-            withContext(Dispatchers.Default) {
-                if (mSelectedItems.contains(position)) {
-                    if (!value) {
-                        mSelectedItems.delete(position)
-                        findNewMinMaxSelected(position)
-                    }
-                } else {
-                    if (value) {
-                        mSelectedItems.put(position, true)
-                        compareAndSetMinMax(position)
-                    }
-                }
-                onNotifyItemChanged(position, layoutManager)
-            }
-        }
-    }
     protected fun selectableItemSelectAll(layoutManager : GridLayoutManager? = null) {
-        MainScope().launch {
-            withContext(Dispatchers.Default) {
-                mMinSelected = 0
-                mMaxSelected = itemCount
-                for (i in 0 until itemCount) {
-                    if (!mSelectedItems.contains(i)) {
-                        mSelectedItems.put(i, true)
-                    }
-                }
-                onNotifyVisibleItemChanged(layoutManager)
+        mMinSelected = 0
+        mMaxSelected = itemCount
+        for (i in 0 until itemCount) {
+            if (!mSelectedItems.contains(i)) {
+                mSelectedItems.add(i)
             }
         }
+        onNotifyVisibleItemChanged(layoutManager)
     }
     protected fun selectableItemClearAllSelection(layoutManager : GridLayoutManager? = null) {
-        MainScope().launch {
-            mSelectedItems.clear()
-            mMinSelected = -1
-            mMaxSelected = -1
+        mSelectedItems.clear()
+        mMinSelected = -1
+        mMaxSelected = -1
+        onNotifyVisibleItemChanged(layoutManager)
+    }
+
+    protected fun selectableItemSelectRange(mOnSelectSelectableItemListener: OnSelectSelectableItemListener, layoutManager : GridLayoutManager? = null) {
+        val oldSize = mSelectedItems.size
+        if(mMinSelected >= 0 && mMaxSelected >= 0) {
+            for (i in mMinSelected .. mMaxSelected){
+                if(!mSelectedItems.contains(i)){
+                    mSelectedItems.add(i)
+                }
+            }
+        }
+        if(mSelectedItems.size != oldSize)
+        {
+            mOnSelectSelectableItemListener.onTotalSelectedItemChange(mSelectedItems.size)
             onNotifyVisibleItemChanged(layoutManager)
         }
     }
 
-    protected fun selectableItemSelectRange(mOnSelectSelectableItemListener: OnSelectSelectableItemListener, layoutManager : GridLayoutManager? = null) {
-        val oldSize = mSelectedItems.size()
-        MainScope().launch {
-            selectRange(layoutManager)
-            if(mSelectedItems.size() != oldSize)
-            {
-                mOnSelectSelectableItemListener.onTotalSelectedItemChange(mSelectedItems.size)
-                onNotifyVisibleItemChanged(layoutManager)
-            }
-        }
-    }
-    private suspend fun selectRange(layoutManager : GridLayoutManager? = null) {
-        withContext(Dispatchers.Default){
-            if(mMinSelected >= 0 && mMaxSelected >= 0) {
-                if (mMinSelected in 0 until mMaxSelected) {
-                    for (i in mMinSelected .. mMaxSelected){
-                        if(!mSelectedItems.contains(i)){
-                            mSelectedItems.put(i, true)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private fun compareAndSetMinMax(position: Int) {
-        if(mMaxSelected < position || mMaxSelected < 0){
+        if(mMaxSelected < position){
             mMaxSelected = position
         }
         if(mMinSelected > position || mMinSelected < 0){
@@ -210,18 +160,16 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
         }
     }
 
-    private fun findNewMinMaxSelected(position: Int) {
-        if((mMaxSelected <= position) || (mMinSelected >= position)){
-            mMaxSelected = -1
-            mMinSelected = -1
-            if(mSelectedItems.size > 0){
-                for (i in 0 until mSelectedItems.size) {
-                    if(i > mMaxSelected){
-                        mMaxSelected = i
-                    }
-                    if(i < mMinSelected || mMinSelected < 0){
-                        mMinSelected = i
-                    }
+    private fun findNewMinMaxSelected() {
+        mMaxSelected = -1
+        mMinSelected = -1
+        if(mSelectedItems.size > 0){
+            for (i in 0 until mSelectedItems.size) {
+                if(mMaxSelected < mSelectedItems[i]){
+                    mMaxSelected = mSelectedItems[i]
+                }
+                if(mMinSelected > mSelectedItems[i] || mMinSelected < 0){
+                    mMinSelected = mSelectedItems[i]
                 }
             }
         }

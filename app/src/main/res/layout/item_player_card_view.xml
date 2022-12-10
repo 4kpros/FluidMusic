@@ -7,9 +7,9 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/player_viewpager_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/player_viewpager_container"
         style="@style/Widget.Material3.CardView.Filled"
         android:backgroundTint="@color/transparent"
         app:cardElevation="0dp"
@@ -17,11 +17,10 @@
         android:layout_marginTop="@dimen/margin_large_size"
         app:cardCornerRadius="@dimen/corner_radius_medium"
         >
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
+            android:layout_height="match_parent"
+            >
             <ImageView
                 android:id="@+id/player_viewpager_imageview"
                 android:layout_width="match_parent"
@@ -34,11 +33,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="?attr/materialIconButtonFilledTonalStyle"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentBottom="true"
                 app:icon="@drawable/lyrics"
                 app:iconSize="24dp"
                 android:scaleType="centerInside"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginStart="10dp"
                 android:layout_marginBottom="10dp"
                 android:visibility="gone"
@@ -49,6 +48,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="?attr/materialIconButtonFilledTonalStyle"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
                 app:icon="@drawable/fullscreen"
                 app:iconSize="24dp"
                 android:scaleType="centerInside"
@@ -58,6 +59,6 @@
                 android:layout_marginBottom="10dp"
                 android:visibility="gone"
                 android:alpha="0" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

@@ -12,7 +12,6 @@
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/margin_large_size"
         android:paddingBottom="@dimen/margin_large_size">
-
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

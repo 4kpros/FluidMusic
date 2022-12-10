@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
-import com.prosabdev.fluidmusic.adapters.explore.YearItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentYearsBinding
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
@@ -29,7 +28,6 @@ class YearsFragment : Fragment() {
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
-    private var mYearItemListAdapter: YearItemListAdapter? = null
     private var mEmptyBottomAdapter: EmptyBottomAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
 

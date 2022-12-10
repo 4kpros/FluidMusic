@@ -6,17 +6,16 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
         android:id="@+id/constraint_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/margin_large_size"
+        android:paddingTop="@dimen/margin_small_size"
         >
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/text_end"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:layout_constraintTop_toTopOf="parent"
             android:text="@string/end_of_list"
             android:gravity="center"
             />
@@ -24,7 +23,7 @@
             android:id="@+id/view_empty_bottom"
             android:layout_width="match_parent"
             android:layout_height="?attr/minTouchTargetSize"
-            app:layout_constraintTop_toBottomOf="@+id/text_end"
+            android:layout_below="@+id/text_end"
             />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
 </layout>

@@ -69,18 +69,11 @@
         <item name="colorOnSurfaceInverse">#353535</item>
         <item name="colorPrimaryInverse">#B8B8B8</item>
 
-        <item name="colorAccent">@color/white</item>
-        <item name="colorControlActivated">@color/white</item>
-        <item name="colorControlNormal">@color/white</item>
-        <item name="colorControlHighlight">@color/white</item>
+        <item name="android:textColorHighlight">#4DFFFFFF</item>
 
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textColorPrimary">@color/white</item>
-        <item name="android:textColorSecondary">@color/white</item>
-        <item name="android:textColorTertiary">@color/white</item>
-        <item name="android:textColorHighlight">@color/white</item>
-        <item name="android:textColorHint">@color/white</item>
-        <item name="android:editTextColor">@color/white</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorSecondary">#FFFFFF</item>
     </style>
 
     <style name="AppTheme" parent="BaseThemeDark">

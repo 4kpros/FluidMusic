@@ -117,16 +117,20 @@ class MusicLibraryFragment : Fragment() {
     }
     private fun tryToUpdateFastScrollStateUI(isFastScrolling: Boolean = true) {
         if(isFastScrolling){
+            if(mMainFragmentViewModel.getSelectMode().value == true){
+                hideSideContentSelectionMenu()
+            }
             mFragmentMusicLibraryBinding?.appBarLayout?.setExpanded(false)
-            hideSideSelectionMenu()
         }else{
-            showSideSelectionMenu()
+            if(mMainFragmentViewModel.getSelectMode().value == true){
+                showSideContentSelectionMenu()
+            }
         }
     }
-    private fun showSideSelectionMenu(animate: Boolean = true) {
+    private fun showSideContentSelectionMenu(animate: Boolean = true) {
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
             AnimatorsUtils.crossFadeUp(
-                fragmentMusicLibraryBinding.includeSideSelectionMenu.constraintCard as View,
+                fragmentMusicLibraryBinding.includeSideSelectionMenu.relativeContainer as View,
                 animate,
                 50
             )
@@ -137,10 +141,10 @@ class MusicLibraryFragment : Fragment() {
             )
         }
     }
-    private fun hideSideSelectionMenu(animate: Boolean = true) {
+    private fun hideSideContentSelectionMenu(animate: Boolean = true) {
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
             AnimatorsUtils.crossFadeDown(
-                fragmentMusicLibraryBinding.includeSideSelectionMenu.constraintCard as View,
+                fragmentMusicLibraryBinding.includeSideSelectionMenu.relativeContainer as View,
                 animate,
                 25
             )

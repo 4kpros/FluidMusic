@@ -7,8 +7,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
-import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
@@ -24,8 +22,6 @@ import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.sothree.slidinguppanel.PanelState
-import com.sothree.slidinguppanel.SlidingUpPanelLayout.GONE
-import com.sothree.slidinguppanel.SlidingUpPanelLayout.VISIBLE
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -63,13 +59,18 @@ import kotlinx.coroutines.launch
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateDrawerMenuUI()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         checkInteractions()
         observeLiveData()
     }
-    private fun updateDrawerMenuUI(showCounter: Int) {
+    private fun updateDrawerMenuUI() {
         mFragmentMainBinding?.let { fragmentMainBinding ->
             when (activity?.supportFragmentManager?.findFragmentById(R.id.main_fragment_container)) {
                 is MusicLibraryFragment -> {
@@ -133,11 +134,15 @@ import kotlinx.coroutines.launch
     }
     private fun tryToUpdateFastScrollStateUI(isFastScrolling: Boolean = true) {
         if(isFastScrolling){
-            hideBottomSelectionMenu()
             updateMiniPlayerScrollingStateUI(1)
+            hideBottomSelectionMenu()
         }else{
-            showBottomSelectionMenu()
             tryToUpdateMiniPlayerScrollStateUI(mMainFragmentViewModel.getScrollingState().value)
+            if(mMainFragmentViewModel.getSelectMode().value == true) {
+                showBottomSelectionMenu()
+            }else{
+                hideBottomSelectionMenu()
+            }
         }
     }
     private fun showBottomSelectionMenu(animate: Boolean = true) {
@@ -193,7 +198,6 @@ import kotlinx.coroutines.launch
                         500f
                     )
                 } else {
-                    if(fragmentMainBinding.constraintMiniPlayerContainer.alpha > 0.0f) return@launch
                     if (mIsAnimatingScroll1) {
                         fragmentMainBinding.constraintMiniPlayerContainer.apply {
                             mIsAnimatingScroll1 = false
@@ -216,15 +220,26 @@ import kotlinx.coroutines.launch
         mFragmentMainBinding?.let { fragmentMainBinding ->
             MainScope().launch {
                 if(totalSelected > 0 && totalSelected >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
-                    if(fragmentMainBinding.includeBottomSelection.buttonSelectRange.isEnabled)
-                        fragmentMainBinding.includeBottomSelection.buttonSelectRange.isEnabled = false
+                    AnimatorsUtils.crossFadeDownClickable(
+                        fragmentMainBinding.includeBottomSelection.buttonSelectRange,
+                        animate,
+                        200
+                    )
+                    fragmentMainBinding.includeBottomSelection.checkboxSelectAll.isChecked = true
                 }else{
+                    fragmentMainBinding.includeBottomSelection.checkboxSelectAll.isChecked = false
                     if(totalSelected >= 2){
-                        if(!fragmentMainBinding.includeBottomSelection.buttonSelectRange.isEnabled)
-                            fragmentMainBinding.includeBottomSelection.buttonSelectRange.isEnabled = true
+                        AnimatorsUtils.crossFadeUpClickable(
+                            fragmentMainBinding.includeBottomSelection.buttonSelectRange,
+                            animate,
+                            200
+                        )
                     }else{
-                        if(fragmentMainBinding.includeBottomSelection.buttonSelectRange.isEnabled)
-                            fragmentMainBinding.includeBottomSelection.buttonSelectRange.isEnabled = false
+                        AnimatorsUtils.crossFadeDownClickable(
+                            fragmentMainBinding.includeBottomSelection.buttonSelectRange,
+                            animate,
+                            200
+                        )
                     }
                 }
                 fragmentMainBinding.includeTopSelection.textSelectedCount.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
@@ -235,13 +250,12 @@ import kotlinx.coroutines.launch
         mFragmentMainBinding?.let { fragmentMainBinding ->
             MainScope().launch {
                 if (selectMode) {
-                    updateMiniPlayerScrollingStateUI(1)
-                    showTopBottomSelectionMenu()
+                    updateMiniPlayerScrollingStateUI(1, animate)
+                    showTopBottomSelectionMenu(animate)
                 } else {
                     tryToUpdateMiniPlayerScrollStateUI(mMainFragmentViewModel.getScrollingState().value)
-                    //Clear old views
                     fragmentMainBinding.includeBottomSelection.checkboxSelectAll.isChecked = false
-                    hideTopBottomSelectionMenu()
+                    hideTopBottomSelectionMenu(animate)
                 }
             }
         }
@@ -379,7 +393,7 @@ import kotlinx.coroutines.launch
 
                     imageRequestBlurred.uri = tempUri
                     imageRequestBlurred.hashedCovertArtSignature = songItem.hashedCovertArtSignature
-                    imageRequestBlurred.imageView = fragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer as ImageView
+                    imageRequestBlurred.imageView = fragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer
                     ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequestBlurred)
                 }
             }
@@ -394,10 +408,8 @@ import kotlinx.coroutines.launch
             fragmentMainBinding.constraintMiniPlayerInclude.buttonSkipNext.setOnClickListener {
                 onClickButtonSkipNextSong()
             }
-            fragmentMainBinding.includeBottomSelection.checkboxSelectAll.setOnCheckedChangeListener { buttonView, isChecked ->
-                onCheckboxSelectAllChanged(
-                    isChecked
-                )
+            fragmentMainBinding.includeBottomSelection.checkboxSelectAll.setOnClickListener {
+                onCheckAllButtonClicked()
             }
             fragmentMainBinding.includeBottomSelection.buttonSelectRange.setOnClickListener {
                 onToggleButtonSelectRange()
@@ -457,6 +469,17 @@ import kotlinx.coroutines.launch
             }
         }
     }
+
+    private fun onCheckAllButtonClicked() {
+        val totalCount = mMainFragmentViewModel.getTotalCount().value ?: 0
+        val totalSelected = mMainFragmentViewModel.getTotalSelected().value ?: 0
+        if(totalSelected < totalCount){
+            mMainFragmentViewModel.setTotalSelected(totalCount)
+        }else{
+            mMainFragmentViewModel.setTotalSelected(0)
+        }
+    }
+
     private fun onClickMiniPlayerContainer() {
         mFragmentMainBinding?.let { fragmentMainBinding ->
             if (fragmentMainBinding.slidingUpPanel.panelState != PanelState.EXPANDED)
@@ -474,16 +497,6 @@ import kotlinx.coroutines.launch
         mMainFragmentViewModel.setToggleRange()
     }
 
-    private fun onCheckboxSelectAllChanged(state: Boolean) {
-        if(mMainFragmentViewModel.getSelectMode().value == false) return
-
-        val tempTotalCount : Int = mMainFragmentViewModel.getTotalCount().value ?: 0
-        if(state){
-            mMainFragmentViewModel.setTotalSelected(tempTotalCount)
-        }else{
-            mMainFragmentViewModel.setTotalSelected(0)
-        }
-    }
     private fun onClickButtonSkipNextSong() {
         mPlayerFragmentViewModel.setCanScrollCurrentPlayingSong(true)
         mPlayerFragmentViewModel.setSkipNextTrackCounter()

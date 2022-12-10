@@ -16,7 +16,7 @@
         android:backgroundTint="@color/transparent"
         app:cardCornerRadius="@dimen/corner_radius_medium"
         >
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingHorizontal="@dimen/margin_large_size"
@@ -25,19 +25,18 @@
                 android:id="@+id/image_folder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="@+id/linear_text_container"
-                app:layout_constraintStart_toStartOf="parent"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
                 android:src="@drawable/folder_open"
                 app:srcCompat="@drawable/folder_open"
                 />
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/linear_text_container"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/image_folder"
-                app:layout_constraintEnd_toStartOf="@+id/button_remove"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/image_folder"
+                android:layout_toStartOf="@+id/button_remove"
                 android:orientation="vertical"
                 android:layout_marginHorizontal="@dimen/margin_small_size"
                 android:layout_marginVertical="@dimen/margin_medium_size"
@@ -74,12 +73,11 @@
                 android:id="@+id/button_remove"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 style="@style/Widget.Material3.Button.IconButton"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
                 app:icon="@drawable/delete"
                 />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

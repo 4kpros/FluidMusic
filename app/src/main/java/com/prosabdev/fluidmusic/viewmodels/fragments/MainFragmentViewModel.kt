@@ -14,10 +14,8 @@ class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mMutableToggleOnRange = MutableLiveData<Int>(0)
     private val mMutableTotalSelected = MutableLiveData<Int>(0)
     private val mMutableTotalCount = MutableLiveData<Int>(0)
-    private val mMutableActivePage = MutableLiveData<Int>(0)
     private val mMutableShowDrawerMenuCounter = MutableLiveData<Int>()
     private val mMutableSlidingUpPanelState = MutableLiveData<PanelState>(PanelState.COLLAPSED)
-
     private val mMutableIsFastScrolling = MutableLiveData<Boolean>(false)
     private val mMutableScrollingState = MutableLiveData<Int>(-2)
     private val mMutableShowSlidingUpPanelCounter = MutableLiveData<Int>(0)
@@ -28,10 +26,8 @@ class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mToggleOnRange: LiveData<Int> get() = mMutableToggleOnRange
     private val mTotalSelected: LiveData<Int> get() = mMutableTotalSelected
     private val mTotalCount: LiveData<Int> get() = mMutableTotalCount
-    private val mActivePage: LiveData<Int> get() = mMutableActivePage
     private val mShowDrawerMenuCounter: LiveData<Int> get() = mMutableShowDrawerMenuCounter
     private val mSlidingUpPanelState: LiveData<PanelState> get() = mMutableSlidingUpPanelState
-
     private val mIsFastScrolling: LiveData<Boolean> get() = mMutableIsFastScrolling
     private val mScrollingState: LiveData<Int> get() = mMutableScrollingState
     private val mShowSlidingUpPanelCounter: LiveData<Int> get() = mMutableShowSlidingUpPanelCounter
