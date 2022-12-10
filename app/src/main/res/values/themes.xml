@@ -6,16 +6,8 @@
         <item name="android:windowActionBarOverlay">false</item>
         <item  name="android:windowActivityTransitions">true</item>
         <item name="android:windowContentTransitions">true</item>
-    </style>
-    <style name="CustomScrollBarStyle">
-        <item name="android:smoothScrollbar">true</item>
-        <item name="android:scrollbarAlwaysDrawVerticalTrack">false</item>
-        <item name="android:scrollbars">vertical</item>
-        <item name="android:fadeScrollbars">true</item>
-        <item name="android:verticalScrollbarPosition">defaultPosition</item>
-        <item name="android:scrollbarThumbVertical">@drawable/custom_scroll_view_thumb</item>
-        <item name="android:scrollbarTrackVertical">@drawable/custom_scroll_view_track</item>
 
+        <item name="android:fontFamily">@font/roboto_bold</item>
     </style>
     <style name="BaseThemeLight" parent="BaseTheme">
         <item name="android:statusBarColor">@color/semiBlack</item>
@@ -103,14 +95,7 @@
         <item name="colorOnSurfaceInverse">#F4F4F4</item>
         <item name="colorPrimaryInverse">#CFCFCF</item>
 
-
-<!--        <item name="colorAccent">@color/black</item>-->
-<!--        <item name="colorControlActivated">#3C000000</item>-->
-<!--        <item name="colorControlNormal">#5C000000</item>-->
-<!--        <item name="colorControlHighlight">#4D000000</item>-->
-
         <item name="android:textColorHighlight">#4D000000</item>
-
         <item name="android:textColor">@color/black</item>
         <item name="android:textColorPrimary">#000000</item>
         <item name="android:textColorSecondary">#000000</item>

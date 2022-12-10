@@ -13,6 +13,7 @@
         <item name="colorErrorContainer">@color/md_theme_dark_errorContainer</item>
         <item name="colorOnErrorContainer">@color/md_theme_dark_onErrorContainer</item>
     </style>
+
     <style name="MainTheme" parent="BaseThemeDark">
         <item name="colorPrimary">@color/white</item>
         <item name="colorOnPrimary">#131313</item>

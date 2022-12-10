@@ -63,7 +63,9 @@
                         android:backgroundTint="?colorPrimary"
                         android:visibility="gone"
                         android:alpha="0"
-                        android:translationY="0dp">
+                        android:translationY="0dp"
+                        android:clickable="true"
+                        >
 
                         <include
                             android:id="@+id/include_bottom_selection"
@@ -79,6 +81,7 @@
                         android:visibility="gone"
                         android:alpha="0"
                         android:translationY="0dp"
+                        android:clickable="true"
                         >
                         <include
                             android:id="@+id/include_top_selection"

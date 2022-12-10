@@ -6,25 +6,25 @@
 
     </data>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <RelativeLayout
         android:id="@+id/constraint_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
         >
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <RelativeLayout
+            android:id="@+id/relative_top"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:layout_marginHorizontal="@dimen/margin_large_size"
             >
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/drag_handle"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@+id/drag_handle"
+                android:layout_alignParentStart="true"
                 android:gravity="start"
                 >
                 <com.google.android.material.button.MaterialButton
@@ -39,12 +39,11 @@
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/drag_handle"
+                android:layout_toEndOf="@+id/drag_handle"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
                 android:gravity="end"
                 >
                 <com.google.android.material.button.MaterialButton
@@ -62,18 +61,39 @@
                 android:id="@+id/drag_handle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_centerInParent="true"
                 app:tint="?attr/colorPrimary"
                 />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </RelativeLayout>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            style="@style/CustomScrollBarStyle"
+            android:layout_below="@+id/relative_top"
             />
-    </androidx.appcompat.widget.LinearLayoutCompat>
+        <RelativeLayout
+            android:id="@+id/constraint_fast_scroller_container"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignTop="@+id/recycler_view"
+            android:layout_alignBottom="@+id/recycler_view"
+            android:layout_alignParentEnd="true"
+            >
+            <com.l4digital.fastscroll.FastScroller
+                android:id="@+id/fast_scroller"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                app:hideScrollbar="false"
+                app:showTrack="false"
+                app:bubbleSize="small"
+                app:showBubble="false"
+                app:showBubbleAlways="false"
+                app:bubbleTextColor="?colorOnPrimary"
+                app:bubbleColor="?colorPrimary"
+                app:handleColor="?colorOutline"
+                app:trackColor="?colorOutline"
+                />
+        </RelativeLayout>
+    </RelativeLayout>
 </layout>

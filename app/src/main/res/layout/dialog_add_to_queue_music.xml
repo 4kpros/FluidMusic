@@ -11,7 +11,6 @@
         android:layout_height="match_parent"
         android:paddingHorizontal="@dimen/margin_large_size"
         >
-
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/linear_container"
             android:layout_width="match_parent"
@@ -21,27 +20,27 @@
             android:layout_marginTop="@dimen/margin_large_size"
             >
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_add_after_playing"
+                android:id="@+id/button_add_to_top"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Widget.Material3.Button.TextButton"
-                android:text="Add after current song"
+                android:text="@string/add_to_top"
                 app:icon="@drawable/vertical_align_top"
                 />
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_add_at_end"
+                android:id="@+id/button_play_next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Widget.Material3.Button.TextButton"
-                android:text="Play next"
+                android:text="@string/play_next"
                 app:icon="@drawable/queue_play_next"
                 />
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_add_at_top"
+                android:id="@+id/button_add_to_end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Widget.Material3.Button.TextButton"
-                android:text="Add to end"
+                android:text="@string/add_to_end"
                 app:icon="@drawable/vertical_align_bottom"
                 />
         </androidx.appcompat.widget.LinearLayoutCompat>

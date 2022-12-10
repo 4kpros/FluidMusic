@@ -473,9 +473,9 @@ class GenericListGridItemAdapter (
             }
         }
         private fun changeColorAndFaceType(typeface: Int, textColorRes: Int, isUnderlined: Boolean){
-            mDataBinding.textTitle.setTypeface(null, typeface)
-            mDataBinding.textSubtitle.setTypeface(null, typeface)
-            mDataBinding.textDetails.setTypeface(null, typeface)
+//            mDataBinding.textTitle.setTypeface(null, typeface)
+//            mDataBinding.textSubtitle.setTypeface(null, typeface)
+//            mDataBinding.textDetails.setTypeface(null, typeface)
 
             mDataBinding.textTitle.setTextColor(textColorRes)
             mDataBinding.textSubtitle.setTextColor(textColorRes)
