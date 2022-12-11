@@ -8,51 +8,23 @@ import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 
-abstract class FragmentCommonMediaPlaybackAction {
+abstract class CommonPlaybackAction {
     companion object{
 
-        fun playAfterToQueueMusic(
-            ctx : Context,
-            selectedItems: SparseBooleanArray,
-            genericListGridItemAdapter: GenericListGridItemAdapter,
-            fragmentSource: String,
-            currentSongPosition: Int,
-        ){
-            updateQueueMusicAndSaveToDatabase(
-                ctx,
-                selectedItems,
-                genericListGridItemAdapter,
-                fragmentSource,
-                currentSongPosition
-            )
-        }
-        fun addToQueueMusic(
-            ctx : Context,
-            selectedItems: SparseBooleanArray,
-            genericListGridItemAdapter: GenericListGridItemAdapter,
-            fragmentSource: String,
-        ){
-            updateQueueMusicAndSaveToDatabase(
-                ctx,
-                selectedItems,
-                genericListGridItemAdapter,
-                fragmentSource
-            )
+        fun playSongAtPositionFromQueueMusic(
+            playerFragmentViewModel : PlayerFragmentViewModel?,
+            songItem: SongItem?
+        ): Boolean {
+            if(playerFragmentViewModel == null) return false
+            if(songItem?.uri == null || songItem.uri?.isEmpty() == true) return false
+
+            playerFragmentViewModel.setCurrentPlayingSong(songItem)
+            playerFragmentViewModel.setIsPlaying(true)
+            playerFragmentViewModel.setPlayingProgressValue(0)
+            return true
         }
 
-        private fun updateQueueMusicAndSaveToDatabase(
-            ctx : Context,
-            selectedItems: SparseBooleanArray,
-            genericListGridItemAdapter: GenericListGridItemAdapter,
-            fragmentSource: String,
-            currentSongPosition: Int = -1,
-            ){
-            //Get all songs
-            //Attach to adapter
-            //Save new queue music to database on background
-        }
-
-        fun playSongAtPosition(
+        fun playSongAtPositionFromGenericAdapterView(
             playerFragmentViewModel : PlayerFragmentViewModel?,
             genericListenDataViewModel: GenericListenDataViewModel?,
             genericListGridItemAdapter: GenericListGridItemAdapter?,

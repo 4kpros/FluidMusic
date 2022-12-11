@@ -158,7 +158,7 @@ class GenericListGridItemAdapter (
                     }
                     PAYLOAD_PLAYBACK_STATE -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_PLAYBACK_STATE")
-                        holder.updateIsPlayingStateUI(mContext, getPlayingPosition(), getIsPlaying(), mHavePlaybackState, mOrganizeListGrid, true)
+                        holder.updateIsPlayingStateUI(getPlayingPosition(), mHavePlaybackState, mOrganizeListGrid, true)
                     }
                     else -> {
                         super.onBindViewHolder(holder, position, payloads)
@@ -171,9 +171,7 @@ class GenericListGridItemAdapter (
             holder.updateOrganizeListGridMotion(mContext, mOrganizeListGrid)
             holder.updateSelectedStateUI(selectableIsSelected(position), mIsSelectable)
             holder.updateIsPlayingStateUI(
-                mContext,
                 getPlayingPosition(),
-                getIsPlaying(),
                 mHavePlaybackState,
                 mOrganizeListGrid,
                 false
@@ -411,11 +409,8 @@ class GenericListGridItemAdapter (
                 ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
             }
         }
-
         fun updateIsPlayingStateUI(
-            ctx: Context,
             playingPosition: Int,
-            isPlaying: Boolean,
             havePlaybackState: Boolean,
             organizeListGrid: Int,
             animate: Boolean
@@ -424,15 +419,15 @@ class GenericListGridItemAdapter (
                 mDataBinding.imageviewBackgroundIsPlaying.visibility = View.GONE
                 mDataBinding.linearIsPlayingAnimContainer.visibility = View.GONE
                 val colorValue = MaterialColors.getColor(mDataBinding.textTitle  as View, com.google.android.material.R.attr.colorOnBackground)
-                changeColorAndFaceType(Typeface.NORMAL, colorValue, false)
+                changeColorAndFaceType(colorValue, false)
                 return
             }
             if(playingPosition == bindingAdapterPosition){
                 val colorValue = MaterialColors.getColor(mDataBinding.textTitle  as View, com.google.android.material.R.attr.colorPrimary)
-                changeColorAndFaceType(Typeface.BOLD, colorValue, true)
+                changeColorAndFaceType(colorValue, true)
             }else{
                 val colorValue = MaterialColors.getColor(mDataBinding.textTitle as View, com.google.android.material.R.attr.colorOnBackground)
-                changeColorAndFaceType(Typeface.NORMAL, colorValue, false)
+                changeColorAndFaceType(colorValue, false)
             }
 
             if(
@@ -445,38 +440,46 @@ class GenericListGridItemAdapter (
                 mDataBinding.imageviewBackgroundIsPlaying.visibility = View.GONE
                 mDataBinding.linearIsPlayingAnimContainer.visibility = View.GONE
             }else{
-                if(playingPosition == bindingAdapterPosition){
-                    AnimatorsUtils.crossFadeUp(
-                        mDataBinding.imageviewBackgroundIsPlaying,
-                        animate,
-                        150,
-                        0.65f
-                    )
-                    AnimatorsUtils.crossFadeUp(
-                        mDataBinding.linearIsPlayingAnimContainer,
-                        animate,
-                        200,
-                        1.0f
-                    )
+                if(animate){
+                    if(playingPosition == bindingAdapterPosition){
+                        AnimatorsUtils.crossFadeUp(
+                            mDataBinding.imageviewBackgroundIsPlaying,
+                            true,
+                            150,
+                            0.65f
+                        )
+                        AnimatorsUtils.crossFadeUp(
+                            mDataBinding.linearIsPlayingAnimContainer,
+                            true,
+                            200,
+                            1.0f
+                        )
+                    }else{
+                        AnimatorsUtils.crossFadeDown(
+                            mDataBinding.imageviewBackgroundIsPlaying,
+                            true,
+                            200
+                        )
+                        AnimatorsUtils.crossFadeDown(
+                            mDataBinding.linearIsPlayingAnimContainer,
+                            true,
+                            150
+                        )
+                    }
                 }else{
-                    AnimatorsUtils.crossFadeDown(
-                        mDataBinding.imageviewBackgroundIsPlaying,
-                        animate,
-                        200
-                    )
-                    AnimatorsUtils.crossFadeDown(
-                        mDataBinding.linearIsPlayingAnimContainer,
-                        animate,
-                        150
-                    )
+                    if(playingPosition == bindingAdapterPosition){
+                        mDataBinding.imageviewBackgroundIsPlaying.visibility = VISIBLE
+                        mDataBinding.imageviewBackgroundIsPlaying.alpha = 0.65f
+                        mDataBinding.linearIsPlayingAnimContainer.visibility = VISIBLE
+                        mDataBinding.linearIsPlayingAnimContainer.alpha = 1.0f
+                    }else{
+                        mDataBinding.imageviewBackgroundIsPlaying.alpha = 0.0f
+                        mDataBinding.linearIsPlayingAnimContainer.alpha = 0.0f
+                    }
                 }
             }
         }
-        private fun changeColorAndFaceType(typeface: Int, textColorRes: Int, isUnderlined: Boolean){
-//            mDataBinding.textTitle.setTypeface(null, typeface)
-//            mDataBinding.textSubtitle.setTypeface(null, typeface)
-//            mDataBinding.textDetails.setTypeface(null, typeface)
-
+        private fun changeColorAndFaceType(textColorRes: Int, isUnderlined: Boolean){
             mDataBinding.textTitle.setTextColor(textColorRes)
             mDataBinding.textSubtitle.setTextColor(textColorRes)
             mDataBinding.textDetails.setTextColor(textColorRes)
@@ -494,7 +497,6 @@ class GenericListGridItemAdapter (
                 mDataBinding.textDetails.text = mDataBinding.textDetails.text.toString()
             }
         }
-
         fun updateWithAnimationSelectedStateUI(selectableIsSelected: Boolean, isSelectable: Boolean) {
             if(!isSelectable){
                 hideDirectlySelectedItemBackground()

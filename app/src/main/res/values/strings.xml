@@ -87,7 +87,7 @@
     <string name="dialog_large_grid">Large grid</string>
     <string name="dialog_view_type_subtitle">This selection will be deleted. But the files will be conserved on device.</string>
     //Delete selection dialog
-    <string name="dialog_delete_selection_title">Delete selection ?</string>
+    <string name="dialog_delete_selection_title">Delete</string>
     <string name="dialog_delete_selection_description">This selection will be deleted from your device. Do you really want to continue ?</string>
     //Add to playlist dialog
     <string name="dialog_add_to_playlist_title">Add on playlist</string>

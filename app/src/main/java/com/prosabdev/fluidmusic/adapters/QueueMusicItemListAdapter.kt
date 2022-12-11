@@ -1,7 +1,6 @@
 package com.prosabdev.fluidmusic.adapters
 
 import android.content.Context
-import android.graphics.Typeface
 import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
@@ -75,7 +74,7 @@ class QueueMusicItemListAdapter(
                 when (payload) {
                     PAYLOAD_PLAYBACK_STATE -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_PLAYBACK_STATE")
-                        holder.updateIsPlayingStateUI(mContext, getIsPlaying(), getPlayingPosition())
+                        holder.updateIsPlayingStateUI(getPlayingPosition(), true)
                     }
                     SongItemAdapter.PAYLOAD_IS_COVERT_ART_TEXT -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
@@ -88,8 +87,8 @@ class QueueMusicItemListAdapter(
             }
         } else {
             //If the is no payload specified on notify adapter, refresh all UI to be safe
-            holder.updateIsPlayingStateUI(mContext, getIsPlaying(), getPlayingPosition())
             holder.updateCovertArtAndTitleUI(mContext, getItem(position) as SongItem)
+            holder.updateIsPlayingStateUI(getPlayingPosition(), true)
         }
     }
 
@@ -124,14 +123,14 @@ class QueueMusicItemListAdapter(
         mOnTouchListener: OnTouchListener
     ) : RecyclerView.ViewHolder(mItemQueueMusicBinding.root) {
         init {
-            mItemQueueMusicBinding.linearCoverArtContainer.setOnClickListener {
+            mItemQueueMusicBinding.cardViewClickable.setOnClickListener {
                 mOnItemClickListener.onSongItemClicked(bindingAdapterPosition)
             }
             mItemQueueMusicBinding.buttonDrag.setOnTouchListener { view, event ->
                 if (event?.action == MotionEvent.ACTION_DOWN) {
                     mOnTouchListener.requestDrag(this)
                 } else if (event?.action == MotionEvent.ACTION_UP) {
-                    view?.performClick();
+                    view?.performClick()
                 }
                 false
             }
@@ -161,54 +160,92 @@ class QueueMusicItemListAdapter(
             imageRequest.hashedCovertArtSignature = songItem.hashedCovertArtSignature
             ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
         }
-        fun updateIsPlayingStateUI(ctx : Context, isPlaying: Boolean, playingPosition : Int) {
+        fun updateIsPlayingStateUI(
+            playingPosition: Int,
+            animate: Boolean
+        ) {
             if(playingPosition == bindingAdapterPosition){
-                mItemQueueMusicBinding.textTitle.setTypeface(null, Typeface.BOLD)
-                mItemQueueMusicBinding.textSubtitle.setTypeface(null, Typeface.BOLD)
-                mItemQueueMusicBinding.textDetails.setTypeface(null, Typeface.BOLD)
-                mItemQueueMusicBinding.textNowPlaying.setTypeface(null, Typeface.BOLD)
-
-                val value = MaterialColors.getColor(mItemQueueMusicBinding.textTitle  as View, com.google.android.material.R.attr.colorPrimary)
-                mItemQueueMusicBinding.textTitle.setTextColor(value)
-                mItemQueueMusicBinding.textSubtitle.setTextColor(value)
-                mItemQueueMusicBinding.textDetails.setTextColor(value)
-                if(isPlaying){
-                    mItemQueueMusicBinding.textNowPlaying.text = ctx.getString(R.string.playing)
-                }else{
-                    mItemQueueMusicBinding.textNowPlaying.text = ctx.getString(R.string.paused)
-                }
-                mItemQueueMusicBinding.textNowPlaying.setTextColor(value)
-                mItemQueueMusicBinding.textNowPlaying.visibility = VISIBLE
+                mItemQueueMusicBinding.imageviewBackgroundIsPlaying.visibility = GONE
+                mItemQueueMusicBinding.linearIsPlayingAnimContainer.visibility = GONE
+                val colorValue = MaterialColors.getColor(mItemQueueMusicBinding.textTitle  as View, com.google.android.material.R.attr.colorPrimary)
+                changeColorAndFaceType(colorValue, true)
+                showPlayingPositionImageHover(animate)
             }else{
-                mItemQueueMusicBinding.textTitle.setTypeface(null, Typeface.NORMAL)
-                mItemQueueMusicBinding.textSubtitle.setTypeface(null, Typeface.NORMAL)
-                mItemQueueMusicBinding.textDetails.setTypeface(null, Typeface.NORMAL)
-                mItemQueueMusicBinding.textNowPlaying.setTypeface(null, Typeface.NORMAL)
-
-                val value = MaterialColors.getColor(mItemQueueMusicBinding.textTitle as View, com.google.android.material.R.attr.colorOnBackground)
-                mItemQueueMusicBinding.textTitle.setTextColor(value)
-                mItemQueueMusicBinding.textSubtitle.setTextColor(value)
-                mItemQueueMusicBinding.textDetails.setTextColor(value)
-                mItemQueueMusicBinding.textNowPlaying.setTextColor(value)
-                mItemQueueMusicBinding.textNowPlaying.visibility = INVISIBLE
+                mItemQueueMusicBinding.imageviewBackgroundIsPlaying.visibility = GONE
+                mItemQueueMusicBinding.linearIsPlayingAnimContainer.visibility = GONE
+                val colorValue = MaterialColors.getColor(mItemQueueMusicBinding.textTitle as View, com.google.android.material.R.attr.colorOnBackground)
+                changeColorAndFaceType(colorValue, false)
+                hidePlayingPositionImageHover(animate)
+            }
+        }
+        private fun changeColorAndFaceType(textColorRes: Int, isUnderlined: Boolean){
+            mItemQueueMusicBinding.textTitle.setTextColor(textColorRes)
+            mItemQueueMusicBinding.textSubtitle.setTextColor(textColorRes)
+            mItemQueueMusicBinding.textDetails.setTextColor(textColorRes)
+            if(isUnderlined){
+                mItemQueueMusicBinding.textTitle.text = FormattersAndParsersUtils.getUnderLinedWord(mItemQueueMusicBinding.textTitle.text.toString())
+                mItemQueueMusicBinding.textSubtitle.text = FormattersAndParsersUtils.getUnderLinedWord(mItemQueueMusicBinding.textSubtitle.text.toString())
+                mItemQueueMusicBinding.textDetails.text = FormattersAndParsersUtils.getUnderLinedWord(mItemQueueMusicBinding.textDetails.text.toString())
+            }else{
+                mItemQueueMusicBinding.textTitle.text = mItemQueueMusicBinding.textTitle.text.toString()
+                mItemQueueMusicBinding.textSubtitle.text = mItemQueueMusicBinding.textSubtitle.text.toString()
+                mItemQueueMusicBinding.textDetails.text = mItemQueueMusicBinding.textDetails.text.toString()
+            }
+        }
+        private fun showPlayingPositionImageHover(animate: Boolean){
+            if(animate){
+                AnimatorsUtils.crossFadeUp(
+                    mItemQueueMusicBinding.imageviewBackgroundIsPlaying,
+                    true,
+                    150,
+                    0.65f
+                )
+                AnimatorsUtils.crossFadeUp(
+                    mItemQueueMusicBinding.linearIsPlayingAnimContainer,
+                    true,
+                    200,
+                    1.0f
+                )
+            }else{
+                mItemQueueMusicBinding.imageviewBackgroundIsPlaying.visibility = VISIBLE
+                mItemQueueMusicBinding.imageviewBackgroundIsPlaying.alpha = 0.65f
+                mItemQueueMusicBinding.linearIsPlayingAnimContainer.visibility = VISIBLE
+                mItemQueueMusicBinding.linearIsPlayingAnimContainer.alpha = 1.0f
+            }
+        }
+        private fun hidePlayingPositionImageHover(animate: Boolean){
+            if(animate){
+                AnimatorsUtils.crossFadeDown(
+                    mItemQueueMusicBinding.imageviewBackgroundIsPlaying,
+                    true,
+                    200
+                )
+                AnimatorsUtils.crossFadeDown(
+                    mItemQueueMusicBinding.linearIsPlayingAnimContainer,
+                    true,
+                    150
+                )
+            }else{
+                mItemQueueMusicBinding.imageviewBackgroundIsPlaying.alpha = 0.0f
+                mItemQueueMusicBinding.linearIsPlayingAnimContainer.alpha = 0.0f
             }
         }
         fun updateItemTouchHelper(isDragging : Boolean, animated: Boolean = true){
-            if(isDragging) {
-                AnimatorsUtils.crossFadeUp(
-                    mItemQueueMusicBinding.songItemIsSelected,
-                    animated,
-                    150,
-                    0.15f
-                )
-            }
-            else {
-                AnimatorsUtils.crossFadeDown(
-                    mItemQueueMusicBinding.songItemIsSelected,
-                    animated,
-                    150
-                )
-            }
+//            if(isDragging) {
+//                AnimatorsUtils.crossFadeUp(
+//                    mItemQueueMusicBinding.songItemIsSelected,
+//                    animated,
+//                    150,
+//                    0.15f
+//                )
+//            }
+//            else {
+//                AnimatorsUtils.crossFadeDown(
+//                    mItemQueueMusicBinding.songItemIsSelected,
+//                    animated,
+//                    150
+//                )
+//            }
         }
     }
 

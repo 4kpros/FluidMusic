@@ -103,7 +103,11 @@ import kotlinx.coroutines.withContext
                             mSongItemViewModel.getAllDirectly(mPlayerFragmentViewModel.getSortBy().value ?: "title")
                     updateEmptyListUI(songList?.size ?: 0)
                     mPlayerPagerAdapter?.submitList(songList)
-                    mQueueMusicBottomSheetDialog.updateQueueMusicList(songList)
+                    if(mQueueMusicBottomSheetDialog.isVisible){
+                        mQueueMusicBottomSheetDialog.updateQueueMusicList(
+                            songList
+                        )
+                    }
                 }
             }
             AlbumsFragment.TAG -> {
@@ -234,7 +238,6 @@ import kotlinx.coroutines.withContext
                         mPlayerFragmentViewModel.setQueueListSourceValue(queueListSourceValue)
                         mPlayerFragmentViewModel.setSleepTimer(sleepTimer)
                         mPlayerFragmentViewModel.setSleepTimerStateStarted(false)
-                        Log.i(ConstantValues.TAG, "CURRENT SONG sdadasdasd playingPosition : ${tempSongItem?.position}")
                     }
                 }
             }
@@ -373,7 +376,11 @@ import kotlinx.coroutines.withContext
                         mAllSongsFragmentViewModel.getAllDirectly()
                     ) as List<SongItem>
             mPlayerPagerAdapter?.submitList(songList)
-            mQueueMusicBottomSheetDialog?.updateQueueMusicList(songList)
+            if(mQueueMusicBottomSheetDialog.isVisible){
+                mQueueMusicBottomSheetDialog.updateQueueMusicList(
+                    songList
+                )
+            }
             updateEmptyListUI(songList.size)
             mPlayerFragmentViewModel.setIsQueueMusicUpdated()
         }
@@ -612,7 +619,15 @@ import kotlinx.coroutines.withContext
         }
     }
     private fun showQueueMusicDialog() {
-        mQueueMusicBottomSheetDialog.show(childFragmentManager, QueueMusicBottomSheetDialog.TAG)
+        if(!mQueueMusicBottomSheetDialog.isVisible) {
+            mQueueMusicBottomSheetDialog.updateQueueMusicList(
+                mPlayerPagerAdapter?.currentList
+            )
+            mQueueMusicBottomSheetDialog.show(
+                childFragmentManager,
+                QueueMusicBottomSheetDialog.TAG
+            )
+        }
     }
     private fun openMediaScannerActivity() {
         startActivity(Intent(context, MediaScannerSettingsActivity::class.java).apply {})
@@ -621,10 +636,11 @@ import kotlinx.coroutines.withContext
         //
     }
     private fun showMoreOptionsDialog() {
-        if(!mPlayerMoreBottomSheetDialog.isVisible)
+        if(!mPlayerMoreBottomSheetDialog.isVisible) {
             activity?.supportFragmentManager?.let {
                 mPlayerMoreBottomSheetDialog.show(it, PlayerMoreFullBottomSheetDialog.TAG)
             }
+        }
     }
     private fun onRepeatButtonClicked(){
         when (mPlayerFragmentViewModel.getRepeat().value ?: PlaybackStateCompat.REPEAT_MODE_NONE) {

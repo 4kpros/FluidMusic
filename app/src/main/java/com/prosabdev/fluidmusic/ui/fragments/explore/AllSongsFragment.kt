@@ -31,7 +31,7 @@ import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortSongsBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
-import com.prosabdev.fluidmusic.ui.fragments.commonmethods.FragmentCommonMediaPlaybackAction
+import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 import com.prosabdev.fluidmusic.utils.MathComputationsUtils
@@ -380,7 +380,7 @@ class AllSongsFragment : Fragment() {
         listHeadlines.add(0)
         mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
             override fun onPlayButtonClicked() {
-                FragmentCommonMediaPlaybackAction.playSongAtPosition(
+                CommonPlaybackAction.playSongAtPositionFromGenericAdapterView(
                     mPlayerFragmentViewModel,
                     mAllSongsFragmentViewModel,
                     mGenericListGridItemAdapter,
@@ -418,7 +418,7 @@ class AllSongsFragment : Fragment() {
                     if(mMainFragmentViewModel.getSelectMode().value == true){
                         mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
                     }else{
-                        FragmentCommonMediaPlaybackAction.playSongAtPosition(
+                        CommonPlaybackAction.playSongAtPositionFromGenericAdapterView(
                             mPlayerFragmentViewModel,
                             mAllSongsFragmentViewModel,
                             mGenericListGridItemAdapter,
@@ -506,7 +506,6 @@ class AllSongsFragment : Fragment() {
                         mMainFragmentViewModel.setScrollingState(2)
                     }
                 }
-
             })
         }
     }
@@ -543,7 +542,7 @@ class AllSongsFragment : Fragment() {
                         (mGenericListGridItemAdapter?.currentList?.size ?: 0) -1
                     )
                 mGenericListGridItemAdapter?.let { genericListGridItemAdapter ->
-                    FragmentCommonMediaPlaybackAction.playSongAtPosition(
+                    CommonPlaybackAction.playSongAtPositionFromGenericAdapterView(
                         mPlayerFragmentViewModel,
                         mAllSongsFragmentViewModel,
                         genericListGridItemAdapter,

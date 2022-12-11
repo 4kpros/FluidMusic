@@ -6,7 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.databinding.ItemPlaylistBinding
+import com.prosabdev.fluidmusic.databinding.ItemPlaylistAddSongBinding
 import com.prosabdev.fluidmusic.models.playlist.PlaylistItemView
 import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
 
@@ -22,9 +22,9 @@ class PlaylistItemViewAdapter(
         parent: ViewGroup,
         viewType: Int
     ): PlaylistItemViewHolder {
-        val tempItemPlaylistBinding: ItemPlaylistBinding = DataBindingUtil.inflate(
+        val tempItemPlaylistBinding: ItemPlaylistAddSongBinding = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context),
-            R.layout.item_playlist,
+            R.layout.item_playlist_add_song,
             parent,
             false
         )
@@ -39,18 +39,18 @@ class PlaylistItemViewAdapter(
     }
 
     class PlaylistItemViewHolder(
-        private val mItemPlaylistBinding: ItemPlaylistBinding,
+        private val mItemPlaylistAddSongBinding: ItemPlaylistAddSongBinding,
         listener: OnItemClickListener
-    ): RecyclerView.ViewHolder(mItemPlaylistBinding.root) {
+    ): RecyclerView.ViewHolder(mItemPlaylistAddSongBinding.root) {
         init {
-            mItemPlaylistBinding.cardViewClickable.setOnClickListener{
+            mItemPlaylistAddSongBinding.cardViewClickable.setOnClickListener{
                 listener.onClickListener(bindingAdapterPosition)
             }
         }
 
         fun updateUI(playlistItemView: PlaylistItemView){
-            mItemPlaylistBinding.textTitle.text = playlistItemView.name
-            mItemPlaylistBinding.textSubtitle.text = "${playlistItemView.numberTracks} songs | ${FormattersAndParsersUtils.formatSongDurationToString(playlistItemView.totalDuration)} min"
+            mItemPlaylistAddSongBinding.textTitle.text = playlistItemView.name
+            mItemPlaylistAddSongBinding.textSubtitle.text = "${playlistItemView.numberTracks} songs | ${FormattersAndParsersUtils.formatSongDurationToString(playlistItemView.totalDuration)} min"
 
         }
     }

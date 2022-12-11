@@ -1,5 +1,7 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +9,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -17,14 +20,19 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
+import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
+import com.prosabdev.fluidmusic.models.songitem.SongItem
+import com.prosabdev.fluidmusic.service.intents.IntentActionsManager
 import com.prosabdev.fluidmusic.ui.fragments.explore.AlbumsFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.AllSongsFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.ArtistsFragment
 import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MusicLibraryFragment : Fragment() {
     private var mFragmentMusicLibraryBinding: FragmentMusicLibraryBinding? = null
@@ -224,7 +232,7 @@ class MusicLibraryFragment : Fragment() {
                 }
             })
             fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonPlayAfter.setOnClickListener {
-                addToPlayAfter()
+                addToQueueMusic()
             }
             fragmentMusicLibraryBinding.includeSideSelectionMenu.buttonPlaylistAdd.setOnClickListener {
                 openPlaylistAddDialog()
@@ -265,17 +273,23 @@ class MusicLibraryFragment : Fragment() {
     }
 
     private fun openShareSelectionDialog() {
-        Toast.makeText(this.requireContext(), "On share selection", Toast.LENGTH_SHORT).show()
-    }
-    private fun openAddSelectionToPlaylistDialog() {
-        Toast.makeText(this.requireContext(), "On add selection to playlist", Toast.LENGTH_SHORT).show()
-    }
-    private fun addSelectionToQueueMusicDialog() {
-        Toast.makeText(this.requireContext(), "On add selection to queue music", Toast.LENGTH_SHORT).show()
+        context?.let { ctx ->
+            val dialogShareSongBinding : DialogShareSongBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_share_song, null, false)
+            MaterialAlertDialogBuilder(this.requireContext())
+                .setTitle(ctx.getString(R.string.share))
+                .setIcon(R.drawable.share)
+                .setView(dialogShareSongBinding.root)
+                .setNegativeButton(ctx.getString(R.string.close)) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show().apply {
+                }
+        }
     }
     private fun openDeleteSelectionDialog() {
         MaterialAlertDialogBuilder(this.requireContext())
             .setTitle(resources.getString(R.string.dialog_delete_selection_title))
+            .setIcon(R.drawable.delete)
             .setMessage(resources.getString(R.string.dialog_delete_selection_description))
             .setNegativeButton(resources.getString(R.string.decline)) { dialog, which ->
                 dialog.dismiss()
@@ -286,10 +300,17 @@ class MusicLibraryFragment : Fragment() {
             .show()
     }
     private fun deleteSelection() {
+        mMainFragmentViewModel.getSelectMode()
         Toast.makeText(this.requireContext(), "On delete selection", Toast.LENGTH_SHORT).show()
     }
-    private fun addToPlayAfter() {
-        Toast.makeText(this.requireContext(), "On add to play after selection", Toast.LENGTH_SHORT)
+    private fun addToQueueMusic() {
+        MaterialAlertDialogBuilder(this.requireContext())
+            .setTitle("Add to queue")
+            .setIcon(R.drawable.queue_music)
+            .setView(R.layout.dialog_add_to_queue_music)
+            .setNegativeButton(resources.getString(R.string.close)) { dialog, which ->
+                dialog.dismiss()
+            }
             .show()
     }
 

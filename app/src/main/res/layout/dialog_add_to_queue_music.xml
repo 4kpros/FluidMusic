@@ -8,7 +8,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:paddingHorizontal="@dimen/margin_large_size"
         >
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -19,6 +19,19 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="@dimen/margin_large_size"
             >
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="@dimen/margin_medium_size"
+                >
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/MaterialAlertDialog.Material3.Body.Text"
+                    android:text="Add to top or bottom of queue music. Play next add after current playing."
+                    />
+            </androidx.appcompat.widget.LinearLayoutCompat>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_add_to_top"
                 android:layout_width="wrap_content"

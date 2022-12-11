@@ -6,7 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.databinding.ItemPlaylistBinding
+import com.prosabdev.fluidmusic.databinding.ItemPlaylistAddSongBinding
 import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 
 class PlaylistItemAdapter(
@@ -19,9 +19,9 @@ class PlaylistItemAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistItemHolder {
-        val tempItemPlaylistBinding: ItemPlaylistBinding = DataBindingUtil.inflate(
+        val tempItemPlaylistBinding: ItemPlaylistAddSongBinding = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context),
-            R.layout.item_playlist,
+            R.layout.item_playlist_add_song,
             parent,
             false
         )
@@ -33,7 +33,7 @@ class PlaylistItemAdapter(
     }
 
     class PlaylistItemHolder(
-        private val mItemPlaylistBinding: ItemPlaylistBinding,
+        private val mItemPlaylistBinding: ItemPlaylistAddSongBinding,
         listener: OnItemClickListener
     ): RecyclerView.ViewHolder(mItemPlaylistBinding.root) {
         init {
