@@ -13,6 +13,7 @@ import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.commit
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
@@ -24,6 +25,7 @@ import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
 import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.service.intents.IntentActionsManager
+import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.EditTagsBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.AlbumsFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.AllSongsFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.ArtistsFragment
@@ -38,6 +40,8 @@ class MusicLibraryFragment : Fragment() {
     private var mFragmentMusicLibraryBinding: FragmentMusicLibraryBinding? = null
 
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
+
+    private val mEditTagsBottomSheetDialogFragment: EditTagsBottomSheetDialogFragment = EditTagsBottomSheetDialogFragment.newInstance()
 
     private var mTabLayoutAdapter: TabLayoutAdapter? = null
 
@@ -249,7 +253,9 @@ class MusicLibraryFragment : Fragment() {
         }
     }
     private fun openTagEditorDialog() {
-        //
+        if(!mEditTagsBottomSheetDialogFragment.isVisible){
+            mEditTagsBottomSheetDialogFragment.show(childFragmentManager, EditTagsBottomSheetDialogFragment.TAG)
+        }
     }
     private fun openPlaylistAddDialog() {
         //

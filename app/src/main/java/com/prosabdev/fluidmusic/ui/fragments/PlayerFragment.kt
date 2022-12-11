@@ -103,11 +103,9 @@ import kotlinx.coroutines.withContext
                             mSongItemViewModel.getAllDirectly(mPlayerFragmentViewModel.getSortBy().value ?: "title")
                     updateEmptyListUI(songList?.size ?: 0)
                     mPlayerPagerAdapter?.submitList(songList)
-                    if(mQueueMusicBottomSheetDialog.isVisible){
-                        mQueueMusicBottomSheetDialog.updateQueueMusicList(
-                            songList
-                        )
-                    }
+                    mQueueMusicBottomSheetDialog.updateQueueMusicList(
+                        songList
+                    )
                 }
             }
             AlbumsFragment.TAG -> {
@@ -376,11 +374,9 @@ import kotlinx.coroutines.withContext
                         mAllSongsFragmentViewModel.getAllDirectly()
                     ) as List<SongItem>
             mPlayerPagerAdapter?.submitList(songList)
-            if(mQueueMusicBottomSheetDialog.isVisible){
-                mQueueMusicBottomSheetDialog.updateQueueMusicList(
-                    songList
-                )
-            }
+            mQueueMusicBottomSheetDialog.updateQueueMusicList(
+                songList
+            )
             updateEmptyListUI(songList.size)
             mPlayerFragmentViewModel.setIsQueueMusicUpdated()
         }

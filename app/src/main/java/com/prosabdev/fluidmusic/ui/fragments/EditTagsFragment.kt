@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentEditTagsBinding
 import com.prosabdev.fluidmusic.databinding.FragmentEqualizerBinding
@@ -22,6 +23,10 @@ class EditTagsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        exitTransition = MaterialFadeThrough()
+        reenterTransition = MaterialFadeThrough()
+
         arguments?.let {
             mDataList = it.getStringArrayList(DATA_LIST)
             mModelType = it.getString(MODEL_TYPE)
@@ -36,7 +41,7 @@ class EditTagsFragment : Fragment() {
         mFragmentEditTagsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_tags, container, false)
 
         initViews()
-        setupSongInfosData()
+        setupSongInfoData()
         return mFragmentEditTagsBinding?.root
     }
 
@@ -52,10 +57,14 @@ class EditTagsFragment : Fragment() {
     private fun observeLiveData() {
     }
 
-    private fun setupSongInfosData() {
+    private fun setupSongInfoData() {
     }
 
     private fun initViews() {
+        mFragmentEditTagsBinding?.let { dataBidingView ->
+            InsetModifiersUtils.updateTopViewInsets(dataBidingView.relativeTopApp)
+            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
+        }
     }
 
     companion object {
@@ -66,10 +75,10 @@ class EditTagsFragment : Fragment() {
         const val MODEL_TYPE_VALUE: String = "MODEL_TYPE_VALUE"
 
         @JvmStatic
-        fun newInstance(dataList: List<String>?, modelType: String, modelTypeValue: String) =
+        fun newInstance(dataList: List<String>?, modelType: String?, modelTypeValue: String?) =
             EditTagsFragment().apply {
                 arguments = Bundle().apply {
-                    putStringArrayList(DATA_LIST, dataList as ArrayList<String>)
+                    putStringArrayList(DATA_LIST, dataList as ArrayList<String>?)
                     putString(MODEL_TYPE, modelType)
                     putString(MODEL_TYPE_VALUE, modelTypeValue)
                 }
