@@ -11,8 +11,9 @@
         android:id="@+id/constraint_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:backgroundTint="?android:colorBackground"
         tools:context=".ui.fragments.PlayerFragment"
+        android:backgroundTint="?android:colorBackground"
+        android:background="?android:colorBackground"
         >
         <ImageView
             android:id="@+id/blurred_imageview"
@@ -21,19 +22,22 @@
             android:scaleType="centerCrop"
             />
         <View
-            android:id="@+id/constraint_hover_blurred_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="?android:colorBackground"
-            android:alpha="0"
+            android:alpha="0.35"
             />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linear_viewpager"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             android:orientation="vertical"
-            app:layout_constraintHeight_percent="0.5"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHeight_percent="@integer/viewpager_height"
+            >
 
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/view_pager_player"
@@ -72,20 +76,22 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linear_controls"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:orientation="vertical"
-            android:paddingHorizontal="@dimen/margin_large_size"
-            android:paddingBottom="@dimen/margin_large_size"
-            app:layout_constraintBottom_toTopOf="@+id/linear_more_buttons"
             app:layout_constraintTop_toBottomOf="@+id/linear_viewpager"
+            app:layout_constraintBottom_toTopOf="@+id/linear_more_buttons"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="@dimen/margin_medium_size"
             >
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/linear_song_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toTopOf="@+id/linear_progress_bar_container"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginHorizontal="@dimen/margin_large_size"
+                >
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
@@ -125,7 +131,9 @@
                 android:id="@+id/linear_progress_bar_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@+id/linear_buttons_container">
+                app:layout_constraintBottom_toTopOf="@+id/linear_buttons_container"
+                android:layout_marginHorizontal="@dimen/margin_large_size"
+                >
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -169,7 +177,8 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginHorizontal="@dimen/margin_large_size">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_shuffle"
@@ -253,6 +262,13 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:id="@+id/constraint_hover_blurred_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0.4"
+                android:background="?android:colorBackground" />
         </androidx.appcompat.widget.LinearLayoutCompat>
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/drag_handle_view_container"

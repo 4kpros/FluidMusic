@@ -361,7 +361,7 @@ import kotlinx.coroutines.launch
                     fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text =
                         context?.getString(R.string.unknown_artist)
                     context?.let {
-                        ImageLoadersUtils.loadWithResourceID(
+                        ImageLoadersUtils.loadWithPlaceholderResourceID(
                             it,
                             fragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer,
                             0

@@ -45,6 +45,8 @@
             app:strokeColor="@color/transparent"
             android:alpha="0.65"
             android:background="?android:colorBackground"
+            android:visibility="gone"
+            android:layout_margin="@dimen/margin_small_size"
             />
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/linear_is_playing_anim_container"
@@ -68,7 +70,6 @@
                 android:layout_weight=".7"
                 android:src="@drawable/ic_fluid_music_icon"
                 app:tint="?colorPrimary"
-                android:layout_margin="@dimen/margin_medium_size"
                 />
         </androidx.appcompat.widget.LinearLayoutCompat>
         <androidx.appcompat.widget.LinearLayoutCompat

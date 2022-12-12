@@ -38,5 +38,20 @@ abstract class InsetModifiersUtils {
                 insets
             }
         }
+        fun updateRightViewInsets(view: View) {
+            view.setOnApplyWindowInsetsListener { v, insets ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    val finalInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                    v.updatePadding(
+                        right= finalInsets.right
+                    )
+                } else {
+                    v.updatePadding(
+                        right = insets.systemWindowInsetRight
+                    )
+                }
+                insets
+            }
+        }
     }
 }

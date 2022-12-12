@@ -388,6 +388,7 @@ class GenericListGridItemAdapter (
             mDataBinding.textTitle.text = genericData.title
             mDataBinding.textSubtitle.text = genericData.subtitle
             mDataBinding.textDetails.text = genericData.details
+
             updateCovertArtUI(ctx, genericData.imageUri, genericData.imageHashedSignature, organizeListGrid)
         }
         private fun updateCovertArtUI(ctx: Context, uri: Uri?, imageSignature: Int, organizeListGrid: Int) {

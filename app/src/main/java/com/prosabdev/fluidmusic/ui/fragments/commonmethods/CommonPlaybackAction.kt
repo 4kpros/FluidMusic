@@ -41,6 +41,8 @@ abstract class CommonPlaybackAction {
                 playerFragmentViewModel.getIsInverted().value != genericListenDataViewModel.getIsInverted().value ||
                 playerFragmentViewModel.getQueueListSource().value != fragmentSource
             ){
+                playerFragmentViewModel.setSortBy(genericListenDataViewModel.getSortBy().value ?: "order")
+                playerFragmentViewModel.setIsInverted(genericListenDataViewModel.getIsInverted().value ?: false)
                 playerFragmentViewModel.setQueueListSource(fragmentSource)
                 playerFragmentViewModel.setUpdatePlaylistCounter()
             }

@@ -57,13 +57,6 @@
                     app:icon="@drawable/clear_all"
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>
-            <com.google.android.material.bottomsheet.BottomSheetDragHandleView
-                android:id="@+id/drag_handle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                app:tint="?attr/colorPrimary"
-                />
         </RelativeLayout>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"

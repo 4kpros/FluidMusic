@@ -10,8 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
+        android:backgroundTint="?android:colorBackground"
+        android:background="?android:colorBackground"
         >
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraint_container"
             android:layout_width="0dp"
@@ -21,7 +22,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             >
-
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/imageview_blurred_mini_player"
                 android:layout_width="match_parent"

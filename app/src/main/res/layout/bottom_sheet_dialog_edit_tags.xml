@@ -6,7 +6,7 @@
 
     </data>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <RelativeLayout
         android:id="@+id/constraint_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,6 +37,7 @@
             android:id="@+id/nested_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/linear_title"
             >
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
@@ -65,7 +66,7 @@
                     android:hint="File name"
                     app:startIconDrawable="@drawable/audio_file"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edit_text_file_name"
@@ -82,7 +83,7 @@
                     android:hint="Title"
                     app:startIconDrawable="@drawable/title"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edit_text_title"
@@ -98,7 +99,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Artist"
                     app:startIconDrawable="@drawable/person"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/edit_text_artist"
@@ -115,7 +116,7 @@
                     android:hint="Album"
                     app:startIconDrawable="@drawable/album"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/edit_text_album"
@@ -132,7 +133,7 @@
                     android:hint="Album artist"
                     app:startIconDrawable="@drawable/album_artist"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/edit_text_album_artist"
@@ -149,7 +150,7 @@
                     android:hint="Composer"
                     app:startIconDrawable="@drawable/speech_to_text"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/edit_text_composer"
@@ -166,7 +167,7 @@
                     android:hint="Genre"
                     app:startIconDrawable="@drawable/piano"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/edit_text_genre"
@@ -183,7 +184,7 @@
                     android:hint="Track number"
                     app:startIconDrawable="@drawable/filter_1"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edit_text_track_number"
@@ -200,7 +201,7 @@
                     android:hint="Disc number"
                     app:startIconDrawable="@drawable/filter_1"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/edit_text_disc_number"
@@ -217,7 +218,7 @@
                     android:hint="Year"
                     app:startIconDrawable="@drawable/calendar_month"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/edit_text_year"
@@ -234,7 +235,7 @@
                     android:hint="Comment"
                     app:startIconDrawable="@drawable/comment"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/edit_text_disc_comment"
@@ -251,7 +252,7 @@
                     android:hint="Language"
                     app:startIconDrawable="@drawable/language"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/edit_text_disc_language"
@@ -268,7 +269,7 @@
                     android:hint="Author"
                     app:startIconDrawable="@drawable/attribution"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/edit_text_disc_author"
@@ -285,7 +286,7 @@
                     android:hint="Writer"
                     app:startIconDrawable="@drawable/draw"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/edit_text_disc_writer"
@@ -302,7 +303,7 @@
                     android:hint="Country"
                     app:startIconDrawable="@drawable/flag"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/edit_text_disc_country"
@@ -319,7 +320,7 @@
                     android:hint="Record_label"
                     app:startIconDrawable="@drawable/label"
                     app:endIconMode="clear_text"
-                    android:layout_marginTop="@dimen/margin_medium_size"
+                    android:layout_marginBottom="@dimen/margin_medium_size"
                     >
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/edit_text_record_label"
@@ -331,5 +332,5 @@
                 </com.google.android.material.textfield.TextInputLayout>
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.core.widget.NestedScrollView>
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    </RelativeLayout>
 </layout>

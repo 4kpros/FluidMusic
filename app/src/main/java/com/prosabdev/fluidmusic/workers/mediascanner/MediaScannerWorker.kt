@@ -13,7 +13,7 @@ import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.utils.AudioInfoExtractorUtils
 import com.prosabdev.fluidmusic.utils.SystemSettingsUtils
-import com.prosabdev.fluidmusic.workers.playlist.PlaylistAddSongsWorker
+import com.prosabdev.fluidmusic.workers.playlist.AddSongsToPlaylistWorker
 import kotlinx.coroutines.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -29,12 +29,12 @@ class MediaScannerWorker(
         val scannedPlaylists: ConcurrentLinkedQueue<String> = ConcurrentLinkedQueue()
         return withContext(Dispatchers.IO) {
             try {
-                Log.i(PlaylistAddSongsWorker.TAG, "WORKER $TAG : started")
+                Log.i(AddSongsToPlaylistWorker.TAG, "WORKER $TAG : started")
 
                 //Start to scan folders
                 scanSongsAndPlaylists(scannedFolders, scannedSongs, scannedPlaylists)
 
-                Log.i(PlaylistAddSongsWorker.TAG, "WORKER $TAG : ended")
+                Log.i(AddSongsToPlaylistWorker.TAG, "WORKER $TAG : ended")
 
                 Result.success(
                     workDataOf(
@@ -44,8 +44,8 @@ class MediaScannerWorker(
                     )
                 )
             } catch (error: Throwable) {
-                Log.i(PlaylistAddSongsWorker.TAG, "Error loading... ${error.stackTrace}")
-                Log.i(PlaylistAddSongsWorker.TAG, "Error loading... ${error.message}")
+                Log.i(AddSongsToPlaylistWorker.TAG, "Error loading... ${error.stackTrace}")
+                Log.i(AddSongsToPlaylistWorker.TAG, "Error loading... ${error.message}")
                 Result.failure()
             }
         }

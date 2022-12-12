@@ -94,17 +94,14 @@ import kotlinx.coroutines.withContext
         when (mPlayerFragmentViewModel.getQueueListSource().value ?: AllSongsFragment.TAG) {
             AllSongsFragment.TAG -> {
                 MainScope().launch {
-                    val tempIsInverted : Boolean = mAllSongsFragmentViewModel.getIsInverted().value ?: false
-                    val songList =
-                        if(tempIsInverted)
-                            mSongItemViewModel.getAllDirectly(mPlayerFragmentViewModel.getSortBy().value ?: "title")
-                                ?.reversed()
-                        else
-                            mSongItemViewModel.getAllDirectly(mPlayerFragmentViewModel.getSortBy().value ?: "title")
+                    val tempIsInverted : Boolean = mAllSongsFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
+                    val songList = mSongItemViewModel.getAllDirectly(mPlayerFragmentViewModel.getSortBy().value ?: SORT_LIST_GRID_DEFAULT_VALUE)
                     updateEmptyListUI(songList?.size ?: 0)
-                    mPlayerPagerAdapter?.submitList(songList)
+                    mPlayerPagerAdapter?.submitList(
+                        if(tempIsInverted) songList?.reversed() else songList
+                    )
                     mQueueMusicBottomSheetDialog.updateQueueMusicList(
-                        songList
+                        if(tempIsInverted) songList?.reversed() else songList
                     )
                 }
             }
@@ -185,8 +182,8 @@ import kotlinx.coroutines.withContext
                 mPlayerFragmentViewModel.getSleepTimer().value
             )
             val sortOrganize: SortOrganizeItemSP = SortOrganizeItemSP()
-            sortOrganize.sortOrderBy = mPlayerFragmentViewModel.getSortBy().value ?: "title"
-            sortOrganize.isInvertSort = mPlayerFragmentViewModel.getIsInverted().value ?:false
+            sortOrganize.sortOrderBy = mPlayerFragmentViewModel.getSortBy().value ?: SORT_LIST_GRID_DEFAULT_VALUE
+            sortOrganize.isInvertSort = mPlayerFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
             SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.saveSortOrganizeItemsFor(
                 ctx,
                 SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SHARED_PREFERENCES_SORT_ORGANIZE_PLAYER_QUEUE_MUSIC,
@@ -203,8 +200,8 @@ import kotlinx.coroutines.withContext
                     SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SHARED_PREFERENCES_SORT_ORGANIZE_PLAYER_QUEUE_MUSIC
                 )
             val queueListSource: String? = SharedPreferenceManagerUtils.Player.loadQueueListSource(ctx)
-            mPlayerFragmentViewModel.setSortBy(sortOrganize?.sortOrderBy ?: "title")
-            mPlayerFragmentViewModel.setIsInverted(sortOrganize?.isInvertSort ?: false)
+            mPlayerFragmentViewModel.setSortBy(sortOrganize?.sortOrderBy ?: SORT_LIST_GRID_DEFAULT_VALUE)
+            mPlayerFragmentViewModel.setIsInverted(sortOrganize?.isInvertSort ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE)
             mPlayerFragmentViewModel.setQueueListSource(queueListSource ?: AllSongsFragment.TAG)
 
             val songItem: SongItem? = SharedPreferenceManagerUtils.Player.loadCurrentPlayingSong(ctx)
@@ -362,8 +359,8 @@ import kotlinx.coroutines.withContext
     private fun updatePlayListData() {
         val queueListSource: String = mPlayerFragmentViewModel.getQueueListSource().value ?: AllSongsFragment.TAG
         if(queueListSource == AllSongsFragment.TAG) {
-            val tempSortBy : String = mAllSongsFragmentViewModel.getSortBy().value ?: "title"
-            val tempIsInverted : Boolean = mAllSongsFragmentViewModel.getIsInverted().value ?: false
+            val tempSortBy : String = mAllSongsFragmentViewModel.getSortBy().value ?: SORT_LIST_GRID_DEFAULT_VALUE
+            val tempIsInverted : Boolean = mAllSongsFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
             mPlayerFragmentViewModel.setSortBy(tempSortBy)
             mPlayerFragmentViewModel.setIsInverted(tempIsInverted)
             //Get songs
@@ -468,7 +465,7 @@ import kotlinx.coroutines.withContext
         }
     }
     private fun updateCurrentPlayingSongUI(songItem: SongItem?, isQueueMusicUpdated: Boolean?) {
-        if(isQueueMusicUpdated == false) return
+//        if(isQueueMusicUpdated == false) return
         updateViewpagerUI(songItem)
         updateTextTitleSubtitleDurationUI(songItem)
         updateBlurredBackgroundUIFromUri(songItem)
@@ -495,15 +492,14 @@ import kotlinx.coroutines.withContext
 
     private fun updateBlurredBackgroundUIFromUri(songItem: SongItem?) {
         mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
-            MainScope().launch {
-                context?.let { ctx ->
-                    val tempUri: Uri = Uri.parse(songItem?.uri ?: "")
-                    val imageRequestBlurred: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newBlurInstance()
-                    imageRequestBlurred.uri = tempUri
-                    imageRequestBlurred.hashedCovertArtSignature = songItem?.hashedCovertArtSignature ?: -1
-                    imageRequestBlurred.imageView = fragmentPlayerBinding.blurredImageview
-                    ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequestBlurred)
-                }
+            context?.let { ctx ->
+                Log.i(ConstantValues.TAG, "BLUR VIEW FROM PLAYER FRAGMENT : ${songItem?.fileName} : HAS COVER SIGNATURE ${songItem?.hashedCovertArtSignature}")
+                val tempUri: Uri = Uri.parse(songItem?.uri ?: "")
+                val imageRequestBlurred: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newBlurInstance()
+                imageRequestBlurred.uri = tempUri
+                imageRequestBlurred.hashedCovertArtSignature = songItem?.hashedCovertArtSignature ?: -1
+                imageRequestBlurred.imageView = fragmentPlayerBinding.blurredImageview
+                ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequestBlurred)
             }
         }
     }
@@ -710,6 +706,9 @@ import kotlinx.coroutines.withContext
 
             InsetModifiersUtils.updateBottomViewInsets(fragmentPlayerBinding.dragHandleViewContainer)
             InsetModifiersUtils.updateBottomViewInsets(fragmentPlayerBinding.constraintBottomButtonsContainer)
+//            InsetModifiersUtils.updateRightViewInsets(fragmentPlayerBinding.dragHandleViewContainer)
+//            InsetModifiersUtils.updateRightViewInsets(fragmentPlayerBinding.constraintBottomButtonsContainer)
+//            InsetModifiersUtils.updateRightViewInsets(fragmentPlayerBinding.linearControls)
 
             mPlayerMoreBottomSheetDialog.updateData(
                 mPlayerFragmentViewModel,
@@ -724,6 +723,9 @@ import kotlinx.coroutines.withContext
 
     companion object {
         const val TAG = "PlayerFragment"
+
+        private const val SORT_LIST_GRID_DEFAULT_VALUE: String = "playOrder"
+        private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 
         @JvmStatic
         fun newInstance() =

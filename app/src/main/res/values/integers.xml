@@ -6,4 +6,6 @@
     <integer name="organize_grid_medium_span_count">3</integer>
     <integer name="organize_grid_large_span_count">2</integer>
     <integer name="organize_grid_extra_large_span_count">1</integer>
+
+    <item type="integer" name="viewpager_height" format="float">0.6</item>
 </resources>

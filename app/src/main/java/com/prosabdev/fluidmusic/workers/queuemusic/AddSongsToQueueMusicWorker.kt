@@ -15,7 +15,7 @@ import com.prosabdev.fluidmusic.workers.WorkerConstantValues
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class QueueMusicAddSongsWorker(
+class AddSongsToQueueMusicWorker(
     ctx: Context,
     params: WorkerParameters
 ) : CoroutineWorker(ctx, params) {
@@ -29,7 +29,7 @@ class QueueMusicAddSongsWorker(
                 //Extract worker params
                 val modelType = inputData.getString(WorkerConstantValues.ITEM_LIST_MODEL_TYPE)
                 val addMethod = inputData.getString(ADD_METHOD)
-                val addAtPosition = inputData.getInt(ADD_AT_POSITION, 1)
+                val addAtPosition = inputData.getInt(ADD_AT_ORDER, 1)
                 val itemsList = inputData.getStringArray(WorkerConstantValues.ITEM_LIST)
                 val orderBy = inputData.getString(WorkerConstantValues.ITEM_LIST_ORDER_BY)
                 val whereClause = inputData.getString(WorkerConstantValues.ITEM_LIST_WHERE)
@@ -130,27 +130,44 @@ class QueueMusicAddSongsWorker(
         if((stringList == null || stringList.isEmpty()) && (songUriList == null || songUriList.isEmpty())) return 0
         var tempResult = 0
         val listSize = (stringList?.size ?: (songUriList?.size ?: 0))
-        if(addMethod == ADD_METHOD_ADD_AT_POSITION){
-            //Update orders of current queue music from add at position to max play order
-            for(i in addAtPlayOrder until maxPlayOrder){
-                updatePlayOrderOfQueueMusic(i, i+maxPlayOrder)
-            }
-            for (i in 0 until listSize){
-                val songUri = stringList?.get(i) ?: (songUriList?.get(i)?.uri)
-                if(songUri != null && songUri.isNotEmpty()){
-                    val insertResult = insertSongAtPlayOrderOfQueueMusic(songUri, addAtPlayOrder + i)
-                    if (insertResult > 0) {
-                        tempResult++
+        when (addMethod) {
+            ADD_METHOD_ADD_AT_POSITION -> {
+                //Update orders of current queue music from add at position to max play order
+                for(i in addAtPlayOrder until maxPlayOrder){
+                    updatePlayOrderOfQueueMusic(i, i+maxPlayOrder)
+                }
+                for (i in 0 until listSize){
+                    val songUri = stringList?.get(i) ?: (songUriList?.get(i)?.uri)
+                    if(songUri != null && songUri.isNotEmpty()){
+                        val insertResult = insertSongAtPlayOrderOfQueueMusic(songUri, addAtPlayOrder + i)
+                        if (insertResult > 0) {
+                            tempResult++
+                        }
                     }
                 }
             }
-        }else{
-            for (i in 0 until listSize){
-                val songUri = stringList?.get(i) ?: (songUriList?.get(i)?.uri)
-                if(songUri != null && songUri.isNotEmpty()){
-                    val insertResult = insertSongToEndOfQueueMusic(songUri, (maxPlayOrder + i) + 1)
-                    if (insertResult > 0) {
-                        tempResult++
+            ADD_METHOD_ADD_TO_TOP -> {
+                for(i in 0 until maxPlayOrder){
+                    updatePlayOrderOfQueueMusic(i, i+maxPlayOrder)
+                }
+                for (i in 0 until listSize){
+                    val songUri = stringList?.get(i) ?: (songUriList?.get(i)?.uri)
+                    if(songUri != null && songUri.isNotEmpty()){
+                        val insertResult = insertSongToEndOfQueueMusic(songUri, (maxPlayOrder + i) + 1)
+                        if (insertResult > 0) {
+                            tempResult++
+                        }
+                    }
+                }
+            }
+            else -> {
+                for (i in 0 until listSize){
+                    val songUri = stringList?.get(i) ?: (songUriList?.get(i)?.uri)
+                    if(songUri != null && songUri.isNotEmpty()){
+                        val insertResult = insertSongToEndOfQueueMusic(songUri, (maxPlayOrder + i) + 1)
+                        if (insertResult > 0) {
+                            tempResult++
+                        }
                     }
                 }
             }
@@ -183,8 +200,9 @@ class QueueMusicAddSongsWorker(
 
         const val ADD_METHOD = "ADD_METHOD"
         const val ADD_METHOD_ADD_AT_POSITION = "ADD_METHOD_ADD_AT_POSITION"
-        const val ADD_METHOD_APPEND = "ADD_METHOD_APPEND"
+        const val ADD_METHOD_ADD_TO_TOP = "ADD_METHOD_ADD_TO_TOP"
+        const val ADD_METHOD_ADD_TO_BOTTOM = "ADD_METHOD_ADD_TO_BOTTOM"
 
-        const val ADD_AT_POSITION = "ADD_METHOD"
+        const val ADD_AT_ORDER = "ADD_AT_ORDER"
     }
 }

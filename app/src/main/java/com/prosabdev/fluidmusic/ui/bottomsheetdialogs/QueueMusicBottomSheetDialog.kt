@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -17,12 +19,10 @@ import com.prosabdev.fluidmusic.databinding.BottomSheetQueueMusicBinding
 import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
+import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
 
@@ -43,6 +43,8 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
     ): View? {
         mBottomSheetQueueMusicBinding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_queue_music, container, false)
         val view = mBottomSheetQueueMusicBinding?.root
+
+        Log.i(ConstantValues.TAG, "ON CREATE VIEW NEW : 111111")
 
         initViews()
         setupRecyclerView()
@@ -79,9 +81,6 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
 
     private fun checkInteractions() {
         mBottomSheetQueueMusicBinding?.let { bottomSheetQueueMusicBinding ->
-            bottomSheetQueueMusicBinding.dragHandle.setOnClickListener{
-                dismiss()
-            }
             bottomSheetQueueMusicBinding.buttonClearQueueMusic.setOnClickListener{
                 clearQueueMusicList()
             }
@@ -129,6 +128,8 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
                             bottomSheetQueueMusicBinding.recyclerView.layoutManager = mLayoutManager
                             mQueueMusicItemAdapter?.submitList(mSongList)
                         }
+                        mQueueMusicItemAdapter?.setIsPlaying(mPlayerFragmentViewModel?.getIsPlaying()?.value ?: false)
+                        mQueueMusicItemAdapter?.setPlayingPosition(mPlayerFragmentViewModel?.getCurrentPlayingSong()?.value?.position ?: -1)
                         mPlayerFragmentViewModel?.let { playerFragmentViewModel ->
                             val tempCurrentSong: SongItem =
                                 playerFragmentViewModel.getCurrentPlayingSong().value

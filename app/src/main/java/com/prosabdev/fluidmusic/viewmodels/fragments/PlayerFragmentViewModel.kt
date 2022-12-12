@@ -196,7 +196,7 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
     fun setSortBy(sortBy : String) {
         if(sortBy == mSortBy.value) return
         MainScope().launch {
-            mMutableSortBy.value = sortBy
+            mMutableSortBy.value = sortBy ?: "name"
         }
     }
     fun getSortBy(): LiveData<String> {

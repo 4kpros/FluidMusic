@@ -13,7 +13,7 @@ import com.prosabdev.fluidmusic.workers.WorkerConstantValues
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class PlaylistAddSongsWorker(
+class AddSongsToPlaylistWorker(
     ctx: Context,
     params: WorkerParameters
 ) : CoroutineWorker(ctx, params) {

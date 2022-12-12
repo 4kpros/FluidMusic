@@ -249,7 +249,14 @@ abstract class ImageLoadersUtils {
         fun startExploreContentImageLoaderJob(ctx: Context, imageRequest: ImageRequestItem?) {
             if(imageRequest == null) return
             if(imageRequest.imageView == null) return
-            if(imageRequest.hashedCovertArtSignature == -1) return
+            if(imageRequest.hashedCovertArtSignature == -1) {
+                if(imageRequest.isBlurred){
+                    imageRequest.imageView?.setImageDrawable(null)
+                }else{
+                    loadWithPlaceholderResourceID(ctx, imageRequest.imageView, R.drawable.ic_fluid_music_icon_with_padding)
+                }
+                return
+            }
             if(mImageLoaderRequests.remainingCapacity() <= 5)
             {
                 try{
@@ -287,7 +294,22 @@ abstract class ImageLoadersUtils {
             }
         }
 
-        fun loadWithResourceID(
+        private fun loadWithResourceID(
+            context : Context,
+            imageView : ImageView?,
+            resourceId: Int = 0
+        ){
+            if(imageView == null)
+                return
+
+            MainScope().launch {
+                imageView.setImageBitmap(null)
+                Glide.with(context.applicationContext)
+                    .load(resourceId)
+                    .into(imageView)
+            }
+        }
+        fun loadWithPlaceholderResourceID(
             context : Context,
             imageView : ImageView?,
             resourceId: Int = 0
@@ -298,19 +320,9 @@ abstract class ImageLoadersUtils {
             MainScope().launch {
                 Glide.with(context.applicationContext)
                     .load(resourceId)
-                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                     .placeholder(R.drawable.ic_fluid_music_icon_with_padding)
                     .into(imageView)
             }
-        }
-
-        fun hasImage(view: ImageView): Boolean {
-            val drawable: Drawable? = view.drawable
-            var hasImage = drawable != null
-            if (hasImage && drawable is BitmapDrawable) {
-                hasImage = drawable.bitmap != null
-            }
-            return hasImage
         }
     }
 }

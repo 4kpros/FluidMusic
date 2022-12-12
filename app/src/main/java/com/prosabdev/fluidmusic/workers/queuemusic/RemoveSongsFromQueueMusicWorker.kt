@@ -2,9 +2,7 @@ package com.prosabdev.fluidmusic.workers.queuemusic
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.net.Uri
 import android.util.Log
-import androidx.documentfile.provider.DocumentFile
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -15,7 +13,7 @@ import com.prosabdev.fluidmusic.workers.WorkerConstantValues
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class QueueMusicRemoveSongsWorker(
+class RemoveSongsFromQueueMusicWorker(
     ctx: Context,
     params: WorkerParameters
 ) : CoroutineWorker(ctx, params) {

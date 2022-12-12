@@ -10,7 +10,7 @@ import com.prosabdev.fluidmusic.workers.WorkerConstantValues
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class PlaylistRemoveWorker(
+class RemoveSongsFromPlaylistWorker (
     ctx: Context,
     params: WorkerParameters
 ) : CoroutineWorker(ctx, params) {
@@ -22,12 +22,12 @@ class PlaylistRemoveWorker(
                 Log.i(TAG, "WORKER $TAG : started")
 
                 //Extract worker params
-                val playlistIdArray = inputData.getIntArray(PLAYLIST_ID_ARRAY)
-                if(playlistIdArray != null && playlistIdArray.isNotEmpty()){
-                    for(i in playlistIdArray.indices){
-                        if(playlistIdArray[i] > 0){
-                            //Remove playlist from database
-                            dataResult = AppDatabase.getDatabase(applicationContext).playlistItemDao().deleteAtId(playlistIdArray[i].toLong())
+                val songUriArray = inputData.getStringArray(SONG_URI_ARRAY)
+                if(songUriArray != null && songUriArray.isNotEmpty()){
+                    for(i in songUriArray.indices){
+                        if(songUriArray[i] != null && songUriArray[i].isNotEmpty()){
+                            //Remove songs from playlist from database
+                            dataResult = AppDatabase.getDatabase(applicationContext).playlistSongItemDao().deleteAtSongUri(songUriArray[i])
                         }
                     }
                 }
@@ -46,10 +46,9 @@ class PlaylistRemoveWorker(
             }
         }
     }
-
     companion object {
         const val TAG = "PlaylistAddWorker"
 
-        const val PLAYLIST_ID_ARRAY = "PLAYLIST_ID_ARRAY"
+        const val SONG_URI_ARRAY = "SONG_URI_ARRAY"
     }
 }

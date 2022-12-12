@@ -13,8 +13,7 @@
         style="@style/Widget.Material3.CardView.Filled"
         android:backgroundTint="@color/transparent"
         app:cardElevation="0dp"
-        android:layout_marginHorizontal="@dimen/margin_large_size"
-        android:layout_marginTop="@dimen/margin_large_size"
+        android:layout_margin="@dimen/margin_large_size"
         app:cardCornerRadius="@dimen/corner_radius_medium"
         >
         <RelativeLayout
