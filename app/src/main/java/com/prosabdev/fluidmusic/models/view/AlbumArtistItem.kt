@@ -20,8 +20,12 @@ import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
             "COUNT(DISTINCT songItem.composer) as numberComposers, " +
             "COUNT(songItem.id) as numberTracks, " +
             "SUM(songItem.duration) as totalDuration, " +
-            "MAX(songItem.hashedCovertArtSignature) as hashedCovertArtSignature, " +
-            "(SELECT tempSI.uri FROM SongItem as tempSI WHERE tempSI.hashedCovertArtSignature = songItem.hashedCovertArtSignature LIMIT 1) as uriImage " +
+            "(SELECT tempSI.hashedCovertArtSignature FROM SongItem as tempSI WHERE tempSI.albumArtist = songItem.albumArtist AND tempSI.hashedCovertArtSignature > -1 " +
+            "ORDER BY COALESCE(NULLIF(tempSI.albumArtist,''), tempSI.fileName) COLLATE NOCASE ASC LIMIT 1" +
+            ") as hashedCovertArtSignature," +
+            "(SELECT tempSI.uri FROM SongItem as tempSI WHERE tempSI.albumArtist = songItem.albumArtist AND tempSI.hashedCovertArtSignature > -1 " +
+            "ORDER BY COALESCE(NULLIF(tempSI.albumArtist,''), tempSI.fileName) COLLATE NOCASE ASC LIMIT 1" +
+            ") as uriImage " +
             "FROM SongItem as songItem " +
             "GROUP BY SongItem.albumArtist ORDER BY SongItem.albumArtist"
 )

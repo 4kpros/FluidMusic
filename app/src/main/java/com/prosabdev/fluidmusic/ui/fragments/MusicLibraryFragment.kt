@@ -51,7 +51,6 @@ class MusicLibraryFragment : Fragment() {
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 
-    private val mPlaylistActionsWorkerViewModel: PlaylistActionsWorkerViewModel by activityViewModels()
     private val mQueueMusicActionsWorkerViewModel: QueueMusicActionsWorkerViewModel by activityViewModels()
     private val mSongActionsWorkerViewModel: SongActionsWorkerViewModel by activityViewModels()
 
@@ -89,15 +88,17 @@ class MusicLibraryFragment : Fragment() {
     private fun setupTabLayoutViewPagerAdapter() {
         mFragmentMusicLibraryBinding?.let { fragmentMusicLibraryBinding ->
             mTabLayoutAdapter = TabLayoutAdapter(this)
-            fragmentMusicLibraryBinding.viewPager.adapter = mTabLayoutAdapter
-            fragmentMusicLibraryBinding.viewPager.offscreenPageLimit = 1
-            TabLayoutMediator(
-                fragmentMusicLibraryBinding.tabLayout,
-                fragmentMusicLibraryBinding.viewPager
-            ) { tab, position ->
-                applyToolBarTitle(position, tab)
-            }.attach()
-            fragmentMusicLibraryBinding.viewPager.currentItem = 0
+            MainScope().launch {
+                fragmentMusicLibraryBinding.viewPager.adapter = mTabLayoutAdapter
+                fragmentMusicLibraryBinding.viewPager.offscreenPageLimit = 8
+                TabLayoutMediator(
+                    fragmentMusicLibraryBinding.tabLayout,
+                    fragmentMusicLibraryBinding.viewPager
+                ) { tab, position ->
+                    applyToolBarTitle(position, tab)
+                }.attach()
+                fragmentMusicLibraryBinding.viewPager.currentItem = 0
+            }
         }
     }
     private fun applyToolBarTitle(position: Int, tab: TabLayout.Tab) {

@@ -81,7 +81,9 @@ class AlbumArtistsFragment : Fragment() {
         val view = mDataBidingView?.root
 
         initViews()
-        setupRecyclerViewAdapter()
+        MainScope().launch {
+            setupRecyclerViewAdapter()
+        }
         return view
     }
 
@@ -374,132 +376,140 @@ class AlbumArtistsFragment : Fragment() {
         })
     }
 
-    private fun setupRecyclerViewAdapter() {
-        val ctx : Context = context ?: return
-        //Setup headline adapter
-        val listHeadlines : ArrayList<Int> = ArrayList()
-        listHeadlines.add(0)
-        mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
-            override fun onPlayButtonClicked() {
-                playFirstSong()
-            }
-            override fun onShuffleButtonClicked() {
-                playSongOnShuffle()
-            }
-            override fun onSortButtonClicked() {
-                showSortDialog()
-            }
-            override fun onOrganizeButtonClicked() {
-                showOrganizeDialog()
-            }
-        })
-
-        //Setup generic item adapter
-        mGenericListGridItemAdapter = GenericListGridItemAdapter(
-            ctx,
-            object : GenericListGridItemAdapter.OnItemRequestDataInfo{
-                override fun onRequestDataInfo(dataItem: Any, position: Int): GenericItemListGrid? {
-                    return AlbumArtistItem.castDataItemToGeneric(ctx, dataItem)
+    private suspend fun setupRecyclerViewAdapter() {
+        withContext(Dispatchers.Default){
+            val ctx : Context = context ?: return@withContext
+            //Setup headline adapter
+            val listHeadlines : ArrayList<Int> = ArrayList()
+            listHeadlines.add(0)
+            mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
+                override fun onPlayButtonClicked() {
+                    playFirstSong()
                 }
-                override fun onRequestTextIndexForFastScroller(
-                    dataItem: Any,
-                    position: Int
-                ): String {
-                    return AlbumArtistItem.getStringIndexForFastScroller(dataItem)
+                override fun onShuffleButtonClicked() {
+                    playSongOnShuffle()
                 }
-            },
-            object : GenericListGridItemAdapter.OnItemClickListener{
-                override fun onItemClicked(position: Int) {
-                    if(mMainFragmentViewModel.getSelectMode().value == true){
-                        mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
-                    }else{
-                        openExploreContentFragment(position)
-                    }
+                override fun onSortButtonClicked() {
+                    showSortDialog()
                 }
-                override fun onItemLongPressed(position: Int) {
-                    mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
-                }
-            },
-            object : SelectableItemListAdapter.OnSelectSelectableItemListener{
-                override fun onSelectModeChange(selectMode: Boolean) {
-                    mMainFragmentViewModel.setSelectMode(selectMode)
-                }
-                override fun onRequestGetStringIndex(position: Int): String {
-                    return AlbumArtistItem.getStringIndexForSelection(
-                        mGenericListGridItemAdapter?.currentList?.get(position)
-                    )
-                }
-                override fun onSelectedListChange(selectedList: HashMap<Int, String>) {
-                    mMainFragmentViewModel.setSelectedDataList(selectedList)
-                }
-            },
-            AlbumArtistItem.diffCallback as DiffUtil.ItemCallback<Any>,
-            mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE,
-            mIsSelectable = true,
-            mHavePlaybackState = false,
-            mIsImageFullCircle = false,
-        )
-
-        //Setup empty bottom space adapter
-        val listEmptyBottomSpace : ArrayList<String> = ArrayList()
-        listEmptyBottomSpace.add("")
-        mEmptyBottomAdapter = EmptyBottomAdapter(listEmptyBottomSpace)
-
-        //Setup concat adapter
-        mConcatAdapter = ConcatAdapter()
-        mHeadlineTopPlayShuffleAdapter?.let {
-            mConcatAdapter?.addAdapter(it)
-        }
-        mGenericListGridItemAdapter?.let {
-            mConcatAdapter?.addAdapter(it)
-        }
-        mEmptyBottomAdapter?.let {
-            mConcatAdapter?.addAdapter(it)
-        }
-
-        //Add Layout manager
-        val initialSpanCount : Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value)
-        mLayoutManager = GridLayoutManager(ctx, initialSpanCount, GridLayoutManager.VERTICAL, false)
-        mLayoutManager?.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                val newSpanCount : Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value)
-                val updatedSpan : Int = if(mLayoutManager?.spanCount == newSpanCount) newSpanCount else mLayoutManager?.spanCount ?: 1
-                return when (position) {
-                    0 -> updatedSpan
-                    ((mLayoutManager?.itemCount ?: 0) - 1) -> updatedSpan
-                    else -> 1
-                }
-            }
-        }
-        mDataBidingView?.let { dataBidingView ->
-            dataBidingView.recyclerView.adapter = mConcatAdapter
-            dataBidingView.recyclerView.layoutManager = mLayoutManager
-            val newSpanCount : Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value)
-            val updatedSpan : Int = if(mLayoutManager?.spanCount == newSpanCount) newSpanCount else mLayoutManager?.spanCount ?: 1
-            mItemDecoration = GridSpacingItemDecoration(updatedSpan)
-            mItemDecoration?.let {
-                dataBidingView.recyclerView.addItemDecoration(it)
-            }
-
-            dataBidingView.fastScroller.setSectionIndexer(mGenericListGridItemAdapter)
-            dataBidingView.fastScroller.attachRecyclerView(dataBidingView.recyclerView)
-            dataBidingView.fastScroller.setFastScrollListener(object :
-                FastScroller.FastScrollListener {
-                override fun onFastScrollStart(fastScroller: FastScroller) {
-                    mMainFragmentViewModel.setIsFastScrolling(true)
-                }
-
-                override fun onFastScrollStop(fastScroller: FastScroller) {
-                    mMainFragmentViewModel.setIsFastScrolling(false)
-                    if (mDataBidingView?.recyclerView?.canScrollVertically(-1) == false) {
-                        //On scrolled to top
-                        mMainFragmentViewModel.setScrollingState(-2)
-                    }else if(mDataBidingView?.recyclerView?.canScrollVertically(1) == false){
-                        //On scrolled to bottom
-                        mMainFragmentViewModel.setScrollingState(2)
-                    }
+                override fun onOrganizeButtonClicked() {
+                    showOrganizeDialog()
                 }
             })
+
+            //Setup generic item adapter
+            mGenericListGridItemAdapter = GenericListGridItemAdapter(
+                ctx,
+                object : GenericListGridItemAdapter.OnItemRequestDataInfo{
+                    override fun onRequestDataInfo(dataItem: Any, position: Int): GenericItemListGrid? {
+                        return AlbumArtistItem.castDataItemToGeneric(ctx, dataItem)
+                    }
+                    override fun onRequestTextIndexForFastScroller(
+                        dataItem: Any,
+                        position: Int
+                    ): String {
+                        return AlbumArtistItem.getStringIndexForFastScroller(dataItem)
+                    }
+                },
+                object : GenericListGridItemAdapter.OnItemClickListener{
+                    override fun onItemClicked(position: Int) {
+                        if(mMainFragmentViewModel.getSelectMode().value == true){
+                            mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
+                        }else{
+                            openExploreContentFragment(position)
+                        }
+                    }
+                    override fun onItemLongPressed(position: Int) {
+                        mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
+                    }
+                },
+                object : SelectableItemListAdapter.OnSelectSelectableItemListener{
+                    override fun onSelectModeChange(selectMode: Boolean) {
+                        mMainFragmentViewModel.setSelectMode(selectMode)
+                    }
+                    override fun onRequestGetStringIndex(position: Int): String {
+                        return AlbumArtistItem.getStringIndexForSelection(
+                            mGenericListGridItemAdapter?.currentList?.get(position)
+                        )
+                    }
+                    override fun onSelectedListChange(selectedList: HashMap<Int, String>) {
+                        mMainFragmentViewModel.setSelectedDataList(selectedList)
+                    }
+                },
+                AlbumArtistItem.diffCallback as DiffUtil.ItemCallback<Any>,
+                mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE,
+                mIsSelectable = true,
+                mHavePlaybackState = false,
+                mIsImageFullCircle = false,
+            )
+
+            //Setup empty bottom space adapter
+            val listEmptyBottomSpace : ArrayList<String> = ArrayList()
+            listEmptyBottomSpace.add("")
+            mEmptyBottomAdapter = EmptyBottomAdapter(listEmptyBottomSpace)
+
+            //Setup concat adapter
+            mConcatAdapter = ConcatAdapter()
+            mHeadlineTopPlayShuffleAdapter?.let {
+                mConcatAdapter?.addAdapter(it)
+            }
+            mGenericListGridItemAdapter?.let {
+                mConcatAdapter?.addAdapter(it)
+            }
+            mEmptyBottomAdapter?.let {
+                mConcatAdapter?.addAdapter(it)
+            }
+
+            //Add Layout manager
+            val initialSpanCount : Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value)
+            mLayoutManager = GridLayoutManager(ctx, initialSpanCount, GridLayoutManager.VERTICAL, false)
+            mLayoutManager?.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    val newSpanCount : Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value)
+                    val updatedSpan : Int = if(mLayoutManager?.spanCount == newSpanCount) newSpanCount else mLayoutManager?.spanCount ?: 1
+                    return when (position) {
+                        0 -> updatedSpan
+                        ((mLayoutManager?.itemCount ?: 0) - 1) -> updatedSpan
+                        else -> 1
+                    }
+                }
+            }
+            mDataBidingView?.let { dataBidingView ->
+                MainScope().launch {
+                    dataBidingView.recyclerView.adapter = mConcatAdapter
+                    dataBidingView.recyclerView.layoutManager = mLayoutManager
+                }
+                val newSpanCount : Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value)
+                val updatedSpan : Int = if(mLayoutManager?.spanCount == newSpanCount) newSpanCount else mLayoutManager?.spanCount ?: 1
+                mItemDecoration = GridSpacingItemDecoration(updatedSpan)
+                mItemDecoration?.let {
+                    MainScope().launch {
+                        dataBidingView.recyclerView.addItemDecoration(it)
+                    }
+                }
+
+                MainScope().launch {
+                    dataBidingView.fastScroller.setSectionIndexer(mGenericListGridItemAdapter)
+                    dataBidingView.fastScroller.attachRecyclerView(dataBidingView.recyclerView)
+                    dataBidingView.fastScroller.setFastScrollListener(object :
+                        FastScroller.FastScrollListener {
+                        override fun onFastScrollStart(fastScroller: FastScroller) {
+                            mMainFragmentViewModel.setIsFastScrolling(true)
+                        }
+
+                        override fun onFastScrollStop(fastScroller: FastScroller) {
+                            mMainFragmentViewModel.setIsFastScrolling(false)
+                            if (mDataBidingView?.recyclerView?.canScrollVertically(-1) == false) {
+                                //On scrolled to top
+                                mMainFragmentViewModel.setScrollingState(-2)
+                            }else if(mDataBidingView?.recyclerView?.canScrollVertically(1) == false){
+                                //On scrolled to bottom
+                                mMainFragmentViewModel.setScrollingState(2)
+                            }
+                        }
+                    })
+                }
+            }
         }
     }
 

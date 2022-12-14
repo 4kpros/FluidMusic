@@ -21,8 +21,12 @@ import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
             "COUNT(DISTINCT songItem.composer) as numberComposers, " +
             "COUNT(songItem.id) as numberTracks, " +
             "SUM(songItem.duration) as totalDuration, " +
-            "MAX(songItem.hashedCovertArtSignature) as hashedCovertArtSignature, " +
-            "(SELECT tempSI.uri FROM SongItem as tempSI WHERE tempSI.hashedCovertArtSignature = songItem.hashedCovertArtSignature LIMIT 1) as uriImage " +
+            "(SELECT tempSI.hashedCovertArtSignature FROM SongItem as tempSI WHERE tempSI.folder = songItem.folder AND tempSI.hashedCovertArtSignature > -1 " +
+            "ORDER BY COALESCE(NULLIF(tempSI.folder,''), tempSI.fileName) COLLATE NOCASE ASC LIMIT 1" +
+            ") as hashedCovertArtSignature," +
+            "(SELECT tempSI.uri FROM SongItem as tempSI WHERE tempSI.folder = songItem.folder AND tempSI.hashedCovertArtSignature > -1 " +
+            "ORDER BY COALESCE(NULLIF(tempSI.folder,''), tempSI.fileName) COLLATE NOCASE ASC LIMIT 1" +
+            ") as uriImage " +
             "FROM SongItem as songItem " +
             "INNER JOIN FolderUriTree as folderUriTree ON songItem.uriTreeId = folderUriTree.id " +
             "GROUP BY SongItem.folder ORDER BY SongItem.folder"
@@ -66,10 +70,10 @@ class FolderItem {
             if(dataItem is FolderItem) {
                 tempResult = GenericItemListGrid()
                 val tempTitle : String = dataItem.name.ifEmpty { ctx.getString(R.string.unknown_folder) }
-                val tempSubtitle : String = dataItem.parentFolder.ifEmpty { "/" }
+                val tempSubtitle : String = dataItem.parentFolder.ifEmpty { dataItem.deviceName }
                 val tempDetails = ""
-                tempResult.title = tempTitle
-                tempResult.subtitle = tempSubtitle
+                tempResult.title = "/${tempTitle}"
+                tempResult.subtitle = if(tempSubtitle == dataItem.deviceName) tempSubtitle else "/${tempSubtitle}"
                 tempResult.details = tempDetails
                 tempResult.imageUri = Uri.parse(dataItem.uriImage)
                 tempResult.imageHashedSignature = dataItem.hashedCovertArtSignature

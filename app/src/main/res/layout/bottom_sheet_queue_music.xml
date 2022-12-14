@@ -23,7 +23,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_toStartOf="@+id/drag_handle"
                 android:layout_alignParentStart="true"
                 android:gravity="start"
                 >
@@ -41,7 +40,6 @@
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@+id/drag_handle"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:gravity="end"
