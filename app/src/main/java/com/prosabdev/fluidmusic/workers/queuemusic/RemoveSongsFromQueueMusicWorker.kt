@@ -27,16 +27,14 @@ class RemoveSongsFromQueueMusicWorker(
                 //Extract worker params
                 val modelType = inputData.getString(WorkerConstantValues.ITEM_LIST_MODEL_TYPE)
                 val itemsList = inputData.getStringArray(WorkerConstantValues.ITEM_LIST)
-                val orderBy = inputData.getString(WorkerConstantValues.ITEM_LIST_ORDER_BY)
                 val whereClause = inputData.getString(WorkerConstantValues.ITEM_LIST_WHERE)
-                val indexColum = inputData.getString(WorkerConstantValues.INDEX_COLUM)
+                val whereColumn = inputData.getString(WorkerConstantValues.WHERE_COLUMN_INDEX)
                 //Delete songs from queue music
                 val dataResult = tryToDeleteSongsFromSource(
                     modelType,
                     itemsList,
-                    indexColum,
-                    orderBy,
                     whereClause,
+                    whereColumn
                 )
                 Log.i(TAG, "WORKER $TAG : DELETED SONGS ON QUEUE MUSIC : ${dataResult} ")
 
@@ -79,9 +77,8 @@ class RemoveSongsFromQueueMusicWorker(
     private fun tryToDeleteSongsFromSource(
         modelType: String?,
         itemsList: Array<String>?,
-        indexColum: String?,
-        orderBy: String?,
-        whereClause: String?
+        whereClause: String?,
+        whereColumn: String?
     ): Int {
         var resultList = 0
         if(
@@ -93,27 +90,25 @@ class RemoveSongsFromQueueMusicWorker(
             resultList = removeSongsFromQueueMusic(itemsList)
         }else{
             if(
-                indexColum == null || indexColum.isEmpty() ||
-                orderBy == null || orderBy.isEmpty() ||
-                whereClause == null || whereClause.isEmpty()
+                whereClause == null || whereClause.isEmpty() ||
+                whereColumn == null || whereColumn.isEmpty()
             ) return 0
 
             for (i in itemsList.indices){
+                val tempFieldValue = itemsList[i]
                 val tempSongUriList =
                     when (whereClause) {
                         //If it is standard content explorer, then get all songs uri directly
                         WorkerConstantValues.ITEM_LIST_WHERE_EQUAL ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereEqual(
-                                indexColum,
-                                itemsList[i],
-                                orderBy
+                                whereColumn,
+                                tempFieldValue
                             )
                         //If it is from search view, get songs uri directly with "where like" clause
                         WorkerConstantValues.ITEM_LIST_WHERE_LIKE ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereLike(
-                                indexColum,
-                                itemsList[i],
-                                orderBy
+                                whereColumn,
+                                tempFieldValue
                             )
                         else -> null
                     }

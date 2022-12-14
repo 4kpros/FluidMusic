@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.DialogInterface.OnShowListener
 import android.os.Bundle
+import android.provider.MediaStore.Audio.Genres
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,12 +13,17 @@ import com.google.android.exoplayer2.util.Log
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetOrganizeItemsBinding
+import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
+import com.prosabdev.fluidmusic.ui.fragments.PlaylistsFragment
+import com.prosabdev.fluidmusic.ui.fragments.StreamsFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.*
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
+import java.time.Year
 
 class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnShowListener {
 
-    private var mBottomSheetOrganizeItemsBinding: BottomSheetOrganizeItemsBinding? = null
+    private var mDataBidingView: BottomSheetOrganizeItemsBinding? = null
 
     private var mGenericListenDataViewModel: GenericListenDataViewModel? = null
 
@@ -29,8 +35,8 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mBottomSheetOrganizeItemsBinding = DataBindingUtil.inflate(inflater, R.layout._bottom_sheet_organize_items, container, false)
-        val view = mBottomSheetOrganizeItemsBinding?.root
+        mDataBidingView = DataBindingUtil.inflate(inflater, R.layout._bottom_sheet_organize_items, container, false)
+        val view = mDataBidingView?.root
 
         initViews()
 
@@ -44,7 +50,7 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
     }
 
     private fun checkInteractions() {
-        mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.setOnCheckedChangeListener { _, checkedId ->
+        mDataBidingView?.radioGroupOrganize?.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.radio_list_extra_small -> {
                     mGenericListenDataViewModel?.setOrganizeListGrid(ConstantValues.ORGANIZE_LIST_EXTRA_SMALL)
@@ -94,58 +100,132 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
     }
 
     private fun initViews() {
+        updateTitleUI()
         updateCheckedOrganizeButtonUI()
     }
+
+    private fun updateTitleUI() {
+        when (mFromSource) {
+            AllSongsFragment.TAG -> {
+                mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.all_songs) ?: ""
+            }
+            AlbumsFragment.TAG -> {
+                mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.albums) ?: ""
+            }
+            AlbumArtistsFragment.TAG -> {
+                mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.album_artists) ?: ""
+            }
+            ArtistsFragment.TAG -> {
+                mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.artists) ?: ""
+            }
+            ComposersFragment.TAG -> {
+                mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.composers) ?: ""
+            }
+            FoldersFragment.TAG -> {
+                mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.folders) ?: ""
+            }
+            GenresFragment.TAG -> {
+                mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.genres) ?: ""
+            }
+            YearsFragment.TAG -> {
+                mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.years) ?: ""
+            }
+            PlaylistsFragment.TAG -> {
+                mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.playlists) ?: ""
+            }
+//            FavoritesFragment.TAG -> {
+//                mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.favorites) ?: ""
+//            }
+            StreamsFragment.TAG -> {
+                mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.streams) ?: ""
+            }
+            ExploreContentsForFragment.TAG -> {
+                when (mFromSourceValue) {
+                    AlbumsFragment.TAG -> {
+                        mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.songs_for_album) ?: ""
+                    }
+                    AlbumArtistsFragment.TAG -> {
+                        mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.songs_for_album_artist) ?: ""
+                    }
+                    ArtistsFragment.TAG -> {
+                        mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.songs_for_artist) ?: ""
+                    }
+                    ComposersFragment.TAG -> {
+                        mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.songs_for_composer) ?: ""
+                    }
+                    FoldersFragment.TAG -> {
+                        mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.songs_for_folder) ?: ""
+                    }
+                    GenresFragment.TAG -> {
+                        mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.songs_for_genre) ?: ""
+                    }
+                    YearsFragment.TAG -> {
+                        mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.songs_for_year) ?: ""
+                    }
+                    PlaylistsFragment.TAG -> {
+                        mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.songs_for_playlist) ?: ""
+                    }
+//                    FavoritesFragment.TAG -> {
+//                        mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.songs_for_favorites) ?: ""
+//                    }
+                    StreamsFragment.TAG -> {
+                        mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.songs_for_stream) ?: ""
+                    }
+                }
+            }
+        }
+    }
+
     private fun updateCheckedOrganizeButtonUI() {
         if(mGenericListenDataViewModel == null) return
         val tempOrganize : Int = mGenericListenDataViewModel?.getOrganizeListGrid()?.value ?: return
-        mBottomSheetOrganizeItemsBinding?.let { bottomSheetOrganizeItemsBinding ->
+        mDataBidingView?.let { bottomSheetOrganizeItemsBinding ->
             when (tempOrganize) {
                 ConstantValues.ORGANIZE_LIST_EXTRA_SMALL -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListExtraSmall.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListExtraSmall.id)
                 }
                 ConstantValues.ORGANIZE_LIST_SMALL -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListSmall.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListSmall.id)
                 }
                 ConstantValues.ORGANIZE_LIST_MEDIUM -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListMedium.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListMedium.id)
                 }
                 ConstantValues.ORGANIZE_LIST_LARGE -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListLarge.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListLarge.id)
                 }
                 ConstantValues.ORGANIZE_LIST_SMALL_NO_IMAGE -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListSmallNoImage.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListSmallNoImage.id)
                 }
                 ConstantValues.ORGANIZE_LIST_MEDIUM_NO_IMAGE -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListMediumNoImage.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListMediumNoImage.id)
                 }
                 ConstantValues.ORGANIZE_LIST_LARGE_NO_IMAGE -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListLargeNoImage.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListLargeNoImage.id)
                 }
 
                 ConstantValues.ORGANIZE_GRID_EXTRA_SMALL -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridExtraSmall.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridExtraSmall.id)
                 }
                 ConstantValues.ORGANIZE_GRID_SMALL -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridSmall.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridSmall.id)
                 }
                 ConstantValues.ORGANIZE_GRID_MEDIUM -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridMedium.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridMedium.id)
                 }
                 ConstantValues.ORGANIZE_GRID_LARGE -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridLarge.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridLarge.id)
                 }
                 ConstantValues.ORGANIZE_GRID_EXTRA_LARGE -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridExtraLarge.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridExtraLarge.id)
                 }
                 ConstantValues.ORGANIZE_GRID_SMALL_NO_IMAGE -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridSmallNoImage.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridSmallNoImage.id)
                 }
                 ConstantValues.ORGANIZE_GRID_MEDIUM_NO_IMAGE -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridMediumNoImage.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridMediumNoImage.id)
                 }
                 else -> {
-                    mBottomSheetOrganizeItemsBinding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListSmall.id)
+                    mDataBidingView?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListSmall.id)
                 }
             }
         }

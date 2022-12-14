@@ -16,7 +16,7 @@ class PlaylistSongItem {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
     var playlistId: Long = 0
-    var songUri: String? = null
+    var songUri: String = ""
     var lastAddedDateToLibrary: Long = 0
 
     companion object {

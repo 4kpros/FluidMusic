@@ -22,13 +22,56 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
+    <string name="fluid_music">Fluid Music</string>
+    <string name="music_player">Music player</string>
 
-    <string name="folders">Folders</string>
     <string name="songs">Songs</string>
-    <string name="all_songs">All songs</string>
-    <string name="albums">Albums</string>
-    <string name="artists">Artists</string>
+    <string name="explore">Explore</string>
+
+    //Songs info
+    <string name="album">Album</string>
+    <string name="artist">Artist</string>
     <string name="genre">Genre</string>
+    <string name="tracks">Tracks</string>
+    <string name="date">Date</string>
+    <string name="duration">Duration</string>
+    <string name="year">Year</string>
+    <string name="title">Title</string>
+    <string name="folder">Folder</string>
+    <string name="file">File</string>
+    <string name="file_name">File name</string>
+    <string name="file_path">File path</string>
+    <string name="file_size">File size</string>
+    <string name="track">Track</string>
+    <string name="disc">Disc</string>
+    <string name="album_artist">Album artist</string>
+    <string name="composer">Composer</string>
+    <string name="many_artists">Many artists</string>
+    <string name="track_number">Track number #</string>
+    <string name="disc_number">Disc number #</string>
+    <string name="added_date_to_library">Added date to library</string>
+    <string name="last_modified_date">Last modified date</string>
+    <string name="file_path_case_sensitive">File path case sensitive</string>
+    <string name="size">Size</string>
+    <string name="mime_type">Mime type</string>
+    <string name="rating">Rating</string>
+    <string name="author">Author</string>
+    <string name="writer">Writer</string>
+    <string name="language">Language</string>
+    <string name="sample_rate">Sample rate</string>
+    <string name="bitrate">Bitrate</string>
+    <string name="name">Name</string>
+    <string name="total_duration">Total duration</string>
+    <string name="song_count">Song count</string>
+    <string name="artist_count">Artist count</string>
+    <string name="album_artist_count">Album artist count</string>
+    <string name="composer_count">Composer count</string>
+    <string name="album_count">Album count</string>
+    <string name="album_name">Album name</string>
+    <string name="artist_name">Artist name</string>
+    <string name="composer_name">Composer name</string>
+    <string name="folder_name">Folder name</string>
+    //
     <string name="unknown_artist">Unknown artist</string>
     <string name="unknown_album_artist">Unknown album artist</string>
     <string name="unknown_artists">Unknown artists</string>
@@ -39,11 +82,33 @@
     <string name="unknown_folder">Unknown folder</string>
     <string name="unknown_folder_parent">Unknown folder parent</string>
     <string name="unknown_year">Unknown year</string>
+    //
+    <string name="songs_for_album">Songs for album</string>
+    <string name="songs_for_album_artist">Songs for album artist</string>
+    <string name="songs_for_artist">Songs for artist</string>
+    <string name="songs_for_composer">Songs for composer</string>
+    <string name="songs_for_folder">Songs for folder</string>
+    <string name="songs_for_genre">Songs for genre</string>
+    <string name="songs_for_year">Songs for year</string>
+    <string name="songs_for_playlist">Songs for playlist</string>
+    <string name="songs_for_favorites">Songs for favorites</string>
+    <string name="songs_for_stream">Songs for stream</string>
+    //
+    <string name="all_songs">All songs</string>
+    <string name="albums">Albums</string>
+    <string name="album_artists">Album artists</string>
+    <string name="artists">Artists</string>
+    <string name="composers">Composers</string>
+    <string name="folders">Folders</string>
+    <string name="genres">Genres</string>
+    <string name="years">Years</string>
+    <string name="playlists">Playlists</string>
+    <string name="favorites">Favorites</string>
+    <string name="streams">Streams</string>
+
     <string name="pause">Pause</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-    <string name="fluid_music">Fluid Music</string>
-    <string name="music_player">Music player</string>
     <string name="close">Close</string>
     <string name="delete">Delete</string>
     <string name="sort">Sort</string>
@@ -56,16 +121,9 @@
     <string name="all">All</string>
     <string name="random">Random</string>
     <string name="range">Range</string>
-    <string name="date">Date</string>
-    <string name="duration">Duration</string>
-    <string name="year">Year</string>
-    <string name="title">Title</string>
     <string name="high_resolution">High resolution</string>
-    <string name="file_name">File name</string>
     <string name="location">Location</string>
     <string name="browse">Browse</string>
-    <string name="artist">Artist</string>
-    <string name="album">Album</string>
     <string name="playing_date">Playing date</string>
     <string name="play_count">Play count</string>
     <string name="invert">Invert</string>
@@ -96,8 +154,6 @@
     <string name="get_started">Get started</string>
     <string name="get_permissions">Get permissions</string>
     <string name="queue_music">Queue music</string>
-    <string name="favorites">Favorites</string>
-    <string name="playlists">Playlists</string>
     <string name="device_explorer">Device explorer</string>
     <string name="music_library">Music library</string>
     <string name="settings">Settings</string>
@@ -110,19 +166,12 @@
     <string name="title_activity_media_scanner">Media scanner</string>
     <string name="rescan_device">Rescan device</string>
     <string name="equalizer">Equalizer</string>
-    <string name="streams">Streams</string>
     <string name="folders_hierarchy">Folders hierarchy</string>
 
     ///
     <string name="item_song_card_text_details">%1$s | %2$s</string>
     //
-    <string name="file_size">File size</string>
-    <string name="track">Track</string>
-    <string name="disc">Disc</string>
-    <string name="album_artist">Album artist</string>
-    <string name="composer">Composer</string>
     <string name="details">Details</string>
-    <string name="file_path">File path</string>
     <string name="edit">Edit</string>
     <string name="song_info_tags">Song info/Tags</string>
     //
@@ -135,11 +184,13 @@
     //
     <string name="_music_content_by">Music file : %1$s By %2$s</string>
     //
+    <string name="play">Play</string>
+    <string name="shuffle">Shuffle</string>
+    <string name="paused">Paused</string>
+    //
     <string name="disabled">Disabled</string>
-    <string name="folder">Folder</string>
     <string name="delete_file">Delete file</string>
     <string name="lets_go">Let\'s go</string>
-    <string name="file">File</string>
     <string name="share_file">Share file</string>
     <string name="share_screenshot">Share screenshot</string>
     <string name="currently_listening_icon">Currently listening 🎵</string>
@@ -162,43 +213,10 @@
     <string name="add_new_playlist">Add new playlist</string>
     <string name="save">Save</string>
     <string name="playlist_name">Playlist name</string>
-    <string name="play">Play</string>
-    <string name="shuffle">Shuffle</string>
-    <string name="paused">Paused</string>
-    <string name="explore">Explore</string>
-    <string name="tracks">Tracks</string>
-    <string name="genres">Genres</string>
-    <string name="years">Years</string>
-    <string name="composers">Composers</string>
-    <string name="album_artists">Album artists</string>
     <string name="edit_tags">Edit tags</string>
     <string name="play_after">Play after</string>
-    <string name="many_artists">Many artists</string>
-    <string name="track_number">Track number #</string>
-    <string name="disc_number">Disc number #</string>
-    <string name="added_date_to_library">Added date to library</string>
-    <string name="last_modified_date">Last modified date</string>
-    <string name="file_path_case_sensitive">File path case sensitive</string>
-    <string name="size">Size</string>
-    <string name="mime_type">Mime type</string>
-    <string name="rating">Rating</string>
-    <string name="author">Author</string>
-    <string name="writer">Writer</string>
-    <string name="language">Language</string>
-    <string name="sample_rate">Sample rate</string>
-    <string name="bitrate">Bitrate</string>
-    <string name="name">Name</string>
-    <string name="total_duration">Total duration</string>
-    <string name="song_count">Song count</string>
-    <string name="artist_count">Artist count</string>
-    <string name="album_artist_count">Album artist count</string>
-    <string name="composer_count">Composer count</string>
-    <string name="album_count">Album count</string>
-    <string name="album_name">Album name</string>
-    <string name="artist_name">Artist name</string>
-    <string name="composer_name">Composer name</string>
-    <string name="folder_name">Folder name</string>
 
+    //List grid organize
     <string name="list">List</string>
     <string name="list_extra_small">List extra small</string>
     <string name="list_small">List small</string>
@@ -215,6 +233,8 @@
     <string name="grid_extra_large">Grid extra large</string>
     <string name="grid_small_no_image">Grid small no image</string>
     <string name="grid_medium_no_image">Grid medium no image</string>
+
+    //
     <string name="add_to_top">Add to top</string>
     <string name="play_next">Play next</string>
     <string name="add_to_end">Add to end</string>

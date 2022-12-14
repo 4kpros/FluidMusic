@@ -42,11 +42,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 style="@style/TextAppearance.Material3.TitleMedium"
-                android:text=" for ALBUMS"
+                android:text=""
+                android:textAllCaps="true"
+                app:autoSizeTextType="uniform"
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:layout_weight="1"
-                android:layout_marginEnd="@dimen/margin_small_size" />
+                android:layout_marginStart="@dimen/margin_small_size"
+                android:layout_marginEnd="@dimen/margin_small_size"
+                />
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/checkbox_invert_items"

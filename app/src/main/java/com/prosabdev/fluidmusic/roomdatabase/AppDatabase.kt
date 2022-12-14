@@ -35,7 +35,7 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
         GenreItem::class,
         YearItem::class,
            ],
-    version = 77)
+    version = 81)
 
 abstract class AppDatabase : RoomDatabase() {
 
@@ -57,7 +57,7 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        private const val FLUID_MUSIC_DATABASE_NAME = "${ConstantValues.PACKAGE_NAME}.main_database"
+        private const val FLUID_MUSIC_DATABASE_NAME = "${ConstantValues.PACKAGE_NAME}.main_database_name"
 
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {

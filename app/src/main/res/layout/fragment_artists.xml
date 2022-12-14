@@ -7,31 +7,38 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.fragments.explore.ArtistsFragment">
-
+        tools:context=".ui.fragments.explore.ArtistsFragment"
+        >
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />
-        <com.l4digital.fastscroll.FastScroller
-            android:id="@+id/fast_scroller"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_fast_scroller_container"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:layout_gravity="end"
-            app:hideScrollbar="true"
-            app:bubbleSize="small"
-            app:showBubble="true"
-            app:showBubbleAlways="false"
-            app:bubbleTextColor="?colorOnPrimary"
-            app:bubbleColor="?colorPrimary"
-            app:handleColor="?colorPrimary"
-            app:trackColor="?colorOutline"
-            />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_alignTop="@+id/recycler_view"
+            android:layout_alignBottom="@+id/recycler_view"
+            android:layout_alignParentEnd="true"
+            >
+            <com.l4digital.fastscroll.FastScroller
+                android:id="@+id/fast_scroller"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:hideScrollbar="true"
+                app:bubbleSize="small"
+                app:showBubble="true"
+                app:showBubbleAlways="false"
+                app:bubbleTextColor="?colorOnPrimary"
+                app:bubbleColor="?colorPrimary"
+                app:handleColor="?colorPrimary"
+                app:trackColor="?colorOutline"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
 </layout>

@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.graphics.Bitmap
+import android.icu.text.CaseMap.Fold
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -21,16 +22,24 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
+import com.prosabdev.fluidmusic.databinding.DialogAddToQueueMusicBinding
 import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
+import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 import com.prosabdev.fluidmusic.models.songitem.SongItem
+import com.prosabdev.fluidmusic.models.view.*
 import com.prosabdev.fluidmusic.service.intents.IntentActionsManager
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.EditTagsBottomSheetDialogFragment
-import com.prosabdev.fluidmusic.ui.fragments.explore.AlbumsFragment
-import com.prosabdev.fluidmusic.ui.fragments.explore.AllSongsFragment
-import com.prosabdev.fluidmusic.ui.fragments.explore.ArtistsFragment
+import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
+import com.prosabdev.fluidmusic.ui.fragments.explore.*
 import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.workers.PlaylistActionsWorkerViewModel
+import com.prosabdev.fluidmusic.viewmodels.workers.QueueMusicActionsWorkerViewModel
+import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
+import com.prosabdev.fluidmusic.workers.WorkerConstantValues
+import com.prosabdev.fluidmusic.workers.queuemusic.AddSongsToQueueMusicWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -40,6 +49,11 @@ class MusicLibraryFragment : Fragment() {
     private var mFragmentMusicLibraryBinding: FragmentMusicLibraryBinding? = null
 
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
+    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
+
+    private val mPlaylistActionsWorkerViewModel: PlaylistActionsWorkerViewModel by activityViewModels()
+    private val mQueueMusicActionsWorkerViewModel: QueueMusicActionsWorkerViewModel by activityViewModels()
+    private val mSongActionsWorkerViewModel: SongActionsWorkerViewModel by activityViewModels()
 
     private val mEditTagsBottomSheetDialogFragment: EditTagsBottomSheetDialogFragment = EditTagsBottomSheetDialogFragment.newInstance()
 
@@ -119,9 +133,9 @@ class MusicLibraryFragment : Fragment() {
         mMainFragmentViewModel.getSelectMode().observe(viewLifecycleOwner) {
             updateSelectModeUI(it)
         }
-        mMainFragmentViewModel.getTotalSelected().observe(viewLifecycleOwner
-        ) { totalSelected ->
-            updateTotalSelectedItemsUI(totalSelected ?: 0)
+        mMainFragmentViewModel.getSelectedDataList().observe(viewLifecycleOwner
+        ) { dataList ->
+            updateTotalSelectedItemsUI(dataList.size)
         }
         mMainFragmentViewModel.getIsFastScrolling().observe(viewLifecycleOwner){
             tryToUpdateFastScrollStateUI(it)
@@ -230,7 +244,7 @@ class MusicLibraryFragment : Fragment() {
                     super.onPageSelected(position)
                     updateViewModelLibraryPage(position)
                     mMainFragmentViewModel.setSelectMode(false)
-                    mMainFragmentViewModel.setTotalSelected(0)
+                    mMainFragmentViewModel.setSelectedDataList(HashMap())
                     updateSelectModeUI(false)
                     applyAppBarTitle(position)
                 }
@@ -263,7 +277,7 @@ class MusicLibraryFragment : Fragment() {
 
     private fun updateViewModelLibraryPage(position: Int) {
         mMainFragmentViewModel.setTotalCount(0)
-        mMainFragmentViewModel.setTotalSelected(0)
+        mMainFragmentViewModel.setSelectedDataList(HashMap())
         mMainFragmentViewModel.setSelectMode(false)
         when (position) {
             0 -> {
@@ -272,8 +286,23 @@ class MusicLibraryFragment : Fragment() {
             1 -> {
                 mMainFragmentViewModel.setCurrentSelectablePage(AlbumsFragment.TAG)
             }
-            3 -> {
+            2 -> {
                 mMainFragmentViewModel.setCurrentSelectablePage(ArtistsFragment.TAG)
+            }
+            3 -> {
+                mMainFragmentViewModel.setCurrentSelectablePage(FoldersFragment.TAG)
+            }
+            4 -> {
+                mMainFragmentViewModel.setCurrentSelectablePage(GenresFragment.TAG)
+            }
+            5 -> {
+                mMainFragmentViewModel.setCurrentSelectablePage(AlbumArtistsFragment.TAG)
+            }
+            6 -> {
+                mMainFragmentViewModel.setCurrentSelectablePage(ComposersFragment.TAG)
+            }
+            7 -> {
+                mMainFragmentViewModel.setCurrentSelectablePage(YearsFragment.TAG)
             }
         }
     }
@@ -281,6 +310,14 @@ class MusicLibraryFragment : Fragment() {
     private fun openShareSelectionDialog() {
         context?.let { ctx ->
             val dialogShareSongBinding : DialogShareSongBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_share_song, null, false)
+            dialogShareSongBinding.buttonShareScreenshot.isEnabled =
+                (mMainFragmentViewModel.getSelectedDataList().value?.size ?: 0) <= 1
+            dialogShareSongBinding.buttonShareFile.setOnClickListener {
+                shareSelectedFiles()
+            }
+            dialogShareSongBinding.buttonShareScreenshot.setOnClickListener {
+                shareScreenShootForSelectedUniqueItem()
+            }
             MaterialAlertDialogBuilder(this.requireContext())
                 .setTitle(ctx.getString(R.string.share))
                 .setIcon(R.drawable.share)
@@ -292,6 +329,15 @@ class MusicLibraryFragment : Fragment() {
                 }
         }
     }
+
+    private fun shareSelectedFiles() {
+        //
+    }
+
+    private fun shareScreenShootForSelectedUniqueItem() {
+        //
+    }
+
     private fun openDeleteSelectionDialog() {
         MaterialAlertDialogBuilder(this.requireContext())
             .setTitle(resources.getString(R.string.dialog_delete_selection_title))
@@ -306,18 +352,75 @@ class MusicLibraryFragment : Fragment() {
             .show()
     }
     private fun deleteSelection() {
-        mMainFragmentViewModel.getSelectMode()
-        Toast.makeText(this.requireContext(), "On delete selection", Toast.LENGTH_SHORT).show()
+        val modelTypeInfo = CommonPlaybackAction.getModelTypeInfo(mMainFragmentViewModel)
+        val dataList = mMainFragmentViewModel.getSelectedDataList().value ?: return
+        mSongActionsWorkerViewModel.deleteSongs(
+            modelTypeInfo[0],
+            dataList.values,
+            modelTypeInfo[1],
+            modelTypeInfo[2]
+        )
     }
+
     private fun addToQueueMusic() {
+        val dataBidingView : DialogAddToQueueMusicBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_add_to_queue_music, null, false)
+        dataBidingView.buttonAddToTop.setOnClickListener{
+            addSelectionToTopOfQueueMusic()
+        }
+        dataBidingView.buttonPlayNext.setOnClickListener{
+            addSelectionToPlayNextOfQueueMusic()
+        }
+        dataBidingView.buttonAddToEnd.setOnClickListener{
+            addSelectionToBottomOfQueueMusic()
+        }
         MaterialAlertDialogBuilder(this.requireContext())
             .setTitle("Add to queue")
             .setIcon(R.drawable.queue_music)
-            .setView(R.layout.dialog_add_to_queue_music)
+            .setView(dataBidingView.root)
             .setNegativeButton(resources.getString(R.string.close)) { dialog, which ->
                 dialog.dismiss()
             }
             .show()
+    }
+
+    private fun addSelectionToBottomOfQueueMusic() {
+        val modelTypeInfo = CommonPlaybackAction.getModelTypeInfo(mMainFragmentViewModel)
+        val dataList = mMainFragmentViewModel.getSelectedDataList().value ?: return
+        mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
+            modelTypeInfo[0],
+            AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_BOTTOM,
+            -1,
+            dataList.values,
+            modelTypeInfo[1],
+            modelTypeInfo[2]
+        )
+    }
+
+    private fun addSelectionToPlayNextOfQueueMusic() {
+        val modelTypeInfo = CommonPlaybackAction.getModelTypeInfo(mMainFragmentViewModel)
+        val dataList = mMainFragmentViewModel.getSelectedDataList().value ?: return
+        val currentPlayingPosition = mPlayerFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
+        mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
+            modelTypeInfo[0],
+            AddSongsToQueueMusicWorker.ADD_METHOD_ADD_AT_POSITION,
+            currentPlayingPosition,
+            dataList.values,
+            modelTypeInfo[1],
+            modelTypeInfo[2]
+        )
+    }
+
+    private fun addSelectionToTopOfQueueMusic() {
+        val modelTypeInfo = CommonPlaybackAction.getModelTypeInfo(mMainFragmentViewModel)
+        val dataList = mMainFragmentViewModel.getSelectedDataList().value ?: return
+        mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
+            modelTypeInfo[0],
+            AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_TOP,
+            0,
+            dataList.values,
+            modelTypeInfo[1],
+            modelTypeInfo[2]
+        )
     }
 
     private fun applyAppBarTitle(position: Int) {

@@ -27,9 +27,9 @@ import androidx.room.DatabaseView
 )
 class PlaylistItemView {
     var playlistId: Long = 0
-    var name: String? = null
-    var songUri: String? = null
-    var year: String? = null
+    var name: String = ""
+    var songUri: String = ""
+    var year: String = ""
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
     var numberArtists: Int = 0
@@ -37,7 +37,7 @@ class PlaylistItemView {
     var numberTracks: Int = 0
     var totalDuration: Long = 0
     var hashedCovertArtSignature: Int = -1
-    var uriImage: String? = null
+    var uriImage: String = ""
 
     companion object {
         const val TAG = "PlaylistItemView"

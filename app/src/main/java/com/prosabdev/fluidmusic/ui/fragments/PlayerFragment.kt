@@ -64,7 +64,6 @@ import kotlinx.coroutines.withContext
 
         if(savedInstanceState == null){
             loadLastPlayerSession()
-            loadDirectlyQueueMusicListFromDatabase()
         }
 
         arguments?.let {
@@ -88,62 +87,6 @@ import kotlinx.coroutines.withContext
 
         checkInteractions()
         observeLiveData()
-    }
-
-    private fun loadDirectlyQueueMusicListFromDatabase() {
-        when (mPlayerFragmentViewModel.getQueueListSource().value ?: AllSongsFragment.TAG) {
-            AllSongsFragment.TAG -> {
-                MainScope().launch {
-                    val tempIsInverted : Boolean = mAllSongsFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
-                    val songList = mSongItemViewModel.getAllDirectly(mPlayerFragmentViewModel.getSortBy().value ?: SORT_LIST_GRID_DEFAULT_VALUE)
-                    updateEmptyListUI(songList?.size ?: 0)
-                    mPlayerPagerAdapter?.submitList(
-                        if(tempIsInverted) songList?.reversed() else songList
-                    )
-                    mQueueMusicBottomSheetDialog.updateQueueMusicList(
-                        if(tempIsInverted) songList?.reversed() else songList
-                    )
-                }
-            }
-            AlbumsFragment.TAG -> {
-                //
-            }
-            AlbumArtistsFragment.TAG -> {
-                //
-            }
-            ArtistsFragment.TAG -> {
-                //
-            }
-            ComposersFragment.TAG -> {
-                //
-            }
-            FoldersFragment.TAG -> {
-                //
-            }
-            GenresFragment.TAG -> {
-                //
-            }
-            YearsFragment.TAG -> {
-                //
-            }
-
-            ExploreContentsForFragment.TAG -> {
-                //
-            }
-
-            FoldersHierarchyFragment.TAG -> {
-                //
-            }
-            PlaylistsFragment.TAG -> {
-                //
-            }
-            StreamsFragment.TAG -> {
-                //
-            }
-            else -> {
-                //
-            }
-        }
     }
 
     override fun onDestroy() {
@@ -204,6 +147,11 @@ import kotlinx.coroutines.withContext
             mPlayerFragmentViewModel.setIsInverted(sortOrganize?.isInvertSort ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE)
             mPlayerFragmentViewModel.setQueueListSource(queueListSource ?: AllSongsFragment.TAG)
 
+            loadDirectlyQueueMusicListFromDatabase(
+                sortOrganize?.sortOrderBy ?: SORT_LIST_GRID_DEFAULT_VALUE,
+                sortOrganize?.isInvertSort ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE,
+                queueListSource ?: AllSongsFragment.TAG
+            )
             val songItem: SongItem? = SharedPreferenceManagerUtils.Player.loadCurrentPlayingSong(ctx)
             val progressValue: Long = SharedPreferenceManagerUtils.Player.loadPlayingProgressValue(ctx)
             val queueListSourceValue: String? = SharedPreferenceManagerUtils.Player.loadQueueListSourceValue(ctx)
@@ -269,6 +217,60 @@ import kotlinx.coroutines.withContext
             }
         }
     }
+    private fun loadDirectlyQueueMusicListFromDatabase(sortOrderBy: String, isInvertSort: Boolean, queueListSource: String) {
+        when (queueListSource) {
+            AllSongsFragment.TAG -> {
+                MainScope().launch {
+                    val songList = mSongItemViewModel.getAllDirectly(sortOrderBy)
+                    updateEmptyListUI(songList?.size ?: 0)
+                    mPlayerPagerAdapter?.submitList(
+                        if(isInvertSort) songList?.reversed() else songList
+                    )
+                    mQueueMusicBottomSheetDialog.updateQueueMusicList(
+                        if(isInvertSort) songList?.reversed() else songList
+                    )
+                }
+            }
+            AlbumsFragment.TAG -> {
+                //
+            }
+            AlbumArtistsFragment.TAG -> {
+                //
+            }
+            ArtistsFragment.TAG -> {
+                //
+            }
+            ComposersFragment.TAG -> {
+                //
+            }
+            FoldersFragment.TAG -> {
+                //
+            }
+            GenresFragment.TAG -> {
+                //
+            }
+            YearsFragment.TAG -> {
+                //
+            }
+
+            ExploreContentsForFragment.TAG -> {
+                //
+            }
+
+            FoldersHierarchyFragment.TAG -> {
+                //
+            }
+            PlaylistsFragment.TAG -> {
+                //
+            }
+            StreamsFragment.TAG -> {
+                //
+            }
+            else -> {
+                //
+            }
+        }
+    }
 
     private fun updateEmptyListUI(size: Int) {
         mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
@@ -289,7 +291,7 @@ import kotlinx.coroutines.withContext
             }
         }
         mPlayerFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner){
-            updateCurrentPlayingSongUI(it, mPlayerFragmentViewModel.getIsQueueMusicUpdated().value)
+            updateCurrentPlayingSongUI(it)
         }
         mPlayerFragmentViewModel.getIsPlaying().observe(viewLifecycleOwner){
             updatePlaybackStateUI(it)
@@ -358,24 +360,24 @@ import kotlinx.coroutines.withContext
 
     private fun updatePlayListData() {
         val queueListSource: String = mPlayerFragmentViewModel.getQueueListSource().value ?: AllSongsFragment.TAG
+        val tempIsInverted : Boolean = mPlayerFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
+        Log.i(TAG, "IS PLAYING INVERTED : ${tempIsInverted}")
         if(queueListSource == AllSongsFragment.TAG) {
-            val tempSortBy : String = mAllSongsFragmentViewModel.getSortBy().value ?: SORT_LIST_GRID_DEFAULT_VALUE
-            val tempIsInverted : Boolean = mAllSongsFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
-            mPlayerFragmentViewModel.setSortBy(tempSortBy)
-            mPlayerFragmentViewModel.setIsInverted(tempIsInverted)
             //Get songs
-            val songList = (
-                    if(tempIsInverted)
-                        mAllSongsFragmentViewModel.getAllDirectly()?.reversed()
-                    else
-                        mAllSongsFragmentViewModel.getAllDirectly()
-                    ) as List<SongItem>
-            mPlayerPagerAdapter?.submitList(songList)
-            mQueueMusicBottomSheetDialog.updateQueueMusicList(
-                songList
+            val songList = mAllSongsFragmentViewModel.getAllDirectly() as List<SongItem>?
+            updateEmptyListUI(songList?.size ?: 0)
+            mPlayerPagerAdapter?.submitList(
+                if(tempIsInverted)
+                    songList?.reversed()
+                else
+                    songList
             )
-            updateEmptyListUI(songList.size)
-            mPlayerFragmentViewModel.setIsQueueMusicUpdated()
+            mQueueMusicBottomSheetDialog.updateQueueMusicList(
+                if(tempIsInverted)
+                    songList?.reversed()
+                else
+                    songList
+            )
         }
     }
 
@@ -464,8 +466,7 @@ import kotlinx.coroutines.withContext
             }
         }
     }
-    private fun updateCurrentPlayingSongUI(songItem: SongItem?, isQueueMusicUpdated: Boolean?) {
-//        if(isQueueMusicUpdated == false) return
+    private fun updateCurrentPlayingSongUI(songItem: SongItem?) {
         updateViewpagerUI(songItem)
         updateTextTitleSubtitleDurationUI(songItem)
         updateBlurredBackgroundUIFromUri(songItem)

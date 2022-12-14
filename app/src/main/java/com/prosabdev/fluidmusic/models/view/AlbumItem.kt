@@ -25,10 +25,10 @@ import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
             "GROUP BY SongItem.album ORDER BY SongItem.album"
 )
 class AlbumItem {
-    var name: String? = null
-    var artist: String? = null
-    var albumArtist: String? = null
-    var year: String? = null
+    var name: String = ""
+    var artist: String = ""
+    var albumArtist: String = ""
+    var year: String = ""
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
     var numberArtists: Int = 0
@@ -36,26 +36,32 @@ class AlbumItem {
     var numberTracks: Int = 0
     var totalDuration: Long = 0
     var hashedCovertArtSignature: Int = -1
-    var uriImage: String? = null
+    var uriImage: String = ""
 
     companion object {
         const val TAG = "AlbumItem"
-        const val DEFAULT_INDEX = "name"
         const val INDEX_COLUM_TO_SONG_ITEM = "album"
 
-        fun getStringIndexRequestFastScroller(ctx: Context, dataItem: Any): String {
+        fun getStringIndexForSelection(dataItem: Any?): String {
+            if(dataItem != null && dataItem is AlbumItem) {
+                return dataItem.name.ifEmpty { "" }
+            }
+            return ""
+        }
+        fun getStringIndexForFastScroller(dataItem: Any): String {
             if(dataItem is AlbumItem) {
-                return dataItem.name ?: ctx.getString(R.string.unknown_album)
+                return dataItem.name.ifEmpty { "#" }
             }
             return "#"
         }
+
         fun castDataItemToGeneric(ctx: Context, dataItem: Any): GenericItemListGrid? {
             var tempResult : GenericItemListGrid? = null
             if(dataItem is AlbumItem) {
                 tempResult = GenericItemListGrid()
-                val tempTitle : String = dataItem.name ?: ctx.getString(R.string.unknown_album)
-                val tempSubtitle : String = dataItem.artist ?: ctx.getString(R.string.unknown_artists)
-                val tempDetails : String = "${dataItem.numberTracks} song(s) | ${FormattersAndParsersUtils.formatSongDurationToString(dataItem.totalDuration)} min"
+                val tempTitle : String = dataItem.name.ifEmpty { ctx.getString(R.string.unknown_album) }
+                val tempSubtitle : String = dataItem.artist.ifEmpty { ctx.getString(R.string.unknown_artists) }
+                val tempDetails = ""
                 tempResult.title = tempTitle
                 tempResult.subtitle =
                     if (tempTitle != ctx.getString(R.string.unknown_album))

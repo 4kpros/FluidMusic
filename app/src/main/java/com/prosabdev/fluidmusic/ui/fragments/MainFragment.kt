@@ -111,8 +111,8 @@ import kotlinx.coroutines.launch
         mMainFragmentViewModel.getSelectMode().observe(viewLifecycleOwner){
             updateSelectModeUI(it)
         }
-        mMainFragmentViewModel.getTotalSelected().observe(viewLifecycleOwner){
-            updateTotalSelectedTracksUI(it)
+        mMainFragmentViewModel.getSelectedDataList().observe(viewLifecycleOwner){
+            updateTotalSelectedTracksUI(it.size)
         }
         mMainFragmentViewModel.getScrollingState().observe(viewLifecycleOwner){
             tryToUpdateMiniPlayerScrollStateUI(it)
@@ -409,10 +409,10 @@ import kotlinx.coroutines.launch
                 onClickButtonSkipNextSong()
             }
             fragmentMainBinding.includeBottomSelection.checkboxSelectAll.setOnClickListener {
-                onCheckAllButtonClicked()
+                mMainFragmentViewModel.setReQuestToggleSelectAll()
             }
             fragmentMainBinding.includeBottomSelection.buttonSelectRange.setOnClickListener {
-                onToggleButtonSelectRange()
+                mMainFragmentViewModel.setReQuestToggleSelectRange()
             }
             fragmentMainBinding.includeBottomSelection.buttonClose.setOnClickListener {
                 onClickButtonCloseSelectionMenu()
@@ -470,16 +470,6 @@ import kotlinx.coroutines.launch
         }
     }
 
-    private fun onCheckAllButtonClicked() {
-        val totalCount = mMainFragmentViewModel.getTotalCount().value ?: 0
-        val totalSelected = mMainFragmentViewModel.getTotalSelected().value ?: 0
-        if(totalSelected < totalCount){
-            mMainFragmentViewModel.setTotalSelected(totalCount)
-        }else{
-            mMainFragmentViewModel.setTotalSelected(0)
-        }
-    }
-
     private fun onClickMiniPlayerContainer() {
         mFragmentMainBinding?.let { fragmentMainBinding ->
             if (fragmentMainBinding.slidingUpPanel.panelState != PanelState.EXPANDED)
@@ -488,13 +478,9 @@ import kotlinx.coroutines.launch
     }
 
     private fun onClickButtonCloseSelectionMenu() {
-        mMainFragmentViewModel.setTotalSelected(0)
+        mMainFragmentViewModel.setSelectedDataList(HashMap())
         mMainFragmentViewModel.setTotalCount(0)
         mMainFragmentViewModel.setSelectMode(false)
-    }
-
-    private fun onToggleButtonSelectRange() {
-        mMainFragmentViewModel.setToggleRange()
     }
 
     private fun onClickButtonSkipNextSong() {

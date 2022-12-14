@@ -52,31 +52,31 @@ abstract class AudioInfoExtractorUtils {
                 mediaMetadataRetriever.setDataSource(fileDescriptor)
                 mediaMetadataRetriever.use { mdr ->
                     tempSong.uri = tempFFF.uri.toString()
-                    tempSong.fileName = tempFFF.name
-                    tempSong.uriPath = tempFFF.uri.lastPathSegment
+                    tempSong.fileName = tempFFF.name ?: ""
+                    tempSong.uriPath = tempFFF.uri.lastPathSegment ?: ""
                     val extension: String =
                         tempFFF.uri.lastPathSegment.toString().substringAfterLast(".").uppercase()
                     tempSong.fileExtension = extension
                     tempSong.size = tempFFF.length()
-                    tempSong.title = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
-                    tempSong.artist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
-                    tempSong.composer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER)
-                    tempSong.album = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
-                    tempSong.albumArtist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST)
-                    tempSong.genre = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
+                    tempSong.title = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: ""
+                    tempSong.artist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: ""
+                    tempSong.composer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER) ?: ""
+                    tempSong.album = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) ?: ""
+                    tempSong.albumArtist = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST) ?: ""
+                    tempSong.genre = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE) ?: ""
 
-                    tempSong.year = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
+                    tempSong.year = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR) ?: ""
                     tempSong.duration = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0
-                    tempSong.typeMime = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
+                    tempSong.typeMime = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE) ?: ""
                     tempSong.bitrate = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)?.toDouble() ?: 0.0
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { //For versions under 31, checkout at the end of this block
-                        tempSong.bitPerSample = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITS_PER_SAMPLE)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        tempSong.bitPerSample = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITS_PER_SAMPLE) ?: ""
                     }
-                    tempSong.author = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR)
-                    tempSong.diskNumber = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DISC_NUMBER)
-                    tempSong.cdTrackNumber = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER)
-                    tempSong.writer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_WRITER)
-                    tempSong.numberTracks = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS)
+                    tempSong.author = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR) ?: ""
+                    tempSong.diskNumber = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DISC_NUMBER) ?: ""
+                    tempSong.cdTrackNumber = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER) ?: ""
+                    tempSong.writer = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_WRITER) ?: ""
+                    tempSong.numberTracks = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS) ?: ""
 
                     val tempUpdatedDate: Long = tempFFF.lastModified()
                     tempSong.lastUpdateDate = tempUpdatedDate
@@ -97,7 +97,7 @@ abstract class AudioInfoExtractorUtils {
                     for (i in 0 until numTracks) {
                         val format : MediaFormat = mediaExtractor.getTrackFormat(i)
                         tempSong.sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
-                        tempSong.language = format.getString(MediaFormat.KEY_LANGUAGE)
+                        tempSong.language = format.getString(MediaFormat.KEY_LANGUAGE) ?: ""
                         tempSong.channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                             try {

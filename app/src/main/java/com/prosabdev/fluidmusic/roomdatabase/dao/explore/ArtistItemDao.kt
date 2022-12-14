@@ -13,16 +13,34 @@ interface ArtistItemDao {
     @Query(
         "SELECT * FROM ArtistItem " +
                 "ORDER BY " +
-                "CASE :orderBy WHEN 'name' THEN COALESCE(ArtistItem.name, 'Unknown field') END, ArtistItem.lastAddedDateToLibrary DESC," +
-                "CASE :orderBy WHEN 'year' THEN COALESCE(ArtistItem.year, 'Unknown field') END COLLATE NOCASE, COALESCE(ArtistItem.name, 'Unknown field'), ArtistItem.lastAddedDateToLibrary DESC," +
-                "CASE :orderBy WHEN 'lastUpdateDate' THEN ArtistItem.lastUpdateDate END DESC, COALESCE(ArtistItem.name, 'Unknown field'), ArtistItem.lastAddedDateToLibrary DESC," +
-                "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN ArtistItem.lastAddedDateToLibrary END DESC, COALESCE(ArtistItem.name, 'Unknown field'), COALESCE(ArtistItem.name, 'Unknown field') DESC," +
-                "CASE :orderBy WHEN 'totalDuration' THEN ArtistItem.totalDuration END, COALESCE(ArtistItem.name, 'Unknown field'), ArtistItem.lastAddedDateToLibrary DESC," +
-                "CASE :orderBy WHEN 'numberTracks' THEN ArtistItem.numberTracks END, COALESCE(ArtistItem.name, 'Unknown field'), ArtistItem.lastAddedDateToLibrary DESC," +
-//                "CASE :orderBy WHEN 'numberArtists' THEN ArtistItem.numberArtists END , COALESCE(ArtistItem.name, 'Unknown field'), ArtistItem.lastAddedDateToLibrary DESC," +
-                "CASE :orderBy WHEN 'numberAlbums' THEN ArtistItem.numberAlbums END, COALESCE(ArtistItem.name, 'Unknown field'), ArtistItem.lastAddedDateToLibrary DESC," +
-                "CASE :orderBy WHEN 'numberAlbumArtists' THEN ArtistItem.numberAlbumArtists END, COALESCE(ArtistItem.name, 'Unknown field'), ArtistItem.lastAddedDateToLibrary DESC," +
-                "CASE :orderBy WHEN 'numberComposers' THEN ArtistItem.numberComposers END, COALESCE(ArtistItem.name, 'Unknown field'), ArtistItem.lastAddedDateToLibrary DESC"
+                "CASE :orderBy WHEN 'name' THEN COALESCE(NULLIF(ArtistItem.name,''), 'Unknown field') END COLLATE NOCASE," +
+                "CASE :orderBy WHEN 'year' THEN COALESCE(NULLIF(ArtistItem.year,''), '0') END COLLATE NOCASE DESC," +
+                "CASE :orderBy WHEN 'lastUpdateDate' THEN ArtistItem.lastUpdateDate END DESC," +
+                "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN ArtistItem.lastAddedDateToLibrary END DESC," +
+                "CASE :orderBy WHEN 'totalDuration' THEN ArtistItem.totalDuration END," +
+                "CASE :orderBy WHEN 'numberTracks' THEN ArtistItem.numberTracks END," +
+                "CASE :orderBy WHEN 'numberAlbums' THEN ArtistItem.numberAlbums END," +
+                "CASE :orderBy WHEN 'numberAlbumArtists' THEN ArtistItem.numberAlbumArtists END," +
+                "CASE :orderBy WHEN 'numberComposers' THEN ArtistItem.numberComposers END," +
+                "COALESCE(NULLIF(ArtistItem.name,''), 'Unknown field')," +
+                "ArtistItem.lastAddedDateToLibrary DESC"
     )
     fun getAll(orderBy: String): LiveData<List<ArtistItem>>?
+
+    @Query(
+        "SELECT * FROM ArtistItem " +
+                "ORDER BY " +
+                "CASE :orderBy WHEN 'name' THEN COALESCE(NULLIF(ArtistItem.name,''), 'Unknown field') END COLLATE NOCASE," +
+                "CASE :orderBy WHEN 'year' THEN COALESCE(NULLIF(ArtistItem.year,''), '0') END COLLATE NOCASE DESC," +
+                "CASE :orderBy WHEN 'lastUpdateDate' THEN ArtistItem.lastUpdateDate END DESC," +
+                "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN ArtistItem.lastAddedDateToLibrary END DESC," +
+                "CASE :orderBy WHEN 'totalDuration' THEN ArtistItem.totalDuration END," +
+                "CASE :orderBy WHEN 'numberTracks' THEN ArtistItem.numberTracks END," +
+                "CASE :orderBy WHEN 'numberAlbums' THEN ArtistItem.numberAlbums END," +
+                "CASE :orderBy WHEN 'numberAlbumArtists' THEN ArtistItem.numberAlbumArtists END," +
+                "CASE :orderBy WHEN 'numberComposers' THEN ArtistItem.numberComposers END," +
+                "COALESCE(NULLIF(ArtistItem.name,''), 'Unknown field')," +
+                "ArtistItem.lastAddedDateToLibrary DESC"
+    )
+    fun getAllDirectly(orderBy: String): List<ArtistItem>?
 }

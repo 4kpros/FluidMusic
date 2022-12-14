@@ -46,7 +46,7 @@ import kotlinx.coroutines.withContext
 
 
 class AllSongsFragment : Fragment() {
-    private var mFragmentAllSongsBinding: FragmentAllSongsBinding? = null
+    private var mDataBidingView: FragmentAllSongsBinding? = null
 
     private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by activityViewModels()
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
@@ -80,8 +80,8 @@ class AllSongsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mFragmentAllSongsBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_all_songs,container,false)
-        val view = mFragmentAllSongsBinding?.root
+        mDataBidingView = DataBindingUtil.inflate(inflater,R.layout.fragment_all_songs,container,false)
+        val view = mDataBidingView?.root
 
         initViews()
         setupRecyclerViewAdapter()
@@ -163,11 +163,11 @@ class AllSongsFragment : Fragment() {
         mMainFragmentViewModel.getSelectMode().observe(viewLifecycleOwner) {
             onSelectionModeChanged(it)
         }
-        mMainFragmentViewModel.getTotalSelected().observe(viewLifecycleOwner){
-            onTotalSelectedItemsChanged(it)
+        mMainFragmentViewModel.getReQuestToggleSelectAll().observe(viewLifecycleOwner){
+            onReQuestToggleSelectAll(it)
         }
-        mMainFragmentViewModel.getToggleRange().observe(viewLifecycleOwner){
-            onToggleRangeChanged()
+        mMainFragmentViewModel.getReQuestToggleSelectRange().observe(viewLifecycleOwner){
+            onReQuestToggleSelectRange(it)
         }
         mMainFragmentViewModel.getScrollingState().observe(viewLifecycleOwner){
             updateOnScrollingStateUI(it)
@@ -181,8 +181,8 @@ class AllSongsFragment : Fragment() {
         }
     }
     private fun invertSongListAndUpdateAdapter(isInverted: Boolean?) {
-        val tempNewReverseLayout : Boolean = isInverted ?: false
-        if(tempNewReverseLayout){
+        val tempNewIsInverted : Boolean = isInverted ?: false
+        if(tempNewIsInverted){
             mGenericListGridItemAdapter?.submitList(mAllSongsFragmentViewModel.getAll().value?.reversed())
         }else{
             mGenericListGridItemAdapter?.submitList(mAllSongsFragmentViewModel.getAll().value)
@@ -234,16 +234,20 @@ class AllSongsFragment : Fragment() {
                 mEmptyBottomAdapter?.onSetScrollState(2)
         }
     }
-    private fun onToggleRangeChanged() {
+    private fun onReQuestToggleSelectRange(requestCount : Int?) {
+        if(requestCount == null || requestCount <= 0) return
         if(mMainFragmentViewModel.getCurrentSelectablePage().value == TAG) {
             mGenericListGridItemAdapter?.selectableSelectRange(mLayoutManager)
         }
     }
-    private fun onTotalSelectedItemsChanged(it: Int?) {
+    private fun onReQuestToggleSelectAll(requestCount: Int?) {
+        if(requestCount == null || requestCount <= 0) return
         if(mMainFragmentViewModel.getCurrentSelectablePage().value == TAG){
-            if((it ?: 0) > 0 && (it ?: 0) >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
+            val totalItemCount = mGenericListGridItemAdapter?.itemCount ?: 0
+            val selectedItemCount = mGenericListGridItemAdapter?.selectableGetSelectedItemCount() ?: 0
+            if(totalItemCount > selectedItemCount){
                 mGenericListGridItemAdapter?.selectableSelectAll(mLayoutManager)
-            }else if((it ?: 0) <= 0 && (mGenericListGridItemAdapter?.selectableGetSelectedItemCount() ?: 0) > 0){
+            }else{
                 mGenericListGridItemAdapter?.selectableClearSelection(mLayoutManager)
             }
         }
@@ -324,7 +328,7 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun checkInteractions() {
-        mFragmentAllSongsBinding?.recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        mDataBidingView?.recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if(mIsDraggingToScroll){
                     if(dy < 0){
@@ -410,7 +414,7 @@ class AllSongsFragment : Fragment() {
                     dataItem: Any,
                     position: Int
                 ): String {
-                    return SongItem.getStringIndexRequestFastScroller(ctx, dataItem)
+                    return SongItem.getStringIndexForFastScroller(dataItem)
                 }
             },
             object : GenericListGridItemAdapter.OnItemClickListener{
@@ -435,14 +439,20 @@ class AllSongsFragment : Fragment() {
                 override fun onSelectModeChange(selectMode: Boolean) {
                     mMainFragmentViewModel.setSelectMode(selectMode)
                 }
-                override fun onTotalSelectedItemChange(totalSelected: Int) {
-                    mMainFragmentViewModel.setTotalSelected(totalSelected)
+                override fun onRequestGetStringIndex(position: Int): String {
+                    return SongItem.getStringIndexForSelection(
+                        mGenericListGridItemAdapter?.currentList?.get(position)
+                    )
+                }
+                override fun onSelectedListChange(selectedList: HashMap<Int, String>) {
+                    mMainFragmentViewModel.setSelectedDataList(selectedList)
                 }
             },
             SongItem.diffCallback as DiffUtil.ItemCallback<Any>,
             mAllSongsFragmentViewModel.getOrganizeListGrid().value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE,
             mIsSelectable = true,
-            mHavePlaybackState = true
+            mHavePlaybackState = true,
+            mIsImageFullCircle = false
         )
 
         //Setup empty bottom space adapter
@@ -464,8 +474,7 @@ class AllSongsFragment : Fragment() {
 
         //Add Layout manager
         val initialSpanCount : Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, mAllSongsFragmentViewModel.getOrganizeListGrid().value)
-        val initialReverseLayout : Boolean = mAllSongsFragmentViewModel.getIsInverted().value ?: false
-        mLayoutManager = GridLayoutManager(ctx, initialSpanCount, GridLayoutManager.VERTICAL, initialReverseLayout)
+        mLayoutManager = GridLayoutManager(ctx, initialSpanCount, GridLayoutManager.VERTICAL, false)
         mLayoutManager?.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 val newSpanCount : Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, mAllSongsFragmentViewModel.getOrganizeListGrid().value)
@@ -477,31 +486,29 @@ class AllSongsFragment : Fragment() {
                 }
             }
         }
-        mFragmentAllSongsBinding?.let { fragmentAllSongsBinding ->
-            fragmentAllSongsBinding.recyclerView.adapter = mConcatAdapter
-            fragmentAllSongsBinding.recyclerView.layoutManager = mLayoutManager
+        mDataBidingView?.let { dataBidingView ->
+            dataBidingView.recyclerView.adapter = mConcatAdapter
+            dataBidingView.recyclerView.layoutManager = mLayoutManager
             val newSpanCount : Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, mAllSongsFragmentViewModel.getOrganizeListGrid().value)
             val updatedSpan : Int = if(mLayoutManager?.spanCount == newSpanCount) newSpanCount else mLayoutManager?.spanCount ?: 1
             mItemDecoration = GridSpacingItemDecoration(updatedSpan)
             mItemDecoration?.let {
-                fragmentAllSongsBinding.recyclerView.addItemDecoration(it)
+                dataBidingView.recyclerView.addItemDecoration(it)
             }
 
-            fragmentAllSongsBinding.fastScroller.setSectionIndexer(mGenericListGridItemAdapter)
-            fragmentAllSongsBinding.fastScroller.attachRecyclerView(fragmentAllSongsBinding.recyclerView)
-            fragmentAllSongsBinding.fastScroller.setFastScrollListener(object : FastScrollListener{
+            dataBidingView.fastScroller.setSectionIndexer(mGenericListGridItemAdapter)
+            dataBidingView.fastScroller.attachRecyclerView(dataBidingView.recyclerView)
+            dataBidingView.fastScroller.setFastScrollListener(object : FastScrollListener{
                 override fun onFastScrollStart(fastScroller: FastScroller) {
                     mMainFragmentViewModel.setIsFastScrolling(true)
-                    println("FAST SCROLLING STARTED")
                 }
 
                 override fun onFastScrollStop(fastScroller: FastScroller) {
                     mMainFragmentViewModel.setIsFastScrolling(false)
-                    println("FAST SCROLLING STOPPED")
-                    if (mFragmentAllSongsBinding?.recyclerView?.canScrollVertically(-1) == false) {
+                    if (mDataBidingView?.recyclerView?.canScrollVertically(-1) == false) {
                         //On scrolled to top
                         mMainFragmentViewModel.setScrollingState(-2)
-                    }else if(mFragmentAllSongsBinding?.recyclerView?.canScrollVertically(1) == false){
+                    }else if(mDataBidingView?.recyclerView?.canScrollVertically(1) == false){
                         //On scrolled to bottom
                         mMainFragmentViewModel.setScrollingState(2)
                     }
@@ -557,7 +564,7 @@ class AllSongsFragment : Fragment() {
         }
     }
     private fun updateRecyclerViewScrollingSate(){
-        if(mFragmentAllSongsBinding?.recyclerView?.scrollState == RecyclerView.SCROLL_STATE_SETTLING){
+        if(mDataBidingView?.recyclerView?.scrollState == RecyclerView.SCROLL_STATE_SETTLING){
             mIsDraggingToScroll = false
         }
         mMainFragmentViewModel.setScrollingState(-1)
@@ -565,10 +572,8 @@ class AllSongsFragment : Fragment() {
 
 
     private fun initViews() {
-        mFragmentAllSongsBinding?.recyclerView?.setHasFixedSize(true)
-//        mFragmentAllSongsBinding?.recyclerView?.setItemViewCacheSize(100)
-
-        mFragmentAllSongsBinding?.constraintFastScrollerContainer?.let {
+        mDataBidingView?.recyclerView?.setHasFixedSize(true)
+        mDataBidingView?.constraintFastScrollerContainer?.let {
             InsetModifiersUtils.updateBottomViewInsets(
                 it
             )
@@ -578,7 +583,7 @@ class AllSongsFragment : Fragment() {
     companion object {
         const val TAG = "AllSongsFragment"
         private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = ConstantValues.ORGANIZE_LIST_SMALL
-        private const val SORT_LIST_GRID_DEFAULT_VALUE: String = "title"
+        private const val SORT_LIST_GRID_DEFAULT_VALUE: String = SongItem.DEFAULT_INDEX
         private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 
         @JvmStatic

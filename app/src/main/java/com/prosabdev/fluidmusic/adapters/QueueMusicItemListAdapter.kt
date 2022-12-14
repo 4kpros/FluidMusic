@@ -140,10 +140,8 @@ class QueueMusicItemListAdapter(
             Glide.with(ctx.applicationContext).clear(mItemQueueMusicBinding.imageviewCoverArt)
         }
         fun updateCovertArtAndTitleUI(ctx: Context, songItem: SongItem) {
-            var tempTitle : String = songItem.title ?: ""
-            var tempArtist : String = songItem.artist ?: ""
-            if(tempTitle.isEmpty()) tempTitle = songItem.fileName ?: ctx.getString(R.string.unknown_title)
-            if(tempArtist.isEmpty()) tempArtist = ctx.getString(R.string.unknown_artist)
+            val tempTitle : String = songItem.title.ifEmpty { songItem.fileName.ifEmpty { ctx.getString(R.string.unknown_title) } }
+            val tempArtist : String = songItem.artist.ifEmpty { ctx.getString(R.string.unknown_artist) }
             mItemQueueMusicBinding.textTitle.text = tempTitle
             mItemQueueMusicBinding.textSubtitle.text = tempArtist
             mItemQueueMusicBinding.textDetails.text =
@@ -153,7 +151,7 @@ class QueueMusicItemListAdapter(
                     songItem.fileExtension
                 )
 
-            val tempUri: Uri? = Uri.parse(songItem.uri ?: "")
+            val tempUri: Uri? = Uri.parse(songItem.uri)
             val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newOriginalCardInstance()
             imageRequest.uri = tempUri
             imageRequest.imageView = mItemQueueMusicBinding.imageviewCoverArt

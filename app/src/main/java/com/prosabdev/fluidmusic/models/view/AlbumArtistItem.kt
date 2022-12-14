@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.room.DatabaseView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.models.generic.GenericItemListGrid
+import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
 
 @DatabaseView(
@@ -25,10 +26,10 @@ import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
             "GROUP BY SongItem.albumArtist ORDER BY SongItem.albumArtist"
 )
 class AlbumArtistItem {
-    var name: String? = null
-    var artist: String? = null
-    var album: String? = null
-    var year: String? = null
+    var name: String = ""
+    var artist: String = ""
+    var album: String = ""
+    var year: String = ""
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
     var numberArtists: Int = 0
@@ -36,26 +37,32 @@ class AlbumArtistItem {
     var numberTracks: Int = 0
     var totalDuration: Long = 0
     var hashedCovertArtSignature: Int = -1
-    var uriImage: String? = null
+    var uriImage: String = ""
 
     companion object {
         const val TAG = "AlbumArtistItem"
-        const val DEFAULT_INDEX = "name"
-        const val INDEX_COLUM_TO_SONG_ITEM = "albumItem"
+        const val INDEX_COLUM_TO_SONG_ITEM = "albumArtist"
 
-        fun getStringIndexRequestFastScroller(ctx: Context, dataItem: Any): String {
+        fun getStringIndexForSelection(dataItem: Any?): String {
+            if(dataItem != null && dataItem is AlbumArtistItem) {
+                return dataItem.name.ifEmpty { "" }
+            }
+            return ""
+        }
+        fun getStringIndexForFastScroller(dataItem: Any): String {
             if(dataItem is AlbumArtistItem) {
-                return dataItem.name ?: ctx.getString(R.string.unknown_album_artist)
+                return dataItem.name.ifEmpty { "#" }
             }
             return "#"
         }
+
         fun castDataItemToGeneric(ctx: Context, dataItem: Any): GenericItemListGrid? {
             var tempResult : GenericItemListGrid? = null
             if(dataItem is AlbumArtistItem) {
                 tempResult = GenericItemListGrid()
-                val tempTitle : String = dataItem.name ?: ctx.getString(R.string.unknown_album_artist)
-                val tempSubtitle : String = dataItem.artist ?: ctx.getString(R.string.unknown_artists)
-                val tempDetails : String = "${dataItem.numberTracks} song(s) | ${FormattersAndParsersUtils.formatSongDurationToString(dataItem.totalDuration)} min"
+                val tempTitle : String = dataItem.name.ifEmpty { ctx.getString(R.string.unknown_album_artist) }
+                val tempSubtitle : String = dataItem.artist.ifEmpty { ctx.getString(R.string.unknown_artists) }
+                val tempDetails = ""
                 tempResult.title = tempTitle
                 tempResult.subtitle =
                     if (tempTitle != ctx.getString(R.string.unknown_album))

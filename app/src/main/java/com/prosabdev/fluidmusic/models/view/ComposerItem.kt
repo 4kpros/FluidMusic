@@ -24,8 +24,8 @@ import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
             "GROUP BY SongItem.composer ORDER BY SongItem.composer"
 )
 class ComposerItem {
-    var name: String? = null
-    var year: String? = null
+    var name: String = ""
+    var year: String = ""
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
     var numberArtists: Int = 0
@@ -34,26 +34,32 @@ class ComposerItem {
     var numberTracks: Int = 0
     var totalDuration: Long = 0
     var hashedCovertArtSignature: Int = -1
-    var uriImage: String? = null
+    var uriImage: String = ""
 
     companion object {
         const val TAG = "ComposerItem"
-        const val DEFAULT_INDEX = "name"
         const val INDEX_COLUM_TO_SONG_ITEM = "composer"
 
-        fun getStringIndexRequestFastScroller(ctx: Context, dataItem: Any): String {
+        fun getStringIndexForSelection(dataItem: Any?): String {
+            if(dataItem != null && dataItem is ComposerItem) {
+                return dataItem.name.ifEmpty { "" }
+            }
+            return ""
+        }
+        fun getStringIndexForFastScroller(dataItem: Any): String {
             if(dataItem is ComposerItem) {
-                return dataItem.name ?: ctx.getString(R.string.unknown_composer)
+                return dataItem.name.ifEmpty { "#" }
             }
             return "#"
         }
+
         fun castDataItemToGeneric(ctx: Context, dataItem: Any): GenericItemListGrid? {
             var tempResult : GenericItemListGrid? = null
             if(dataItem is ComposerItem) {
                 tempResult = GenericItemListGrid()
-                val tempTitle : String = dataItem.name ?: ctx.getString(R.string.unknown_composer)
-                val tempSubtitle : String = ""
-                val tempDetails : String = "${dataItem.numberTracks} song(s) | ${FormattersAndParsersUtils.formatSongDurationToString(dataItem.totalDuration)} min"
+                val tempTitle : String = dataItem.name.ifEmpty { ctx.getString(R.string.unknown_composer) }
+                val tempSubtitle = ""
+                val tempDetails = ""
                 tempResult.title = tempTitle
                 tempResult.subtitle = tempSubtitle
                 tempResult.details = tempDetails

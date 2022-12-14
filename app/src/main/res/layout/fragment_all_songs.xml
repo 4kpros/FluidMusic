@@ -31,13 +31,12 @@
                 android:layout_height="match_parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:hideScrollbar="true"
-                app:showTrack="false"
                 app:bubbleSize="small"
                 app:showBubble="true"
                 app:showBubbleAlways="false"
                 app:bubbleTextColor="?colorOnPrimary"
                 app:bubbleColor="?colorPrimary"
-                app:handleColor="?colorOutline"
+                app:handleColor="?colorPrimary"
                 app:trackColor="?colorOutline"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>

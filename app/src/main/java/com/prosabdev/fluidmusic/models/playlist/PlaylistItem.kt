@@ -1,9 +1,11 @@
 package com.prosabdev.fluidmusic.models.playlist
 
+import android.content.Context
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 
 @Entity(
     indices = [Index(value = ["name"], unique = true)]
@@ -15,10 +17,24 @@ class PlaylistItem {
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
     var isRealFile: Boolean = false
-    var uri: String? = null
+    var uri: String = ""
 
     companion object {
         const val TAG = "PlaylistItem"
+        const val INDEX_COLUM_TO_SONG_ITEM = "playlistId"
+
+        fun getStringIndexForSelection(dataItem: Any?): String {
+            if(dataItem != null && dataItem is PlaylistItem) {
+                return dataItem.name
+            }
+            return ""
+        }
+        fun getStringIndexForFastScroller(ctx: Context, dataItem: Any): String {
+            if(dataItem is PlaylistItem) {
+                return dataItem.name
+            }
+            return "#"
+        }
 
         val diffCallback = object : DiffUtil.ItemCallback<PlaylistItem>() {
             override fun areItemsTheSame(oldItem: PlaylistItem, newItem: PlaylistItem): Boolean {

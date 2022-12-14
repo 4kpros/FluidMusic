@@ -96,7 +96,7 @@ abstract class FormattersAndParsersUtils {
 
             val tempFolderUriTree = FolderUriTree()
             tempFolderUriTree.uriTree = documentFile?.uri.toString()
-            tempFolderUriTree.lastPathSegment = uri.lastPathSegment
+            tempFolderUriTree.lastPathSegment = uri.lastPathSegment ?: ""
             tempFolderUriTree.pathTree = uri.path.toString().trim()
             tempFolderUriTree.normalizeScheme = uri.normalizeScheme().toString()
             tempFolderUriTree.path = "/${(uri.lastPathSegment ?: "").substringAfter(":")}"

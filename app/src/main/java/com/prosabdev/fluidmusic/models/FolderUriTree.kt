@@ -10,12 +10,12 @@ import androidx.room.PrimaryKey
 class FolderUriTree {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
-    var uriTree: String? = null
-    var path: String? = null
-    var pathTree: String? = null
-    var lastPathSegment: String? = null
-    var normalizeScheme: String? = null
-    var deviceName: String? = null
+    var uriTree: String = ""
+    var path: String = ""
+    var pathTree: String = ""
+    var lastPathSegment: String = ""
+    var normalizeScheme: String = ""
+    var deviceName: String = ""
 
     var lastModified: Long = 0
 

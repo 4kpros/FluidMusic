@@ -1,17 +1,15 @@
 package com.prosabdev.fluidmusic.adapters.generic
 
 import android.content.Context
-import android.graphics.Typeface
 import android.net.Uri
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.RelativeLayout
 import android.widget.RelativeLayout.LayoutParams
-import android.widget.RelativeLayout.VISIBLE
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -25,9 +23,6 @@ import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class GenericListGridItemAdapter (
@@ -39,6 +34,7 @@ class GenericListGridItemAdapter (
     private var mOrganizeListGrid: Int = ConstantValues.ORGANIZE_GRID_MEDIUM,
     private var mIsSelectable: Boolean = true,
     private var mHavePlaybackState: Boolean = false,
+    private var mIsImageFullCircle: Boolean = false,
 ) : SelectablePlayingItemListAdapter<GenericListGridItemAdapter.GenericListGridItemHolder>(diffCallback),
     FastScroller.SectionIndexer
 {
@@ -102,17 +98,21 @@ class GenericListGridItemAdapter (
         if(!mIsSelectable) return
         selectableItemSelectRange(mOnSelectSelectableItemListener, layoutManager)
     }
+    fun selectableGetSelectedItemList(): HashMap<Int, String> {
+        if(!mIsSelectable) return HashMap()
+        return selectableItemGetSelectedItemList()
+    }
     fun selectableGetSelectedItemCount(): Int {
         if(!mIsSelectable) return -1
         return selectableItemGetSelectedItemCount()
     }
     fun selectableSelectAll(layoutManager : GridLayoutManager? = null) {
         if(!mIsSelectable) return
-        selectableItemSelectAll(layoutManager)
+        selectableItemSelectAll(mOnSelectSelectableItemListener, layoutManager)
     }
     fun selectableClearSelection(layoutManager : GridLayoutManager? = null) {
         if(!mIsSelectable) return
-        selectableItemClearAllSelection(layoutManager)
+        selectableItemClearAllSelection(mOnSelectSelectableItemListener, layoutManager)
     }
 
     //Fast scroll text section
@@ -128,7 +128,6 @@ class GenericListGridItemAdapter (
             LayoutInflater.from(parent.context),
             R.layout.item_generic_list_grid, parent, false
         )
-        Log.i(ConstantValues.TAG, "ON RECREADTE ITEM VIEW HOLDER")
         return GenericListGridItemHolder(
             mDataBinding,
             mOnItemRequestDataInfo,
@@ -144,13 +143,13 @@ class GenericListGridItemAdapter (
         if (payloads.isNotEmpty()) {
             for (payload in payloads) {
                 when (payload) {
-                    PAYLOAD_IS_COVERT_ART_TEXT -> {
-                        Log.i(ConstantValues.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
-                        holder.updateTextAndImageViewUI(mContext, getItem(position), mOrganizeListGrid)
-                    }
                     PAYLOAD_IS_ORGANIZE_LIST_GRID -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_ORGANIZE_LIST_GRID")
-                        holder.updateOrganizeListGridMotion(mContext, mOrganizeListGrid)
+                        holder.updateOrganizeListGridMotion(mContext, mOrganizeListGrid, mIsImageFullCircle)
+                    }
+                    PAYLOAD_IS_COVERT_ART_TEXT -> {
+                        Log.i(ConstantValues.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
+                        holder.updateTextAndImageViewUI(mContext, getItem(position), mOrganizeListGrid, mIsImageFullCircle)
                     }
                     PAYLOAD_IS_SELECTED -> {
                         Log.i(ConstantValues.TAG, "PAYLOAD_IS_SELECTED")
@@ -167,8 +166,13 @@ class GenericListGridItemAdapter (
             }
         } else {
             //If the is no payload specified on notify adapter, refresh all UI to be safe
-            holder.updateTextAndImageViewUI(mContext, getItem(position), mOrganizeListGrid)
-            holder.updateOrganizeListGridMotion(mContext, mOrganizeListGrid)
+            holder.updateOrganizeListGridMotion(mContext, mOrganizeListGrid, mIsImageFullCircle)
+            holder.updateTextAndImageViewUI(
+                mContext,
+                getItem(position),
+                mOrganizeListGrid,
+                mIsImageFullCircle
+            )
             holder.updateSelectedStateUI(selectableIsSelected(position), mIsSelectable)
             holder.updateIsPlayingStateUI(
                 getPlayingPosition(),
@@ -193,7 +197,9 @@ class GenericListGridItemAdapter (
                 true
             }
         }
-        fun updateOrganizeListGridMotion(ctx: Context, organizeListGrid: Int) {
+        fun updateOrganizeListGridMotion(ctx: Context, organizeListGrid: Int, isImageFullCircle: Boolean) {
+            updateImageShape(isImageFullCircle)
+
             val marginLarge = ctx.resources.getDimensionPixelSize(R.dimen.margin_large_size)
             val marginMedium = ctx.resources.getDimensionPixelSize(R.dimen.margin_medium_size)
             val widthForListSize = FormattersAndParsersUtils.getSpecificWidthSizeForListType(ctx, organizeListGrid)
@@ -279,6 +285,9 @@ class GenericListGridItemAdapter (
             when (organizeListGrid) {
                 ConstantValues.ORGANIZE_LIST_SMALL_NO_IMAGE -> {
                     //Update text size and font
+                    mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_title_size))
+                    mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_subtitle_details_size))
+                    mDataBinding.textDetails.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_subtitle_details_size))
                     //Show or hide non necessary text view
                     mDataBinding.textTitle.visibility = View.VISIBLE
                     mDataBinding.textSubtitle.visibility = View.GONE
@@ -286,13 +295,19 @@ class GenericListGridItemAdapter (
                 }
                 ConstantValues.ORGANIZE_LIST_MEDIUM_NO_IMAGE -> {
                     //Update text size and font
+                    mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_title_size))
+                    mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_subtitle_details_size))
+                    mDataBinding.textDetails.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_subtitle_details_size))
                     //Show or hide non necessary text view
                     mDataBinding.textTitle.visibility = View.VISIBLE
-                    mDataBinding.textSubtitle.visibility = View.GONE
-                    mDataBinding.textDetails.visibility = View.VISIBLE
+                    mDataBinding.textSubtitle.visibility = View.VISIBLE
+                    mDataBinding.textDetails.visibility = View.GONE
                 }
                 ConstantValues.ORGANIZE_LIST_LARGE_NO_IMAGE -> {
                     //Update text size and font
+                    mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_title_size))
+                    mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_subtitle_details_size))
+                    mDataBinding.textDetails.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_subtitle_details_size))
                     //Show or hide non necessary text view
                     mDataBinding.textTitle.visibility = View.VISIBLE
                     mDataBinding.textSubtitle.visibility = View.VISIBLE
@@ -300,13 +315,19 @@ class GenericListGridItemAdapter (
                 }
                 ConstantValues.ORGANIZE_GRID_SMALL_NO_IMAGE -> {
                     //Update text size and font
+                    mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_title_size))
+                    mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_subtitle_details_size))
+                    mDataBinding.textDetails.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_subtitle_details_size))
                     //Show or hide non necessary text view
                     mDataBinding.textTitle.visibility = View.VISIBLE
-                    mDataBinding.textSubtitle.visibility = View.GONE
-                    mDataBinding.textDetails.visibility = View.VISIBLE
+                    mDataBinding.textSubtitle.visibility = View.VISIBLE
+                    mDataBinding.textDetails.visibility = View.GONE
                 }
                 ConstantValues.ORGANIZE_GRID_MEDIUM_NO_IMAGE -> {
                     //Update text size and font
+                    mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_title_size))
+                    mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_subtitle_details_size))
+                    mDataBinding.textDetails.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_subtitle_details_size))
                     //Show or hide non necessary text view
                     mDataBinding.textTitle.visibility = View.VISIBLE
                     mDataBinding.textSubtitle.visibility = View.VISIBLE
@@ -315,13 +336,19 @@ class GenericListGridItemAdapter (
                 //
                 ConstantValues.ORGANIZE_LIST_EXTRA_SMALL -> {
                     //Update text size and font
+                    mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_small_text_title_size))
+                    mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_small_text_subtitle_details_size))
+                    mDataBinding.textDetails.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_small_text_subtitle_details_size))
                     //Show or hide non necessary text view
                     mDataBinding.textTitle.visibility = View.VISIBLE
                     mDataBinding.textSubtitle.visibility = View.VISIBLE
-                    mDataBinding.textDetails.visibility = View.VISIBLE
+                    mDataBinding.textDetails.visibility = View.GONE
                 }
                 ConstantValues.ORGANIZE_LIST_SMALL -> {
                     //Update text size and font
+                    mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_title_size))
+                    mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_subtitle_details_size))
+                    mDataBinding.textDetails.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_subtitle_details_size))
                     //Show or hide non necessary text view
                     mDataBinding.textTitle.visibility = View.VISIBLE
                     mDataBinding.textSubtitle.visibility = View.VISIBLE
@@ -329,6 +356,9 @@ class GenericListGridItemAdapter (
                 }
                 ConstantValues.ORGANIZE_LIST_MEDIUM -> {
                     //Update text size and font
+                    mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_title_size))
+                    mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_subtitle_details_size))
+                    mDataBinding.textDetails.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_subtitle_details_size))
                     //Show or hide non necessary text view
                     mDataBinding.textTitle.visibility = View.VISIBLE
                     mDataBinding.textSubtitle.visibility = View.VISIBLE
@@ -336,6 +366,9 @@ class GenericListGridItemAdapter (
                 }
                 ConstantValues.ORGANIZE_LIST_LARGE -> {
                     //Update text size and font
+                    mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_title_size))
+                    mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_subtitle_details_size))
+                    mDataBinding.textDetails.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_subtitle_details_size))
                     //Show or hide non necessary text view
                     mDataBinding.textTitle.visibility = View.VISIBLE
                     mDataBinding.textSubtitle.visibility = View.VISIBLE
@@ -344,6 +377,9 @@ class GenericListGridItemAdapter (
                 //
                 ConstantValues.ORGANIZE_GRID_EXTRA_SMALL -> {
                     //Update text size and font
+                    mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_small_text_title_size))
+                    mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_small_text_subtitle_details_size))
+                    mDataBinding.textDetails.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_small_text_subtitle_details_size))
                     //Show or hide non necessary text view
                     mDataBinding.textTitle.visibility = View.VISIBLE
                     mDataBinding.textSubtitle.visibility = View.GONE
@@ -351,64 +387,114 @@ class GenericListGridItemAdapter (
                 }
                 ConstantValues.ORGANIZE_GRID_SMALL -> {
                     //Update text size and font
+                    mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_title_size))
+                    mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_subtitle_details_size))
+                    mDataBinding.textDetails.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_subtitle_details_size))
                     //Show or hide non necessary text view
                     mDataBinding.textTitle.visibility = View.VISIBLE
                     mDataBinding.textSubtitle.visibility = View.GONE
-                    mDataBinding.textDetails.visibility = View.VISIBLE
+                    mDataBinding.textDetails.visibility = View.GONE
                 }
                 ConstantValues.ORGANIZE_GRID_MEDIUM -> {
                     //Update text size and font
+                    mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_title_size))
+                    mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_subtitle_details_size))
+                    mDataBinding.textDetails.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_subtitle_details_size))
                     //Show or hide non necessary text view
                     mDataBinding.textTitle.visibility = View.VISIBLE
                     mDataBinding.textSubtitle.visibility = View.GONE
-                    mDataBinding.textDetails.visibility = View.VISIBLE
+                    mDataBinding.textDetails.visibility = View.GONE
                 }
                 ConstantValues.ORGANIZE_GRID_LARGE -> {
                     //Update text size and font
-                    //Show or hide non necessary text view
-                    mDataBinding.textTitle.visibility = View.VISIBLE
-                    mDataBinding.textSubtitle.visibility = View.GONE
-                    mDataBinding.textDetails.visibility = View.VISIBLE
-                }
-                ConstantValues.ORGANIZE_GRID_EXTRA_LARGE -> {
-                    //Update text size and font
+                    mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_title_size))
+                    mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_subtitle_details_size))
+                    mDataBinding.textDetails.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_subtitle_details_size))
                     //Show or hide non necessary text view
                     mDataBinding.textTitle.visibility = View.VISIBLE
                     mDataBinding.textSubtitle.visibility = View.VISIBLE
-                    mDataBinding.textDetails.visibility = View.VISIBLE
+                    mDataBinding.textDetails.visibility = View.GONE
+                }
+                ConstantValues.ORGANIZE_GRID_EXTRA_LARGE -> {
+                    //Update text size and font
+                    mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_large_text_title_size))
+                    mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_large_text_subtitle_details_size))
+                    mDataBinding.textDetails.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_large_text_subtitle_details_size))
+                    //Show or hide non necessary text view
+                    mDataBinding.textTitle.visibility = View.VISIBLE
+                    mDataBinding.textSubtitle.visibility = View.VISIBLE
+                    mDataBinding.textDetails.visibility = View.GONE
                 }
             }
         }
 
-        fun updateTextAndImageViewUI(ctx: Context, dataItem: Any, organizeListGrid: Int) {
+        private fun updateImageShape(isImageFullCircle: Boolean) {
+            if(isImageFullCircle){
+                mDataBinding.textTitle.textAlignment = View.TEXT_ALIGNMENT_CENTER
+                mDataBinding.textSubtitle.textAlignment = View.TEXT_ALIGNMENT_CENTER
+                mDataBinding.textDetails.textAlignment = View.TEXT_ALIGNMENT_CENTER
+
+                mDataBinding.imageviewCoverArt.visibility = View.GONE
+                mDataBinding.imageviewCoverArtCircle.visibility = View.VISIBLE
+            }else{
+                mDataBinding.textTitle.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
+                mDataBinding.textSubtitle.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
+                mDataBinding.textDetails.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
+
+                mDataBinding.imageviewCoverArtCircle.visibility = View.GONE
+                mDataBinding.imageviewCoverArt.visibility = View.VISIBLE
+            }
+        }
+        fun updateTextAndImageViewUI(
+            ctx: Context,
+            dataItem: Any,
+            organizeListGrid: Int,
+            isImageFullCircle: Boolean
+        ) {
             val genericData : GenericItemListGrid =
                 mOnItemRequestDataInfo.onRequestDataInfo(dataItem, bindingAdapterPosition)
                     ?: return
 
+            if(genericData.subtitle.isEmpty()){
+                mDataBinding.textSubtitle.visibility = View.GONE
+            }
+            if(genericData.details.isEmpty()){
+                mDataBinding.textDetails.visibility = View.GONE
+            }
             mDataBinding.textTitle.text = genericData.title
             mDataBinding.textSubtitle.text = genericData.subtitle
             mDataBinding.textDetails.text = genericData.details
 
-            updateCovertArtUI(ctx, genericData.imageUri, genericData.imageHashedSignature, organizeListGrid)
+            updateCovertArtUI(ctx, genericData.imageUri, genericData.imageHashedSignature, organizeListGrid, isImageFullCircle)
         }
-        private fun updateCovertArtUI(ctx: Context, uri: Uri?, imageSignature: Int, organizeListGrid: Int) {
-            CoroutineScope(Dispatchers.Default).launch {
-                if(
-                    organizeListGrid == ConstantValues.ORGANIZE_LIST_SMALL_NO_IMAGE ||
-                    organizeListGrid == ConstantValues.ORGANIZE_LIST_MEDIUM_NO_IMAGE ||
-                    organizeListGrid == ConstantValues.ORGANIZE_LIST_LARGE_NO_IMAGE ||
-                    organizeListGrid == ConstantValues.ORGANIZE_GRID_SMALL_NO_IMAGE ||
-                    organizeListGrid == ConstantValues.ORGANIZE_GRID_MEDIUM_NO_IMAGE
-                ){
-                    ImageLoadersUtils.clearImageView(ctx, mDataBinding.imageviewCoverArt)
-                    return@launch
-                }
-                val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newOriginalCardInstance()
-                imageRequest.uri = uri
-                imageRequest.imageView = mDataBinding.imageviewCoverArt
-                imageRequest.hashedCovertArtSignature = imageSignature
-                ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
+
+        private fun updateCovertArtUI(
+            ctx: Context,
+            uri: Uri?,
+            imageSignature: Int,
+            organizeListGrid: Int,
+            isImageFullCircle: Boolean
+        ) {
+            if(
+                organizeListGrid == ConstantValues.ORGANIZE_LIST_SMALL_NO_IMAGE ||
+                organizeListGrid == ConstantValues.ORGANIZE_LIST_MEDIUM_NO_IMAGE ||
+                organizeListGrid == ConstantValues.ORGANIZE_LIST_LARGE_NO_IMAGE ||
+                organizeListGrid == ConstantValues.ORGANIZE_GRID_SMALL_NO_IMAGE ||
+                organizeListGrid == ConstantValues.ORGANIZE_GRID_MEDIUM_NO_IMAGE
+            ){
+                ImageLoadersUtils.clearImageView(ctx, mDataBinding.imageviewCoverArt)
+                ImageLoadersUtils.clearImageView(ctx, mDataBinding.imageviewCoverArtCircle)
+                return
             }
+            val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newOriginalCardInstance()
+            imageRequest.uri = uri
+            imageRequest.hashedCovertArtSignature = imageSignature
+            if(isImageFullCircle){
+                imageRequest.imageView = mDataBinding.imageviewCoverArtCircle
+            }else{
+                imageRequest.imageView = mDataBinding.imageviewCoverArt
+            }
+            ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
         }
         fun updateIsPlayingStateUI(
             playingPosition: Int,
@@ -469,9 +555,9 @@ class GenericListGridItemAdapter (
                     }
                 }else{
                     if(playingPosition == bindingAdapterPosition){
-                        mDataBinding.imageviewBackgroundIsPlaying.visibility = VISIBLE
+                        mDataBinding.imageviewBackgroundIsPlaying.visibility = View.VISIBLE
                         mDataBinding.imageviewBackgroundIsPlaying.alpha = 0.65f
-                        mDataBinding.linearIsPlayingAnimContainer.visibility = VISIBLE
+                        mDataBinding.linearIsPlayingAnimContainer.visibility = View.VISIBLE
                         mDataBinding.linearIsPlayingAnimContainer.alpha = 1.0f
                     }else{
                         mDataBinding.imageviewBackgroundIsPlaying.alpha = 0.0f
@@ -537,7 +623,7 @@ class GenericListGridItemAdapter (
                 if(selectableIsSelected) {
                     mDataBinding.backgroundSelected.clearAnimation()
                     mDataBinding.backgroundSelected.alpha = 0.125f
-                    mDataBinding.backgroundSelected.visibility = VISIBLE
+                    mDataBinding.backgroundSelected.visibility = View.VISIBLE
                 }
                 else {
                     mDataBinding.backgroundSelected.clearAnimation()

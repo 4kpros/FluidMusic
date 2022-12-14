@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.viewmodels.fragments
 
 import android.app.Application
+import android.util.SparseBooleanArray
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,8 +12,8 @@ import kotlinx.coroutines.launch
 class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mMutableCurrentSelectablePage = MutableLiveData<String>(null)
     private val mMutableSelectMode = MutableLiveData<Boolean>(false)
-    private val mMutableToggleOnRange = MutableLiveData<Int>(0)
-    private val mMutableTotalSelected = MutableLiveData<Int>(0)
+    private val mMutableRequestToggleSelectRange = MutableLiveData<Int>(0)
+    private val mMutableRequestToggleSelectAll = MutableLiveData<Int>(0)
     private val mMutableTotalCount = MutableLiveData<Int>(0)
     private val mMutableShowDrawerMenuCounter = MutableLiveData<Int>()
     private val mMutableSlidingUpPanelState = MutableLiveData<PanelState>(PanelState.COLLAPSED)
@@ -20,11 +21,12 @@ class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mMutableScrollingState = MutableLiveData<Int>(-2)
     private val mMutableShowSlidingUpPanelCounter = MutableLiveData<Int>(0)
     private val mMutableHideSlidingUpPanelCounter = MutableLiveData<Int>(0)
+    private val mMutableSelectedDataList = MutableLiveData<HashMap<Int, String>>(HashMap())
 
     private val mCurrentSelectablePage: LiveData<String> get() = mMutableCurrentSelectablePage
     private val mSelectMode: LiveData<Boolean> get() = mMutableSelectMode
-    private val mToggleOnRange: LiveData<Int> get() = mMutableToggleOnRange
-    private val mTotalSelected: LiveData<Int> get() = mMutableTotalSelected
+    private val mRequestToggleSelectRange: LiveData<Int> get() = mMutableRequestToggleSelectRange
+    private val mRequestToggleSelectAll: LiveData<Int> get() = mMutableRequestToggleSelectAll
     private val mTotalCount: LiveData<Int> get() = mMutableTotalCount
     private val mShowDrawerMenuCounter: LiveData<Int> get() = mMutableShowDrawerMenuCounter
     private val mSlidingUpPanelState: LiveData<PanelState> get() = mMutableSlidingUpPanelState
@@ -32,6 +34,7 @@ class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mScrollingState: LiveData<Int> get() = mMutableScrollingState
     private val mShowSlidingUpPanelCounter: LiveData<Int> get() = mMutableShowSlidingUpPanelCounter
     private val mHideSlidingUpPanelCounter: LiveData<Int> get() = mMutableHideSlidingUpPanelCounter
+    private val mSelectedDataList: LiveData<HashMap<Int, String>> get() = mMutableSelectedDataList
 
     fun setIsFastScrolling(isFastScrolling : Boolean) {
         MainScope().launch {
@@ -96,25 +99,37 @@ class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
             mMutableSelectMode.value = value
         }
     }
-    fun setToggleRange() {
+    fun setReQuestToggleSelectRange() {
+        var tempValue: Int = mRequestToggleSelectRange.value ?: 0
+        if(tempValue >= 100)
+            tempValue = 0
+        tempValue++
         MainScope().launch {
-            var tempToggleRange: Int = mToggleOnRange.value ?: 0
-            if(tempToggleRange >= 100)
-                tempToggleRange = 0
-            tempToggleRange++
-            mMutableToggleOnRange.value = tempToggleRange
+            mMutableRequestToggleSelectRange.value = tempValue
         }
     }
-    fun getToggleRange(): LiveData<Int> {
-        return mToggleOnRange
+    fun getReQuestToggleSelectRange(): LiveData<Int> {
+        return mRequestToggleSelectRange
     }
-    fun setTotalSelected(value : Int) {
+    fun setReQuestToggleSelectAll(){
+        var tempValue: Int = mRequestToggleSelectAll.value ?: 0
+        if(tempValue >= 100)
+            tempValue = 0
+        tempValue++
         MainScope().launch {
-            mMutableTotalSelected.value = value
+            mMutableRequestToggleSelectAll.value = tempValue
         }
     }
-    fun getTotalSelected(): LiveData<Int> {
-        return mTotalSelected
+    fun getReQuestToggleSelectAll(): LiveData<Int> {
+        return mRequestToggleSelectAll
+    }
+    fun getSelectedDataList() : LiveData<HashMap<Int, String>> {
+        return mSelectedDataList
+    }
+    fun setSelectedDataList(value : HashMap<Int, String>) {
+        MainScope().launch {
+            mMutableSelectedDataList.value = value
+        }
     }
     fun setTotalCount(value : Int) {
         MainScope().launch {
@@ -125,12 +140,12 @@ class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
         return mTotalCount
     }
     fun setShowDrawerMenuCounter() {
+        var tempValue: Int = mShowDrawerMenuCounter.value ?: 0
+        if(tempValue >= 100)
+            tempValue = 0
+        tempValue++
         MainScope().launch {
-            var tempShowDrawer: Int = mShowDrawerMenuCounter.value ?: 0
-            if(tempShowDrawer >= 100)
-                tempShowDrawer = 0
-            tempShowDrawer++
-            mMutableShowDrawerMenuCounter.value = tempShowDrawer
+            mMutableShowDrawerMenuCounter.value = tempValue
         }
     }
     fun getShowDrawerMenuCounter() : LiveData<Int> {

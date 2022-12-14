@@ -18,42 +18,42 @@ class SongItem {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
     var uriTreeId: Long = 0
-    var uri: String? = null
-    var fileName: String? = null
-    var title: String? = null
-    var artist: String? = null
-    var albumArtist: String? = null
-    var composer: String? = null
-    var album: String? = null
-    var genre: String? = null
-    var uriPath: String? = null
-    var folder: String? = null
-    var folderParent: String? = null
-    var folderUri: String? = null
-    var year: String? = null
+    var uri: String = ""
+    var fileName: String = ""
+    var title: String = ""
+    var artist: String = ""
+    var albumArtist: String = ""
+    var composer: String = ""
+    var album: String = ""
+    var genre: String = ""
+    var uriPath: String = ""
+    var folder: String = ""
+    var folderParent: String = ""
+    var folderUri: String = ""
+    var year: String = ""
     var duration: Long = 0
-    var language: String? = null
+    var language: String = ""
 
-    var typeMime: String? = null
+    var typeMime: String = ""
     var sampleRate: Int = 0
     var bitrate: Double = 0.0
 
     var size: Long = 0
 
     var channelCount: Int = 0
-    var fileExtension: String? = null
-    var bitPerSample: String? = null
+    var fileExtension: String = ""
+    var bitPerSample: String = ""
 
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
 
-    var author: String? = null
-    var diskNumber: String? = null
-    var writer: String? = null
-    var cdTrackNumber: String? = null
-    var numberTracks: String? = null
+    var author: String = ""
+    var diskNumber: String = ""
+    var writer: String = ""
+    var cdTrackNumber: String = ""
+    var numberTracks: String = ""
 
-    var comments: String? = null
+    var comments: String = ""
 
     var rating: Int = 0
     var playCount: Int = 0
@@ -67,10 +67,17 @@ class SongItem {
 
     companion object {
         const val TAG = "SongItem"
+        const val DEFAULT_INDEX = "title"
 
-        fun getStringIndexRequestFastScroller(ctx: Context, dataItem: Any): String {
+        fun getStringIndexForSelection(dataItem: Any?): String {
+            if(dataItem != null && dataItem is SongItem) {
+                return dataItem.uri
+            }
+            return ""
+        }
+        fun getStringIndexForFastScroller(dataItem: Any): String {
             if(dataItem is SongItem) {
-                return dataItem.title ?: dataItem.fileName ?: "#"
+                return dataItem.title.ifEmpty { dataItem.fileName }
             }
             return "#"
         }
@@ -78,9 +85,8 @@ class SongItem {
             var tempResult : GenericItemListGrid? = null
             if(dataItem is SongItem) {
                 tempResult = GenericItemListGrid()
-                tempResult.title = dataItem.title ?: dataItem.fileName ?: ctx.getString(
-                    com.prosabdev.fluidmusic.R.string.unknown_title)
-                tempResult.subtitle = dataItem.artist ?: ctx.getString(com.prosabdev.fluidmusic.R.string.unknown_artist)
+                tempResult.title = dataItem.title.ifEmpty { dataItem.fileName }
+                tempResult.subtitle = dataItem.title.ifEmpty { ctx.getString(com.prosabdev.fluidmusic.R.string.unknown_artist) }
                 tempResult.details = ctx.getString(
                     com.prosabdev.fluidmusic.R.string.item_song_card_text_details,
                     FormattersAndParsersUtils.formatSongDurationToString(dataItem.duration),
@@ -98,19 +104,18 @@ class SongItem {
                 newItem: SongItem
             ): Boolean =
                 oldItem.id == newItem.id
-
             override fun areContentsTheSame(oldItem: SongItem, newItem: SongItem) =
                 oldItem.id == newItem.id &&
                 oldItem.uriTreeId == newItem.uriTreeId &&
                 oldItem.uri == newItem.uri
         }
+
         val diffCallbackViewPager = object : DiffUtil.ItemCallback<SongItem>() {
             override fun areItemsTheSame(
                 oldItem: SongItem,
                 newItem: SongItem
             ): Boolean =
                 false
-
             override fun areContentsTheSame(oldItem: SongItem, newItem: SongItem) =
                 oldItem == newItem
         }

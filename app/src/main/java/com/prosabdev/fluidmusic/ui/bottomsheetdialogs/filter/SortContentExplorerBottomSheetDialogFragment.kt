@@ -11,12 +11,15 @@ import androidx.databinding.DataBindingUtil
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetSortContentExplorerBinding
+import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
+import com.prosabdev.fluidmusic.ui.fragments.PlaylistsFragment
+import com.prosabdev.fluidmusic.ui.fragments.StreamsFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 
-class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment() {
+class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
-    private var mBottomSheetSortContentExplorerBinding: BottomSheetSortContentExplorerBinding? = null
+    private var mDataBidingView: BottomSheetSortContentExplorerBinding? = null
 
     private var mGenericListenDataViewModel: GenericListenDataViewModel? = null
 
@@ -28,8 +31,8 @@ class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mBottomSheetSortContentExplorerBinding = DataBindingUtil.inflate(inflater, R.layout._bottom_sheet_sort_content_explorer, container, false)
-        val view = mBottomSheetSortContentExplorerBinding?.root
+        mDataBidingView = DataBindingUtil.inflate(inflater, R.layout._bottom_sheet_sort_content_explorer, container, false)
+        val view = mDataBidingView?.root
 
         initViews()
         return view
@@ -42,7 +45,7 @@ class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment(
     }
 
     private fun checkInteractions() {
-        mBottomSheetSortContentExplorerBinding?.let { viewBiding ->
+        mDataBidingView?.let { viewBiding ->
             viewBiding.radioGroupSort.setOnCheckedChangeListener { _, checkedId ->
                 onRadioGroupStateChanged(
                     checkedId
@@ -62,7 +65,7 @@ class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment(
     }
 
     private fun onRadioGroupStateChanged(checkedId: Int) {
-        mBottomSheetSortContentExplorerBinding?.let { viewBiding ->
+        mDataBidingView?.let { viewBiding ->
             when (checkedId) {
                 viewBiding.radioName.id -> {
                     mGenericListenDataViewModel?.setSortBy("name")
@@ -111,9 +114,44 @@ class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment(
     }
 
     private fun initViews() {
+        updateTitleUI()
         setupInitialStateUI()
         updateDefaultCheckedRadioButtonUI()
         updateDefaultCheckboxInvertButtonUI()
+    }
+    private fun updateTitleUI() {
+        when (mFromSource) {
+            AlbumsFragment.TAG -> {
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.albums) ?: ""
+            }
+            AlbumArtistsFragment.TAG -> {
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.album_artists) ?: ""
+            }
+            ArtistsFragment.TAG -> {
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.artists) ?: ""
+            }
+            ComposersFragment.TAG -> {
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.composers) ?: ""
+            }
+            FoldersFragment.TAG -> {
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.folders) ?: ""
+            }
+            GenresFragment.TAG -> {
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.genres) ?: ""
+            }
+            YearsFragment.TAG -> {
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.years) ?: ""
+            }
+            PlaylistsFragment.TAG -> {
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.playlists) ?: ""
+            }
+//            FavoritesFragment.TAG -> {
+//                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.favorites) ?: ""
+//            }
+            StreamsFragment.TAG -> {
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.streams) ?: ""
+            }
+        }
     }
 
     private fun setupInitialStateUI() {
@@ -122,7 +160,7 @@ class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment(
     }
     private fun updateRadioButtonsForSortGenericItems() {
         //Update generic first radio button text title
-        mBottomSheetSortContentExplorerBinding?.let { viewBiding ->
+        mDataBidingView?.let { viewBiding ->
             when (mFromSource) {
                 AllSongsFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -184,7 +222,7 @@ class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment(
         }
     }
     private fun showAllRadioButtonsVisibility() {
-        mBottomSheetSortContentExplorerBinding?.let { viewBiding ->
+        mDataBidingView?.let { viewBiding ->
             viewBiding.radioName.visibility = VISIBLE
             viewBiding.radioArtist.visibility = VISIBLE
             viewBiding.radioAlbum.visibility = VISIBLE
@@ -202,11 +240,11 @@ class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment(
     }
 
     private fun updateDefaultCheckboxInvertButtonUI() {
-        mBottomSheetSortContentExplorerBinding?.checkboxInvertItems?.isChecked = mGenericListenDataViewModel?.getIsInverted()?.value ?: false
+        mDataBidingView?.checkboxInvertItems?.isChecked = mGenericListenDataViewModel?.getIsInverted()?.value ?: false
     }
     private fun updateDefaultCheckedRadioButtonUI() {
         if(mGenericListenDataViewModel == null) return
-        mBottomSheetSortContentExplorerBinding?.let { viewBiding ->
+        mDataBidingView?.let { viewBiding ->
             val tempFilter = mGenericListenDataViewModel?.getSortBy()?.value ?: return
             when (tempFilter) {
                 "name" -> {
@@ -260,18 +298,18 @@ class SortContentExplorerIBottomSheetDialogFragment : BottomSheetDialogFragment(
     }
 
     companion object {
-        const val TAG = "SortContentExplorerIBottomSheetDialogFragment"
+        const val TAG = "SortContentExplorerBottomSheetDialogFragment"
 
         @JvmStatic
         fun newInstance(genericListenDataViewModel: GenericListenDataViewModel?, fromSource: String?, fromSourceValue: String? = null) =
-            SortContentExplorerIBottomSheetDialogFragment().apply {
+            SortContentExplorerBottomSheetDialogFragment().apply {
                 mGenericListenDataViewModel = genericListenDataViewModel
                 mFromSource = fromSource
                 mFromSourceValue = fromSourceValue
             }
         @JvmStatic
         fun newInstance() =
-            SortContentExplorerIBottomSheetDialogFragment().apply {
+            SortContentExplorerBottomSheetDialogFragment().apply {
             }
     }
 }

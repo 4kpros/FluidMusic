@@ -12,6 +12,7 @@ import com.prosabdev.fluidmusic.models.songitem.SongItemUri
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.utils.SystemSettingsUtils
 import com.prosabdev.fluidmusic.workers.WorkerConstantValues
+import com.prosabdev.fluidmusic.workers.delete.DeleteSongsWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -31,18 +32,23 @@ class AddSongsToQueueMusicWorker(
                 val addMethod = inputData.getString(ADD_METHOD)
                 val addAtPosition = inputData.getInt(ADD_AT_ORDER, 1)
                 val itemsList = inputData.getStringArray(WorkerConstantValues.ITEM_LIST)
-                val orderBy = inputData.getString(WorkerConstantValues.ITEM_LIST_ORDER_BY)
                 val whereClause = inputData.getString(WorkerConstantValues.ITEM_LIST_WHERE)
-                val indexColum = inputData.getString(WorkerConstantValues.INDEX_COLUM)
+                val whereColumn = inputData.getString(WorkerConstantValues.WHERE_COLUMN_INDEX)
+                Log.i(TAG, "WORKER ${TAG} : modelType ${modelType}")
+                Log.i(TAG, "WORKER ${TAG} : addMethod ${addMethod}")
+                Log.i(TAG, "WORKER ${TAG} : addAtPosition ${addAtPosition}")
+                Log.i(TAG, "WORKER ${TAG} : itemsList size ${itemsList?.size}")
+                Log.i(TAG, "WORKER ${TAG} : itemsList ${itemsList?.get(0)}")
+                Log.i(TAG, "WORKER ${TAG} : whereClause ${whereClause}")
+                Log.i(TAG, "WORKER ${TAG} : whereColumn ${whereColumn}")
                 //Add songs to queue music
                 val addedSongs = tryToAddSongsToQueueMusic(
                     modelType,
                     addMethod,
                     addAtPosition,
                     itemsList,
-                    indexColum,
-                    orderBy,
                     whereClause,
+                    whereColumn
                 )
                 Log.i(TAG, "WORKER $TAG : ADDED SONGS TO QUEUE MUSIC : $addedSongs ")
 
@@ -66,9 +72,8 @@ class AddSongsToQueueMusicWorker(
         addMethod: String?,
         addAtPosition: Int,
         itemsList: Array<String>?,
-        indexColum: String?,
-        orderBy: String?,
-        whereClause: String?
+        whereClause: String?,
+        whereColumn: String?
     ): Int {
         if(
             modelType == null || modelType.isEmpty() ||
@@ -87,29 +92,27 @@ class AddSongsToQueueMusicWorker(
             )
         }else{
             if(
-                indexColum == null || indexColum.isEmpty() ||
-                orderBy == null || orderBy.isEmpty() ||
-                whereClause == null || whereClause.isEmpty()
+                whereClause == null || whereClause.isEmpty() ||
+                whereColumn == null || whereColumn.isEmpty()
             ) return 0
 
             //Get all song uri
             val songUriList = ArrayList<SongItemUri>()
             for (i in itemsList.indices){
+                val tempFieldValue = itemsList[i]
                 val tempSongUriList =
                     when (whereClause) {
                         //If it is standard content explorer, then get all songs uri directly
                         WorkerConstantValues.ITEM_LIST_WHERE_EQUAL ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereEqual(
-                                indexColum,
-                                itemsList[i],
-                                orderBy
+                                whereColumn,
+                                tempFieldValue
                             )
                         //If it is from search view, get songs uri directly with "where like" clause
                         WorkerConstantValues.ITEM_LIST_WHERE_LIKE ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereLike(
-                                indexColum,
-                                itemsList[i],
-                                orderBy
+                                whereColumn,
+                                tempFieldValue
                             )
                         else -> null
                     }
@@ -130,11 +133,14 @@ class AddSongsToQueueMusicWorker(
         if((stringList == null || stringList.isEmpty()) && (songUriList == null || songUriList.isEmpty())) return 0
         var tempResult = 0
         val listSize = (stringList?.size ?: (songUriList?.size ?: 0))
+        Log.i(TAG, "WORKER ${TAG} : songUriList size ${listSize}")
         when (addMethod) {
             ADD_METHOD_ADD_AT_POSITION -> {
                 //Update orders of current queue music from add at position to max play order
-                for(i in addAtPlayOrder until maxPlayOrder){
-                    updatePlayOrderOfQueueMusic(i, i+maxPlayOrder)
+                if(maxPlayOrder > 0) {
+                    for (i in addAtPlayOrder until maxPlayOrder) {
+                        updatePlayOrderOfQueueMusic(i, i + maxPlayOrder)
+                    }
                 }
                 for (i in 0 until listSize){
                     val songUri = stringList?.get(i) ?: (songUriList?.get(i)?.uri)
@@ -147,13 +153,15 @@ class AddSongsToQueueMusicWorker(
                 }
             }
             ADD_METHOD_ADD_TO_TOP -> {
-                for(i in 0 until maxPlayOrder){
-                    updatePlayOrderOfQueueMusic(i, i+maxPlayOrder)
+                if(maxPlayOrder > 0){
+                    for(i in 0 .. maxPlayOrder){
+                        updatePlayOrderOfQueueMusic(i, i+maxPlayOrder)
+                    }
                 }
                 for (i in 0 until listSize){
                     val songUri = stringList?.get(i) ?: (songUriList?.get(i)?.uri)
                     if(songUri != null && songUri.isNotEmpty()){
-                        val insertResult = insertSongToEndOfQueueMusic(songUri, (maxPlayOrder + i) + 1)
+                        val insertResult = insertSongAtPlayOrderOfQueueMusic(songUri, (maxPlayOrder + i))
                         if (insertResult > 0) {
                             tempResult++
                         }
@@ -172,13 +180,14 @@ class AddSongsToQueueMusicWorker(
                 }
             }
         }
+        Log.i(TAG, "WORKER ${TAG} : inserted ${tempResult}")
         return tempResult
     }
     private fun insertSongToEndOfQueueMusic(songUri: String, maxPlayOrder: Int): Long {
         val queueMusicItem = QueueMusicItem()
         queueMusicItem.songUri = songUri
         queueMusicItem.addedDate = SystemSettingsUtils.getCurrentDateInMilli()
-        queueMusicItem.playOrder = maxPlayOrder + 1
+        queueMusicItem.playOrder = maxPlayOrder
         return AppDatabase.getDatabase(applicationContext).queueMusicItemDao()
             .insert(queueMusicItem)
     }
@@ -196,7 +205,7 @@ class AddSongsToQueueMusicWorker(
     }
 
     companion object {
-        const val TAG = "QueueMusicAddSongsWorker"
+        const val TAG = "AddSongsToQMW"
 
         const val ADD_METHOD = "ADD_METHOD"
         const val ADD_METHOD_ADD_AT_POSITION = "ADD_METHOD_ADD_AT_POSITION"

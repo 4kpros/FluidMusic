@@ -28,9 +28,8 @@ class AddSongsToPlaylistWorker(
                 val playlistId = inputData.getInt(PLAYLIST_ID, -1)
                 val modelType = inputData.getString(WorkerConstantValues.ITEM_LIST_MODEL_TYPE)
                 val itemsList = inputData.getStringArray(WorkerConstantValues.ITEM_LIST)
-                val orderBy = inputData.getString(WorkerConstantValues.ITEM_LIST_ORDER_BY)
                 val whereClause = inputData.getString(WorkerConstantValues.ITEM_LIST_WHERE)
-                val indexColum = inputData.getString(WorkerConstantValues.INDEX_COLUM)
+                val whereColumn = inputData.getString(WorkerConstantValues.WHERE_COLUMN_INDEX)
                 //Retrieve song list from items list of worker params
                 val playlistItemList: List<PlaylistSongItem>? =
                     getPlayListItemsFromParams(
@@ -38,8 +37,7 @@ class AddSongsToPlaylistWorker(
                         modelType,
                         itemsList,
                         whereClause,
-                        indexColum,
-                        orderBy
+                        whereColumn
                     )
                 //Insert to database
                 dataResult = AppDatabase.getDatabase(applicationContext).playlistSongItemDao().insertMultiple(playlistItemList)
@@ -63,9 +61,8 @@ class AddSongsToPlaylistWorker(
         playlistId: Int,
         modelType: String?,
         itemsList: Array<String>?,
-        indexColum: String?,
-        itemsListOrderBy: String?,
-        whereClause: String? = null
+        whereClause: String?,
+        whereColumn: String?
     ): List<PlaylistSongItem>? {
         if(
             itemsList == null || itemsList.isEmpty() ||
@@ -86,27 +83,25 @@ class AddSongsToPlaylistWorker(
             }
         }else{
             if(
-                indexColum == null || indexColum.isEmpty() ||
-                itemsListOrderBy == null || itemsListOrderBy.isEmpty() ||
-                whereClause == null || whereClause.isEmpty()
+                whereClause == null || whereClause.isEmpty() ||
+                whereColumn == null || whereColumn.isEmpty()
             ) return null
 
             for (i in itemsList.indices){
+                val tempFieldValue = itemsList[i]
                 val tempSongUriList =
                     when (whereClause) {
                         //If it is standard content explorer, then get all songs uri directly
                         WorkerConstantValues.ITEM_LIST_WHERE_EQUAL ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereEqual(
-                            indexColum,
-                                itemsList[i],
-                            itemsListOrderBy
+                                whereColumn,
+                                tempFieldValue
                         )
                         //If it is from search view, get songs uri directly with "where like" clause
                         WorkerConstantValues.ITEM_LIST_WHERE_LIKE ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereLike(
-                            indexColum,
-                                itemsList[i],
-                            itemsListOrderBy
+                                whereColumn,
+                                tempFieldValue
                         )
                         else -> null
                     }

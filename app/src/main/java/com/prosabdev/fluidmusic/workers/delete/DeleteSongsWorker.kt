@@ -27,16 +27,14 @@ class DeleteSongsWorker(
                 //Extract worker params
                 val modelType = inputData.getString(WorkerConstantValues.ITEM_LIST_MODEL_TYPE)
                 val itemsList = inputData.getStringArray(WorkerConstantValues.ITEM_LIST)
-                val orderBy = inputData.getString(WorkerConstantValues.ITEM_LIST_ORDER_BY)
                 val whereClause = inputData.getString(WorkerConstantValues.ITEM_LIST_WHERE)
-                val indexColum = inputData.getString(WorkerConstantValues.INDEX_COLUM)
+                val whereColumn = inputData.getString(WorkerConstantValues.WHERE_COLUMN_INDEX)
                 //Delete songs from database and on device
                 val dataResult = tryToDeleteSongsFromSource(
                     modelType,
                     itemsList,
-                    indexColum,
-                    orderBy,
-                    whereClause
+                    whereClause,
+                    whereColumn
                 )
                 Log.i(TAG, "WORKER $TAG : DELETED SONGS ON DATABASE : ${dataResult[0]} ")
                 Log.i(TAG, "WORKER $TAG : DELETED SONGS ON DEVICE : ${dataResult[1]}")
@@ -105,9 +103,8 @@ class DeleteSongsWorker(
     private fun tryToDeleteSongsFromSource(
         modelType: String?,
         itemsList: Array<String>?,
-        indexColum: String?,
-        orderBy: String?,
-        whereClause: String?
+        whereClause: String?,
+        whereColumn: String?
     ): Array<Int> {
         val resultList = Array(2){0}
         if(
@@ -120,30 +117,29 @@ class DeleteSongsWorker(
             resultList[1] = deleteSongsFromDevice(itemsList)
         }else{
             if(
-                indexColum == null || indexColum.isEmpty() ||
-                orderBy == null || orderBy.isEmpty() ||
-                whereClause == null || whereClause.isEmpty()
+                whereClause == null || whereClause.isEmpty() ||
+                whereColumn == null || whereColumn.isEmpty()
             ) return resultList
 
             for (i in itemsList.indices){
+                val tempFieldValue = itemsList[i]
                 val tempSongUriList =
                     when (whereClause) {
                         //If it is standard content explorer, then get all songs uri directly
                         WorkerConstantValues.ITEM_LIST_WHERE_EQUAL ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereEqual(
-                                indexColum,
-                                itemsList[i],
-                                orderBy
+                                whereColumn,
+                                tempFieldValue
                             )
                         //If it is from search view, get songs uri directly with "where like" clause
                         WorkerConstantValues.ITEM_LIST_WHERE_LIKE ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereLike(
-                                indexColum,
-                                itemsList[i],
-                                orderBy
+                                whereColumn,
+                                tempFieldValue
                             )
                         else -> null
                     }
+                Log.i(TAG, "WORKER $TAG : tempSongUriList size ${tempSongUriList?.size}")
                 if(tempSongUriList != null && tempSongUriList.isNotEmpty()){
                     resultList[0] += deleteSongsFromDatabase(tempSongUriList)
                     resultList[1] += deleteSongsFromDevice(tempSongUriList)

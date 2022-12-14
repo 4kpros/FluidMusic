@@ -21,7 +21,6 @@ class PlaylistActionsWorkerViewModel(app: Application) : AndroidViewModel(app) {
         playlistId: Long,
         modelType: String,
         itemList: Array<String>,
-        orderBy: String,
         whereClause: String,
         indexColumn: String,
     ){
@@ -31,9 +30,8 @@ class PlaylistActionsWorkerViewModel(app: Application) : AndroidViewModel(app) {
                     AddSongsToPlaylistWorker.PLAYLIST_ID to playlistId,
                     WorkerConstantValues.ITEM_LIST_MODEL_TYPE to modelType,
                     WorkerConstantValues.ITEM_LIST to itemList,
-                    WorkerConstantValues.ITEM_LIST_ORDER_BY to orderBy,
                     WorkerConstantValues.ITEM_LIST_WHERE to whereClause,
-                    WorkerConstantValues.INDEX_COLUM to indexColumn
+                    WorkerConstantValues.WHERE_COLUMN_INDEX to indexColumn
                 )
             )
             .addTag(AddSongsToPlaylistWorker.TAG)

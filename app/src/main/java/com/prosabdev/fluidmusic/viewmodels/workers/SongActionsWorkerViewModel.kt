@@ -13,21 +13,21 @@ class SongActionsWorkerViewModel(app: Application) : AndroidViewModel(app) {
     init {
         outputWorkInfoItems = workManager.getWorkInfosByTagLiveData(DeleteSongsWorker.TAG)
     }
+
     fun deleteSongs(
         modelType: String,
-        itemList: Array<String>,
-        orderBy: String,
+        itemsList: MutableCollection<String>?,
         whereClause: String,
-        indexColumn: String,
+        whereColumn: String
     ){
+        if(itemsList == null) return
         val deleteSongsWorkRequest: OneTimeWorkRequest = OneTimeWorkRequestBuilder<DeleteSongsWorker>()
             .setInputData(
                 workDataOf(
                     WorkerConstantValues.ITEM_LIST_MODEL_TYPE to modelType,
-                    WorkerConstantValues.ITEM_LIST to itemList,
-                    WorkerConstantValues.ITEM_LIST_ORDER_BY to orderBy,
+                    WorkerConstantValues.ITEM_LIST to itemsList.toTypedArray(),
                     WorkerConstantValues.ITEM_LIST_WHERE to whereClause,
-                    WorkerConstantValues.INDEX_COLUM to indexColumn
+                    WorkerConstantValues.WHERE_COLUMN_INDEX to whereColumn
                 )
             )
             .addTag(DeleteSongsWorker.TAG)

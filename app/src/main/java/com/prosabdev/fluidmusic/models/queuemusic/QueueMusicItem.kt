@@ -7,13 +7,13 @@ import com.prosabdev.fluidmusic.models.songitem.SongItem
 
 @Entity(
     foreignKeys = [
-        ForeignKey(entity = SongItem::class, parentColumns = ["id"], childColumns = ["songUri"], onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.NO_ACTION)
+        ForeignKey(entity = SongItem::class, parentColumns = ["uri"], childColumns = ["songUri"], onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.NO_ACTION)
     ]
 )
 class QueueMusicItem {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
-    var songUri: String? = null
+    var songUri: String = ""
     var addedDate: Long = 0
     var playOrder: Int = 0
 }

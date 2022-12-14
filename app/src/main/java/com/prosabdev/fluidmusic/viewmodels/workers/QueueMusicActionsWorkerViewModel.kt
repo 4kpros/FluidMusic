@@ -24,21 +24,20 @@ class QueueMusicActionsWorkerViewModel(app: Application) : AndroidViewModel(app)
         modelType: String,
         addMethod: String,
         addAtOrder: Int,
-        itemList: Array<String>,
-        orderBy: String,
+        itemList: MutableCollection<String>?,
         whereClause: String,
-        indexColumn: String,
+        whereIndexColumn: String
     ){
+        if(itemList == null) return
         val workRequest: OneTimeWorkRequest = OneTimeWorkRequestBuilder<AddSongsToQueueMusicWorker>()
             .setInputData(
                 workDataOf(
                     WorkerConstantValues.ITEM_LIST_MODEL_TYPE to modelType,
                     AddSongsToQueueMusicWorker.ADD_METHOD to addMethod,
                     AddSongsToQueueMusicWorker.ADD_AT_ORDER to addAtOrder,
-                    WorkerConstantValues.ITEM_LIST to itemList,
-                    WorkerConstantValues.ITEM_LIST_ORDER_BY to orderBy,
+                    WorkerConstantValues.ITEM_LIST to itemList.toTypedArray(),
                     WorkerConstantValues.ITEM_LIST_WHERE to whereClause,
-                    WorkerConstantValues.INDEX_COLUM to indexColumn
+                    WorkerConstantValues.WHERE_COLUMN_INDEX to whereIndexColumn
                 )
             )
             .addTag(AddSongsToQueueMusicWorker.TAG)
@@ -52,19 +51,18 @@ class QueueMusicActionsWorkerViewModel(app: Application) : AndroidViewModel(app)
     }
     fun removeSongsFromQueueMusic(
         modelType: String,
-        itemList: Array<String>,
-        orderBy: String,
+        itemList: MutableCollection<String>?,
         whereClause: String,
-        indexColumn: String,
+        whereIndexColumn: String
     ){
+        if(itemList == null) return
         val workRequest: OneTimeWorkRequest = OneTimeWorkRequestBuilder<RemoveSongsFromQueueMusicWorker>()
             .setInputData(
                 workDataOf(
                     WorkerConstantValues.ITEM_LIST_MODEL_TYPE to modelType,
                     WorkerConstantValues.ITEM_LIST to itemList,
-                    WorkerConstantValues.ITEM_LIST_ORDER_BY to orderBy,
                     WorkerConstantValues.ITEM_LIST_WHERE to whereClause,
-                    WorkerConstantValues.INDEX_COLUM to indexColumn
+                    WorkerConstantValues.WHERE_COLUMN_INDEX to whereIndexColumn
                 )
             )
             .addTag(RemoveSongsFromQueueMusicWorker.TAG)

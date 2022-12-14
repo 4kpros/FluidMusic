@@ -119,9 +119,9 @@ class MediaScannerWorker(
                                         )
                                         if(tempSong != null){
                                             scannedSongs.add(tempFFF.name)
-                                            tempSong.folder = tempDocFile.name
+                                            tempSong.folder = tempDocFile.name ?: ""
                                             tempSong.folderUri = uriTree.toString()
-                                            tempSong.folderParent = parentFolder
+                                            tempSong.folderParent = parentFolder ?: ""
                                             tempSong.uriTreeId = folderUriTreeId ?: -1
                                             Log.i(TAG, "SONG FOUND : ${tempSong.fileName}")
                                             saveSongToDatabase(tempSong)
@@ -144,8 +144,9 @@ class MediaScannerWorker(
         }
     }
     private fun saveSongToDatabase(songItem: SongItem) {
+        if(songItem.uri.isEmpty()) return
         val updateResult = AppDatabase.getDatabase(applicationContext).songItemDao().updateAtUri(
-            songItem.uri ?: return,
+            songItem.uri,
             songItem.uriTreeId,
             songItem.fileName,
             songItem.title,

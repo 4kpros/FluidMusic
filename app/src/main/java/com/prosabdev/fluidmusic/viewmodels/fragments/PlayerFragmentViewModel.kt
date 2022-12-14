@@ -26,7 +26,6 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mMutableSkipNextTrackCounter = MutableLiveData<Int>(0)
     private val mMutableSkipPrevTrackCounter = MutableLiveData<Int>(0)
     private val mMutableUpdatePlaylistCounter = MutableLiveData<Int>(0)
-    private val mMutableIsQueueMusicUpdated = MutableLiveData<Boolean>(true)
     private val mMutableSortBy = MutableLiveData<String>("id")
     private val mMutableIsInverted = MutableLiveData<Boolean>(false)
     private val mMutableCanScrollSmoothViewpager = MutableLiveData<Boolean>(false)
@@ -47,7 +46,6 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
     private val mSkipNextTrackCounter: LiveData<Int> get() = mMutableSkipNextTrackCounter
     private val mSkipPrevTrackCounter: LiveData<Int> get() = mMutableSkipPrevTrackCounter
     private val mUpdatePlaylistCounter: LiveData<Int> get() = mMutableUpdatePlaylistCounter
-    private val mIsQueueMusicUpdated: LiveData<Boolean> get() = mMutableIsQueueMusicUpdated
     private val mSortBy: LiveData<String> get() = mMutableSortBy
     private val mIsInverted: LiveData<Boolean> get() = mMutableIsInverted
     private val mCanScrollSmoothViewpager: LiveData<Boolean> get() = mMutableCanScrollSmoothViewpager
@@ -178,20 +176,11 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
             if(tempCounter >= 100)
                 tempCounter = 0
             tempCounter++
-            mMutableIsQueueMusicUpdated.value = false
             mMutableUpdatePlaylistCounter.value = tempCounter
         }
     }
     fun getUpdatePlaylistCounter(): LiveData<Int> {
         return mUpdatePlaylistCounter
-    }
-    fun setIsQueueMusicUpdated() {
-        MainScope().launch {
-            mMutableIsQueueMusicUpdated.value = true
-        }
-    }
-    fun getIsQueueMusicUpdated(): LiveData<Boolean> {
-        return mIsQueueMusicUpdated
     }
     fun setSortBy(sortBy : String) {
         if(sortBy == mSortBy.value) return

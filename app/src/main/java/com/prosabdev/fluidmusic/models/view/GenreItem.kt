@@ -25,8 +25,8 @@ import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
             "GROUP BY SongItem.genre ORDER BY SongItem.genre"
 )
 class GenreItem {
-    var name: String? = null
-    var year: String? = null
+    var name: String = ""
+    var year: String = ""
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
     var numberArtists: Int = 0
@@ -36,26 +36,32 @@ class GenreItem {
     var numberTracks: Int = 0
     var totalDuration: Long = 0
     var hashedCovertArtSignature: Int = -1
-    var uriImage: String? = null
+    var uriImage: String = ""
 
     companion object {
         const val TAG = "GenreItem"
-        const val DEFAULT_INDEX = "name"
         const val INDEX_COLUM_TO_SONG_ITEM = "genre"
 
-        fun getStringIndexRequestFastScroller(ctx: Context, dataItem: Any): String {
+        fun getStringIndexForSelection(dataItem: Any?): String {
+            if(dataItem != null && dataItem is GenreItem) {
+                return dataItem.name.ifEmpty { "" }
+            }
+            return ""
+        }
+        fun getStringIndexForFastScroller(dataItem: Any): String {
             if(dataItem is GenreItem) {
-                return dataItem.name ?: ctx.getString(R.string.unknown_genre)
+                return dataItem.name.ifEmpty { "#" }
             }
             return "#"
         }
+
         fun castDataItemToGeneric(ctx: Context, dataItem: Any): GenericItemListGrid? {
             var tempResult : GenericItemListGrid? = null
             if(dataItem is GenreItem) {
                 tempResult = GenericItemListGrid()
-                val tempTitle : String = dataItem.name ?: ctx.getString(R.string.unknown_genre)
-                val tempSubtitle : String = ""
-                val tempDetails : String = "${dataItem.numberTracks} song(s) | ${FormattersAndParsersUtils.formatSongDurationToString(dataItem.totalDuration)} min"
+                val tempTitle : String = dataItem.name.ifEmpty { ctx.getString(R.string.unknown_genre) }
+                val tempSubtitle = ""
+                val tempDetails = ""
                 tempResult.title = tempTitle
                 tempResult.subtitle = tempSubtitle
                 tempResult.details = tempDetails

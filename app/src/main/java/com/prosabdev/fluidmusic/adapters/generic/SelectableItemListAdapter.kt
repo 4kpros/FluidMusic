@@ -1,32 +1,25 @@
 package com.prosabdev.fluidmusic.adapters.generic
 
-import android.util.Log
-import android.util.SparseBooleanArray
 import androidx.core.util.contains
-import androidx.core.util.remove
 import androidx.core.util.size
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallback: DiffUtil.ItemCallback<Any>) : ListAdapter<Any, VH>(
     diffCallback
 ) {
     private val mTAG: String = SelectableItemListAdapter::class.java.simpleName
-    private var mSelectedItems: ArrayList<Int> = ArrayList()
+    private var mSelectedStringItems: HashMap<Int, String> = HashMap()
     private var mMinSelected: Int = -1
     private var mMaxSelected: Int = -1
     private var mSelectionMode: Boolean = false
 
     interface OnSelectSelectableItemListener{
         fun onSelectModeChange(selectMode : Boolean)
-        fun onTotalSelectedItemChange(totalSelected : Int)
+        fun onRequestGetStringIndex(position : Int) : String
+        fun onSelectedListChange(selectedList : HashMap<Int, String>)
     }
 
     private fun onNotifyVisibleItemChanged(layoutManager : GridLayoutManager?){
@@ -58,8 +51,11 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
         return false
     }
 
+    protected fun selectableItemGetSelectedItemList(): HashMap<Int, String> {
+        return mSelectedStringItems
+    }
     protected fun selectableItemGetSelectedItemCount(): Int {
-        return mSelectedItems.size
+        return mSelectedStringItems.size
     }
     protected fun selectableItemGetMinSelected(): Int {
         return mMinSelected
@@ -71,7 +67,7 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
         return mSelectionMode
     }
     protected fun selectableItemIsSelected(position: Int): Boolean {
-        return mSelectedItems.contains(position)
+        return mSelectedStringItems.contains(position)
     }
 
     protected fun selectableItemSetSelectionMode(
@@ -81,7 +77,7 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
         if(value == mSelectionMode)
             return
         if(!value){
-            mSelectedItems.clear()
+            mSelectedStringItems.clear()
             mMinSelected = -1
             mMaxSelected = -1
             mSelectionMode = false
@@ -95,14 +91,17 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
         layoutManager: GridLayoutManager? = null
     ) {
         if(mSelectionMode){
-            if(mSelectedItems.contains(position)){
-                mSelectedItems.remove(position)
-                onSelectSelectableItemListener.onTotalSelectedItemChange(mSelectedItems.size)
+            if(mSelectedStringItems.contains(position)){
+                mSelectedStringItems.remove(position)
+
+                onSelectSelectableItemListener.onSelectedListChange(mSelectedStringItems)
                 onNotifyItemChanged(position, layoutManager, false)
                 findNewMinMaxSelected()
             }else{
-                mSelectedItems.add(position)
-                onSelectSelectableItemListener.onTotalSelectedItemChange(mSelectedItems.size)
+                val stringIndex = onSelectSelectableItemListener.onRequestGetStringIndex(position)
+                mSelectedStringItems[position] = stringIndex
+
+                onSelectSelectableItemListener.onSelectedListChange(mSelectedStringItems)
                 onNotifyItemChanged(position, layoutManager, false)
                 compareAndSetMinMax(position)
             }
@@ -110,43 +109,50 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
             mSelectionMode = true
             mMinSelected = position
             mMaxSelected = position
-            mSelectedItems.clear()
-            mSelectedItems.add(position)
+
+            mSelectedStringItems.clear()
+            val stringIndex = onSelectSelectableItemListener.onRequestGetStringIndex(position)
+            mSelectedStringItems[position] = stringIndex
+
             onSelectSelectableItemListener.onSelectModeChange(mSelectionMode)
-            onSelectSelectableItemListener.onTotalSelectedItemChange(1)
+            onSelectSelectableItemListener.onSelectedListChange(mSelectedStringItems)
             onNotifyItemChanged(position, layoutManager, false)
         }
     }
 
-    protected fun selectableItemSelectAll(layoutManager : GridLayoutManager? = null) {
+    protected fun selectableItemSelectAll(onSelectSelectableItemListener: OnSelectSelectableItemListener, layoutManager : GridLayoutManager? = null) {
         mMinSelected = 0
         mMaxSelected = itemCount
         for (i in 0 until itemCount) {
-            if (!mSelectedItems.contains(i)) {
-                mSelectedItems.add(i)
+            if(!mSelectedStringItems.contains(i)){
+                val stringIndex = onSelectSelectableItemListener.onRequestGetStringIndex(i)
+                mSelectedStringItems[i] = stringIndex
             }
         }
+        onSelectSelectableItemListener.onSelectedListChange(mSelectedStringItems)
         onNotifyVisibleItemChanged(layoutManager)
     }
-    protected fun selectableItemClearAllSelection(layoutManager : GridLayoutManager? = null) {
-        mSelectedItems.clear()
+    protected fun selectableItemClearAllSelection(onSelectSelectableItemListener: OnSelectSelectableItemListener, layoutManager : GridLayoutManager? = null) {
+        mSelectedStringItems.clear()
         mMinSelected = -1
         mMaxSelected = -1
+        onSelectSelectableItemListener.onSelectedListChange(mSelectedStringItems)
         onNotifyVisibleItemChanged(layoutManager)
     }
 
-    protected fun selectableItemSelectRange(mOnSelectSelectableItemListener: OnSelectSelectableItemListener, layoutManager : GridLayoutManager? = null) {
-        val oldSize = mSelectedItems.size
+    protected fun selectableItemSelectRange(onSelectSelectableItemListener: OnSelectSelectableItemListener, layoutManager : GridLayoutManager? = null) {
+        val oldSize = mSelectedStringItems.size
         if(mMinSelected >= 0 && mMaxSelected >= 0) {
             for (i in mMinSelected .. mMaxSelected){
-                if(!mSelectedItems.contains(i)){
-                    mSelectedItems.add(i)
+                if(!mSelectedStringItems.contains(i)){
+                    val stringIndex = onSelectSelectableItemListener.onRequestGetStringIndex(i)
+                    mSelectedStringItems[i] = stringIndex
                 }
             }
         }
-        if(mSelectedItems.size != oldSize)
+        if(mSelectedStringItems.size != oldSize)
         {
-            mOnSelectSelectableItemListener.onTotalSelectedItemChange(mSelectedItems.size)
+            onSelectSelectableItemListener.onSelectedListChange(mSelectedStringItems)
             onNotifyVisibleItemChanged(layoutManager)
         }
     }
@@ -163,13 +169,13 @@ abstract class SelectableItemListAdapter<VH : RecyclerView.ViewHolder>(diffCallb
     private fun findNewMinMaxSelected() {
         mMaxSelected = -1
         mMinSelected = -1
-        if(mSelectedItems.size > 0){
-            for (i in 0 until mSelectedItems.size) {
-                if(mMaxSelected < mSelectedItems[i]){
-                    mMaxSelected = mSelectedItems[i]
+        if(mSelectedStringItems.size > 0){
+            mSelectedStringItems.keys.forEach { key ->
+                if(mMaxSelected < key){
+                    mMaxSelected = key
                 }
-                if(mMinSelected > mSelectedItems[i] || mMinSelected < 0){
-                    mMinSelected = mSelectedItems[i]
+                if(mMinSelected > key || mMinSelected < 0){
+                    mMinSelected = key
                 }
             }
         }
