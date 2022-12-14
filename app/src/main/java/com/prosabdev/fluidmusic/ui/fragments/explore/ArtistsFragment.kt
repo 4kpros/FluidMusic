@@ -383,13 +383,7 @@ class ArtistsFragment : Fragment() {
         listHeadlines.add(0)
         mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
             override fun onPlayButtonClicked() {
-                CommonPlaybackAction.playSongAtPositionFromGenericAdapterView(
-                    mPlayerFragmentViewModel,
-                    mArtistsFragmentViewModel,
-                    mGenericListGridItemAdapter,
-                    TAG,
-                    0
-                )
+                playFirstSong()
             }
             override fun onShuffleButtonClicked() {
                 playSongOnShuffle()
@@ -510,6 +504,7 @@ class ArtistsFragment : Fragment() {
             })
         }
     }
+
     private fun openExploreContentFragment(position: Int) {
         //
     }
@@ -545,20 +540,15 @@ class ArtistsFragment : Fragment() {
                         mGenericListGridItemAdapter?.getPlayingPosition() ?: -1,
                         (mGenericListGridItemAdapter?.currentList?.size ?: 0) -1
                     )
-                mGenericListGridItemAdapter?.let { genericListGridItemAdapter ->
-                    CommonPlaybackAction.playSongAtPositionFromGenericAdapterView(
-                        mPlayerFragmentViewModel,
-                        mArtistsFragmentViewModel,
-                        genericListGridItemAdapter,
-                        TAG,
-                        randomExcludedNumber,
-                        PlaybackStateCompat.REPEAT_MODE_NONE,
-                        PlaybackStateCompat.SHUFFLE_MODE_NONE
-                    )
-                }
+
+                //Load song and play
                 updateRecyclerViewScrollingSate()
             }
         }
+    }
+
+    private fun playFirstSong() {
+        //
     }
     private fun updateRecyclerViewScrollingSate(){
         if(mDataBidingView?.recyclerView?.scrollState == RecyclerView.SCROLL_STATE_SETTLING){

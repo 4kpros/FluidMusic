@@ -2,8 +2,11 @@ package com.prosabdev.fluidmusic.viewmodels.fragments.explore
 
 import android.app.Application
 import androidx.lifecycle.LifecycleOwner
+import com.prosabdev.fluidmusic.models.songitem.SongItem
+import com.prosabdev.fluidmusic.models.view.AlbumArtistItem
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.explore.AlbumArtistItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.explore.ArtistItemViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -15,5 +18,8 @@ class AlbumArtistsFragmentViewModel (app: Application) : GenericListenDataViewMo
                 mMutableDataList.value = it as ArrayList<Any>?
             }
         }
+    }
+    suspend fun requestDataDirectlyFromDatabase(viewModel: AlbumArtistItemViewModel){
+        mMutableDataList.value = viewModel.getAllDirectly(getSortBy().value ?: AlbumArtistItem.DEFAULT_INDEX)
     }
 }

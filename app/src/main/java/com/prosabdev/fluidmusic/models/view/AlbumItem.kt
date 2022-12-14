@@ -40,6 +40,7 @@ class AlbumItem {
 
     companion object {
         const val TAG = "AlbumItem"
+        const val DEFAULT_INDEX = "name"
         const val INDEX_COLUM_TO_SONG_ITEM = "album"
 
         fun getStringIndexForSelection(dataItem: Any?): String {

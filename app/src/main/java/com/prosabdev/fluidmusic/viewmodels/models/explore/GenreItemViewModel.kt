@@ -13,7 +13,10 @@ class GenreItemViewModel(app: Application) : AndroidViewModel(app) {
     suspend fun getAtName(name : String) : GenreItem? {
         return repository?.getAtName(name)
     }
-    suspend fun getAll(order_by: String = "name") : LiveData<List<GenreItem>>? {
+    suspend fun getAll(order_by: String) : LiveData<List<GenreItem>>? {
         return repository?.getAll(order_by)
+    }
+    suspend fun getAllDirectly(order_by: String) : List<GenreItem>? {
+        return repository?.getAllDirectly(order_by)
     }
 }

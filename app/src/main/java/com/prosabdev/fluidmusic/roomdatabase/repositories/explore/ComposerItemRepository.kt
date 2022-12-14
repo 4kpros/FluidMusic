@@ -2,6 +2,7 @@ package com.prosabdev.fluidmusic.roomdatabase.repositories.explore
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import com.prosabdev.fluidmusic.models.view.ArtistItem
 import com.prosabdev.fluidmusic.models.view.ComposerItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.roomdatabase.dao.explore.ComposerItemDao
@@ -20,6 +21,11 @@ class ComposerItemRepository(ctx : Context) {
     suspend fun getAll(orderBy: String) : LiveData<List<ComposerItem>>? {
         return withContext(Dispatchers.IO){
             mDao?.getAll(orderBy)
+        }
+    }
+    suspend fun getAllDirectly(orderBy: String) : List<ComposerItem>? {
+        return withContext(Dispatchers.IO){
+            mDao?.getAllDirectly(orderBy)
         }
     }
 }

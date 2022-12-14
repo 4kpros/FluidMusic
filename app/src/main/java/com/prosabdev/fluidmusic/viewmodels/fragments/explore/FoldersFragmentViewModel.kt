@@ -2,7 +2,10 @@ package com.prosabdev.fluidmusic.viewmodels.fragments.explore
 
 import android.app.Application
 import androidx.lifecycle.LifecycleOwner
+import com.prosabdev.fluidmusic.models.songitem.SongItem
+import com.prosabdev.fluidmusic.models.view.FolderItem
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.explore.ArtistItemViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.explore.FolderItemViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -15,5 +18,8 @@ class FoldersFragmentViewModel(app: Application) : GenericListenDataViewModel(ap
                 mMutableDataList.value = it as ArrayList<Any>?
             }
         }
+    }
+    suspend fun requestDataDirectlyFromDatabase(viewModel: FolderItemViewModel){
+        mMutableDataList.value = viewModel.getAllDirectly(getSortBy().value ?: FolderItem.DEFAULT_INDEX)
     }
 }

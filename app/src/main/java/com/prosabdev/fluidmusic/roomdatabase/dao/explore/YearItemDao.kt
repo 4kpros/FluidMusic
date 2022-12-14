@@ -13,7 +13,7 @@ interface YearItemDao {
     @Query(
         "SELECT * FROM YearItem " +
                 "ORDER BY " +
-                "CASE :orderBy WHEN 'name' THEN COALESCE(NULLIF(YearItem.name,''), 'Unknown field') END COLLATE NOCASE," +
+                "CASE :orderBy WHEN 'name' THEN COALESCE(NULLIF(YearItem.name,''), '0') END COLLATE NOCASE DESC," +
                 "CASE :orderBy WHEN 'lastUpdateDate' THEN YearItem.lastUpdateDate END DESC," +
                 "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN YearItem.lastAddedDateToLibrary END DESC," +
                 "CASE :orderBy WHEN 'totalDuration' THEN YearItem.totalDuration END," +
@@ -30,7 +30,7 @@ interface YearItemDao {
     @Query(
         "SELECT * FROM YearItem " +
                 "ORDER BY " +
-                "CASE :orderBy WHEN 'name' THEN COALESCE(NULLIF(YearItem.name,''), 'Unknown field') END COLLATE NOCASE," +
+                "CASE :orderBy WHEN 'name' THEN COALESCE(NULLIF(YearItem.name,''), '0') END COLLATE NOCASE DESC," +
                 "CASE :orderBy WHEN 'lastUpdateDate' THEN YearItem.lastUpdateDate END DESC," +
                 "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN YearItem.lastAddedDateToLibrary END DESC," +
                 "CASE :orderBy WHEN 'totalDuration' THEN YearItem.totalDuration END," +

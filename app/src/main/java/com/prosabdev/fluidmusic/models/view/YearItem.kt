@@ -38,6 +38,7 @@ class YearItem {
 
     companion object {
         const val TAG = "YearItem"
+        const val DEFAULT_INDEX = "name"
         const val INDEX_COLUM_TO_SONG_ITEM = "year"
 
         fun getStringIndexForSelection(dataItem: Any?): String {

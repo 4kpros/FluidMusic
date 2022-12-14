@@ -45,6 +45,7 @@ class FolderItem {
 
     companion object {
         const val TAG = "FolderItem"
+        const val DEFAULT_INDEX = "name"
         const val INDEX_COLUM_TO_SONG_ITEM = "folder"
 
         fun getStringIndexForSelection(dataItem: Any?): String {
