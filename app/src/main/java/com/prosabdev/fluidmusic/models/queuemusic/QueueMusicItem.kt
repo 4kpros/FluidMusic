@@ -13,7 +13,7 @@ import com.prosabdev.fluidmusic.models.songitem.SongItem
 class QueueMusicItem {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
-    var songUri: String = ""
+    var songUri: String? = ""
     var addedDate: Long = 0
     var playOrder: Int = 0
 }

@@ -1,7 +1,6 @@
 package com.prosabdev.fluidmusic.roomdatabase.repositories.songitem
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.roomdatabase.dao.SongItemDao
@@ -43,34 +42,29 @@ class SongItemRepository(ctx : Context) {
             mDao?.getAtId(id)
         }
     }
-    suspend fun getAtUri(uri: String) : SongItem? {
+    suspend fun getAtUri(uri: String?) : SongItem? {
         return withContext(Dispatchers.IO){
             mDao?.getAtUri(uri)
         }
     }
-    suspend fun getAllLimit(orderBy: String, limit: Int) : LiveData<List<SongItem>>? {
+    suspend fun getAllDirectlyLimit(orderBy: String?, limit: Int) : List<SongItem>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAllLimit(orderBy, limit)
+            mDao?.getAllDirectlyLimit(orderBy, limit)
         }
     }
-    suspend fun getAll(orderBy: String) : LiveData<List<SongItem>>? {
-        return withContext(Dispatchers.IO){
-            mDao?.getAll(orderBy)
-        }
-    }
-    suspend fun getAllDirectly(orderBy: String) : List<SongItem>? {
+    suspend fun getAllDirectly(orderBy: String?) : List<SongItem>? {
         return withContext(Dispatchers.IO){
             mDao?.getAllDirectly(orderBy)
         }
     }
-    suspend fun getAllWhereEqual(whereColumn: String, columnValue: String?, orderBy: String) : LiveData<List<SongItem>>? {
+    suspend fun getAllDirectlyWhereEqual(whereColumn: String?, columnValue: String?, orderBy: String?) : List<SongItem>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAllWhereEqual(whereColumn, columnValue, orderBy)
+            mDao?.getAllDirectlyWhereEqual(whereColumn, columnValue, orderBy)
         }
     }
-    suspend fun getAllWhereLike(whereColumn: String, columnValue: String?, orderBy: String) : LiveData<List<SongItem>>? {
+    suspend fun getAllDirectlyWhereLike(whereColumn: String?, columnValue: String?, orderBy: String?) : List<SongItem>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAllWhereLike(whereColumn, columnValue, orderBy)
+            mDao?.getAllDirectlyWhereLike(whereColumn, columnValue, orderBy)
         }
     }
 }

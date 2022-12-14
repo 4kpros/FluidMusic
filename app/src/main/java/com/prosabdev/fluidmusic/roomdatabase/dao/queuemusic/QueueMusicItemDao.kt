@@ -34,7 +34,7 @@ interface QueueMusicItemDao {
     fun deleteAtId(id: Long) : Int
 
     @Query("DELETE FROM QueueMusicItem WHERE songUri = :uri")
-    fun deleteAtSongUri(uri: String) : Int
+    fun deleteAtSongUri(uri: String?) : Int
 
     @Query("SELECT * FROM QueueMusicItem WHERE id = :id LIMIT 1")
     fun getAtId(id: Long): QueueMusicItem?

@@ -8,7 +8,7 @@ import com.prosabdev.fluidmusic.models.view.GenreItem
 @Dao
 interface GenreItemDao {
     @Query("SELECT * FROM GenreItem WHERE name = :name LIMIT 1")
-    fun getAtName(name : String): GenreItem?
+    fun getAtName(name : String?): GenreItem?
 
     @Query(
         "SELECT * FROM GenreItem " +
@@ -26,7 +26,7 @@ interface GenreItemDao {
                 "COALESCE(NULLIF(GenreItem.name,''), 'Unknown field')," +
                 "GenreItem.lastAddedDateToLibrary DESC"
     )
-    fun getAll(orderBy: String): LiveData<List<GenreItem>>?
+    fun getAll(orderBy: String?): LiveData<List<GenreItem>>?
 
     @Query(
         "SELECT * FROM GenreItem " +
@@ -44,5 +44,5 @@ interface GenreItemDao {
                 "COALESCE(NULLIF(GenreItem.name,''), 'Unknown field')," +
                 "GenreItem.lastAddedDateToLibrary DESC"
     )
-    fun getAllDirectly(orderBy: String): List<GenreItem>?
+    fun getAllDirectly(orderBy: String?): List<GenreItem>?
 }

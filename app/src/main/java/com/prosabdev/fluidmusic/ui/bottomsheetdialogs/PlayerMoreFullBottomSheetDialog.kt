@@ -21,7 +21,9 @@ import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
 import com.prosabdev.fluidmusic.models.songitem.SongItem
+import com.prosabdev.fluidmusic.models.view.*
 import com.prosabdev.fluidmusic.service.intents.IntentActionsManager
+import com.prosabdev.fluidmusic.sharedprefs.SharedPreferenceManagerUtils
 import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
@@ -65,10 +67,8 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        MainScope().launch {
-            updateCurrentPlayingSongUI(mPlayerFragmentViewModel.getCurrentPlayingSong().value)
-            checkInteractions()
-        }
+        updateCurrentPlayingSongUI(mPlayerFragmentViewModel.getCurrentPlayingSong().value)
+        checkInteractions()
     }
 
     private fun observeLiveData() {
@@ -82,39 +82,26 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         }
     }
 
-    private suspend fun updateCurrentPlayingSongUI(songItem: SongItem?) {
+    private fun updateCurrentPlayingSongUI(songItem: SongItem?) {
         if(songItem == null)
             return
         context?.let { ctx ->
-            MainScope().launch {
-                mBottomSheetPlayerMoreBinding.textTitle.text =
-                    if(
-                        songItem.title != null && songItem.title!!.isNotEmpty()
-                    )
-                        songItem.title
-                    else
-                        songItem.fileName
+            mBottomSheetPlayerMoreBinding.textTitle.text = songItem.title?.ifEmpty { songItem.fileName } ?: songItem.fileName
+            mBottomSheetPlayerMoreBinding.textArtist.text = songItem.artist?.ifEmpty { ctx.getString(R.string.unknown_artist) } ?: ctx.getString(R.string.unknown_artist)
 
-                mBottomSheetPlayerMoreBinding.textArtist.text =
-                    if(songItem.artist != null && songItem.artist!!.isNotEmpty())
-                        songItem.artist
-                    else
-                        ctx.getString(R.string.unknown_artist)
+            mBottomSheetPlayerMoreBinding.textDescription.text =
+                ctx.getString(
+                    R.string.item_song_card_text_details,
+                    FormattersAndParsersUtils.formatSongDurationToString(songItem.duration ),
+                    songItem.typeMime
+                )
 
-                mBottomSheetPlayerMoreBinding.textDescription.text =
-                    ctx.getString(
-                        R.string.item_song_card_text_details,
-                        FormattersAndParsersUtils.formatSongDurationToString(songItem.duration ),
-                        songItem.typeMime
-                    )
-
-                val tempUri: Uri? = Uri.parse(songItem.uri ?: "")
-                val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newOriginalCardInstance()
-                imageRequest.uri = tempUri
-                imageRequest.imageView = mBottomSheetPlayerMoreBinding.covertArt
-                imageRequest.hashedCovertArtSignature = songItem.hashedCovertArtSignature
-                ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
-            }
+            val tempUri: Uri? = Uri.parse(songItem.uri)
+            val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newOriginalCardInstance()
+            imageRequest.uri = tempUri
+            imageRequest.imageView = mBottomSheetPlayerMoreBinding.covertArt
+            imageRequest.hashedCovertArtSignature = songItem.hashedCovertArtSignature
+            ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
         }
     }
 
@@ -156,13 +143,13 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     dialog.dismiss()
                 }
                 .setPositiveButton(ctx.getString(R.string.delete_file)) { _, _ ->
-                    deleteSelectedSongs()
+                    deleteSelectedSongs(tempSongItem)
                 }
                 .show()
         }
         dismiss()
     }
-    private fun deleteSelectedSongs(){
+    private fun deleteSelectedSongs(songItem: SongItem) {
         //
     }
 
@@ -208,22 +195,28 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     dialog.dismiss()
                 }
                 .show().apply {
-                    mDialogGotoSongBinding.buttonArtist.setOnClickListener{
-                        this.dismiss()
-                        mMainFragmentViewModel.setHideSlidingPanelCounter()
-                        tempFragmentManager.commit {
-                            setReorderingAllowed(false)
-                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ArtistsFragment.TAG, tempSongItem.artist ?: ""))
-                            addToBackStack(null)
-                        }
-                    }
                     mDialogGotoSongBinding.buttonAlbum.setOnClickListener{
                         this.dismiss()
                         mMainFragmentViewModel.setHideSlidingPanelCounter()
                         tempFragmentManager.commit {
                             setReorderingAllowed(false)
-                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(AlbumsFragment.TAG, tempSongItem.album ?: ""))
-                            addToBackStack(null)
+                            add(
+                                R.id.main_fragment_container,
+                                ExploreContentsForFragment.newInstance(
+                                    SharedPreferenceManagerUtils
+                                        .SortAnOrganizeForExploreContents
+                                        .SHARED_PREFERENCES_SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ALBUM,
+                                    AlbumsFragment.TAG,
+                                    AlbumItem.INDEX_COLUM_TO_SONG_ITEM,
+                                    tempSongItem.album,
+                                    null,
+                                    -1,
+                                    null,
+                                    null,
+                                    null
+                                )
+                            )
+                            addToBackStack(AlbumsFragment.TAG)
                         }
                     }
                     mDialogGotoSongBinding.buttonAlbumArtist.setOnClickListener{
@@ -231,17 +224,47 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                         mMainFragmentViewModel.setHideSlidingPanelCounter()
                         tempFragmentManager.commit {
                             setReorderingAllowed(false)
-                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(AlbumArtistsFragment.TAG, tempSongItem.albumArtist ?: ""))
-                            addToBackStack(null)
+                            add(
+                                R.id.main_fragment_container,
+                                ExploreContentsForFragment.newInstance(
+                                    SharedPreferenceManagerUtils
+                                        .SortAnOrganizeForExploreContents
+                                        .SHARED_PREFERENCES_SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ALBUM_ARTIST,
+                                    AlbumArtistsFragment.TAG,
+                                    AlbumArtistItem.INDEX_COLUM_TO_SONG_ITEM,
+                                    tempSongItem.albumArtist,
+                                    null,
+                                    -1,
+                                    null,
+                                    null,
+                                    null
+                                )
+                            )
+                            addToBackStack(AlbumArtistsFragment.TAG)
                         }
                     }
-                    mDialogGotoSongBinding.buttonFolder.setOnClickListener{
+                    mDialogGotoSongBinding.buttonArtist.setOnClickListener{
                         this.dismiss()
                         mMainFragmentViewModel.setHideSlidingPanelCounter()
                         tempFragmentManager.commit {
                             setReorderingAllowed(false)
-                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(FoldersFragment.TAG, tempSongItem.folder ?: ""))
-                            addToBackStack(null)
+                            add(
+                                R.id.main_fragment_container,
+                                ExploreContentsForFragment.newInstance(
+                                    SharedPreferenceManagerUtils
+                                        .SortAnOrganizeForExploreContents
+                                        .SHARED_PREFERENCES_SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ARTIST,
+                                    ArtistsFragment.TAG,
+                                    ArtistItem.INDEX_COLUM_TO_SONG_ITEM,
+                                    tempSongItem.artist,
+                                    null,
+                                    -1,
+                                    null,
+                                    null,
+                                    null
+                                )
+                            )
+                            addToBackStack(ArtistsFragment.TAG)
                         }
                     }
                     mDialogGotoSongBinding.buttonComposer.setOnClickListener{
@@ -249,8 +272,47 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                         mMainFragmentViewModel.setHideSlidingPanelCounter()
                         tempFragmentManager.commit {
                             setReorderingAllowed(false)
-                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(ComposersFragment.TAG, tempSongItem.composer ?: ""))
-                            addToBackStack(null)
+                            add(
+                                R.id.main_fragment_container,
+                                ExploreContentsForFragment.newInstance(
+                                    SharedPreferenceManagerUtils
+                                        .SortAnOrganizeForExploreContents
+                                        .SHARED_PREFERENCES_SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_COMPOSER,
+                                    ComposersFragment.TAG,
+                                    ComposerItem.INDEX_COLUM_TO_SONG_ITEM,
+                                    tempSongItem.composer,
+                                    null,
+                                    -1,
+                                    null,
+                                    null,
+                                    null
+                                )
+                            )
+                            addToBackStack(ComposersFragment.TAG)
+                        }
+                    }
+                    mDialogGotoSongBinding.buttonFolder.setOnClickListener{
+                        this.dismiss()
+                        mMainFragmentViewModel.setHideSlidingPanelCounter()
+                        tempFragmentManager.commit {
+                            setReorderingAllowed(false)
+                            add(
+                                R.id.main_fragment_container,
+                                ExploreContentsForFragment.newInstance(
+                                    SharedPreferenceManagerUtils
+                                        .SortAnOrganizeForExploreContents
+                                        .SHARED_PREFERENCES_SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_FOLDER,
+                                    FoldersFragment.TAG,
+                                    FolderItem.INDEX_COLUM_TO_SONG_ITEM,
+                                    tempSongItem.folder,
+                                    null,
+                                    -1,
+                                    null,
+                                    null,
+                                    null
+                                )
+                            )
+                            addToBackStack(FoldersFragment.TAG)
                         }
                     }
                     mDialogGotoSongBinding.buttonGenre.setOnClickListener{
@@ -258,10 +320,48 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                         mMainFragmentViewModel.setHideSlidingPanelCounter()
                         tempFragmentManager.commit {
                             setReorderingAllowed(false)
-                            add(R.id.main_fragment_container, ExploreContentsForFragment.newInstance(GenresFragment.TAG, tempSongItem.genre ?: ""))
-                            addToBackStack(null)
+                            add(
+                                R.id.main_fragment_container,
+                                ExploreContentsForFragment.newInstance(
+                                    SharedPreferenceManagerUtils
+                                        .SortAnOrganizeForExploreContents
+                                        .SHARED_PREFERENCES_SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_GENRE,
+                                    GenresFragment.TAG,
+                                    GenreItem.INDEX_COLUM_TO_SONG_ITEM,
+                                    tempSongItem.genre,
+                                    null,
+                                    -1,
+                                    null,
+                                    null,
+                                    null
+                                )
+                            )
+                            addToBackStack(GenresFragment.TAG)
                         }
                     }
+//                    mDialogGotoSongBinding.buttonYear.setOnClickListener{
+//                        this.dismiss()
+//                        mMainFragmentViewModel.setHideSlidingPanelCounter()
+//                        tempFragmentManager.commit {
+//                            setReorderingAllowed(false)
+//                            add(
+//                                R.id.main_fragment_container,
+//                                ExploreContentsForFragment.newInstance(
+//                                    SharedPreferenceManagerUtils
+//                                        .SortAnOrganizeForExploreContents
+//                                        .SHARED_PREFERENCES_SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_YEAR,
+//                                    YearsFragment.TAG,
+//                                    tempSongItem.year,
+//                                    null,
+//                                    -1,
+//                                    null,
+//                                    null,
+//                                    null
+//                                )
+//                            )
+//                            addToBackStack(YearsFragment.TAG)
+//                        }
+//                    }
                 }
         }
         dismiss()

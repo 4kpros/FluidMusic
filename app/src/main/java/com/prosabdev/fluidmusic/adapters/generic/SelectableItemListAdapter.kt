@@ -1,7 +1,5 @@
 package com.prosabdev.fluidmusic.adapters.generic
 
-import androidx.core.util.contains
-import androidx.core.util.size
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter

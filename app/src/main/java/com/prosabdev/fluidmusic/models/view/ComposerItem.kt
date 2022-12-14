@@ -28,8 +28,8 @@ import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
             "GROUP BY SongItem.composer ORDER BY SongItem.composer"
 )
 class ComposerItem {
-    var name: String = ""
-    var year: String = ""
+    var name: String? = ""
+    var year: String? = ""
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
     var numberArtists: Int = 0
@@ -38,7 +38,7 @@ class ComposerItem {
     var numberTracks: Int = 0
     var totalDuration: Long = 0
     var hashedCovertArtSignature: Int = -1
-    var uriImage: String = ""
+    var uriImage: String? = ""
 
     companion object {
         const val TAG = "ComposerItem"
@@ -47,28 +47,44 @@ class ComposerItem {
 
         fun getStringIndexForSelection(dataItem: Any?): String {
             if(dataItem != null && dataItem is ComposerItem) {
-                return dataItem.name.ifEmpty { "" }
+                return dataItem.name?.ifEmpty { "" } ?: ""
             }
             return ""
         }
         fun getStringIndexForFastScroller(dataItem: Any): String {
             if(dataItem is ComposerItem) {
-                return dataItem.name.ifEmpty { "#" }
+                return dataItem.name?.ifEmpty { "#" } ?: "#"
             }
             return "#"
         }
 
-        fun castDataItemToGeneric(ctx: Context, dataItem: Any): GenericItemListGrid? {
+        fun castDataItemToGeneric(ctx: Context, dataItem: Any, setAllText: Boolean = false): GenericItemListGrid? {
             var tempResult : GenericItemListGrid? = null
             if(dataItem is ComposerItem) {
                 tempResult = GenericItemListGrid()
-                val tempTitle : String = dataItem.name.ifEmpty { ctx.getString(R.string.unknown_composer) }
-                val tempSubtitle = ""
-                val tempDetails = ""
+                val tempTitle : String = dataItem.name?.ifEmpty { ctx.getString(R.string.unknown_composer) } ?: ctx.getString(R.string.unknown_composer)
+                val tempSubtitle =
+                    ctx.getString(
+                        R.string.item_content_explore_text_subtitle,
+                        dataItem.numberArtists.toString(),
+                        dataItem.numberAlbums.toString()
+                    )
+                val tempDetails =
+                    if(setAllText)
+                        ctx.getString(
+                            R.string.item_content_explore_text_details,
+                            FormattersAndParsersUtils.formatSongDurationToString(dataItem.totalDuration),
+                            dataItem.numberTracks.toString()
+                        )
+                    else
+                        ""
+                tempResult.name = dataItem.name
                 tempResult.title = tempTitle
                 tempResult.subtitle = tempSubtitle
                 tempResult.details = tempDetails
-                tempResult.imageUri = Uri.parse(dataItem.uriImage)
+                if(dataItem.uriImage?.isNotEmpty() == true){
+                    tempResult.imageUri = Uri.parse(dataItem.uriImage)
+                }
                 tempResult.imageHashedSignature = dataItem.hashedCovertArtSignature
             }
             return tempResult

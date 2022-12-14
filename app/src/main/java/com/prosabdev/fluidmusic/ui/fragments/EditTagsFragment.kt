@@ -1,17 +1,15 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentEditTagsBinding
-import com.prosabdev.fluidmusic.databinding.FragmentEqualizerBinding
 import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
-import java.util.ArrayList
 
 class EditTagsFragment : Fragment() {
 

@@ -8,6 +8,7 @@
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.fragments.MusicLibraryFragment">
@@ -24,7 +25,8 @@
                 android:layout_height="?attr/actionBarSize"
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:menu="@menu/main_top_app_bar"
-                app:navigationIcon="@drawable/menu" />
+                app:navigationIcon="@drawable/menu"
+                />
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tab_layout"
@@ -32,7 +34,12 @@
                 android:layout_height="wrap_content"
                 app:tabMode="scrollable"
                 app:tabContentStart="60dp"
-                android:contentDescription="@string/explore">
+                app:layout_scrollEffect="compress"
+                app:layout_scrollInterpolator="?motionEasingEmphasizedInterpolator"
+                app:tabRippleColor="@color/transparent"
+                app:tabUnboundedRipple="true"
+                android:contentDescription="@string/explore"
+                >
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
@@ -87,7 +94,9 @@
                 android:id="@+id/view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+                android:fillViewport="true"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/side_selection_menu_container"

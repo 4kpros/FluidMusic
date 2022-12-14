@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.DialogInterface.OnShowListener
 import android.os.Bundle
-import android.provider.MediaStore.Audio.Genres
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +18,6 @@ import com.prosabdev.fluidmusic.ui.fragments.StreamsFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
-import java.time.Year
 
 class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnShowListener {
 
@@ -174,6 +172,8 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
                 }
             }
         }
+        Log.i(TAG, "EXPLORE CONTENT FOR ${mFromSource}")
+        Log.i(TAG, "EXPLORE CONTENT FOR ${mFromSourceValue}")
     }
 
     private fun updateCheckedOrganizeButtonUI() {

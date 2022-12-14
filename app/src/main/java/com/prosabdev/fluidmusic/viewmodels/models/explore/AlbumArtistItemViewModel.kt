@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.prosabdev.fluidmusic.models.view.AlbumArtistItem
-import com.prosabdev.fluidmusic.models.view.ArtistItem
 import com.prosabdev.fluidmusic.roomdatabase.repositories.explore.AlbumArtistItemRepository
 
 class AlbumArtistItemViewModel(app: Application) : AndroidViewModel(app) {

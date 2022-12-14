@@ -33,12 +33,12 @@ class PlaylistItemRepository(ctx : Context) {
         }
     }
     //Getters
-    suspend fun getMaxIdLikeName(playlistName: String) : Long? {
+    suspend fun getMaxIdLikeName(playlistName: String?) : Long? {
         return withContext(Dispatchers.IO){
             return@withContext mDao?.getMaxIdLikeName(playlistName)
         }
     }
-    suspend fun getWithName(name: String) : PlaylistItem? {
+    suspend fun getWithName(name: String?) : PlaylistItem? {
         return withContext(Dispatchers.IO){
             return@withContext mDao?.getWithName(name)
         }
@@ -48,7 +48,7 @@ class PlaylistItemRepository(ctx : Context) {
             return@withContext mDao?.getAtId(id)
         }
     }
-    suspend fun getAll(orderBy: String) : LiveData<List<PlaylistItem>>? {
+    suspend fun getAll(orderBy: String?) : LiveData<List<PlaylistItem>>? {
         return withContext(Dispatchers.IO){
             return@withContext mDao?.getAll(orderBy)
         }

@@ -1,7 +1,6 @@
 package com.prosabdev.fluidmusic.viewmodels.fragments
 
 import android.app.Application
-import android.util.SparseBooleanArray
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

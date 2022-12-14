@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.ui.fragments.explore
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.commit
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -30,6 +32,7 @@ import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortContentExplorerBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
+import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 import com.prosabdev.fluidmusic.utils.MathComputationsUtils
@@ -199,6 +202,7 @@ class AlbumsFragment : Fragment() {
         }
     }
     private fun requestNewDataFromDatabase() {
+        if(mAlbumsFragmentViewModel.getSortBy().value?.isEmpty() == true) return
         MainScope().launch {
             mAlbumsFragmentViewModel.requestDataDirectlyFromDatabase(
                 mAlbumItemViewModel
@@ -514,7 +518,33 @@ class AlbumsFragment : Fragment() {
     }
 
     private fun openExploreContentFragment(position: Int) {
-        //
+        val tempFragmentManager = activity?.supportFragmentManager ?: return
+        val tempItem = mGenericListGridItemAdapter?.currentList?.get(position) ?: return
+
+        context?.let { ctx ->
+            val tempGeneric = AlbumItem.castDataItemToGeneric(ctx, tempItem, true) ?: return
+            val tempStringUri = if(tempGeneric.imageUri == Uri.EMPTY) "" else tempGeneric.imageUri.toString()
+            tempFragmentManager.commit {
+                setReorderingAllowed(false)
+                add(
+                    R.id.main_fragment_container,
+                    ExploreContentsForFragment.newInstance(
+                        SharedPreferenceManagerUtils
+                            .SortAnOrganizeForExploreContents
+                            .SHARED_PREFERENCES_SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ALBUM,
+                        TAG,
+                        AlbumItem.INDEX_COLUM_TO_SONG_ITEM,
+                        tempGeneric.name,
+                        tempStringUri,
+                        tempGeneric.imageHashedSignature,
+                        tempGeneric.title,
+                        tempGeneric.subtitle,
+                        tempGeneric.details,
+                    )
+                )
+                addToBackStack(TAG)
+            }
+        }
     }
 
     private fun showSortDialog() {

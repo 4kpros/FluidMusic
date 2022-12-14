@@ -43,12 +43,12 @@ class PlaylistSongItemRepository(ctx : Context) {
             return@withContext mDao?.getAtId(id)
         }
     }
-    suspend fun getAll(orderBy: String) : LiveData<List<PlaylistSongItem>?>? {
+    suspend fun getAll(orderBy: String?) : LiveData<List<PlaylistSongItem>?>? {
         return withContext(Dispatchers.IO){
             return@withContext mDao?.getAll(orderBy)
         }
     }
-    suspend fun getAllDirectly(orderBy: String) : List<PlaylistSongItem>? {
+    suspend fun getAllDirectly(orderBy: String?) : List<PlaylistSongItem>? {
         return withContext(Dispatchers.IO){
             return@withContext mDao?.getAllDirectly(orderBy)
         }

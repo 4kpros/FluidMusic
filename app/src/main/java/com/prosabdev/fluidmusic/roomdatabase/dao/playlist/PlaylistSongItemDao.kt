@@ -25,7 +25,7 @@ interface PlaylistSongItemDao {
     fun deleteAll() : Int
 
     @Query("DELETE FROM PlaylistSongItem WHERE songUri = :songUri")
-    fun deleteAtSongUri(songUri: String) : Int
+    fun deleteAtSongUri(songUri: String?) : Int
 
     @Query("SELECT * FROM PlaylistSongItem WHERE id = :id LIMIT 1")
     fun getAtId(id: Long): PlaylistSongItem?
@@ -37,7 +37,7 @@ interface PlaylistSongItemDao {
             "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN PlaylistSongItem.lastAddedDateToLibrary END ASC," +
             "CASE :orderBy WHEN 'id' THEN PlaylistSongItem.id END ASC"
     )
-    fun getAll(orderBy: String): LiveData<List<PlaylistSongItem>?>
+    fun getAll(orderBy: String?): LiveData<List<PlaylistSongItem>?>
 
     @Query("SELECT * FROM PlaylistSongItem " +
             "ORDER BY " +
@@ -46,5 +46,5 @@ interface PlaylistSongItemDao {
             "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN PlaylistSongItem.lastAddedDateToLibrary END ASC," +
             "CASE :orderBy WHEN 'id' THEN PlaylistSongItem.id END ASC"
     )
-    fun getAllDirectly(orderBy: String): List<PlaylistSongItem>?
+    fun getAllDirectly(orderBy: String?): List<PlaylistSongItem>?
 }

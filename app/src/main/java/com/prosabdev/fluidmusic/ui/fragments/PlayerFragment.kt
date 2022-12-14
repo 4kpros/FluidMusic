@@ -509,17 +509,11 @@ import kotlinx.coroutines.withContext
             if ((mPlayerPagerAdapter?.currentList?.size ?: 0) <= (songItem?.position ?: 0))
                 return
             MainScope().launch {
-                context?.let {
+                context?.let { ctx ->
                     fragmentPlayerBinding.textTitle.text =
-                        if (songItem?.title != null)
-                            songItem.title
-                        else
-                            songItem?.fileName
+                        songItem?.title?.ifEmpty { songItem.fileName ?: ctx.getString(R.string.unknown_title) } ?: songItem?.fileName ?: ctx.getString(R.string.unknown_title)
                     fragmentPlayerBinding.textArtist.text =
-                        if (songItem?.artist != null)
-                            songItem.artist
-                        else
-                            it.getString(R.string.unknown_artist)
+                        songItem?.artist?.ifEmpty { ctx.getString(com.prosabdev.fluidmusic.R.string.unknown_artist) } ?: ctx.getString(R.string.unknown_artist)
                     fragmentPlayerBinding.textDuration.text =
                         FormattersAndParsersUtils.formatSongDurationToString(
                             songItem?.duration ?: 0

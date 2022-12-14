@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.room.DatabaseView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.models.generic.GenericItemListGrid
-import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
 
 @DatabaseView(
@@ -30,10 +29,10 @@ import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
             "GROUP BY SongItem.albumArtist ORDER BY SongItem.albumArtist"
 )
 class AlbumArtistItem {
-    var name: String = ""
-    var artist: String = ""
-    var album: String = ""
-    var year: String = ""
+    var name: String? = ""
+    var artist: String? = ""
+    var album: String? = ""
+    var year: String? = ""
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
     var numberArtists: Int = 0
@@ -41,7 +40,7 @@ class AlbumArtistItem {
     var numberTracks: Int = 0
     var totalDuration: Long = 0
     var hashedCovertArtSignature: Int = -1
-    var uriImage: String = ""
+    var uriImage: String? = ""
 
     companion object {
         const val TAG = "AlbumArtistItem"
@@ -50,24 +49,33 @@ class AlbumArtistItem {
 
         fun getStringIndexForSelection(dataItem: Any?): String {
             if(dataItem != null && dataItem is AlbumArtistItem) {
-                return dataItem.name.ifEmpty { "" }
+                return dataItem.name?.ifEmpty { "" } ?: ""
             }
             return ""
         }
         fun getStringIndexForFastScroller(dataItem: Any): String {
             if(dataItem is AlbumArtistItem) {
-                return dataItem.name.ifEmpty { "#" }
+                return dataItem.name?.ifEmpty { "#" } ?: ""
             }
             return "#"
         }
 
-        fun castDataItemToGeneric(ctx: Context, dataItem: Any): GenericItemListGrid? {
+        fun castDataItemToGeneric(ctx: Context, dataItem: Any, setAllText: Boolean = false): GenericItemListGrid? {
             var tempResult : GenericItemListGrid? = null
             if(dataItem is AlbumArtistItem) {
                 tempResult = GenericItemListGrid()
-                val tempTitle : String = dataItem.name.ifEmpty { ctx.getString(R.string.unknown_album_artist) }
-                val tempSubtitle : String = dataItem.artist.ifEmpty { ctx.getString(R.string.unknown_artists) }
-                val tempDetails = ""
+                val tempTitle : String = dataItem.name?.ifEmpty { ctx.getString(R.string.unknown_album_artist) } ?: ctx.getString(R.string.unknown_album_artist)
+                val tempSubtitle : String = dataItem.artist?.ifEmpty { ctx.getString(R.string.unknown_artists) } ?: ctx.getString(R.string.unknown_album_artist)
+                val tempDetails =
+                    if(setAllText)
+                        ctx.getString(
+                            R.string.item_content_explore_text_details,
+                            FormattersAndParsersUtils.formatSongDurationToString(dataItem.totalDuration),
+                            dataItem.numberTracks.toString()
+                        )
+                    else
+                        ""
+                tempResult.name = dataItem.name ?: ""
                 tempResult.title = tempTitle
                 tempResult.subtitle =
                     if (tempTitle != ctx.getString(R.string.unknown_album))
@@ -81,7 +89,9 @@ class AlbumArtistItem {
                         else
                             "${dataItem.numberArtists} artist(s)"
                 tempResult.details = tempDetails
-                tempResult.imageUri = Uri.parse(dataItem.uriImage)
+                if(dataItem.uriImage?.isNotEmpty() == true){
+                    tempResult.imageUri = Uri.parse(dataItem.uriImage)
+                }
                 tempResult.imageHashedSignature = dataItem.hashedCovertArtSignature
             }
             return tempResult

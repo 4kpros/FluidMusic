@@ -12,7 +12,6 @@ import com.prosabdev.fluidmusic.models.songitem.SongItemUri
 import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.utils.SystemSettingsUtils
 import com.prosabdev.fluidmusic.workers.WorkerConstantValues
-import com.prosabdev.fluidmusic.workers.delete.DeleteSongsWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

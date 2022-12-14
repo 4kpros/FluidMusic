@@ -1,18 +1,20 @@
 package com.prosabdev.fluidmusic.viewmodels.fragments
 
 import android.app.Application
-import androidx.lifecycle.LifecycleOwner
+import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.viewmodels.models.SongItemViewModel
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 
 class ExploreContentsForFragmentViewModel(app: Application) : GenericListenDataViewModel(app) {
 
-    fun listenAllData(viewModel: SongItemViewModel, lifecycleOwner: LifecycleOwner){
-        MainScope().launch {
-            viewModel.getAll(getSortBy().value ?: "title")?.observe(lifecycleOwner){
-                mMutableDataList.value = it as ArrayList<Any>?
-            }
-        }
+    suspend fun requestDataDirectlyWhereColumnEqualFromDatabase(
+        viewModel: SongItemViewModel,
+        whereColumnIndex: String,
+        columnValue: String?
+    ){
+        mMutableDataList.value = viewModel.getAllDirectlyWhereEqual(
+            whereColumnIndex,
+            columnValue,
+            getSortBy().value?.ifEmpty { SongItem.DEFAULT_INDEX } ?: SongItem.DEFAULT_INDEX
+        )
     }
 }

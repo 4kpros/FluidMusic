@@ -201,6 +201,7 @@ class AllSongsFragment : Fragment() {
         }
     }
     private fun requestNewDataFromDatabase() {
+        if(mAllSongsFragmentViewModel.getSortBy().value?.isEmpty() == true) return
         MainScope().launch {
             mAllSongsFragmentViewModel.requestDataDirectlyFromDatabase(
                 mSongItemViewModel

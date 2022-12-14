@@ -83,7 +83,7 @@ class PlayerPageAdapter(
 
         fun loadCovertArt(ctx: Context, songItem: SongItem) {
             val tempUri : Uri? = Uri.parse(songItem.uri ?: "")
-            val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newLargeOriginalCardInstance()
+            val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newOriginalLargeCardInstance()
             imageRequest.uri = tempUri
             imageRequest.imageView = mItemPlayerCardViewBinding.playerViewpagerImageview
             imageRequest.hashedCovertArtSignature = songItem.hashedCovertArtSignature

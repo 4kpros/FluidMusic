@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.prosabdev.fluidmusic.models.view.AlbumItem
-import com.prosabdev.fluidmusic.models.view.ArtistItem
 import com.prosabdev.fluidmusic.roomdatabase.repositories.explore.AlbumItemRepository
 
 class AlbumItemViewModel(app: Application) : AndroidViewModel(app) {
@@ -14,10 +13,10 @@ class AlbumItemViewModel(app: Application) : AndroidViewModel(app) {
     suspend fun getAtName(name : String) : AlbumItem? {
         return repository?.getAtName(name)
     }
-    suspend fun getAll(order_by: String) : LiveData<List<AlbumItem>>? {
-        return repository?.getAll(order_by)
+    suspend fun getAll(orderBy: String) : LiveData<List<AlbumItem>>? {
+        return repository?.getAll(orderBy)
     }
-    suspend fun getAllDirectly(order_by: String) : List<AlbumItem>? {
-        return repository?.getAllDirectly(order_by)
+    suspend fun getAllDirectly(orderBy: String) : List<AlbumItem>? {
+        return repository?.getAllDirectly(orderBy)
     }
 }

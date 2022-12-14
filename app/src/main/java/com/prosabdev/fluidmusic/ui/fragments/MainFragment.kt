@@ -369,20 +369,14 @@ import kotlinx.coroutines.launch
                     }
                     return@launch
                 }
-                fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.text =
-                    if (songItem.title != null)
-                        songItem.title
-                    else
-                        songItem.fileName
 
-                fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text =
-                    if (songItem.artist != null)
-                        songItem.artist
-                    else
-                        context?.getString(R.string.unknown_artist)
-
-                val tempUri = Uri.parse(songItem.uri ?: "")
                 context?.let { ctx ->
+                    fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.text =
+                        songItem.title?.ifEmpty { songItem.fileName ?: ctx.getString(R.string.unknown_title) } ?: songItem.fileName ?: ctx.getString(R.string.unknown_title)
+                    fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text =
+                        songItem.artist?.ifEmpty { ctx.getString(R.string.unknown_artist) } ?: ctx.getString(R.string.unknown_artist)
+
+                    val tempUri = Uri.parse(songItem.uri ?: "")
                     val imageRequest: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newOriginalCardInstance()
                     val imageRequestBlurred: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newBlurInstance()
 
@@ -552,7 +546,6 @@ import kotlinx.coroutines.launch
             fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.isSelected = true
             fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.isSelected = true
 
-            InsetModifiersUtils.updateTopViewInsets(fragmentMainBinding.mainFragmentContainer)
             InsetModifiersUtils.updateTopViewInsets(fragmentMainBinding.includeTopSelection.constraintTopSelectionMenu)
             InsetModifiersUtils.updateBottomViewInsets(fragmentMainBinding.constraintMiniPlayerInclude.constraintMiniPlayer)
             InsetModifiersUtils.updateBottomViewInsets(fragmentMainBinding.includeBottomSelection.constraintBottomSelectionMenu)

@@ -455,10 +455,10 @@ class GenericListGridItemAdapter (
                 mOnItemRequestDataInfo.onRequestDataInfo(dataItem, bindingAdapterPosition)
                     ?: return
 
-            if(genericData.subtitle.isEmpty()){
+            if(genericData.subtitle?.isEmpty() == true){
                 mDataBinding.textSubtitle.visibility = View.GONE
             }
-            if(genericData.details.isEmpty()){
+            if(genericData.details?.isEmpty() == true){
                 mDataBinding.textDetails.visibility = View.GONE
             }
             mDataBinding.textTitle.text = genericData.title

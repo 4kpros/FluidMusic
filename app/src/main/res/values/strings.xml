@@ -170,14 +170,16 @@
 
     ///
     <string name="item_song_card_text_details">%1$s | %2$s</string>
+    <string name="item_content_explore_text_subtitle">%1$s Artist(s) | %2$s Album(s)</string>
+    <string name="item_content_explore_text_details">%1$s Min | %2$s Song(s)</string>
     //
     <string name="details">Details</string>
     <string name="edit">Edit</string>
     <string name="song_info_tags">Song info/Tags</string>
     //
-    <string name="_song_details_tags">%1$s, %2$.2f Hz, %3$.2f kbps</string>
-    <string name="_song_duration_tags">%1$s min = %2$d sec</string>
-    <string name="_song_size_tags">%1$.2f Mb = %2$d Kb</string>
+    <string name="_song_details_tags">%1$s, %2$.2f Hz, %3$.2f Kbps</string>
+    <string name="_song_duration_tags">%1$s Min = %2$d Sec</string>
+    <string name="_song_size_tags">%1$.2f Mo = %2$d Kb</string>
     <string name="ok">OK</string>
     //
     <string name="_timer_range_value">%1$d min</string>

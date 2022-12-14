@@ -12,17 +12,17 @@ class ArtistItemRepository(ctx : Context) {
 
     private var mDao: ArtistItemDao? = AppDatabase.getDatabase(ctx).artistItemDao()
 
-    suspend fun getAtName(name : String) : ArtistItem? {
+    suspend fun getAtName(name : String?) : ArtistItem? {
         return withContext(Dispatchers.IO){
             mDao?.getAtName(name)
         }
     }
-    suspend fun getAll(orderBy: String) : LiveData<List<ArtistItem>>? {
+    suspend fun getAll(orderBy: String?) : LiveData<List<ArtistItem>>? {
         return withContext(Dispatchers.IO){
             mDao?.getAll(orderBy)
         }
     }
-    suspend fun getAllDirectly(orderBy: String) : List<ArtistItem>? {
+    suspend fun getAllDirectly(orderBy: String?) : List<ArtistItem>? {
         return withContext(Dispatchers.IO){
             mDao?.getAllDirectly(orderBy)
         }

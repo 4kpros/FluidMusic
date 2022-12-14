@@ -1,9 +1,6 @@
 package com.prosabdev.fluidmusic.ui.fragments.commonmethods
 
-import android.content.Context
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.SparseBooleanArray
-import androidx.core.util.isEmpty
 import com.prosabdev.fluidmusic.adapters.generic.GenericListGridItemAdapter
 import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 import com.prosabdev.fluidmusic.models.songitem.SongItem
@@ -87,7 +84,7 @@ abstract class CommonPlaybackAction {
             songItem: SongItem?
         ): Boolean {
             if(playerFragmentViewModel == null) return false
-            if(songItem?.uri == null || songItem.uri.isEmpty()) return false
+            if(songItem?.uri == null || songItem.uri?.isEmpty() ?: return false) return false
 
             playerFragmentViewModel.setCurrentPlayingSong(songItem)
             playerFragmentViewModel.setIsPlaying(true)

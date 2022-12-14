@@ -44,7 +44,7 @@ abstract class DeviceInfoUtils {
             return if (model.startsWith(manufacturer)) {
                 model.uppercase()
             } else {
-                "${model.uppercase()} $model"
+                model
             }
         }
     }

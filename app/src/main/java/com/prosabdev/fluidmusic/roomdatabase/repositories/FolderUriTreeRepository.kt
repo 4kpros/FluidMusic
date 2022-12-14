@@ -32,7 +32,7 @@ class FolderUriTreeRepository(ctx : Context) {
             mDao?.deleteAtId(id)
         }
     }
-    suspend fun deleteAtUriTree(uri: String) {
+    suspend fun deleteAtUriTree(uri: String?) {
         return withContext(Dispatchers.IO){
             mDao?.deleteAtUriTree(uri)
         }
@@ -53,7 +53,7 @@ class FolderUriTreeRepository(ctx : Context) {
             mDao?.getAtId(id)
         }
     }
-    suspend fun getAll(order_by: String) : LiveData<List<FolderUriTree>>? {
+    suspend fun getAll(order_by: String?) : LiveData<List<FolderUriTree>>? {
         return withContext(Dispatchers.IO){
             mDao?.getAll(order_by)
         }

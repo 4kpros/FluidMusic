@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 abstract class GenericListenDataViewModel (app: Application) : AndroidViewModel(app) {
     protected val mMutableDataList = MutableLiveData<List<Any>>(null)
-    private val mMutableSortBy = MutableLiveData<String>("id")
+    private val mMutableSortBy = MutableLiveData<String>("")
     private val mMutableOrganizeListGrid = MutableLiveData<Int>(ConstantValues.ORGANIZE_LIST_MEDIUM)
     private val mMutableIsInverted = MutableLiveData<Boolean>(false)
 

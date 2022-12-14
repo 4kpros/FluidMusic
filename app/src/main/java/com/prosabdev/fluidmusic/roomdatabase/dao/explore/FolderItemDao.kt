@@ -8,7 +8,7 @@ import com.prosabdev.fluidmusic.models.view.FolderItem
 @Dao
 interface FolderItemDao {
     @Query("SELECT * FROM FolderItem WHERE name = :name LIMIT 1")
-    fun getAtName(name : String): FolderItem?
+    fun getAtName(name : String?): FolderItem?
 
     @Query(
         "SELECT * FROM FolderItem " +
@@ -26,7 +26,7 @@ interface FolderItemDao {
                 "COALESCE(NULLIF(FolderItem.name,''), 'Unknown field')," +
                 "FolderItem.lastAddedDateToLibrary DESC"
     )
-    fun getAll(orderBy: String): LiveData<List<FolderItem>>?
+    fun getAll(orderBy: String?): LiveData<List<FolderItem>>?
 
     @Query(
         "SELECT * FROM FolderItem " +
@@ -44,5 +44,5 @@ interface FolderItemDao {
                 "COALESCE(NULLIF(FolderItem.name,''), 'Unknown field')," +
                 "FolderItem.lastAddedDateToLibrary DESC"
     )
-    fun getAllDirectly(orderBy: String): List<FolderItem>?
+    fun getAllDirectly(orderBy: String?): List<FolderItem>?
 }

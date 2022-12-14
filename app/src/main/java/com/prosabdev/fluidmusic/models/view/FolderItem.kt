@@ -32,10 +32,10 @@ import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
             "GROUP BY SongItem.folder ORDER BY SongItem.folder"
 )
 class FolderItem {
-    var name: String = ""
-    var deviceName: String = ""
-    var parentFolder: String = ""
-    var year: String = ""
+    var name: String? = ""
+    var deviceName: String? = ""
+    var parentFolder: String? = ""
+    var year: String? = ""
     var lastUpdateDate: Long = 0
     var lastAddedDateToLibrary: Long = 0
     var numberArtists: Int = 0
@@ -45,7 +45,7 @@ class FolderItem {
     var numberTracks: Int = 0
     var totalDuration: Long = 0
     var hashedCovertArtSignature: Int = -1
-    var uriImage: String = ""
+    var uriImage: String? = ""
 
     companion object {
         const val TAG = "FolderItem"
@@ -54,28 +54,39 @@ class FolderItem {
 
         fun getStringIndexForSelection(dataItem: Any?): String {
             if(dataItem != null && dataItem is FolderItem) {
-                return dataItem.name.ifEmpty { "" }
+                return dataItem.name?.ifEmpty { "" } ?: ""
             }
             return ""
         }
         fun getStringIndexForFastScroller(dataItem: Any): String {
             if(dataItem is FolderItem) {
-                return dataItem.name.ifEmpty { "#" }
+                return dataItem.name?.ifEmpty { "#" } ?: "#"
             }
             return "#"
         }
 
-        fun castDataItemToGeneric(ctx: Context, dataItem: Any): GenericItemListGrid? {
+        fun castDataItemToGeneric(ctx: Context, dataItem: Any, setAllText: Boolean = false): GenericItemListGrid? {
             var tempResult : GenericItemListGrid? = null
             if(dataItem is FolderItem) {
                 tempResult = GenericItemListGrid()
-                val tempTitle : String = dataItem.name.ifEmpty { ctx.getString(R.string.unknown_folder) }
-                val tempSubtitle : String = dataItem.parentFolder.ifEmpty { dataItem.deviceName }
-                val tempDetails = ""
+                val tempTitle : String = dataItem.name?.ifEmpty { ctx.getString(R.string.unknown_folder) } ?: ctx.getString(R.string.unknown_folder)
+                val tempSubtitle : String = dataItem.parentFolder?.ifEmpty { dataItem.deviceName ?: "/" } ?: dataItem.deviceName ?: "/"
+                val tempDetails =
+                    if(setAllText)
+                        ctx.getString(
+                            R.string.item_content_explore_text_details,
+                            FormattersAndParsersUtils.formatSongDurationToString(dataItem.totalDuration),
+                            dataItem.numberTracks.toString()
+                        )
+                    else
+                        ""
+                tempResult.name = dataItem.name
                 tempResult.title = "/${tempTitle}"
                 tempResult.subtitle = if(tempSubtitle == dataItem.deviceName) tempSubtitle else "/${tempSubtitle}"
                 tempResult.details = tempDetails
-                tempResult.imageUri = Uri.parse(dataItem.uriImage)
+                if(dataItem.uriImage?.isNotEmpty() == true){
+                    tempResult.imageUri = Uri.parse(dataItem.uriImage)
+                }
                 tempResult.imageHashedSignature = dataItem.hashedCovertArtSignature
             }
             return tempResult

@@ -33,19 +33,19 @@ interface PlaylistItemDao {
             "WHERE uri = :uri"
     )
     fun updateAtUri(
-        uri: String,
-        name: String,
+        uri: String?,
+        name: String?,
         isRealFile: Boolean,
     ) : Int
 
     @Query("SELECT MAX(id) FROM PlaylistItem WHERE name GLOB '*' || :playlistName || '*' ")
-    fun getMaxIdLikeName(playlistName: String): Long
+    fun getMaxIdLikeName(playlistName: String?): Long
 
     @Query("SELECT * FROM PlaylistItem WHERE id = :id LIMIT 1")
     fun getAtId(id: Long): PlaylistItem?
 
     @Query("SELECT * FROM PlaylistItem WHERE name = :name LIMIT 1")
-    fun getWithName(name: String): PlaylistItem?
+    fun getWithName(name: String?): PlaylistItem?
 
     @Query("SELECT * FROM PlaylistItem " +
             "ORDER BY " +
@@ -54,5 +54,5 @@ interface PlaylistItemDao {
             "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN PlaylistItem.lastAddedDateToLibrary END ASC," +
             "CASE :orderBy WHEN 'id' THEN PlaylistItem.id END ASC"
     )
-    fun getAll(orderBy: String): LiveData<List<PlaylistItem>>
+    fun getAll(orderBy: String?): LiveData<List<PlaylistItem>>
 }

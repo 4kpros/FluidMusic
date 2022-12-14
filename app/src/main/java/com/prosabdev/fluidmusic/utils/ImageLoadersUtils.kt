@@ -2,7 +2,6 @@ package com.prosabdev.fluidmusic.utils
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Log
@@ -36,9 +35,18 @@ abstract class ImageLoadersUtils {
         companion object {
 
             @JvmStatic
-            fun newLargeOriginalCardInstance() =
+            fun newOriginalLargeCardInstance() =
                 ImageRequestItem().apply {
                     widthHeight = 1200
+                    isBlurred = false
+                    animate = true
+                    animationDuration = 300
+                }
+
+            @JvmStatic
+            fun newOriginalMediumCardInstance() =
+                ImageRequestItem().apply {
+                    widthHeight = 500
                     isBlurred = false
                     animate = true
                     animationDuration = 300
@@ -59,7 +67,7 @@ abstract class ImageLoadersUtils {
                     widthHeight = 50
                     isBlurred = true
                     animate = true
-                    animationDuration = 100
+                    animationDuration = 200
                 }
         }
     }
@@ -101,7 +109,7 @@ abstract class ImageLoadersUtils {
         private suspend fun loadImageFromCachedHashMap(ctx: Context, imageRequest: ImageRequestItem?): Boolean {
             return withContext(Dispatchers.IO){
                 if(imageRequest == null) return@withContext false
-                if(imageRequest.hashedCovertArtSignature == -1) return@withContext false
+                if(imageRequest.hashedCovertArtSignature <= 0) return@withContext false
                 if(imageRequest.isBlurred){
                     if(mCachedHashmapBlurImage.contains(imageRequest.hashedCovertArtSignature)){
                         if(imageRequest.isBlurred){
@@ -139,7 +147,7 @@ abstract class ImageLoadersUtils {
 
         private fun saveImageToCachedHashMap(imageRequest: ImageRequestItem?, bitmap: Bitmap?) {
             if(imageRequest == null || bitmap == null ) return
-            if(imageRequest.hashedCovertArtSignature == -1) return
+            if(imageRequest.hashedCovertArtSignature <= 0) return
             insert(imageRequest, bitmap)
         }
         fun insert(imageRequest: ImageRequestItem?, bitmap: Bitmap?){
@@ -249,7 +257,7 @@ abstract class ImageLoadersUtils {
         fun startExploreContentImageLoaderJob(ctx: Context, imageRequest: ImageRequestItem?) {
             if(imageRequest == null) return
             if(imageRequest.imageView == null) return
-            if(imageRequest.hashedCovertArtSignature == -1) {
+            if(imageRequest.hashedCovertArtSignature <= 0) {
                 if(imageRequest.isBlurred){
                     imageRequest.imageView?.setImageDrawable(null)
                 }else{

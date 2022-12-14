@@ -2,10 +2,7 @@ package com.prosabdev.fluidmusic.utils
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.animation.TimeInterpolator
-import android.util.Log
 import android.view.View
-import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.viewpager2.widget.CompositePageTransformer

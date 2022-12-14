@@ -8,7 +8,7 @@ import com.prosabdev.fluidmusic.models.view.AlbumArtistItem
 @Dao
 interface AlbumArtistItemDao {
     @Query("SELECT * FROM AlbumArtistItem WHERE name = :name LIMIT 1")
-    fun getAtName(name : String): AlbumArtistItem?
+    fun getAtName(name : String?): AlbumArtistItem?
 
     @Query(
         "SELECT * FROM AlbumArtistItem " +
@@ -26,7 +26,7 @@ interface AlbumArtistItemDao {
                 "COALESCE(NULLIF(AlbumArtistItem.name,''), 'Unknown field')," +
                 "AlbumArtistItem.lastAddedDateToLibrary DESC"
     )
-    fun getAll(orderBy: String): LiveData<List<AlbumArtistItem>>?
+    fun getAll(orderBy: String?): LiveData<List<AlbumArtistItem>>?
 
     @Query(
         "SELECT * FROM AlbumArtistItem " +
@@ -44,5 +44,5 @@ interface AlbumArtistItemDao {
                 "COALESCE(NULLIF(AlbumArtistItem.name,''), 'Unknown field')," +
                 "AlbumArtistItem.lastAddedDateToLibrary DESC"
     )
-    fun getAllDirectly(orderBy: String): List<AlbumArtistItem>?
+    fun getAllDirectly(orderBy: String?): List<AlbumArtistItem>?
 }

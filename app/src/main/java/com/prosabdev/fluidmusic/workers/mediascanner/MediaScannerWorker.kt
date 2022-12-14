@@ -14,7 +14,10 @@ import com.prosabdev.fluidmusic.roomdatabase.AppDatabase
 import com.prosabdev.fluidmusic.utils.AudioInfoExtractorUtils
 import com.prosabdev.fluidmusic.utils.SystemSettingsUtils
 import com.prosabdev.fluidmusic.workers.playlist.AddSongsToPlaylistWorker
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -144,7 +147,7 @@ class MediaScannerWorker(
         }
     }
     private fun saveSongToDatabase(songItem: SongItem) {
-        if(songItem.uri.isEmpty()) return
+        if(songItem.uri?.isEmpty() ?: return) return
         val updateResult = AppDatabase.getDatabase(applicationContext).songItemDao().updateAtUri(
             songItem.uri,
             songItem.uriTreeId,
