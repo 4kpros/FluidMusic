@@ -24,7 +24,8 @@ abstract class SharedPreferenceManagerUtils {
             private const val SHARED_PREFERENCES_CURRENT_PLAYING_SONG = "${ConstantValues.PACKAGE_NAME}.SHARED_PREFERENCES_CURRENT_PLAYING_SONG"
             private const val SHARED_PREFERENCES_PLAYING_PROGRESS_VALUE= "${ConstantValues.PACKAGE_NAME}.SHARED_PREFERENCES_PLAYING_PROGRESS_VALUE"
             private const val SHARED_PREFERENCES_QUEUE_LIST_SOURCE = "${ConstantValues.PACKAGE_NAME}.SHARED_PREFERENCES_QUEUE_LIST_SOURCE"
-            private const val SHARED_PREFERENCES_QUEUE_LIST_SOURCE_VALUE = "${ConstantValues.PACKAGE_NAME}.SHARED_PREFERENCES_QUEUE_LIST_SOURCE_VALUE"
+            private const val SHARED_PREFERENCES_QUEUE_LIST_SOURCE_COLUMN_INDEX = "${ConstantValues.PACKAGE_NAME}.SHARED_PREFERENCES_QUEUE_LIST_SOURCE_COLUMN_INDEX"
+            private const val SHARED_PREFERENCES_QUEUE_LIST_SOURCE_COLUMN_VALUE = "${ConstantValues.PACKAGE_NAME}.SHARED_PREFERENCES_QUEUE_LIST_SOURCE_COLUMN_VALUE"
 
             //Current song value
             fun loadCurrentPlayingSong(ctx: Context, sharedPreferences: SharedPreferences? = null): SongItem? {
@@ -33,7 +34,6 @@ abstract class SharedPreferenceManagerUtils {
                     val tempItem: String? = sharedPreferences.getString(
                         SHARED_PREFERENCES_CURRENT_PLAYING_SONG, null)
                     val tempItemType = object : TypeToken<SongItem>() {}.type
-                    Log.i(ConstantValues.TAG, "Current playing song loaded !")
                     return tempGson.fromJson<SongItem>(tempItem, tempItemType)
                 }
                 val tempGson: Gson = Gson()
@@ -43,7 +43,6 @@ abstract class SharedPreferenceManagerUtils {
                 )
                 val tempItem: String? = tempSP.getString(SHARED_PREFERENCES_CURRENT_PLAYING_SONG, null)
                 val tempItemType = object : TypeToken<SongItem>() {}.type
-                Log.i(ConstantValues.TAG, "Current playing song loaded !")
                 return tempGson.fromJson<SongItem>(tempItem, tempItemType)
             }
             fun saveCurrentPlayingSong(ctx: Context, songItem: SongItem?) {
@@ -56,7 +55,6 @@ abstract class SharedPreferenceManagerUtils {
                 val tempJson: String = tempGson.toJson(songItem)
                 tempEditor.putString(SHARED_PREFERENCES_CURRENT_PLAYING_SONG, tempJson)
                 tempEditor.apply()
-                Log.i(ConstantValues.TAG, "Current playing song saved !")
             }
 
             //Sleep timer
@@ -66,7 +64,6 @@ abstract class SharedPreferenceManagerUtils {
                     val tempItem: String? = sharedPreferences.getString(
                         SHARED_PREFERENCES_SLEEP_TIMER, null)
                     val tempItemType = object : TypeToken<SleepTimerSP>() {}.type
-                    Log.i(ConstantValues.TAG, "Sleep timer loaded !")
                     return tempGson.fromJson<SleepTimerSP>(tempItem, tempItemType)
                 }
                 val tempGson: Gson = Gson()
@@ -76,7 +73,6 @@ abstract class SharedPreferenceManagerUtils {
                 )
                 val tempItem: String? = tempSP.getString(SHARED_PREFERENCES_SLEEP_TIMER, null)
                 val tempItemType = object : TypeToken<SleepTimerSP>() {}.type
-                Log.i(ConstantValues.TAG, "Sleep timer loaded !")
                 return tempGson.fromJson<SleepTimerSP>(tempItem, tempItemType)
             }
             fun saveSleepTimer(ctx: Context, sleepTimerSP: SleepTimerSP?) {
@@ -89,13 +85,11 @@ abstract class SharedPreferenceManagerUtils {
                 val tempJson: String = tempGson.toJson(sleepTimerSP)
                 tempEditor.putString(SHARED_PREFERENCES_SLEEP_TIMER, tempJson)
                 tempEditor.apply()
-                Log.i(ConstantValues.TAG, "Sleep timer saved !")
             }
 
             //Repeat
             fun loadRepeat(ctx: Context, sharedPreferences: SharedPreferences? = null): Int {
                 if(sharedPreferences != null) {
-                    Log.i(ConstantValues.TAG, "Current playing song seek position loaded !")
                     return sharedPreferences.getInt(
                         SHARED_PREFERENCES_REPEAT,
                         PlaybackStateCompat.REPEAT_MODE_NONE
@@ -104,7 +98,6 @@ abstract class SharedPreferenceManagerUtils {
                 val tempSP: SharedPreferences = ctx.getSharedPreferences(
                     ctx.getString(R.string.preference_file_key), Context.MODE_PRIVATE
                 )
-                Log.i(ConstantValues.TAG, "Repeat loaded !")
                 return tempSP.getInt(SHARED_PREFERENCES_REPEAT, PlaybackStateCompat.REPEAT_MODE_NONE)
             }
             fun saveRepeat(ctx: Context, value: Int?) {
@@ -115,13 +108,11 @@ abstract class SharedPreferenceManagerUtils {
                 val tempEditor: SharedPreferences.Editor = sharedPref.edit()
                 tempEditor.putInt(SHARED_PREFERENCES_REPEAT, value ?: PlaybackStateCompat.REPEAT_MODE_NONE)
                 tempEditor.apply()
-                Log.i(ConstantValues.TAG, "Repeat saved !")
             }
 
             //Shuffle
             fun loadShuffle(ctx: Context, sharedPreferences: SharedPreferences? = null): Int {
                 if(sharedPreferences != null) {
-                    Log.i(ConstantValues.TAG, "Shuffle loaded !")
                     return sharedPreferences.getInt(
                         SHARED_PREFERENCES_SHUFFLE,
                         PlaybackStateCompat.SHUFFLE_MODE_NONE
@@ -130,7 +121,6 @@ abstract class SharedPreferenceManagerUtils {
                 val tempSP: SharedPreferences = ctx.getSharedPreferences(
                     ctx.getString(R.string.preference_file_key), Context.MODE_PRIVATE
                 )
-                Log.i(ConstantValues.TAG, "Shuffle loaded !")
                 return tempSP.getInt(SHARED_PREFERENCES_SHUFFLE, PlaybackStateCompat.SHUFFLE_MODE_NONE)
             }
             fun saveShuffle(ctx: Context, value: Int?) {
@@ -141,13 +131,11 @@ abstract class SharedPreferenceManagerUtils {
                 val tempEditor: SharedPreferences.Editor = sharedPref.edit()
                 tempEditor.putInt(SHARED_PREFERENCES_SHUFFLE, value ?: PlaybackStateCompat.SHUFFLE_MODE_NONE)
                 tempEditor.apply()
-                Log.i(ConstantValues.TAG, "Shuffle saved !")
             }
 
             //Queue list source
             fun loadQueueListSource(ctx: Context, sharedPreferences: SharedPreferences? = null): String? {
                 if(sharedPreferences != null) {
-                    Log.i(ConstantValues.TAG, "Queue list source loaded !")
                     return sharedPreferences.getString(
                         SHARED_PREFERENCES_QUEUE_LIST_SOURCE,
                         AllSongsFragment.TAG
@@ -156,7 +144,6 @@ abstract class SharedPreferenceManagerUtils {
                 val tempSP: SharedPreferences = ctx.getSharedPreferences(
                     ctx.getString(R.string.preference_file_key), Context.MODE_PRIVATE
                 )
-                Log.i(ConstantValues.TAG, "Queue list source loaded !")
                 return tempSP.getString(
                     SHARED_PREFERENCES_QUEUE_LIST_SOURCE,
                     AllSongsFragment.TAG
@@ -170,13 +157,11 @@ abstract class SharedPreferenceManagerUtils {
                 val tempEditor: SharedPreferences.Editor = sharedPref.edit()
                 tempEditor.putString(SHARED_PREFERENCES_QUEUE_LIST_SOURCE, value)
                 tempEditor.apply()
-                Log.i(ConstantValues.TAG, "Queue list source saved !")
             }
 
             //Queue list size
             fun loadPlayingProgressValue(ctx: Context, sharedPreferences: SharedPreferences? = null): Long {
                 if(sharedPreferences != null) {
-                    Log.i(ConstantValues.TAG, "Playing progress value loaded !")
                     return sharedPreferences.getLong(
                         SHARED_PREFERENCES_PLAYING_PROGRESS_VALUE,
                         0
@@ -185,7 +170,6 @@ abstract class SharedPreferenceManagerUtils {
                 val tempSP: SharedPreferences = ctx.getSharedPreferences(
                     ctx.getString(R.string.preference_file_key), Context.MODE_PRIVATE
                 )
-                Log.i(ConstantValues.TAG, "Playing progress value loaded !")
                 return tempSP.getLong(
                     SHARED_PREFERENCES_PLAYING_PROGRESS_VALUE,
                     0
@@ -199,36 +183,57 @@ abstract class SharedPreferenceManagerUtils {
                 val tempEditor: SharedPreferences.Editor = sharedPref.edit()
                 tempEditor.putLong(SHARED_PREFERENCES_PLAYING_PROGRESS_VALUE, value ?: 0)
                 tempEditor.apply()
-                Log.i(ConstantValues.TAG, "Playing progress value saved !")
             }
 
             //Queue list source value
-            fun loadQueueListSourceValue(ctx: Context, sharedPreferences: SharedPreferences? = null): String? {
+            fun loadQueueListSourceColumnIndex(ctx: Context, sharedPreferences: SharedPreferences? = null): String? {
                 if(sharedPreferences != null) {
-                    Log.i(ConstantValues.TAG, "Queue list source value loaded !")
                     return sharedPreferences.getString(
-                        SHARED_PREFERENCES_QUEUE_LIST_SOURCE_VALUE,
+                        SHARED_PREFERENCES_QUEUE_LIST_SOURCE_COLUMN_INDEX,
                         null
                     )
                 }
                 val tempSP: SharedPreferences = ctx.getSharedPreferences(
                     ctx.getString(R.string.preference_file_key), Context.MODE_PRIVATE
                 )
-                Log.i(ConstantValues.TAG, "Queue list source value loaded !")
                 return tempSP.getString(
-                    SHARED_PREFERENCES_QUEUE_LIST_SOURCE_VALUE,
+                    SHARED_PREFERENCES_QUEUE_LIST_SOURCE_COLUMN_INDEX,
                     null
                 )
             }
-            fun saveQueueListSourceValue(ctx: Context, value: String?) {
+            fun saveQueueListSourceColumnIndex(ctx: Context, value: String?) {
                 val sharedPref: SharedPreferences = ctx.getSharedPreferences(
                     ctx.getString(R.string.preference_file_key),
                     Context.MODE_PRIVATE
                 )
                 val tempEditor: SharedPreferences.Editor = sharedPref.edit()
-                tempEditor.putString(SHARED_PREFERENCES_QUEUE_LIST_SOURCE_VALUE, value)
+                tempEditor.putString(SHARED_PREFERENCES_QUEUE_LIST_SOURCE_COLUMN_INDEX, value)
                 tempEditor.apply()
-                Log.i(ConstantValues.TAG, "Queue list source value saved !")
+            }
+            //Queue list source value
+            fun loadQueueListSourceColumnValue(ctx: Context, sharedPreferences: SharedPreferences? = null): String? {
+                if(sharedPreferences != null) {
+                    return sharedPreferences.getString(
+                        SHARED_PREFERENCES_QUEUE_LIST_SOURCE_COLUMN_VALUE,
+                        null
+                    )
+                }
+                val tempSP: SharedPreferences = ctx.getSharedPreferences(
+                    ctx.getString(R.string.preference_file_key), Context.MODE_PRIVATE
+                )
+                return tempSP.getString(
+                    SHARED_PREFERENCES_QUEUE_LIST_SOURCE_COLUMN_VALUE,
+                    null
+                )
+            }
+            fun saveQueueListSourceColumnValue(ctx: Context, value: String?) {
+                val sharedPref: SharedPreferences = ctx.getSharedPreferences(
+                    ctx.getString(R.string.preference_file_key),
+                    Context.MODE_PRIVATE
+                )
+                val tempEditor: SharedPreferences.Editor = sharedPref.edit()
+                tempEditor.putString(SHARED_PREFERENCES_QUEUE_LIST_SOURCE_COLUMN_VALUE, value)
+                tempEditor.apply()
             }
         }
     }

@@ -22,6 +22,9 @@
         <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
         <item name="colorOnErrorContainer">@color/md_theme_light_onErrorContainer</item>
     </style>
+    <style name="CustomTextTitle" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:textSize">24sp</item>
+    </style>
     <style name="ShapeFullCircle">
         <item name="cornerSize">50%</item>
     </style>

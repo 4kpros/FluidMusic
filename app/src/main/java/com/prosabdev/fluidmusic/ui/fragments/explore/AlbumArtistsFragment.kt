@@ -15,7 +15,10 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textview.MaterialTextView
+import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialFadeThrough
+import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
@@ -32,6 +35,7 @@ import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortContentExplorerBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
+import com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
@@ -68,8 +72,8 @@ class AlbumArtistsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        exitTransition = MaterialFadeThrough()
-        reenterTransition = MaterialFadeThrough()
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Y,true)
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Y,false)
         arguments?.let {
         }
 
@@ -191,6 +195,8 @@ class AlbumArtistsFragment : Fragment() {
         }
         if(
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == null &&
             mPlayerFragmentViewModel.getSortBy().value == mAlbumArtistsFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mAlbumArtistsFragmentViewModel.getIsInverted().value
         ){
@@ -220,6 +226,8 @@ class AlbumArtistsFragment : Fragment() {
         }
         if(
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == null &&
             mPlayerFragmentViewModel.getSortBy().value == mAlbumArtistsFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mAlbumArtistsFragmentViewModel.getIsInverted().value
         ){
@@ -269,6 +277,8 @@ class AlbumArtistsFragment : Fragment() {
 
         if (
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == null &&
             mPlayerFragmentViewModel.getSortBy().value == mAlbumArtistsFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mAlbumArtistsFragmentViewModel.getIsInverted().value
         ) {
@@ -312,6 +322,8 @@ class AlbumArtistsFragment : Fragment() {
     private fun updatePlaybackStateUI(isPlaying: Boolean) {
         if (
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == null &&
             mPlayerFragmentViewModel.getSortBy().value == mAlbumArtistsFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mAlbumArtistsFragmentViewModel.getIsInverted().value
         ) {
@@ -416,7 +428,13 @@ class AlbumArtistsFragment : Fragment() {
                     }
                 },
                 object : GenericListGridItemAdapter.OnItemClickListener{
-                    override fun onItemClicked(position: Int) {
+                    override fun onItemClicked(
+                        position: Int,
+                        imageviewCoverArt: CustomShapeableImageViewImageViewRatio11,
+                        textTitle: MaterialTextView,
+                        textSubtitle: MaterialTextView,
+                        textDetails: MaterialTextView
+                    ) {
                         if(mMainFragmentViewModel.getSelectMode().value == true){
                             mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
                         }else{
@@ -444,7 +462,7 @@ class AlbumArtistsFragment : Fragment() {
                 mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE,
                 mIsSelectable = true,
                 mHavePlaybackState = false,
-                mIsImageFullCircle = false,
+                mIsImageFullCircle = IS_IMAGE_CIRCLE,
             )
 
             //Setup empty bottom space adapter
@@ -520,7 +538,6 @@ class AlbumArtistsFragment : Fragment() {
     private fun openExploreContentFragment(position: Int) {
         val tempFragmentManager = activity?.supportFragmentManager ?: return
         val tempItem = mGenericListGridItemAdapter?.currentList?.get(position) ?: return
-
         context?.let { ctx ->
             val tempGeneric = AlbumArtistItem.castDataItemToGeneric(ctx, tempItem, true) ?: return
             val tempStringUri = if(tempGeneric.imageUri == Uri.EMPTY) "" else tempGeneric.imageUri.toString()
@@ -610,6 +627,7 @@ class AlbumArtistsFragment : Fragment() {
         private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = ConstantValues.ORGANIZE_GRID_LARGE
         private const val SORT_LIST_GRID_DEFAULT_VALUE: String = AlbumArtistItem.DEFAULT_INDEX
         private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
+        private const val IS_IMAGE_CIRCLE: Boolean = false
 
         @JvmStatic
         fun newInstance() =

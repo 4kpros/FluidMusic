@@ -33,8 +33,8 @@
                 app:contentScrim="?android:colorBackground"
                 app:titleTextEllipsize="marquee"
                 app:titleCollapseMode="scale"
-                app:expandedTitleTextAppearance="@style/BaseTheme"
-                app:collapsedTitleTextAppearance="@style/BaseTheme"
+                app:expandedTitleTextAppearance="@style/CustomTextTitle"
+                app:collapsedTitleTextAppearance="@style/CustomTextTitle"
                 >
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -48,6 +48,7 @@
                         app:shapeAppearanceOverlay="@style/ShapeBottomRounded"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_fluid_music_icon_with_padding"
+                        android:transitionName="shared_element_image_view_rounded"
                         />
                     <com.google.android.material.imageview.ShapeableImageView
                         android:layout_width="match_parent"
@@ -57,6 +58,7 @@
                         android:alpha="0.5"
                         android:layout_alignTop="@+id/linear_text"
                         android:layout_alignBottom="@+id/image_view_cover_art"
+                        android:transitionName="shared_element_image_view_circle"
                         />
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:id="@+id/linear_text"
@@ -64,7 +66,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:layout_marginHorizontal="@dimen/margin_large_size"
-                        android:paddingBottom="60dp"
+                        android:paddingBottom="50dp"
                         android:paddingTop="@dimen/margin_medium_size"
                         android:layout_alignParentBottom="true"
                         android:gravity="bottom"
@@ -76,7 +78,7 @@
                             android:ellipsize="end"
                             android:maxLines="1"
                             android:text=""
-                            style="@style/TextAppearance.Material3.TitleLarge"
+                            style="@style/TextAppearance.Material3.TitleMedium"
                             android:textStyle="bold"
                             android:transitionName="shared_element_text_title"
                             />
@@ -87,7 +89,7 @@
                             android:ellipsize="end"
                             android:maxLines="1"
                             android:text=""
-                            style="@style/TextAppearance.Material3.TitleMedium"
+                            style="@style/TextAppearance.Material3.TitleSmall"
                             android:textStyle="bold"
                             android:transitionName="shared_element_text_sub_title"
                             />
@@ -98,7 +100,7 @@
                             android:ellipsize="end"
                             android:maxLines="1"
                             android:text=""
-                            style="@style/TextAppearance.Material3.TitleSmall"
+                            style="@style/TextAppearance.Material3.BodySmall"
                             android:textStyle="bold"
                             android:transitionName="shared_element_text_details_title"
                             />

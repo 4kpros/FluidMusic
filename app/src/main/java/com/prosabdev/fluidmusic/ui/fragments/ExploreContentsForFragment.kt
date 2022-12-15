@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.SharedElementCallback
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -15,8 +16,13 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.transition.platform.MaterialFadeThrough
+import androidx.transition.Transition
+import androidx.transition.TransitionInflater
+import com.google.android.material.textview.MaterialTextView
+import com.google.android.material.transition.platform.MaterialContainerTransform
+import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.l4digital.fastscroll.FastScroller
+import com.prosabdev.fluidmusic.MainActivity
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.GridSpacingItemDecoration
@@ -31,6 +37,7 @@ import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortSongsBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
+import com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
 import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
 import com.prosabdev.fluidmusic.utils.ConstantValues
@@ -81,8 +88,8 @@ class ExploreContentsForFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        exitTransition = MaterialFadeThrough()
-        reenterTransition = MaterialFadeThrough()
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Y, true)
+        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Y, true)
         arguments?.let {
         }
 
@@ -96,6 +103,7 @@ class ExploreContentsForFragment : Fragment() {
         mDataBidingView = DataBindingUtil.inflate(inflater,R.layout.fragment_explore_contents_for,container,false)
         val view = mDataBidingView?.root
 
+        mMainFragmentViewModel.setScrollingState(-2)
         initViews()
         MainScope().launch {
             setupRecyclerViewAdapter()
@@ -202,6 +210,8 @@ class ExploreContentsForFragment : Fragment() {
         }
         if(
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == mWhereColumnIndex &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == mWhereColumnValue &&
             mPlayerFragmentViewModel.getSortBy().value == mExploreContentsForFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mExploreContentsForFragmentViewModel.getIsInverted().value
         ){
@@ -214,9 +224,6 @@ class ExploreContentsForFragment : Fragment() {
     }
     private fun requestNewDataFromDatabase() {
         if(mExploreContentsForFragmentViewModel.getSortBy().value?.isEmpty() == true) return
-        Log.i(TAG, "REQUEST DATA FOR mLoadSongFromSource ${mLoadSongFromSource}")
-        Log.i(TAG, "REQUEST DATA FOR mWhereColumnIndex ${mWhereColumnIndex}")
-        Log.i(TAG, "REQUEST DATA FOR mWhereColumnValue ${mWhereColumnValue}")
         MainScope().launch {
             mExploreContentsForFragmentViewModel.requestDataDirectlyWhereColumnEqualFromDatabase(
                 mSongItemViewModel,
@@ -236,6 +243,8 @@ class ExploreContentsForFragment : Fragment() {
         }
         if(
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == mWhereColumnIndex &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == mWhereColumnValue &&
             mPlayerFragmentViewModel.getSortBy().value == mExploreContentsForFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mExploreContentsForFragmentViewModel.getIsInverted().value
         ){
@@ -285,6 +294,8 @@ class ExploreContentsForFragment : Fragment() {
 
         if (
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == mWhereColumnIndex &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == mWhereColumnValue &&
             mPlayerFragmentViewModel.getSortBy().value == mExploreContentsForFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mExploreContentsForFragmentViewModel.getIsInverted().value
         ) {
@@ -328,6 +339,8 @@ class ExploreContentsForFragment : Fragment() {
     private fun updatePlaybackStateUI(isPlaying: Boolean) {
         if (
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == mWhereColumnIndex &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == mWhereColumnValue &&
             mPlayerFragmentViewModel.getSortBy().value == mExploreContentsForFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mExploreContentsForFragmentViewModel.getIsInverted().value
         ) {
@@ -397,6 +410,8 @@ class ExploreContentsForFragment : Fragment() {
     }
 
     private suspend fun setupRecyclerViewAdapter() {
+        if(mGenericListGridItemAdapter != null) return
+
         withContext(Dispatchers.Default){
             val ctx : Context = context ?: return@withContext
             //Setup headline adapter
@@ -409,6 +424,8 @@ class ExploreContentsForFragment : Fragment() {
                         mExploreContentsForFragmentViewModel,
                         mGenericListGridItemAdapter,
                         TAG,
+                        mWhereColumnIndex,
+                        mWhereColumnValue,
                         0
                     )
                 }
@@ -438,7 +455,13 @@ class ExploreContentsForFragment : Fragment() {
                     }
                 },
                 object : GenericListGridItemAdapter.OnItemClickListener{
-                    override fun onItemClicked(position: Int) {
+                    override fun onItemClicked(
+                        position: Int,
+                        imageviewCoverArt: CustomShapeableImageViewImageViewRatio11,
+                        textTitle: MaterialTextView,
+                        textSubtitle: MaterialTextView,
+                        textDetails: MaterialTextView
+                    ) {
                         if(mMainFragmentViewModel.getSelectMode().value == true){
                             mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
                         }else{
@@ -447,6 +470,8 @@ class ExploreContentsForFragment : Fragment() {
                                 mExploreContentsForFragmentViewModel,
                                 mGenericListGridItemAdapter,
                                 TAG,
+                                mWhereColumnIndex,
+                                mWhereColumnValue,
                                 position
                             )
                         }
@@ -581,6 +606,8 @@ class ExploreContentsForFragment : Fragment() {
                         mExploreContentsForFragmentViewModel,
                         genericListGridItemAdapter,
                         TAG,
+                        mWhereColumnIndex,
+                        mWhereColumnValue,
                         randomExcludedNumber,
                         PlaybackStateCompat.REPEAT_MODE_NONE,
                         PlaybackStateCompat.SHUFFLE_MODE_NONE
@@ -603,10 +630,6 @@ class ExploreContentsForFragment : Fragment() {
             InsetModifiersUtils.updateBottomViewInsets(
                 it
             )
-        }
-        mDataBidingView?.let { dataBidingView ->
-//            InsetModifiersUtils.removeTopViewInsets(dataBidingView.imageViewCoverArtBlurred)
-//            InsetModifiersUtils.updateTopViewInsets(dataBidingView.linearTopContent)
         }
         MainScope().launch {
             updateCoverArts()
@@ -671,6 +694,36 @@ class ExploreContentsForFragment : Fragment() {
         }
     }
 
+    fun updateInstanceData(
+        sharedPrefsKey: String,
+        loadSongFromSource: String?,
+        whereColumnIndex : String?,
+        columnValue : String?,
+        imageUri : String?,
+        hashedCoverArtSignature : Int,
+        textTitle : String?,
+        textSubTitle : String?,
+        textDetails : String?,
+    ){
+        mLoadSongFromSource = loadSongFromSource
+        mWhereColumnIndex = whereColumnIndex
+        mWhereColumnValue = columnValue
+        mSharedPrefsKey = sharedPrefsKey
+        mImageUri = imageUri
+        mHashedCoverArtSignature = hashedCoverArtSignature
+        mTextTitle = textTitle
+        mTextSubTitle = textSubTitle
+        mTextDetails = textDetails
+
+        mMainFragmentViewModel.setScrollingState(-2)
+        loadPrefsAndInitViewModel()
+        MainScope().launch {
+            updateCoverArts()
+            updateBackButtonTitle()
+            updateTextUI()
+            setupRecyclerViewAdapter()
+        }
+    }
 
     companion object {
         const val TAG = "ExploreContentsFor"
@@ -689,7 +742,6 @@ class ExploreContentsForFragment : Fragment() {
             textTitle : String?,
             textSubTitle : String?,
             textDetails : String?,
-
         ) =
             ExploreContentsForFragment().apply {
                 mLoadSongFromSource = loadSongFromSource

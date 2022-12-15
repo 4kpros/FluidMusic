@@ -15,10 +15,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
+import com.google.android.material.textview.MaterialTextView
 import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemGenericListGridBinding
 import com.prosabdev.fluidmusic.models.generic.GenericItemListGrid
+import com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
 import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
@@ -40,7 +42,13 @@ class GenericListGridItemAdapter (
 {
 
     interface OnItemClickListener {
-        fun onItemClicked(position: Int)
+        fun onItemClicked(
+            position: Int,
+            imageviewCoverArt: CustomShapeableImageViewImageViewRatio11,
+            textTitle: MaterialTextView,
+            textSubtitle: MaterialTextView,
+            textDetails: MaterialTextView
+        )
         fun onItemLongPressed(position: Int)
     }
     interface OnItemRequestDataInfo {
@@ -131,7 +139,8 @@ class GenericListGridItemAdapter (
         return GenericListGridItemHolder(
             mDataBinding,
             mOnItemRequestDataInfo,
-            mOnItemClickListener
+            mOnItemClickListener,
+            mIsImageFullCircle
         )
     }
 
@@ -186,11 +195,21 @@ class GenericListGridItemAdapter (
     class GenericListGridItemHolder(
         private val mDataBinding: ItemGenericListGridBinding,
         private val mOnItemRequestDataInfo: OnItemRequestDataInfo,
-        mOnItemClickListener: OnItemClickListener
+        mOnItemClickListener: OnItemClickListener,
+        isImageFullCircle: Boolean
     ) : RecyclerView.ViewHolder(mDataBinding.root) {
         init {
             mDataBinding.cardViewClickable.setOnClickListener {
-                mOnItemClickListener.onItemClicked(bindingAdapterPosition)
+                mOnItemClickListener.onItemClicked(
+                    bindingAdapterPosition,
+                    if(isImageFullCircle)
+                        mDataBinding.imageviewCoverArtCircle
+                    else
+                        mDataBinding.imageviewCoverArt,
+                    mDataBinding.textTitle,
+                    mDataBinding.textSubtitle,
+                    mDataBinding.textDetails,
+                )
             }
             mDataBinding.cardViewClickable.setOnLongClickListener {
                 mOnItemClickListener.onItemLongPressed(bindingAdapterPosition)
@@ -505,12 +524,12 @@ class GenericListGridItemAdapter (
             if(!havePlaybackState){
                 mDataBinding.imageviewBackgroundIsPlaying.visibility = View.GONE
                 mDataBinding.linearIsPlayingAnimContainer.visibility = View.GONE
-                val colorValue = MaterialColors.getColor(mDataBinding.textTitle  as View, com.google.android.material.R.attr.colorOnBackground)
+                val colorValue = MaterialColors.getColor(mDataBinding.textTitle as View, com.google.android.material.R.attr.colorOnBackground)
                 changeColorAndFaceType(colorValue, false)
                 return
             }
             if(playingPosition == bindingAdapterPosition){
-                val colorValue = MaterialColors.getColor(mDataBinding.textTitle  as View, com.google.android.material.R.attr.colorPrimary)
+                val colorValue = MaterialColors.getColor(mDataBinding.textTitle as View, com.google.android.material.R.attr.colorPrimary)
                 changeColorAndFaceType(colorValue, true)
             }else{
                 val colorValue = MaterialColors.getColor(mDataBinding.textTitle as View, com.google.android.material.R.attr.colorOnBackground)

@@ -29,19 +29,19 @@ class SongItemViewModel(app: Application) : AndroidViewModel(app) {
     suspend fun getAtId(id: Long) : SongItem? {
         return repository?.getAtId(id)
     }
-    suspend fun getAtUri(uri: String) : SongItem? {
+    suspend fun getAtUri(uri: String?) : SongItem? {
         return repository?.getAtUri(uri)
     }
-    suspend fun getAllDirectlyLimit(orderBy: String, limit: Int) : List<SongItem>? {
+    suspend fun getAllDirectlyLimit(orderBy: String?, limit: Int) : List<SongItem>? {
         return repository?.getAllDirectlyLimit(orderBy, limit)
     }
-    suspend fun getAllDirectly(orderBy: String) : List<SongItem>? {
+    suspend fun getAllDirectly(orderBy: String?) : List<SongItem>? {
         return repository?.getAllDirectly(orderBy)
     }
-    suspend fun getAllDirectlyWhereEqual(whereColumn: String, columnValue: String?, orderBy: String) : List<SongItem>? {
+    suspend fun getAllDirectlyWhereEqual(whereColumn: String?, columnValue: String?, orderBy: String?) : List<SongItem>? {
         return repository?.getAllDirectlyWhereEqual(whereColumn, columnValue, orderBy)
     }
-    suspend fun getAllDirectlyWhereLike(whereColumn: String, columnValue: String?, orderBy: String) : List<SongItem>? {
+    suspend fun getAllDirectlyWhereLike(whereColumn: String?, columnValue: String?, orderBy: String?) : List<SongItem>? {
         return repository?.getAllDirectlyWhereLike(whereColumn, columnValue, orderBy)
     }
 }

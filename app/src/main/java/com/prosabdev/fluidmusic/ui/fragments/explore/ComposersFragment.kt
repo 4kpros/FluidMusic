@@ -15,7 +15,9 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textview.MaterialTextView
 import com.google.android.material.transition.platform.MaterialFadeThrough
+import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
@@ -32,6 +34,7 @@ import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortContentExplorerBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
+import com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
@@ -68,8 +71,8 @@ class ComposersFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        exitTransition = MaterialFadeThrough()
-        reenterTransition = MaterialFadeThrough()
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Y,true)
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Y,false)
         arguments?.let {
         }
 
@@ -191,6 +194,8 @@ class ComposersFragment : Fragment() {
         }
         if(
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == null &&
             mPlayerFragmentViewModel.getSortBy().value == mComposersFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mComposersFragmentViewModel.getIsInverted().value
         ){
@@ -220,6 +225,8 @@ class ComposersFragment : Fragment() {
         }
         if(
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == null &&
             mPlayerFragmentViewModel.getSortBy().value == mComposersFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mComposersFragmentViewModel.getIsInverted().value
         ){
@@ -269,6 +276,8 @@ class ComposersFragment : Fragment() {
 
         if (
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == null &&
             mPlayerFragmentViewModel.getSortBy().value == mComposersFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mComposersFragmentViewModel.getIsInverted().value
         ) {
@@ -312,6 +321,8 @@ class ComposersFragment : Fragment() {
     private fun updatePlaybackStateUI(isPlaying: Boolean) {
         if (
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == null &&
             mPlayerFragmentViewModel.getSortBy().value == mComposersFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mComposersFragmentViewModel.getIsInverted().value
         ) {
@@ -416,7 +427,13 @@ class ComposersFragment : Fragment() {
                     }
                 },
                 object : GenericListGridItemAdapter.OnItemClickListener{
-                    override fun onItemClicked(position: Int) {
+                    override fun onItemClicked(
+                        position: Int,
+                        imageviewCoverArt: CustomShapeableImageViewImageViewRatio11,
+                        textTitle: MaterialTextView,
+                        textSubtitle: MaterialTextView,
+                        textDetails: MaterialTextView
+                    ) {
                         if(mMainFragmentViewModel.getSelectMode().value == true){
                             mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
                         }else{

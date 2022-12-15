@@ -13,73 +13,62 @@ import kotlinx.coroutines.launch
 
 class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val mMutablePlayerLoadSessionCount = MutableLiveData<Int>(0)
     private val mMutableCurrentPlayingSong = MutableLiveData<SongItem?>(null)
     private val mMutableIsPlaying = MutableLiveData<Boolean>(false)
     private val mMutablePlayingProgressValue = MutableLiveData<Long>(0)
-    private val mMutableQueueListSource = MutableLiveData<String>(null)
-    private val mMutableQueueListSourceValue = MutableLiveData<String>("")
     private val mMutableShuffle = MutableLiveData<Int>(PlaybackStateCompat.SHUFFLE_MODE_NONE)
     private val mMutableRepeat = MutableLiveData<Int>(PlaybackStateCompat.REPEAT_MODE_NONE)
+    //
+    private val mMutableQueueListSource = MutableLiveData<String?>(null)
+    private val mMutableQueueListSourceColumnValue = MutableLiveData<String?>(null)
+    private val mMutableQueueListSourceColumnIndex = MutableLiveData<String?>(null)
+    private val mMutableSortBy = MutableLiveData<String?>(null)
+    private val mMutableIsInverted = MutableLiveData<Boolean>(false)
+    //
     private val mMutableSleepTimer = MutableLiveData<SleepTimerSP?>(null)
     private val mMutableSleepTimerStateStarted = MutableLiveData<Boolean>(false)
+    //
     private val mMutableSkipNextTrackCounter = MutableLiveData<Int>(0)
     private val mMutableSkipPrevTrackCounter = MutableLiveData<Int>(0)
-    private val mMutableUpdatePlaylistCounter = MutableLiveData<Int>(0)
-    private val mMutableSortBy = MutableLiveData<String>("id")
-    private val mMutableIsInverted = MutableLiveData<Boolean>(false)
-    private val mMutableCanScrollSmoothViewpager = MutableLiveData<Boolean>(false)
-    private val mMutableCanScrollCurrentPlayingSong = MutableLiveData<Boolean>(false)
     private val mMutablePlaySongAtRequest = MutableLiveData<PlaySongAtRequest>(null)
     private val mMutableRequestPlaySongShuffleCounter = MutableLiveData<Int>(null)
+    //
+    private val mMutableUpdatePlaylistCounter = MutableLiveData<Int>(0)
+    private val mMutableCanScrollSmoothViewpager = MutableLiveData<Boolean>(false)
+    private val mMutableCanScrollCurrentPlayingSong = MutableLiveData<Boolean>(false)
 
-    private val mPlayerLoadSessionCount: LiveData<Int> get() = mMutablePlayerLoadSessionCount
+
     private val mCurrentPlayingSong: LiveData<SongItem?> get() = mMutableCurrentPlayingSong
     private val mIsPlaying: LiveData<Boolean> get() = mMutableIsPlaying
     private val mPlayingProgressValue: LiveData<Long> get() = mMutablePlayingProgressValue
-    private val mQueueListSource: LiveData<String> get() = mMutableQueueListSource
-    private val mQueueListSourceValue: LiveData<String> get() = mMutableQueueListSourceValue
     private val mShuffle: LiveData<Int> get() = mMutableShuffle
     private val mRepeat: LiveData<Int> get() = mMutableRepeat
+    //
+    private val mQueueListSource: LiveData<String?> get() = mMutableQueueListSource
+    private val mQueueListSourceColumnValue: LiveData<String?> get() = mMutableQueueListSourceColumnValue
+    private val mQueueListSourceColumnIndex: LiveData<String?> get() = mMutableQueueListSourceColumnIndex
+    private val mSortBy: LiveData<String?> get() = mMutableSortBy
+    private val mIsInverted: LiveData<Boolean> get() = mMutableIsInverted
+    //
     private val mSleepTimer: LiveData<SleepTimerSP?> get() = mMutableSleepTimer
     private val mSleepTimerStateStarted: LiveData<Boolean> get() = mMutableSleepTimerStateStarted
+    //
     private val mSkipNextTrackCounter: LiveData<Int> get() = mMutableSkipNextTrackCounter
     private val mSkipPrevTrackCounter: LiveData<Int> get() = mMutableSkipPrevTrackCounter
+    private val mPlaySongAtRequest: LiveData<PlaySongAtRequest> get() = mMutablePlaySongAtRequest
     private val mUpdatePlaylistCounter: LiveData<Int> get() = mMutableUpdatePlaylistCounter
-    private val mSortBy: LiveData<String> get() = mMutableSortBy
-    private val mIsInverted: LiveData<Boolean> get() = mMutableIsInverted
+    //
     private val mCanScrollSmoothViewpager: LiveData<Boolean> get() = mMutableCanScrollSmoothViewpager
     private val mCanScrollCurrentPlayingSong: LiveData<Boolean> get() = mMutableCanScrollCurrentPlayingSong
-    private val mPlaySongAtRequest: LiveData<PlaySongAtRequest> get() = mMutablePlaySongAtRequest
     private val mRequestPlaySongShuffleCounter: LiveData<Int> get() = mMutableRequestPlaySongShuffleCounter
 
-    fun setPlayerLoadSessionCounter(){
-        MainScope().launch {
-            var tempCounter: Int = mPlayerLoadSessionCount.value ?: 0
-            if(tempCounter >= 100)
-                tempCounter = 0
-            tempCounter++
-            mMutablePlayerLoadSessionCount.value = tempCounter
-        }
-    }
-    fun getPlayerLoadSessionCounter(): LiveData<Int> {
-        return mPlayerLoadSessionCount
+    fun getCurrentPlayingSong(): LiveData<SongItem?> {
+        return mCurrentPlayingSong
     }
     fun setCurrentPlayingSong(songItem : SongItem?){
         MainScope().launch {
             mMutableCurrentPlayingSong.value = songItem
         }
-    }
-    fun getCurrentPlayingSong(): LiveData<SongItem?> {
-        return mCurrentPlayingSong
-    }
-    fun setIsPlaying(value : Boolean){
-        MainScope().launch {
-            mMutableIsPlaying.value = value
-        }
-    }
-    fun getIsPlaying(): LiveData<Boolean> {
-        return mIsPlaying
     }
     fun toggleIsPlaying() {
         if(mCurrentPlayingSong.value == null || mCurrentPlayingSong.value?.uri == null) return
@@ -88,63 +77,81 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
             mMutableIsPlaying.value = !tempIsPlaying
         }
     }
-    fun setPlayingProgressValue(value : Long){
+    fun getIsPlaying(): LiveData<Boolean> {
+        return mIsPlaying
+    }
+    fun setIsPlaying(value : Boolean){
         MainScope().launch {
-            mMutablePlayingProgressValue.value = value
+            mMutableIsPlaying.value = value
         }
     }
     fun getPlayingProgressValue(): LiveData<Long> {
         return mPlayingProgressValue
     }
-    fun setQueueListSource(source : String){
+    fun setPlayingProgressValue(value : Long){
+        MainScope().launch {
+            mMutablePlayingProgressValue.value = value
+        }
+    }
+    fun getQueueListSource(): LiveData<String?> {
+        return mQueueListSource
+    }
+    fun setQueueListSource(source : String?){
         MainScope().launch {
             mMutableQueueListSource.value = source
         }
     }
-    fun getQueueListSource(): LiveData<String> {
-        return mQueueListSource
+    fun getQueueListSourceColumnIndex(): LiveData<String?> {
+        return mQueueListSourceColumnIndex
     }
-    fun setQueueListSourceValue(source : String?){
+    fun setQueueListSourceColumnIndex(source : String?){
         MainScope().launch {
-            mMutableQueueListSourceValue.value = source ?: ""
+            mMutableQueueListSourceColumnIndex.value = source
         }
     }
-    fun getSourceOfQueueListValue(): LiveData<String> {
-        return mQueueListSourceValue
+    fun getQueueListSourceColumnValue(): LiveData<String?> {
+        return mQueueListSourceColumnValue
+    }
+    fun setQueueListSourceColumnValue(source : String?){
+        MainScope().launch {
+            mMutableQueueListSourceColumnValue.value = source
+        }
+    }
+    fun getShuffle(): LiveData<Int> {
+        return mShuffle
     }
     fun setShuffle(newShuffleValue : Int){
         MainScope().launch {
             mMutableShuffle.value = newShuffleValue
         }
     }
-    fun getShuffle(): LiveData<Int> {
-        return mShuffle
+    fun getRepeat(): LiveData<Int> {
+        return mRepeat
     }
     fun setRepeat(newRepeatValue : Int){
         MainScope().launch {
             mMutableRepeat.value = newRepeatValue
         }
     }
-    fun getRepeat(): LiveData<Int> {
-        return mRepeat
+    fun getSleepTimer(): LiveData<SleepTimerSP?> {
+        return mSleepTimer
     }
     fun setSleepTimer(value : SleepTimerSP?){
         MainScope().launch {
             mMutableSleepTimer.value = value
         }
     }
-    fun getSleepTimer(): LiveData<SleepTimerSP?> {
-        return mSleepTimer
+    fun getSleepTimerStateStarted(): LiveData<Boolean> {
+        return mSleepTimerStateStarted
     }
     fun setSleepTimerStateStarted(state : Boolean) {
         MainScope().launch {
             mMutableSleepTimerStateStarted.value = state
         }
     }
-    fun getSleepTimerStateStarted(): LiveData<Boolean> {
-        return mSleepTimerStateStarted
+    fun getSkipNextTrackCounter(): LiveData<Int> {
+        return mSkipNextTrackCounter
     }
-
     fun setSkipNextTrackCounter(){
         MainScope().launch {
             var tempCounter: Int = mSkipNextTrackCounter.value ?: 0
@@ -154,8 +161,8 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
             mMutableSkipNextTrackCounter.value = tempCounter
         }
     }
-    fun getSkipNextTrackCounter(): LiveData<Int> {
-        return mSkipNextTrackCounter
+    fun getSkipPrevTrackCounter(): LiveData<Int> {
+        return mSkipPrevTrackCounter
     }
     fun setSkipPrevTrackCounter(){
         MainScope().launch {
@@ -166,10 +173,9 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
             mMutableSkipPrevTrackCounter.value = tempCounter
         }
     }
-    fun getSkipPrevTrackCounter(): LiveData<Int> {
-        return mSkipPrevTrackCounter
+    fun getUpdatePlaylistCounter(): LiveData<Int> {
+        return mUpdatePlaylistCounter
     }
-
     fun setUpdatePlaylistCounter(){
         MainScope().launch {
             var tempCounter: Int = mUpdatePlaylistCounter.value ?: 0
@@ -179,17 +185,17 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
             mMutableUpdatePlaylistCounter.value = tempCounter
         }
     }
-    fun getUpdatePlaylistCounter(): LiveData<Int> {
-        return mUpdatePlaylistCounter
+    fun getSortBy(): LiveData<String?> {
+        return mSortBy
     }
-    fun setSortBy(sortBy : String) {
+    fun setSortBy(sortBy : String?) {
         if(sortBy == mSortBy.value) return
         MainScope().launch {
             mMutableSortBy.value = sortBy ?: "name"
         }
     }
-    fun getSortBy(): LiveData<String> {
-        return mSortBy
+    fun getIsInverted(): LiveData<Boolean> {
+        return mIsInverted
     }
     fun setIsInverted(isInverted : Boolean) {
         if(isInverted == mIsInverted.value) return
@@ -197,34 +203,32 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
             mMutableIsInverted.value = isInverted
         }
     }
-    fun getIsInverted(): LiveData<Boolean> {
-        return mIsInverted
+    fun getCanScrollCurrentPlayingSong(): LiveData<Boolean> {
+        return mCanScrollSmoothViewpager
     }
-
     fun setCanScrollCurrentPlayingSong(value: Boolean) {
         MainScope().launch {
             mMutableCanScrollSmoothViewpager.value = value
         }
     }
-    fun getCanScrollCurrentPlayingSong(): LiveData<Boolean> {
-        return mCanScrollSmoothViewpager
+    fun getCanScrollSmoothViewpager(): LiveData<Boolean> {
+        return mCanScrollCurrentPlayingSong
     }
-
     fun setCanScrollSmoothViewpager(value: Boolean) {
         MainScope().launch {
             mMutableCanScrollCurrentPlayingSong.value = value
         }
     }
-    fun getCanScrollSmoothViewpager(): LiveData<Boolean> {
-        return mCanScrollCurrentPlayingSong
+    fun getRequestPlaySongAt(): LiveData<PlaySongAtRequest> {
+        return mPlaySongAtRequest
     }
     fun setRequestPlaySongAt(playSongAtRequest: PlaySongAtRequest) {
         MainScope().launch {
             mMutablePlaySongAtRequest.value = playSongAtRequest
         }
     }
-    fun getRequestPlaySongAt(): LiveData<PlaySongAtRequest> {
-        return mPlaySongAtRequest
+    fun getRequestPlaySongShuffleCounter(): LiveData<Int> {
+        return mRequestPlaySongShuffleCounter
     }
     fun setRequestPlaySongShuffleCounter() {
         MainScope().launch {
@@ -234,8 +238,5 @@ class PlayerFragmentViewModel(app: Application) : AndroidViewModel(app) {
             tempCounter++
             mMutableRequestPlaySongShuffleCounter.value = tempCounter
         }
-    }
-    fun getRequestPlaySongShuffleCounter(): LiveData<Int> {
-        return mRequestPlaySongShuffleCounter
     }
 }

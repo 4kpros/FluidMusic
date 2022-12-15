@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -24,6 +23,7 @@ import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentPlayerBinding
 import com.prosabdev.fluidmusic.models.PlaySongAtRequest
 import com.prosabdev.fluidmusic.models.songitem.SongItem
+import com.prosabdev.fluidmusic.models.view.*
 import com.prosabdev.fluidmusic.sharedprefs.SharedPreferenceManagerUtils
 import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
 import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
@@ -32,9 +32,10 @@ import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreFullBottomSheetD
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicBottomSheetDialog
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
 import com.prosabdev.fluidmusic.utils.*
+import com.prosabdev.fluidmusic.viewmodels.fragments.ExploreContentsForFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AllSongsFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.explore.*
 import com.prosabdev.fluidmusic.viewmodels.models.SongItemViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -49,6 +50,15 @@ import kotlinx.coroutines.withContext
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
     private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by activityViewModels()
+    private val mExploreContentsForFragmentViewModel: ExploreContentsForFragmentViewModel by activityViewModels()
+
+    private val mAlbumArtistsFragmentViewModel: AlbumArtistsFragmentViewModel by activityViewModels()
+    private val mAlbumsFragmentViewModel: AlbumsFragmentViewModel by activityViewModels()
+    private val mArtistsFragmentViewModel: ArtistsFragmentViewModel by activityViewModels()
+    private val mComposersFragmentViewModel: ComposersFragmentViewModel by activityViewModels()
+    private val mFoldersFragmentViewModel: FoldersFragmentViewModel by activityViewModels()
+    private val mGenresFragmentViewModel: GenresFragmentViewModel by activityViewModels()
+    private val mYearsFragmentViewModel: YearsFragmentViewModel by activityViewModels()
 
     private val mSongItemViewModel: SongItemViewModel by activityViewModels()
 
@@ -108,9 +118,13 @@ import kotlinx.coroutines.withContext
                 ctx,
                 mPlayerFragmentViewModel.getQueueListSource().value
             )
-            SharedPreferenceManagerUtils.Player.saveQueueListSourceValue(
+            SharedPreferenceManagerUtils.Player.saveQueueListSourceColumnIndex(
                 ctx,
-                mPlayerFragmentViewModel.getSourceOfQueueListValue().value
+                mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value
+            )
+            SharedPreferenceManagerUtils.Player.saveQueueListSourceColumnValue(
+                ctx,
+                mPlayerFragmentViewModel.getQueueListSourceColumnValue().value
             )
             SharedPreferenceManagerUtils.Player.saveRepeat(
                 ctx,
@@ -143,18 +157,24 @@ import kotlinx.coroutines.withContext
                     SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SHARED_PREFERENCES_SORT_ORGANIZE_PLAYER_QUEUE_MUSIC
                 )
             val queueListSource: String? = SharedPreferenceManagerUtils.Player.loadQueueListSource(ctx)
+            val queueListSourceColumnIndex: String? = SharedPreferenceManagerUtils.Player.loadQueueListSourceColumnIndex(ctx)
+            val queueListSourceColumnValue: String? = SharedPreferenceManagerUtils.Player.loadQueueListSourceColumnValue(ctx)
+
+            mPlayerFragmentViewModel.setQueueListSource(queueListSource ?: AllSongsFragment.TAG)
+            mPlayerFragmentViewModel.setQueueListSourceColumnIndex(queueListSourceColumnIndex)
+            mPlayerFragmentViewModel.setQueueListSourceColumnValue(queueListSourceColumnValue)
             mPlayerFragmentViewModel.setSortBy(sortOrganize?.sortOrderBy ?: SORT_LIST_GRID_DEFAULT_VALUE)
             mPlayerFragmentViewModel.setIsInverted(sortOrganize?.isInvertSort ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE)
-            mPlayerFragmentViewModel.setQueueListSource(queueListSource ?: AllSongsFragment.TAG)
 
             loadDirectlyQueueMusicListFromDatabase(
                 sortOrganize?.sortOrderBy ?: SORT_LIST_GRID_DEFAULT_VALUE,
                 sortOrganize?.isInvertSort ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE,
-                queueListSource ?: AllSongsFragment.TAG
+                queueListSource ?: AllSongsFragment.TAG,
+                queueListSourceColumnIndex,
+                queueListSourceColumnValue
             )
             val songItem: SongItem? = SharedPreferenceManagerUtils.Player.loadCurrentPlayingSong(ctx)
             val progressValue: Long = SharedPreferenceManagerUtils.Player.loadPlayingProgressValue(ctx)
-            val queueListSourceValue: String? = SharedPreferenceManagerUtils.Player.loadQueueListSourceValue(ctx)
             val repeat: Int = SharedPreferenceManagerUtils.Player.loadRepeat(ctx)
             val shuffle: Int = SharedPreferenceManagerUtils.Player.loadShuffle(ctx)
             val sleepTimer: SleepTimerSP? = SharedPreferenceManagerUtils.Player.loadSleepTimer(ctx)
@@ -166,7 +186,7 @@ import kotlinx.coroutines.withContext
             }else{
                 MainScope().launch {
                     val tempSongItem : SongItem? =
-                        mSongItemViewModel.getAtUri(songItem.uri ?: "")
+                        mSongItemViewModel.getAtUri(songItem.uri ?: null)
                     if(tempSongItem?.uri == null){
                         MainScope().launch {
                             tryToGetFirstSong()
@@ -178,7 +198,6 @@ import kotlinx.coroutines.withContext
                         mPlayerFragmentViewModel.setIsPlaying(false)
                         mPlayerFragmentViewModel.setRepeat(repeat)
                         mPlayerFragmentViewModel.setShuffle(shuffle)
-                        mPlayerFragmentViewModel.setQueueListSourceValue(queueListSourceValue)
                         mPlayerFragmentViewModel.setSleepTimer(sleepTimer)
                         mPlayerFragmentViewModel.setSleepTimerStateStarted(false)
                     }
@@ -194,7 +213,8 @@ import kotlinx.coroutines.withContext
                         ctx,
                         AllSongsFragment.TAG
                     )
-                    SharedPreferenceManagerUtils.Player.saveQueueListSourceValue(ctx, "")
+                    SharedPreferenceManagerUtils.Player.saveQueueListSourceColumnIndex(ctx, null)
+                    SharedPreferenceManagerUtils.Player.saveQueueListSourceColumnValue(ctx, null)
                     SharedPreferenceManagerUtils.Player.saveRepeat(
                         ctx,
                         PlaybackStateCompat.REPEAT_MODE_NONE
@@ -217,8 +237,14 @@ import kotlinx.coroutines.withContext
             }
         }
     }
-    private fun loadDirectlyQueueMusicListFromDatabase(sortOrderBy: String, isInvertSort: Boolean, queueListSource: String) {
-        when (queueListSource) {
+    private fun loadDirectlyQueueMusicListFromDatabase(
+        sortOrderBy: String,
+        isInvertSort: Boolean,
+        queueListSource: String,
+        queueListSourceColumnIndex: String?,
+        queueListSourceColumnValue: String?
+    ) {
+            when (queueListSource) {
             AllSongsFragment.TAG -> {
                 MainScope().launch {
                     val songList = mSongItemViewModel.getAllDirectly(sortOrderBy)
@@ -231,32 +257,6 @@ import kotlinx.coroutines.withContext
                     )
                 }
             }
-            AlbumsFragment.TAG -> {
-                //
-            }
-            AlbumArtistsFragment.TAG -> {
-                //
-            }
-            ArtistsFragment.TAG -> {
-                //
-            }
-            ComposersFragment.TAG -> {
-                //
-            }
-            FoldersFragment.TAG -> {
-                //
-            }
-            GenresFragment.TAG -> {
-                //
-            }
-            YearsFragment.TAG -> {
-                //
-            }
-
-            ExploreContentsForFragment.TAG -> {
-                //
-            }
-
             FoldersHierarchyFragment.TAG -> {
                 //
             }
@@ -267,7 +267,20 @@ import kotlinx.coroutines.withContext
                 //
             }
             else -> {
-                //
+                MainScope().launch {
+                    val songList = mSongItemViewModel.getAllDirectlyWhereEqual(
+                        queueListSourceColumnIndex,
+                        queueListSourceColumnValue,
+                        sortOrderBy
+                    )
+                    updateEmptyListUI(songList?.size ?: 0)
+                    mPlayerPagerAdapter?.submitList(
+                        if(isInvertSort) songList?.reversed() else songList
+                    )
+                    mQueueMusicBottomSheetDialog.updateQueueMusicList(
+                        if(isInvertSort) songList?.reversed() else songList
+                    )
+                }
             }
         }
     }
@@ -359,26 +372,164 @@ import kotlinx.coroutines.withContext
     }
 
     private fun updatePlayListData() {
-        val queueListSource: String = mPlayerFragmentViewModel.getQueueListSource().value ?: AllSongsFragment.TAG
-        val tempIsInverted : Boolean = mPlayerFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
-        Log.i(TAG, "IS PLAYING INVERTED : ${tempIsInverted}")
-        if(queueListSource == AllSongsFragment.TAG) {
-            //Get songs
-            val songList = mAllSongsFragmentViewModel.getAllDirectly() as List<SongItem>?
-            updateEmptyListUI(songList?.size ?: 0)
+        MainScope().launch {
+            val queueListSource: String = mPlayerFragmentViewModel.getQueueListSource().value ?: AllSongsFragment.TAG
+            val tempIsInverted : Boolean = mPlayerFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
+            val songList = getNewSongsForSource(queueListSource)
+            //Update UI
+            updateEmptyListUI(songList.size)
             mPlayerPagerAdapter?.submitList(
                 if(tempIsInverted)
-                    songList?.reversed()
+                    songList.reversed() as List<SongItem>?
                 else
-                    songList
+                    songList as List<SongItem>?
             )
             mQueueMusicBottomSheetDialog.updateQueueMusicList(
                 if(tempIsInverted)
-                    songList?.reversed()
+                    songList.reversed() as List<SongItem>?
                 else
-                    songList
+                    songList as List<SongItem>?
             )
         }
+    }
+
+    private suspend fun getNewSongsForSource(queueListSource: String): List<Any> {
+        val songList = ArrayList<Any>()
+        withContext(Dispatchers.Default){
+            when (queueListSource) {
+                AllSongsFragment.TAG -> {
+                    mAllSongsFragmentViewModel.getAllDirectly()
+                        ?.let {
+                            songList.addAll(it)
+                        }
+                }
+                ExploreContentsForFragment.TAG -> {
+                    mExploreContentsForFragmentViewModel.getAllDirectly()
+                        ?.let {
+                            songList.addAll(it)
+                        }
+                }
+                FoldersHierarchyFragment.TAG -> {
+                    //
+                }
+                PlaylistsFragment.TAG -> {
+                    //
+                }
+                StreamsFragment.TAG -> {
+                    //
+                }
+                else -> {
+                    when (queueListSource) {
+                        AlbumArtistsFragment.TAG -> {
+                            val dataList = mAlbumArtistsFragmentViewModel.getAllDirectly() ?: return@withContext
+                            if(dataList.isEmpty()) return@withContext
+                            for (i in dataList.indices){
+                                val tempNewSongs: List<SongItem>? =
+                                    mSongItemViewModel.getAllDirectlyWhereEqual(
+                                        AlbumArtistItem.INDEX_COLUM_TO_SONG_ITEM,
+                                        (dataList[i] as AlbumArtistItem).name,
+                                        SongItem.DEFAULT_INDEX
+                                    )
+                                tempNewSongs?.let {
+                                    songList.addAll(it)
+                                }
+                            }
+                        }
+                        AlbumsFragment.TAG -> {
+                            val dataList = mAlbumsFragmentViewModel.getAllDirectly() ?: return@withContext
+                            if(dataList.isEmpty()) return@withContext
+                            for (i in dataList.indices){
+                                val tempNewSongs: List<SongItem>? =
+                                    mSongItemViewModel.getAllDirectlyWhereEqual(
+                                        AlbumItem.INDEX_COLUM_TO_SONG_ITEM,
+                                        (dataList[i] as AlbumItem).name,
+                                        SongItem.DEFAULT_INDEX
+                                    )
+                                tempNewSongs?.let {
+                                    songList.addAll(it)
+                                }
+                            }
+                        }
+                        ArtistsFragment.TAG -> {
+                            val dataList = mArtistsFragmentViewModel.getAllDirectly() ?: return@withContext
+                            if(dataList.isEmpty()) return@withContext
+                            for (i in dataList.indices){
+                                val tempNewSongs: List<SongItem>? =
+                                    mSongItemViewModel.getAllDirectlyWhereEqual(
+                                        ArtistItem.INDEX_COLUM_TO_SONG_ITEM,
+                                        (dataList[i] as ArtistItem).name,
+                                        SongItem.DEFAULT_INDEX
+                                    )
+                                tempNewSongs?.let {
+                                    songList.addAll(it)
+                                }
+                            }
+                        }
+                        ComposersFragment.TAG -> {
+                            val dataList = mComposersFragmentViewModel.getAllDirectly() ?: return@withContext
+                            if(dataList.isEmpty()) return@withContext
+                            for (i in dataList.indices){
+                                val tempNewSongs: List<SongItem>? =
+                                    mSongItemViewModel.getAllDirectlyWhereEqual(
+                                        ComposerItem.INDEX_COLUM_TO_SONG_ITEM,
+                                        (dataList[i] as ComposerItem).name,
+                                        SongItem.DEFAULT_INDEX
+                                    )
+                                tempNewSongs?.let {
+                                    songList.addAll(it)
+                                }
+                            }
+                        }
+                        FoldersFragment.TAG -> {
+                            val dataList = mFoldersFragmentViewModel.getAllDirectly() ?: return@withContext
+                            if(dataList.isEmpty()) return@withContext
+                            for (i in dataList.indices){
+                                val tempNewSongs: List<SongItem>? =
+                                    mSongItemViewModel.getAllDirectlyWhereEqual(
+                                        FolderItem.INDEX_COLUM_TO_SONG_ITEM,
+                                        (dataList[i] as FolderItem).name,
+                                        SongItem.DEFAULT_INDEX
+                                    )
+                                tempNewSongs?.let {
+                                    songList.addAll(it)
+                                }
+                            }
+                        }
+                        GenresFragment.TAG -> {
+                            val dataList = mGenresFragmentViewModel.getAllDirectly() ?: return@withContext
+                            if(dataList.isEmpty()) return@withContext
+                            for (i in dataList.indices){
+                                val tempNewSongs: List<SongItem>? =
+                                    mSongItemViewModel.getAllDirectlyWhereEqual(
+                                        GenreItem.INDEX_COLUM_TO_SONG_ITEM,
+                                        (dataList[i] as GenreItem).name,
+                                        SongItem.DEFAULT_INDEX
+                                    )
+                                tempNewSongs?.let {
+                                    songList.addAll(it)
+                                }
+                            }
+                        }
+                        YearsFragment.TAG -> {
+                            val dataList = mYearsFragmentViewModel.getAllDirectly() ?: return@withContext
+                            if(dataList.isEmpty()) return@withContext
+                            for (i in dataList.indices){
+                                val tempNewSongs: List<SongItem>? =
+                                    mSongItemViewModel.getAllDirectlyWhereEqual(
+                                        YearItem.INDEX_COLUM_TO_SONG_ITEM,
+                                        (dataList[i] as YearItem).name,
+                                        SongItem.DEFAULT_INDEX
+                                    )
+                                tempNewSongs?.let {
+                                    songList.addAll(it)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return songList
     }
 
     private fun onSkipToPrevTrack(skipCounter: Int?) {
@@ -494,7 +645,6 @@ import kotlinx.coroutines.withContext
     private fun updateBlurredBackgroundUIFromUri(songItem: SongItem?) {
         mFragmentPlayerBinding?.let { fragmentPlayerBinding ->
             context?.let { ctx ->
-                Log.i(ConstantValues.TAG, "BLUR VIEW FROM PLAYER FRAGMENT : ${songItem?.fileName} : HAS COVER SIGNATURE ${songItem?.hashedCovertArtSignature}")
                 val tempUri: Uri = Uri.parse(songItem?.uri ?: "")
                 val imageRequestBlurred: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newBlurInstance()
                 imageRequestBlurred.uri = tempUri

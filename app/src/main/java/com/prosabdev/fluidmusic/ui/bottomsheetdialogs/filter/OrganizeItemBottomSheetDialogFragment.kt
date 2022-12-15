@@ -160,20 +160,9 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
                     YearsFragment.TAG -> {
                         mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.songs_for_year) ?: ""
                     }
-                    PlaylistsFragment.TAG -> {
-                        mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.songs_for_playlist) ?: ""
-                    }
-//                    FavoritesFragment.TAG -> {
-//                        mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.songs_for_favorites) ?: ""
-//                    }
-                    StreamsFragment.TAG -> {
-                        mDataBidingView?.textOrganizeDetails?.text = context?.resources?.getString(R.string.songs_for_stream) ?: ""
-                    }
                 }
             }
         }
-        Log.i(TAG, "EXPLORE CONTENT FOR ${mFromSource}")
-        Log.i(TAG, "EXPLORE CONTENT FOR ${mFromSourceValue}")
     }
 
     private fun updateCheckedOrganizeButtonUI() {

@@ -96,7 +96,9 @@ abstract class CommonPlaybackAction {
             playerFragmentViewModel : PlayerFragmentViewModel?,
             genericListenDataViewModel: GenericListenDataViewModel?,
             genericListGridItemAdapter: GenericListGridItemAdapter?,
-            fragmentSource: String,
+            loadFromSource: String,
+            loadFromSourceColumnIndex: String?,
+            loadFromSourceColumnValue: String?,
             position: Int,
             repeat: Int? = null,
             shuffle: Int? = null
@@ -107,11 +109,16 @@ abstract class CommonPlaybackAction {
             if(
                 playerFragmentViewModel.getSortBy().value != genericListenDataViewModel.getSortBy().value ||
                 playerFragmentViewModel.getIsInverted().value != genericListenDataViewModel.getIsInverted().value ||
-                playerFragmentViewModel.getQueueListSource().value != fragmentSource
+                playerFragmentViewModel.getQueueListSource().value != loadFromSource ||
+                playerFragmentViewModel.getQueueListSourceColumnIndex().value != loadFromSourceColumnIndex ||
+                playerFragmentViewModel.getQueueListSourceColumnValue().value != loadFromSourceColumnValue
             ){
                 playerFragmentViewModel.setSortBy(genericListenDataViewModel.getSortBy().value ?: "")
                 playerFragmentViewModel.setIsInverted(genericListenDataViewModel.getIsInverted().value ?: false)
-                playerFragmentViewModel.setQueueListSource(fragmentSource)
+                playerFragmentViewModel.setQueueListSource(loadFromSource)
+                playerFragmentViewModel.setQueueListSourceColumnIndex(loadFromSourceColumnIndex)
+                playerFragmentViewModel.setQueueListSourceColumnValue(loadFromSourceColumnValue)
+
                 playerFragmentViewModel.setUpdatePlaylistCounter()
             }
             playerFragmentViewModel.setCurrentPlayingSong(getCurrentPlayingSongFromPosition(genericListGridItemAdapter, position))

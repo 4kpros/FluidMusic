@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textview.MaterialTextView
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
@@ -32,6 +33,7 @@ import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortContentExplorerBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
+import com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
@@ -191,6 +193,8 @@ class AlbumsFragment : Fragment() {
         }
         if(
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == null &&
             mPlayerFragmentViewModel.getSortBy().value == mAlbumsFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mAlbumsFragmentViewModel.getIsInverted().value
         ){
@@ -220,6 +224,8 @@ class AlbumsFragment : Fragment() {
         }
         if(
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == null &&
             mPlayerFragmentViewModel.getSortBy().value == mAlbumsFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mAlbumsFragmentViewModel.getIsInverted().value
         ){
@@ -269,6 +275,8 @@ class AlbumsFragment : Fragment() {
 
         if (
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == null &&
             mPlayerFragmentViewModel.getSortBy().value == mAlbumsFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mAlbumsFragmentViewModel.getIsInverted().value
         ) {
@@ -312,6 +320,8 @@ class AlbumsFragment : Fragment() {
     private fun updatePlaybackStateUI(isPlaying: Boolean) {
         if (
             mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
+            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == null &&
             mPlayerFragmentViewModel.getSortBy().value == mAlbumsFragmentViewModel.getSortBy().value &&
             mPlayerFragmentViewModel.getIsInverted().value == mAlbumsFragmentViewModel.getIsInverted().value
         ) {
@@ -416,7 +426,13 @@ class AlbumsFragment : Fragment() {
                     }
                 },
                 object : GenericListGridItemAdapter.OnItemClickListener{
-                    override fun onItemClicked(position: Int) {
+                    override fun onItemClicked(
+                        position: Int,
+                        imageviewCoverArt: CustomShapeableImageViewImageViewRatio11,
+                        textTitle: MaterialTextView,
+                        textSubtitle: MaterialTextView,
+                        textDetails: MaterialTextView
+                    ) {
                         if(mMainFragmentViewModel.getSelectMode().value == true){
                             mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
                         }else{
