@@ -121,11 +121,11 @@ abstract class CommonPlaybackAction {
 
                 playerFragmentViewModel.setUpdatePlaylistCounter()
             }
-            playerFragmentViewModel.setCurrentPlayingSong(getCurrentPlayingSongFromPosition(genericListGridItemAdapter, position))
             playerFragmentViewModel.setIsPlaying(true)
             playerFragmentViewModel.setPlayingProgressValue(0)
             playerFragmentViewModel.setRepeat(repeat ?: playerFragmentViewModel.getRepeat().value ?: PlaybackStateCompat.REPEAT_MODE_NONE)
             playerFragmentViewModel.setShuffle(shuffle ?: playerFragmentViewModel.getShuffle().value ?: PlaybackStateCompat.SHUFFLE_MODE_NONE)
+            playerFragmentViewModel.setCurrentPlayingSong(getCurrentPlayingSongFromPosition(genericListGridItemAdapter, position))
             return true
         }
         private fun getCurrentPlayingSongFromPosition(

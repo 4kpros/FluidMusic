@@ -446,6 +446,11 @@ class GenresFragment : Fragment() {
                 },
                 object : SelectableItemListAdapter.OnSelectSelectableItemListener{
                     override fun onSelectModeChange(selectMode: Boolean) {
+                        if(selectMode){
+                            mMainFragmentViewModel.setCurrentSelectablePage(
+                                TAG
+                            )
+                        }
                         mMainFragmentViewModel.setSelectMode(selectMode)
                     }
                     override fun onRequestGetStringIndex(position: Int): String {

@@ -45,8 +45,9 @@
             app:strokeColor="@color/transparent"
             android:alpha="0.65"
             android:background="?android:colorBackground"
-            android:visibility="gone"
+            android:backgroundTint="?android:colorBackground"
             android:layout_margin="@dimen/margin_small_size"
+            android:visibility="gone"
             />
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/linear_is_playing_anim_container"
@@ -59,7 +60,6 @@
             android:gravity="center"
             android:weightSum="1"
             android:orientation="horizontal"
-            android:baselineAligned="false"
             android:visibility="gone"
             >
             <androidx.appcompat.widget.AppCompatImageView

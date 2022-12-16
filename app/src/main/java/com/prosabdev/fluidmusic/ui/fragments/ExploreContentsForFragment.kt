@@ -19,7 +19,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Transition
 import androidx.transition.TransitionInflater
 import com.google.android.material.textview.MaterialTextView
+import com.google.android.material.transition.platform.FadeThroughProvider
 import com.google.android.material.transition.platform.MaterialContainerTransform
+import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.MainActivity
@@ -89,10 +91,10 @@ class ExploreContentsForFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enterTransition = MaterialSharedAxis(MaterialSharedAxis.Y, true)
-        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Y, true)
+        exitTransition = MaterialFadeThrough()
+        returnTransition = MaterialFadeThrough()
         arguments?.let {
         }
-
         loadPrefsAndInitViewModel()
     }
 
@@ -482,6 +484,9 @@ class ExploreContentsForFragment : Fragment() {
                 },
                 object : SelectableItemListAdapter.OnSelectSelectableItemListener{
                     override fun onSelectModeChange(selectMode: Boolean) {
+                        if(selectMode){
+                            mMainFragmentViewModel.setCurrentSelectablePage(TAG)
+                        }
                         mMainFragmentViewModel.setSelectMode(selectMode)
                     }
                     override fun onRequestGetStringIndex(position: Int): String {
@@ -650,8 +655,7 @@ class ExploreContentsForFragment : Fragment() {
         withContext(Dispatchers.Default){
             context?.let { ctx ->
                 val imageRequestLargeImage = ImageLoadersUtils.ImageRequestItem.newOriginalMediumCardInstance()
-                imageRequestLargeImage.uri = Uri.parse(mImageUri)
-                Log.i(TAG, "mHashedCoverArtSignature ${mHashedCoverArtSignature}")
+                imageRequestLargeImage.uri = Uri.parse(mImageUri ?: return@withContext)
                 imageRequestLargeImage.hashedCovertArtSignature = mHashedCoverArtSignature
                 imageRequestLargeImage.imageView = mDataBidingView?.imageViewCoverArt
                 ImageLoadersUtils.startExploreContentImageLoaderJob(
@@ -727,7 +731,7 @@ class ExploreContentsForFragment : Fragment() {
 
     companion object {
         const val TAG = "ExploreContentsFor"
-        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = ConstantValues.ORGANIZE_LIST_MEDIUM
+        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = ConstantValues.ORGANIZE_LIST_SMALL
         private const val SORT_LIST_GRID_DEFAULT_VALUE: String = SongItem.DEFAULT_INDEX
         private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 

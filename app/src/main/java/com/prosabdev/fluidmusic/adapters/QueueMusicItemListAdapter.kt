@@ -31,7 +31,6 @@ class QueueMusicItemListAdapter(
 ) : SelectablePlayingItemListAdapter<QueueMusicItemListAdapter.QueueMusicItemHolder>(SongItem.diffCallback as DiffUtil.ItemCallback<Any>),
     QueueMusicItemCallback.ItemTouchHelperContract
 {
-
     interface OnItemClickListener {
         fun onSongItemClicked(position: Int)
     }
@@ -157,14 +156,10 @@ class QueueMusicItemListAdapter(
             animate: Boolean
         ) {
             if(playingPosition == bindingAdapterPosition){
-                mItemQueueMusicBinding.imageviewBackgroundIsPlaying.visibility = GONE
-                mItemQueueMusicBinding.linearIsPlayingAnimContainer.visibility = GONE
                 val colorValue = MaterialColors.getColor(mItemQueueMusicBinding.textTitle  as View, com.google.android.material.R.attr.colorPrimary)
                 changeColorAndFaceType(colorValue, true)
                 showPlayingPositionImageHover(animate)
             }else{
-                mItemQueueMusicBinding.imageviewBackgroundIsPlaying.visibility = GONE
-                mItemQueueMusicBinding.linearIsPlayingAnimContainer.visibility = GONE
                 val colorValue = MaterialColors.getColor(mItemQueueMusicBinding.textTitle as View, com.google.android.material.R.attr.colorOnBackground)
                 changeColorAndFaceType(colorValue, false)
                 hidePlayingPositionImageHover(animate)
@@ -218,26 +213,26 @@ class QueueMusicItemListAdapter(
                     150
                 )
             }else{
-                mItemQueueMusicBinding.imageviewBackgroundIsPlaying.alpha = 0.0f
-                mItemQueueMusicBinding.linearIsPlayingAnimContainer.alpha = 0.0f
+                mItemQueueMusicBinding.imageviewBackgroundIsPlaying.visibility = GONE
+                mItemQueueMusicBinding.linearIsPlayingAnimContainer.visibility = GONE
             }
         }
         fun updateItemTouchHelper(isDragging : Boolean, animated: Boolean = true){
-//            if(isDragging) {
+            if(isDragging) {
 //                AnimatorsUtils.crossFadeUp(
 //                    mItemQueueMusicBinding.songItemIsSelected,
 //                    animated,
 //                    150,
 //                    0.15f
 //                )
-//            }
-//            else {
+            }
+            else {
 //                AnimatorsUtils.crossFadeDown(
 //                    mItemQueueMusicBinding.songItemIsSelected,
 //                    animated,
 //                    150
 //                )
-//            }
+            }
         }
     }
 

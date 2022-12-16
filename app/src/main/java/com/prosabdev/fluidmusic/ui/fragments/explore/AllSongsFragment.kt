@@ -35,6 +35,7 @@ import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortSongsBottomShee
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
 import com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
+import com.prosabdev.fluidmusic.ui.fragments.PlayerFragment
 import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
@@ -462,6 +463,9 @@ class AllSongsFragment : Fragment() {
                 },
                 object : SelectableItemListAdapter.OnSelectSelectableItemListener{
                     override fun onSelectModeChange(selectMode: Boolean) {
+                        if(selectMode){
+                            mMainFragmentViewModel.setCurrentSelectablePage(TAG)
+                        }
                         mMainFragmentViewModel.setSelectMode(selectMode)
                     }
                     override fun onRequestGetStringIndex(position: Int): String {
@@ -603,7 +607,6 @@ class AllSongsFragment : Fragment() {
         }
         mMainFragmentViewModel.setScrollingState(-1)
     }
-
 
     private fun initViews() {
         mDataBidingView?.recyclerView?.setHasFixedSize(true)

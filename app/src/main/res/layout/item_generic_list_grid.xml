@@ -69,7 +69,6 @@
             android:weightSum="1"
             android:orientation="horizontal"
             android:visibility="gone"
-            android:translationZ="10dp"
             >
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/imageview_is_playing_anim"

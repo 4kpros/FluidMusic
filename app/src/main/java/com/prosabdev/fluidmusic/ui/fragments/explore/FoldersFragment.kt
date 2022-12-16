@@ -446,6 +446,11 @@ class FoldersFragment : Fragment() {
                 },
                 object : SelectableItemListAdapter.OnSelectSelectableItemListener{
                     override fun onSelectModeChange(selectMode: Boolean) {
+                        if(selectMode){
+                            mMainFragmentViewModel.setCurrentSelectablePage(
+                                TAG
+                            )
+                        }
                         mMainFragmentViewModel.setSelectMode(selectMode)
                     }
                     override fun onRequestGetStringIndex(position: Int): String {
@@ -624,7 +629,7 @@ class FoldersFragment : Fragment() {
 
     companion object {
         const val TAG = "FoldersFragment"
-        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = ConstantValues.ORGANIZE_GRID_LARGE
+        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = ConstantValues.ORGANIZE_GRID_MEDIUM
         private const val SORT_LIST_GRID_DEFAULT_VALUE: String = FolderItem.DEFAULT_INDEX
         private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 

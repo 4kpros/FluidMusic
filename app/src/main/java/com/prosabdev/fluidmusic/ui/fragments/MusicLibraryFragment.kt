@@ -65,7 +65,6 @@ class MusicLibraryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         checkInteractions()
         observeLiveData()
     }
@@ -265,32 +264,6 @@ class MusicLibraryFragment : Fragment() {
         mMainFragmentViewModel.setTotalCount(0)
         mMainFragmentViewModel.setSelectedDataList(HashMap())
         mMainFragmentViewModel.setSelectMode(false)
-        when (position) {
-            0 -> {
-                mMainFragmentViewModel.setCurrentSelectablePage(AllSongsFragment.TAG)
-            }
-            1 -> {
-                mMainFragmentViewModel.setCurrentSelectablePage(AlbumsFragment.TAG)
-            }
-            2 -> {
-                mMainFragmentViewModel.setCurrentSelectablePage(ArtistsFragment.TAG)
-            }
-            3 -> {
-                mMainFragmentViewModel.setCurrentSelectablePage(FoldersFragment.TAG)
-            }
-            4 -> {
-                mMainFragmentViewModel.setCurrentSelectablePage(GenresFragment.TAG)
-            }
-            5 -> {
-                mMainFragmentViewModel.setCurrentSelectablePage(AlbumArtistsFragment.TAG)
-            }
-            6 -> {
-                mMainFragmentViewModel.setCurrentSelectablePage(ComposersFragment.TAG)
-            }
-            7 -> {
-                mMainFragmentViewModel.setCurrentSelectablePage(YearsFragment.TAG)
-            }
-        }
     }
 
     private fun openShareSelectionDialog() {

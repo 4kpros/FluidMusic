@@ -63,7 +63,6 @@
                         android:visibility="gone"
                         android:alpha="0"
                         android:translationY="0dp"
-                        android:clickable="true"
                         >
 
                         <include
@@ -80,7 +79,6 @@
                         android:visibility="gone"
                         android:alpha="0"
                         android:translationY="0dp"
-                        android:clickable="true"
                         >
                         <include
                             android:id="@+id/include_top_selection"

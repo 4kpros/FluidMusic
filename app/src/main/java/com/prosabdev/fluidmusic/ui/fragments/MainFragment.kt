@@ -546,9 +546,9 @@ import kotlinx.coroutines.launch
             fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.isSelected = true
             fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.isSelected = true
 
-            InsetModifiersUtils.updateTopViewInsets(fragmentMainBinding.includeTopSelection.constraintTopSelectionMenu)
+            InsetModifiersUtils.updateTopViewInsets(fragmentMainBinding.includeTopSelection.constraintContainer)
             InsetModifiersUtils.updateBottomViewInsets(fragmentMainBinding.constraintMiniPlayerInclude.constraintMiniPlayer)
-            InsetModifiersUtils.updateBottomViewInsets(fragmentMainBinding.includeBottomSelection.constraintBottomSelectionMenu)
+            InsetModifiersUtils.updateBottomViewInsets(fragmentMainBinding.includeBottomSelection.constraintContainer)
 
             fragmentMainBinding.navigationView.setCheckedItem(R.id.music_library)
         }
