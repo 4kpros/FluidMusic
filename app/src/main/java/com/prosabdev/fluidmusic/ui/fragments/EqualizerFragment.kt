@@ -17,15 +17,13 @@ import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 
 @BuildCompat.PrereleaseSdkCheck class EqualizerFragment : Fragment() {
 
-    private var mFragmentEqualizerBinding: FragmentEqualizerBinding? = null
+    private var mDataBidingView: FragmentEqualizerBinding? = null
 
     private val  mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val  mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enterTransition = MaterialFadeThrough()
-        exitTransition = MaterialFadeThrough()
         arguments?.let {
         }
     }
@@ -34,8 +32,8 @@ import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mFragmentEqualizerBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_equalizer, container,false)
-        val view = mFragmentEqualizerBinding?.root
+        mDataBidingView = DataBindingUtil.inflate(inflater,R.layout.fragment_equalizer, container,false)
+        val view = mDataBidingView?.root
 
         initViews()
         setupRecyclerViewAdapter()
@@ -50,31 +48,31 @@ import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
     }
 
     private fun checkInteractions() {
-        mFragmentEqualizerBinding?.let { fragmentEqualizerBinding ->
-            fragmentEqualizerBinding.topAppBar.setNavigationOnClickListener {
+        mDataBidingView?.let { dataBidingView ->
+            dataBidingView.topAppBar.setNavigationOnClickListener {
                 activity?.onBackPressedDispatcher?.onBackPressed()
             }
         }
     }
 
     private fun observeLiveData() {
-        mFragmentEqualizerBinding?.let { fragmentEqualizerBinding ->
-            InsetModifiersUtils.updateTopViewInsets(fragmentEqualizerBinding.container)
-            InsetModifiersUtils.updateBottomViewInsets(fragmentEqualizerBinding.container)
+        mDataBidingView?.let { dataBidingView ->
+            InsetModifiersUtils.updateTopViewInsets(dataBidingView.container)
+            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
         }
     }
 
     private fun setupRecyclerViewAdapter() {
-        mFragmentEqualizerBinding?.let { fragmentEqualizerBinding ->
-            InsetModifiersUtils.updateTopViewInsets(fragmentEqualizerBinding.container)
-            InsetModifiersUtils.updateBottomViewInsets(fragmentEqualizerBinding.container)
+        mDataBidingView?.let { dataBidingView ->
+            InsetModifiersUtils.updateTopViewInsets(dataBidingView.container)
+            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
         }
     }
 
     private fun initViews() {
-        mFragmentEqualizerBinding?.let { fragmentEqualizerBinding ->
-            InsetModifiersUtils.updateTopViewInsets(fragmentEqualizerBinding.container)
-            InsetModifiersUtils.updateBottomViewInsets(fragmentEqualizerBinding.container)
+        mDataBidingView?.let { dataBidingView ->
+            InsetModifiersUtils.updateTopViewInsets(dataBidingView.container)
+            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
         }
     }
 

@@ -23,7 +23,7 @@
                 android:layout_height="?attr/actionBarSize"
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:title="Playlists"
-                app:menu="@menu/main_top_app_bar"
+                app:menu="@menu/app_bar_search"
                 />
         </com.google.android.material.appbar.AppBarLayout>
         <androidx.recyclerview.widget.RecyclerView

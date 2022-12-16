@@ -24,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_scrollFlags="scroll|enterAlways"
-                app:menu="@menu/main_top_app_bar"
+                app:menu="@menu/app_bar_search"
                 app:navigationIcon="@drawable/menu"
                 />
 
@@ -83,7 +83,7 @@
             </com.google.android.material.tabs.TabLayout>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true"
@@ -102,8 +102,8 @@
                 android:id="@+id/side_selection_menu_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
                 android:layout_marginEnd="@dimen/margin_large_size"
                 android:layout_marginBottom="@dimen/margin_large_size"
                 android:orientation="vertical"
@@ -116,6 +116,6 @@
                     android:id="@+id/include_side_selection_menu"
                     layout="@layout/component_side_selection_menu" />
             </androidx.appcompat.widget.LinearLayoutCompat>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </RelativeLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

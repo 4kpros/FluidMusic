@@ -128,7 +128,7 @@ class GenericListGridItemAdapter (
         val tempPosition = if(position >= currentList.size) currentList.size-1 else position
         if(tempPosition < 0) return "#"
         val tempString: String = mOnItemRequestDataInfo.onRequestTextIndexForFastScroller(getItem(tempPosition), tempPosition) ?: "#"
-        return if(tempString.isEmpty()) "3" else tempString.substring(0, 1)
+        return if(tempString.isEmpty()) "#" else tempString.substring(0, 1)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GenericListGridItemHolder {

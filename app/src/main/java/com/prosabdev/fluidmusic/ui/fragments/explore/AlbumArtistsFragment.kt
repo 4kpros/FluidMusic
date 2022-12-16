@@ -72,8 +72,6 @@ class AlbumArtistsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Y,true)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Y,false)
         arguments?.let {
         }
 
@@ -101,9 +99,9 @@ class AlbumArtistsFragment : Fragment() {
         observeLiveData()
     }
 
-    override fun onDestroyView() {
+    override fun onDestroy() {
+        super.onDestroy()
         saveAllDataToPref()
-        super.onDestroyView()
     }
 
     private fun saveAllDataToPref(){
@@ -547,7 +545,7 @@ class AlbumArtistsFragment : Fragment() {
             val tempGeneric = AlbumArtistItem.castDataItemToGeneric(ctx, tempItem, true) ?: return
             val tempStringUri = if(tempGeneric.imageUri == Uri.EMPTY) "" else tempGeneric.imageUri.toString()
             tempFragmentManager.commit {
-                setReorderingAllowed(false)
+                setReorderingAllowed(true)
                 add(
                     R.id.main_fragment_container,
                     ExploreContentsForFragment.newInstance(

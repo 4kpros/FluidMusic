@@ -58,7 +58,7 @@ class YearItem {
             return "#"
         }
 
-        fun castDataItemToGeneric(ctx: Context, dataItem: Any, setAllText: Boolean = false): GenericItemListGrid? {
+        fun castDataItemToGeneric(ctx: Context, dataItem: Any?, setAllText: Boolean = false): GenericItemListGrid? {
             var tempResult : GenericItemListGrid? = null
             if(dataItem is YearItem) {
                 tempResult = GenericItemListGrid()

@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
@@ -36,16 +37,14 @@ import com.prosabdev.fluidmusic.models.generic.GenericItemListGrid
 import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.sharedprefs.SharedPreferenceManagerUtils
 import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
+import com.prosabdev.fluidmusic.ui.activities.SettingsActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortSongsBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
 import com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
 import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
-import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
-import com.prosabdev.fluidmusic.utils.MathComputationsUtils
+import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.ExploreContentsForFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
@@ -57,16 +56,6 @@ import kotlinx.coroutines.withContext
 
 
 class ExploreContentsForFragment : Fragment() {
-    private var mLoadSongFromSource: String? = null
-    private var mWhereColumnIndex: String? = null
-    private var mWhereColumnValue: String? = null
-
-    private var mSharedPrefsKey: String? = null
-    private var mImageUri: String? = null
-    private var mHashedCoverArtSignature: Int = -1
-    private var mTextTitle: String? = null
-    private var mTextSubTitle: String? = null
-    private var mTextDetails: String? = null
 
     private var mDataBidingView: FragmentExploreContentsForBinding? = null
 
@@ -88,11 +77,20 @@ class ExploreContentsForFragment : Fragment() {
 
     private var mIsDraggingToScroll: Boolean = false
 
+    private var mLoadSongFromSource: String? = null
+    private var mWhereColumnIndex: String? = null
+    private var mWhereColumnValue: String? = null
+
+    private var mSharedPrefsKey: String? = null
+    private var mImageUri: String? = null
+    private var mHashedCoverArtSignature: Int = -1
+    private var mTextTitle: String? = null
+    private var mTextSubTitle: String? = null
+    private var mTextDetails: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enterTransition = MaterialSharedAxis(MaterialSharedAxis.Y, true)
-        exitTransition = MaterialFadeThrough()
-        returnTransition = MaterialFadeThrough()
         arguments?.let {
         }
         loadPrefsAndInitViewModel()
@@ -120,9 +118,9 @@ class ExploreContentsForFragment : Fragment() {
         observeLiveData()
     }
 
-    override fun onDestroyView() {
+    override fun onDestroy() {
+        super.onDestroy()
         saveAllDataToPref()
-        super.onDestroyView()
     }
 
     private fun saveAllDataToPref(){
@@ -194,6 +192,14 @@ class ExploreContentsForFragment : Fragment() {
         }
         mMainFragmentViewModel.getScrollingState().observe(viewLifecycleOwner){
             updateOnScrollingStateUI(it)
+        }
+        mMainFragmentViewModel.getIsFastScrolling().observe(viewLifecycleOwner){
+            tryToUpdateFastScrollStateUI(it)
+        }
+    }
+    private fun tryToUpdateFastScrollStateUI(isFastScrolling: Boolean = true) {
+        if(isFastScrolling){
+            mDataBidingView?.appBarLayout?.setExpanded(false)
         }
     }
     private fun updateOrganizeListGrid(organizeValue: Int?) {
@@ -362,53 +368,63 @@ class ExploreContentsForFragment : Fragment() {
     }
 
     private fun checkInteractions() {
-        mDataBidingView?.recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if(mIsDraggingToScroll){
-                    if(dy < 0){
-                        Log.i(TAG, "Scrolling --> TOP")
-                        mMainFragmentViewModel.setScrollingState(-1)
-                    }else if(dy > 0){
-                        Log.i(TAG, "Scrolling --> BOTTOM")
-                        mMainFragmentViewModel.setScrollingState(1)
-                    }
-                    if (!recyclerView.canScrollVertically(1) && dy > 0) {
-                        Log.i(TAG, "Scrolled to BOTTOM")
-                        mMainFragmentViewModel.setScrollingState(2)
-                    } else if (!recyclerView.canScrollVertically(-1) && dy < 0) {
-                        Log.i(TAG, "Scrolled to TOP")
-                        mMainFragmentViewModel.setScrollingState(-2)
-                    }
-                }else{
-                    if (!recyclerView.canScrollVertically(1) && dy > 0) {
-                        Log.i(TAG, "Scrolled to BOTTOM")
-                        if(mMainFragmentViewModel.getScrollingState().value != 2)
+        mDataBidingView?.let { dataBidingView ->
+            dataBidingView.topAppBar.setNavigationOnClickListener {
+                activity?.onBackPressedDispatcher?.onBackPressed()
+            }
+            dataBidingView.topAppBar.setOnMenuItemClickListener {
+                if(it?.itemId == R.id.search){
+                    Log.i(TAG, "ON CLICK TO SEARCH PAGE")
+                }
+                true
+            }
+            dataBidingView.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    if(mIsDraggingToScroll){
+                        if(dy < 0){
+                            Log.i(TAG, "Scrolling --> TOP")
+                            mMainFragmentViewModel.setScrollingState(-1)
+                        }else if(dy > 0){
+                            Log.i(TAG, "Scrolling --> BOTTOM")
+                            mMainFragmentViewModel.setScrollingState(1)
+                        }
+                        if (!recyclerView.canScrollVertically(1) && dy > 0) {
+                            Log.i(TAG, "Scrolled to BOTTOM")
                             mMainFragmentViewModel.setScrollingState(2)
-                    } else if (!recyclerView.canScrollVertically(-1) && dy < 0) {
-                        Log.i(TAG, "Scrolled to TOP")
-                        if(mMainFragmentViewModel.getScrollingState().value != -2)
+                        } else if (!recyclerView.canScrollVertically(-1) && dy < 0) {
+                            Log.i(TAG, "Scrolled to TOP")
                             mMainFragmentViewModel.setScrollingState(-2)
+                        }
+                    }else{
+                        if (!recyclerView.canScrollVertically(1) && dy > 0) {
+                            Log.i(TAG, "Scrolled to BOTTOM")
+                            if(mMainFragmentViewModel.getScrollingState().value != 2)
+                                mMainFragmentViewModel.setScrollingState(2)
+                        } else if (!recyclerView.canScrollVertically(-1) && dy < 0) {
+                            Log.i(TAG, "Scrolled to TOP")
+                            if(mMainFragmentViewModel.getScrollingState().value != -2)
+                                mMainFragmentViewModel.setScrollingState(-2)
+                        }
                     }
                 }
-            }
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                when (newState) {
-                    RecyclerView.SCROLL_STATE_IDLE -> {
-                        mIsDraggingToScroll = false
-                        println("The RecyclerView is SCROLL_STATE_IDLE")
-                    }
-                    RecyclerView.SCROLL_STATE_DRAGGING -> {
-                        mIsDraggingToScroll = true
-                        println("The RecyclerView is SCROLL_STATE_DRAGGING")
-                    }
-                    RecyclerView.SCROLL_STATE_SETTLING -> {
-                        println("The RecyclerView is SCROLL_STATE_SETTLING")
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    when (newState) {
+                        RecyclerView.SCROLL_STATE_IDLE -> {
+                            mIsDraggingToScroll = false
+                            println("The RecyclerView is SCROLL_STATE_IDLE")
+                        }
+                        RecyclerView.SCROLL_STATE_DRAGGING -> {
+                            mIsDraggingToScroll = true
+                            println("The RecyclerView is SCROLL_STATE_DRAGGING")
+                        }
+                        RecyclerView.SCROLL_STATE_SETTLING -> {
+                            println("The RecyclerView is SCROLL_STATE_SETTLING")
+                        }
                     }
                 }
-            }
-        })
+            })
+        }
     }
 
     private suspend fun setupRecyclerViewAdapter() {
@@ -712,6 +728,7 @@ class ExploreContentsForFragment : Fragment() {
         mLoadSongFromSource = loadSongFromSource
         mWhereColumnIndex = whereColumnIndex
         mWhereColumnValue = columnValue
+
         mSharedPrefsKey = sharedPrefsKey
         mImageUri = imageUri
         mHashedCoverArtSignature = hashedCoverArtSignature

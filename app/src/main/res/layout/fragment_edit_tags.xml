@@ -7,361 +7,360 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/container"
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        tools:context=".ui.fragments.EditTagsFragment"
+        android:background="?android:colorBackground"
+        android:backgroundTint="?android:colorBackground"
         >
-        <androidx.core.widget.NestedScrollView
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            >
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/top_app_bar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:menu="@menu/app_bar_save"
+                app:navigationIcon="@drawable/arrow_back"
+                />
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <ScrollView
             android:id="@+id/nested_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="?android:colorBackground"
+            android:fillViewport="true"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:clickable="true"
             >
-            <RelativeLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context=".ui.fragments.EditTagsFragment"
+                android:layout_marginHorizontal="@dimen/margin_large_size"
+                android:paddingBottom="@dimen/margin_large_size"
                 >
-                <RelativeLayout
-                    android:id="@+id/relative_top_app"
-                    android:layout_width="match_parent"
-                    android:layout_height="?actionBarSize"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:orientation="horizontal"
-                    android:layout_marginHorizontal="@dimen/margin_large_size"
-                    android:gravity="center_vertical"
-                    >
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_cancel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        android:text="Back"
-                        app:icon="@drawable/arrow_back"
-                        />
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_save"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        android:text="Save"
-                        app:icon="@drawable/save"
-                        android:layout_alignParentEnd="true"
-                        />
-                </RelativeLayout>
                 <com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
                     android:id="@+id/image_view_cover_Art"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:shapeAppearanceOverlay="@style/ShapeFullRounded"
                     android:src="@drawable/ic_fluid_music_icon_with_padding"
                     android:scaleType="centerCrop"
-                    android:layout_below="@+id/relative_top_app"
                     android:layout_marginHorizontal="@dimen/margin_large_size"
                     />
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_file_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/image_view_cover_Art"
-                    android:orientation="vertical"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/image_view_cover_Art"
+                    android:hint="File name"
+                    app:startIconDrawable="@drawable/audio_file"
+                    app:endIconMode="clear_text"
                     android:layout_marginTop="@dimen/margin_medium_size"
-                    android:layout_marginHorizontal="@dimen/margin_large_size"
                     >
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_file_name"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_text_file_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="File name"
-                        app:startIconDrawable="@drawable/audio_file"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edit_text_file_name"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_title"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_file_name"
+                    android:hint="Title"
+                    app:startIconDrawable="@drawable/title"
+                    app:endIconMode="clear_text"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_text_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Title"
-                        app:startIconDrawable="@drawable/title"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edit_text_title"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_artist"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_artist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_title"
+                    android:hint="Artist"
+                    app:startIconDrawable="@drawable/person"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/edit_text_artist"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Artist"
-                        app:startIconDrawable="@drawable/person"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/edit_text_artist"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_album"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_album"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_artist"
+                    android:hint="Album"
+                    app:startIconDrawable="@drawable/album"
+                    app:endIconMode="clear_text"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/edit_text_album"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Album"
-                        app:startIconDrawable="@drawable/album"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/edit_text_album"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_album_artist"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_album_artist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_album"
+                    android:hint="Album artist"
+                    app:startIconDrawable="@drawable/album_artist"
+                    app:endIconMode="clear_text"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/edit_text_album_artist"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Album artist"
-                        app:startIconDrawable="@drawable/album_artist"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/edit_text_album_artist"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_composer"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_composer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_album_artist"
+                    android:hint="Composer"
+                    app:startIconDrawable="@drawable/speech_to_text"
+                    app:endIconMode="clear_text"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/edit_text_composer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Composer"
-                        app:startIconDrawable="@drawable/speech_to_text"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/edit_text_composer"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_Genre"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_Genre"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_composer"
+                    android:hint="Genre"
+                    app:startIconDrawable="@drawable/piano"
+                    app:endIconMode="clear_text"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/edit_text_genre"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Genre"
-                        app:startIconDrawable="@drawable/piano"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/edit_text_genre"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_track_number"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_track_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_Genre"
+                    android:hint="Track number"
+                    app:startIconDrawable="@drawable/filter_1"
+                    app:endIconMode="clear_text"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_text_track_number"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Track number"
-                        app:startIconDrawable="@drawable/filter_1"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edit_text_track_number"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_disc_number"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_disc_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_track_number"
+                    android:hint="Disc number"
+                    app:startIconDrawable="@drawable/filter_1"
+                    app:endIconMode="clear_text"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/edit_text_disc_number"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Disc number"
-                        app:startIconDrawable="@drawable/filter_1"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/edit_text_disc_number"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_year"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_year"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_disc_number"
+                    android:hint="Year"
+                    app:startIconDrawable="@drawable/calendar_month"
+                    app:endIconMode="clear_text"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/edit_text_year"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Year"
-                        app:startIconDrawable="@drawable/calendar_month"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/edit_text_year"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_comment"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_comment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_year"
+                    android:hint="Comment"
+                    app:startIconDrawable="@drawable/comment"
+                    app:endIconMode="clear_text"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/edit_text_disc_comment"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Comment"
-                        app:startIconDrawable="@drawable/comment"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/edit_text_disc_comment"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_language"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_language"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_comment"
+                    android:hint="Language"
+                    app:startIconDrawable="@drawable/language"
+                    app:endIconMode="clear_text"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/edit_text_disc_language"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Language"
-                        app:startIconDrawable="@drawable/language"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/edit_text_disc_language"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_author"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_author"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_language"
+                    android:hint="Author"
+                    app:startIconDrawable="@drawable/attribution"
+                    app:endIconMode="clear_text"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/edit_text_disc_author"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Author"
-                        app:startIconDrawable="@drawable/attribution"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/edit_text_disc_author"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_writer"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_writer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_author"
+                    android:hint="Writer"
+                    app:startIconDrawable="@drawable/draw"
+                    app:endIconMode="clear_text"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/edit_text_disc_writer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Writer"
-                        app:startIconDrawable="@drawable/draw"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/edit_text_disc_writer"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_country"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_country"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_writer"
+                    android:hint="Country"
+                    app:startIconDrawable="@drawable/flag"
+                    app:endIconMode="clear_text"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/edit_text_disc_country"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Country"
-                        app:startIconDrawable="@drawable/flag"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/edit_text_disc_country"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/text_input_layout_record_label"
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout_record_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    app:layout_constraintTop_toBottomOf="@+id/text_input_layout_country"
+                    android:hint="Record_label"
+                    app:startIconDrawable="@drawable/label"
+                    app:endIconMode="clear_text"
+                    android:layout_marginTop="@dimen/margin_medium_size"
+                    >
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/edit_text_record_label"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                        android:hint="Record_label"
-                        app:startIconDrawable="@drawable/label"
-                        app:endIconMode="clear_text"
-                        android:layout_marginTop="@dimen/margin_medium_size"
-                        >
-                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/edit_text_record_label"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:inputType="text"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-                </androidx.appcompat.widget.LinearLayoutCompat>
-            </RelativeLayout>
-        </androidx.core.widget.NestedScrollView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                        android:text=""
+                        android:inputType="text"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

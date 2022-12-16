@@ -6,14 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import com.google.android.material.transition.platform.MaterialFadeThrough
+import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentEditTagsBinding
 import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 
 class EditTagsFragment : Fragment() {
 
-    private var mFragmentEditTagsBinding: FragmentEditTagsBinding? = null
+    private var mDataBidingView: FragmentEditTagsBinding? = null
 
     private var mDataList: List<String>? = null
     private var mModelType: String? = null
@@ -21,14 +21,7 @@ class EditTagsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        exitTransition = MaterialFadeThrough()
-        reenterTransition = MaterialFadeThrough()
-
         arguments?.let {
-            mDataList = it.getStringArrayList(DATA_LIST)
-            mModelType = it.getString(MODEL_TYPE)
-            mModelTypeValue = it.getString(MODEL_TYPE_VALUE)
         }
     }
 
@@ -36,15 +29,15 @@ class EditTagsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mFragmentEditTagsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_tags, container, false)
+        mDataBidingView = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_tags, container, false)
 
-        initViews()
-        setupSongInfoData()
-        return mFragmentEditTagsBinding?.root
+        return mDataBidingView?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initViews()
+        setupSongInfoData()
         observeLiveData()
         checkInteractions()
     }
@@ -59,27 +52,21 @@ class EditTagsFragment : Fragment() {
     }
 
     private fun initViews() {
-        mFragmentEditTagsBinding?.let { dataBidingView ->
-            InsetModifiersUtils.updateTopViewInsets(dataBidingView.relativeTopApp)
-            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
+        mDataBidingView?.let { dataBidingView ->
+            InsetModifiersUtils.updateTopViewInsets(dataBidingView.coordinatorLayout)
+//            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.coordinatorLayout)
         }
     }
 
     companion object {
         const val TAG: String = "EditTagsFragment"
 
-        const val DATA_LIST: String = "DATA_LIST"
-        const val MODEL_TYPE: String = "MODEL_TYPE"
-        const val MODEL_TYPE_VALUE: String = "MODEL_TYPE_VALUE"
-
         @JvmStatic
         fun newInstance(dataList: List<String>?, modelType: String?, modelTypeValue: String?) =
             EditTagsFragment().apply {
-                arguments = Bundle().apply {
-                    putStringArrayList(DATA_LIST, dataList as ArrayList<String>?)
-                    putString(MODEL_TYPE, modelType)
-                    putString(MODEL_TYPE_VALUE, modelTypeValue)
-                }
+                mDataList = dataList
+                mModelType = modelType
+                mModelTypeValue = modelTypeValue
             }
     }
 }

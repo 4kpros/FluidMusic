@@ -7,21 +7,6 @@ import androidx.core.view.updatePadding
 
 abstract class InsetModifiersUtils {
     companion object{
-
-        fun removeTopViewInsets(view: View) {
-            view.setOnApplyWindowInsetsListener { v, insets ->
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    v.updatePadding(
-                        top = 0
-                    )
-                } else {
-                    v.updatePadding(
-                        top = 0
-                    )
-                }
-                insets
-            }
-        }
         fun updateTopViewInsets(view: View) {
             view.setOnApplyWindowInsetsListener { v, insets ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -62,6 +47,36 @@ abstract class InsetModifiersUtils {
                 } else {
                     v.updatePadding(
                         right = insets.systemWindowInsetRight
+                    )
+                }
+                insets
+            }
+        }
+        fun updateLeftViewInsets(view: View) {
+            view.setOnApplyWindowInsetsListener { v, insets ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    val finalInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                    v.updatePadding(
+                        left= finalInsets.left
+                    )
+                } else {
+                    v.updatePadding(
+                        left = insets.systemWindowInsetLeft
+                    )
+                }
+                insets
+            }
+        }
+
+        fun removeTopViewInsets(view: View) {
+            view.setOnApplyWindowInsetsListener { v, insets ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    v.updatePadding(
+                        top = 0
+                    )
+                } else {
+                    v.updatePadding(
+                        top = 0
                     )
                 }
                 insets

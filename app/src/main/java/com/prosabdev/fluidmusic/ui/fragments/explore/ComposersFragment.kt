@@ -71,8 +71,6 @@ class ComposersFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Y,true)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Y,false)
         arguments?.let {
         }
 
@@ -100,9 +98,9 @@ class ComposersFragment : Fragment() {
         observeLiveData()
     }
 
-    override fun onDestroyView() {
+    override fun onDestroy() {
+        super.onDestroy()
         saveAllDataToPref()
-        super.onDestroyView()
     }
 
     private fun saveAllDataToPref(){

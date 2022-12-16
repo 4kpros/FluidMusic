@@ -71,8 +71,6 @@ class AlbumsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        exitTransition = MaterialSharedAxis(MaterialSharedAxis.Y, true)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Y, true)
         arguments?.let {
         }
         loadPrefsAndInitViewModel()
@@ -99,9 +97,9 @@ class AlbumsFragment : Fragment() {
         observeLiveData()
     }
 
-    override fun onDestroyView() {
+    override fun onDestroy() {
+        super.onDestroy()
         saveAllDataToPref()
-        super.onDestroyView()
     }
 
     private fun saveAllDataToPref(){

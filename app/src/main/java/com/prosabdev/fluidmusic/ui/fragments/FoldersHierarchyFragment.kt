@@ -14,14 +14,10 @@ import kotlinx.coroutines.launch
 
 class FoldersHierarchyFragment : Fragment() {
 
-    private lateinit var mFragmentFoldersHierarchyBinding: FragmentFoldersHierarchyBinding
+    private var mDataBidingView: FragmentFoldersHierarchyBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        exitTransition = MaterialFadeThrough()
-        reenterTransition = MaterialFadeThrough()
-
         arguments?.let {
         }
     }
@@ -30,8 +26,8 @@ class FoldersHierarchyFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mFragmentFoldersHierarchyBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_folders_hierarchy, container,false)
-        val view = mFragmentFoldersHierarchyBinding.root
+        mDataBidingView = DataBindingUtil.inflate(inflater,R.layout.fragment_folders_hierarchy, container,false)
+        val view = mDataBidingView?.root
 
         initViews()
 

@@ -1,13 +1,21 @@
 package com.prosabdev.fluidmusic.adapters
 
+import androidx.annotation.NonNull
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.adapter.FragmentViewHolder
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
 
-class TabLayoutAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+class TabLayoutAdapter(
+    fragmentManager : FragmentManager,
+    lifecycle: Lifecycle
+) : FragmentStateAdapter(fragmentManager, lifecycle) {
     override fun getItemCount(): Int {
         return 8
     }
+
     override fun createFragment(position: Int): Fragment {
         var fragment = Fragment()
         when (position) {
@@ -36,7 +44,6 @@ class TabLayoutAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
                 fragment = YearsFragment.newInstance()
             }
         }
-
         return fragment
     }
 }

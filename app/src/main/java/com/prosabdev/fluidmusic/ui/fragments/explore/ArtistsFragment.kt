@@ -57,8 +57,8 @@ class ArtistsFragment : Fragment() {
 
     private val mArtistItemViewModel: ArtistItemViewModel by activityViewModels()
 
-    private var mOrganizeDialog: OrganizeItemBottomSheetDialogFragment = OrganizeItemBottomSheetDialogFragment.newInstance()
-    private val mSortArtistsDialog: SortContentExplorerBottomSheetDialogFragment = SortContentExplorerBottomSheetDialogFragment.newInstance()
+    private var mOrganizeDialog: OrganizeItemBottomSheetDialogFragment? = OrganizeItemBottomSheetDialogFragment.newInstance()
+    private var mSortArtistsDialog: SortContentExplorerBottomSheetDialogFragment? = SortContentExplorerBottomSheetDialogFragment.newInstance()
 
     private var mConcatAdapter: ConcatAdapter? = null
     private var mEmptyBottomAdapter: EmptyBottomAdapter? = null
@@ -67,12 +67,10 @@ class ArtistsFragment : Fragment() {
     private var mLayoutManager: GridLayoutManager? = null
     private var mItemDecoration: GridSpacingItemDecoration? = null
 
-    private var mIsDraggingToScroll: Boolean = false
+    private var mIsDraggingToScroll: Boolean? = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Y,true)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Y,false)
         arguments?.let {
         }
 
@@ -100,9 +98,9 @@ class ArtistsFragment : Fragment() {
         observeLiveData()
     }
 
-    override fun onDestroyView() {
+    override fun onDestroy() {
+        super.onDestroy()
         saveAllDataToPref()
-        super.onDestroyView()
     }
 
     private fun saveAllDataToPref(){
@@ -344,7 +342,7 @@ class ArtistsFragment : Fragment() {
     private fun checkInteractions() {
         mDataBidingView?.recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if(mIsDraggingToScroll){
+                if(mIsDraggingToScroll == true){
                     if(dy < 0){
                         Log.i(TAG, "Scrolling --> TOP")
                         mMainFragmentViewModel.setScrollingState(-1)
@@ -570,25 +568,25 @@ class ArtistsFragment : Fragment() {
     }
 
     private fun showSortDialog() {
-        if(mSortArtistsDialog.isVisible) return
+        if(mSortArtistsDialog?.isVisible == true) return
 
-        mSortArtistsDialog.updateBottomSheetData(
+        mSortArtistsDialog?.updateBottomSheetData(
             mArtistsFragmentViewModel,
             TAG,
             null
         )
-        mSortArtistsDialog.show(childFragmentManager, SortContentExplorerBottomSheetDialogFragment.TAG)
+        mSortArtistsDialog?.show(childFragmentManager, SortContentExplorerBottomSheetDialogFragment.TAG)
     }
 
     private fun showOrganizeDialog() {
-        if(mOrganizeDialog.isVisible) return
+        if(mOrganizeDialog?.isVisible == true) return
 
-        mOrganizeDialog.updateBottomSheetData(
+        mOrganizeDialog?.updateBottomSheetData(
             mArtistsFragmentViewModel,
             TAG,
             null
         )
-        mOrganizeDialog.show(childFragmentManager, OrganizeItemBottomSheetDialogFragment.TAG)
+        mOrganizeDialog?.show(childFragmentManager, OrganizeItemBottomSheetDialogFragment.TAG)
     }
 
     private fun playSongOnShuffle() {
@@ -619,7 +617,7 @@ class ArtistsFragment : Fragment() {
 
 
     private fun initViews() {
-        mDataBidingView?.recyclerView?.setHasFixedSize(true)
+//        mDataBidingView?.recyclerView?.setHasFixedSize(true)
         mDataBidingView?.constraintFastScrollerContainer?.let {
             InsetModifiersUtils.updateBottomViewInsets(
                 it

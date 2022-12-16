@@ -1,12 +1,14 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.commit
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
@@ -17,9 +19,7 @@ import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
 import com.prosabdev.fluidmusic.databinding.DialogAddToQueueMusicBinding
 import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
-import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.EditTagsBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
-import com.prosabdev.fluidmusic.ui.fragments.explore.*
 import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
@@ -27,8 +27,6 @@ import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.workers.QueueMusicActionsWorkerViewModel
 import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
 import com.prosabdev.fluidmusic.workers.queuemusic.AddSongsToQueueMusicWorker
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 
 class MusicLibraryFragment : Fragment() {
     private var mDataBidingView: FragmentMusicLibraryBinding? = null
@@ -39,14 +37,10 @@ class MusicLibraryFragment : Fragment() {
     private val mQueueMusicActionsWorkerViewModel: QueueMusicActionsWorkerViewModel by activityViewModels()
     private val mSongActionsWorkerViewModel: SongActionsWorkerViewModel by activityViewModels()
 
-    private val mEditTagsBottomSheetDialogFragment: EditTagsBottomSheetDialogFragment = EditTagsBottomSheetDialogFragment.newInstance()
-
     private var mTabLayoutAdapter: TabLayoutAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enterTransition = MaterialFadeThrough()
-        exitTransition = MaterialFadeThrough()
         arguments?.let {
         }
     }
@@ -71,8 +65,8 @@ class MusicLibraryFragment : Fragment() {
 
     private fun setupTabLayoutViewPagerAdapter() {
         mDataBidingView?.let { dataBidingView ->
-            mTabLayoutAdapter = TabLayoutAdapter(this)
-            MainScope().launch {
+            this.parentFragment?.let {
+                mTabLayoutAdapter = TabLayoutAdapter(childFragmentManager, lifecycle)
                 dataBidingView.viewPager.adapter = mTabLayoutAdapter
                 dataBidingView.viewPager.offscreenPageLimit = 8
                 TabLayoutMediator(
@@ -223,6 +217,12 @@ class MusicLibraryFragment : Fragment() {
             dataBidingView.topAppBar.setNavigationOnClickListener {
                 mMainFragmentViewModel.setShowDrawerMenuCounter()
             }
+            dataBidingView.topAppBar.setOnMenuItemClickListener {
+                if(it?.itemId == R.id.search){
+                    Log.i(ExploreContentsForFragment.TAG, "ON CLICK TO SEARCH PAGE")
+                }
+                true
+            }
             dataBidingView.viewPager.registerOnPageChangeCallback(object :
                 ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
@@ -241,7 +241,7 @@ class MusicLibraryFragment : Fragment() {
                 openPlaylistAddDialog()
             }
             dataBidingView.includeSideSelectionMenu.buttonEditTags.setOnClickListener {
-                openTagEditorDialog()
+                openTagEditorFragment()
             }
             dataBidingView.includeSideSelectionMenu.buttonShare.setOnClickListener {
                 openShareSelectionDialog()
@@ -251,9 +251,20 @@ class MusicLibraryFragment : Fragment() {
             }
         }
     }
-    private fun openTagEditorDialog() {
-        if(!mEditTagsBottomSheetDialogFragment.isVisible){
-            mEditTagsBottomSheetDialogFragment.show(childFragmentManager, EditTagsBottomSheetDialogFragment.TAG)
+    private fun openTagEditorFragment() {
+        activity?.let {
+            it.supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                add(
+                    R.id.main_activity_fragment_container,
+                    EditTagsFragment.newInstance(
+                        null,
+                        null,
+                        null
+                    )
+                )
+                addToBackStack(EditTagsFragment.TAG)
+            }
         }
     }
     private fun openPlaylistAddDialog() {
@@ -384,32 +395,30 @@ class MusicLibraryFragment : Fragment() {
 
     private fun applyAppBarTitle(position: Int) {
         mDataBidingView?.let { dataBidingView ->
-            MainScope().launch {
-                when (position) {
-                    0->{
-                        dataBidingView.topAppBar.title = getString(R.string.songs)
-                    }
-                    1->{
-                        dataBidingView.topAppBar.title = getString(R.string.albums)
-                    }
-                    2->{
-                        dataBidingView.topAppBar.title = getString(R.string.artists)
-                    }
-                    3->{
-                        dataBidingView.topAppBar.title = getString(R.string.folders)
-                    }
-                    4->{
-                        dataBidingView.topAppBar.title = getString(R.string.genre)
-                    }
-                    5->{
-                        dataBidingView.topAppBar.title = getString(R.string.album_artists)
-                    }
-                    6->{
-                        dataBidingView.topAppBar.title = getString(R.string.composers)
-                    }
-                    7->{
-                        dataBidingView.topAppBar.title = getString(R.string.years)
-                    }
+            when (position) {
+                0->{
+                    dataBidingView.topAppBar.title = getString(R.string.songs)
+                }
+                1->{
+                    dataBidingView.topAppBar.title = getString(R.string.albums)
+                }
+                2->{
+                    dataBidingView.topAppBar.title = getString(R.string.artists)
+                }
+                3->{
+                    dataBidingView.topAppBar.title = getString(R.string.folders)
+                }
+                4->{
+                    dataBidingView.topAppBar.title = getString(R.string.genre)
+                }
+                5->{
+                    dataBidingView.topAppBar.title = getString(R.string.album_artists)
+                }
+                6->{
+                    dataBidingView.topAppBar.title = getString(R.string.composers)
+                }
+                7->{
+                    dataBidingView.topAppBar.title = getString(R.string.years)
                 }
             }
         }

@@ -60,7 +60,7 @@ class AlbumItem {
             return "#"
         }
 
-        fun castDataItemToGeneric(ctx: Context, dataItem: Any, setAllText: Boolean = false): GenericItemListGrid? {
+        fun castDataItemToGeneric(ctx: Context, dataItem: Any?, setAllText: Boolean = false): GenericItemListGrid? {
             var tempResult : GenericItemListGrid? = null
             if(dataItem is AlbumItem) {
                 tempResult = GenericItemListGrid()

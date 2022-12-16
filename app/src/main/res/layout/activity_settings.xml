@@ -30,7 +30,7 @@
                     android:layout_height="?attr/actionBarSize"
                     app:layout_scrollFlags="enterAlways"
                     app:title="Settings"
-                    app:menu="@menu/main_top_app_bar"
+                    app:menu="@menu/app_bar_search"
                     app:navigationIcon="@drawable/arrow_back" />
 
             </com.google.android.material.appbar.AppBarLayout>

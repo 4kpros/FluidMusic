@@ -82,7 +82,7 @@ class SongItem {
             }
             return "#"
         }
-        fun castDataItemToGeneric(ctx: Context, dataItem: Any): GenericItemListGrid? {
+        fun castDataItemToGeneric(ctx: Context, dataItem: Any?): GenericItemListGrid? {
             var tempResult : GenericItemListGrid? = null
             if(dataItem is SongItem) {
                 tempResult = GenericItemListGrid()

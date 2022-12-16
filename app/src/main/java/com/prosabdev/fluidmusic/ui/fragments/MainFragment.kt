@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 
 @BuildCompat.PrereleaseSdkCheck class MainFragment : Fragment() {
 
-    private var mFragmentMainBinding: FragmentMainBinding? = null
+    private var mDataBidingView: FragmentMainBinding? = null
 
     private val  mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val  mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
@@ -39,10 +39,6 @@ import kotlinx.coroutines.launch
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        exitTransition = MaterialFadeThrough()
-        reenterTransition = MaterialFadeThrough()
-
         arguments?.let {
         }
     }
@@ -51,8 +47,8 @@ import kotlinx.coroutines.launch
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mFragmentMainBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_main,container,false)
-        val view = mFragmentMainBinding?.root
+        mDataBidingView = DataBindingUtil.inflate(inflater,R.layout.fragment_main,container,false)
+        val view = mDataBidingView?.root
 
         initViews()
         setupFragments()
@@ -60,30 +56,30 @@ import kotlinx.coroutines.launch
     }
 
     override fun onResume() {
-        super.onResume()
         updateDrawerMenuUI()
+        super.onResume()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         checkInteractions()
         observeLiveData()
     }
+
     private fun updateDrawerMenuUI() {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
-            when (activity?.supportFragmentManager?.findFragmentById(R.id.main_fragment_container)) {
+        mDataBidingView?.let { dataBidingView ->
+            when (childFragmentManager.findFragmentById(R.id.main_fragment_container)) {
                 is MusicLibraryFragment -> {
-                    fragmentMainBinding.navigationView.setCheckedItem(R.id.music_library)
+                    dataBidingView.navigationView.setCheckedItem(R.id.music_library)
                 }
                 is FoldersHierarchyFragment -> {
-                    fragmentMainBinding.navigationView.setCheckedItem(R.id.folders_hierarchy)
+                    dataBidingView.navigationView.setCheckedItem(R.id.folders_hierarchy)
                 }
                 is PlaylistsFragment -> {
-                    fragmentMainBinding.navigationView.setCheckedItem(R.id.playlists)
+                    dataBidingView.navigationView.setCheckedItem(R.id.playlists)
                 }
                 is StreamsFragment -> {
-                    fragmentMainBinding.navigationView.setCheckedItem(R.id.streams)
+                    dataBidingView.navigationView.setCheckedItem(R.id.streams)
                 }
             }
         }
@@ -126,10 +122,10 @@ import kotlinx.coroutines.launch
     }
 
     private fun openDrawerMenuUI(showCounter: Int?) {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
+        mDataBidingView?.let { dataBidingView ->
             if ((showCounter ?: 0) <= 0) return
-            if (!fragmentMainBinding.drawerLayout.isOpen)
-                fragmentMainBinding.drawerLayout.open()
+            if (!dataBidingView.drawerLayout.isOpen)
+                dataBidingView.drawerLayout.open()
         }
     }
     private fun tryToUpdateFastScrollStateUI(isFastScrolling: Boolean = true) {
@@ -146,18 +142,18 @@ import kotlinx.coroutines.launch
         }
     }
     private fun showBottomSelectionMenu(animate: Boolean = true) {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
+        mDataBidingView?.let { dataBidingView ->
             AnimatorsUtils.crossTranslateInFromVertical(
-                fragmentMainBinding.constraintBottomSelectionContainer as View,
+                dataBidingView.constraintBottomSelectionContainer as View,
                 animate,
                 200
             )
         }
     }
     private fun hideBottomSelectionMenu(animate: Boolean = true) {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
+        mDataBidingView?.let { dataBidingView ->
             AnimatorsUtils.crossTranslateOutFromVertical(
-                fragmentMainBinding.constraintBottomSelectionContainer as View,
+                dataBidingView.constraintBottomSelectionContainer as View,
                 1,
                 animate,
                 100,
@@ -176,13 +172,13 @@ import kotlinx.coroutines.launch
     private var mIsAnimatingScroll1: Boolean = false
     private var mIsAnimatingScroll2: Boolean = false
     private fun updateMiniPlayerScrollingStateUI(scrollState: Int?, animate: Boolean = true) {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
+        mDataBidingView?.let { dataBidingView ->
             MainScope().launch {
                 if (scrollState == null || scrollState >= 1) {
-                    if(fragmentMainBinding.constraintMiniPlayerContainer.alpha < 1.0f) return@launch
+                    if(dataBidingView.constraintMiniPlayerContainer.alpha < 1.0f) return@launch
 
                     if (mIsAnimatingScroll2) {
-                        fragmentMainBinding.constraintMiniPlayerContainer.apply {
+                        dataBidingView.constraintMiniPlayerContainer.apply {
                             mIsAnimatingScroll2 = false
                             clearAnimation()
                         }
@@ -191,7 +187,7 @@ import kotlinx.coroutines.launch
                         return@launch
                     mIsAnimatingScroll1 = true
                     AnimatorsUtils.crossTranslateOutFromVertical(
-                        fragmentMainBinding.constraintMiniPlayerContainer,
+                        dataBidingView.constraintMiniPlayerContainer,
                         1,
                         animate,
                         200,
@@ -199,7 +195,7 @@ import kotlinx.coroutines.launch
                     )
                 } else {
                     if (mIsAnimatingScroll1) {
-                        fragmentMainBinding.constraintMiniPlayerContainer.apply {
+                        dataBidingView.constraintMiniPlayerContainer.apply {
                             mIsAnimatingScroll1 = false
                             clearAnimation()
                         }
@@ -208,7 +204,7 @@ import kotlinx.coroutines.launch
                         return@launch
                     mIsAnimatingScroll2 = true
                     AnimatorsUtils.crossTranslateInFromVertical(
-                        fragmentMainBinding.constraintMiniPlayerContainer,
+                        dataBidingView.constraintMiniPlayerContainer,
                         animate,
                         200
                     )
@@ -217,60 +213,60 @@ import kotlinx.coroutines.launch
         }
     }
     private fun updateTotalSelectedTracksUI(totalSelected: Int, animate: Boolean = true) {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
+        mDataBidingView?.let { dataBidingView ->
             MainScope().launch {
                 if(totalSelected > 0 && totalSelected >= (mMainFragmentViewModel.getTotalCount().value ?: 0)){
                     AnimatorsUtils.crossFadeDownClickable(
-                        fragmentMainBinding.includeBottomSelection.buttonSelectRange,
+                        dataBidingView.includeBottomSelection.buttonSelectRange,
                         animate,
                         200
                     )
-                    fragmentMainBinding.includeBottomSelection.checkboxSelectAll.isChecked = true
+                    dataBidingView.includeBottomSelection.checkboxSelectAll.isChecked = true
                 }else{
-                    fragmentMainBinding.includeBottomSelection.checkboxSelectAll.isChecked = false
+                    dataBidingView.includeBottomSelection.checkboxSelectAll.isChecked = false
                     if(totalSelected >= 2){
                         AnimatorsUtils.crossFadeUpClickable(
-                            fragmentMainBinding.includeBottomSelection.buttonSelectRange,
+                            dataBidingView.includeBottomSelection.buttonSelectRange,
                             animate,
                             200
                         )
                     }else{
                         AnimatorsUtils.crossFadeDownClickable(
-                            fragmentMainBinding.includeBottomSelection.buttonSelectRange,
+                            dataBidingView.includeBottomSelection.buttonSelectRange,
                             animate,
                             200
                         )
                     }
                 }
-                fragmentMainBinding.includeTopSelection.textSelectedCount.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
+                dataBidingView.includeTopSelection.textSelectedCount.text = "$totalSelected / ${mMainFragmentViewModel.getTotalCount().value}"
             }
         }
     }
     private fun updateSelectModeUI(selectMode : Boolean, animate : Boolean = true) {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
+        mDataBidingView?.let { dataBidingView ->
             MainScope().launch {
                 if (selectMode) {
                     updateMiniPlayerScrollingStateUI(1, animate)
                     showTopBottomSelectionMenu(animate)
                 } else {
                     tryToUpdateMiniPlayerScrollStateUI(mMainFragmentViewModel.getScrollingState().value)
-                    fragmentMainBinding.includeBottomSelection.checkboxSelectAll.isChecked = false
+                    dataBidingView.includeBottomSelection.checkboxSelectAll.isChecked = false
                     hideTopBottomSelectionMenu(animate)
                 }
             }
         }
     }
     private fun hideTopBottomSelectionMenu(animate: Boolean = true) {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
+        mDataBidingView?.let { dataBidingView ->
             AnimatorsUtils.crossTranslateOutFromVertical(
-                fragmentMainBinding.constraintBottomSelectionContainer as View,
+                dataBidingView.constraintBottomSelectionContainer as View,
                 1,
                 animate,
                 200,
                 500f
             )
             AnimatorsUtils.crossTranslateOutFromVertical(
-                fragmentMainBinding.constraintTopSelectionContainer as View,
+                dataBidingView.constraintTopSelectionContainer as View,
                 -1,
                 animate,
                 200,
@@ -279,14 +275,14 @@ import kotlinx.coroutines.launch
         }
     }
     private fun showTopBottomSelectionMenu(animate: Boolean = true) {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
+        mDataBidingView?.let { dataBidingView ->
             AnimatorsUtils.crossTranslateInFromVertical(
-                fragmentMainBinding.constraintBottomSelectionContainer as View,
+                dataBidingView.constraintBottomSelectionContainer as View,
                 animate,
                 200
             )
             AnimatorsUtils.crossTranslateInFromVertical(
-                fragmentMainBinding.constraintTopSelectionContainer as View,
+                dataBidingView.constraintTopSelectionContainer as View,
                 animate,
                 200
             )
@@ -302,36 +298,36 @@ import kotlinx.coroutines.launch
         }
     }
     private fun hideSlidingUpPanel(counter: Int?) {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
+        mDataBidingView?.let { dataBidingView ->
             if (counter == null || counter <= 0)
                 return
             MainScope().launch {
-                if (fragmentMainBinding.slidingUpPanel.panelState != PanelState.COLLAPSED)
-                    fragmentMainBinding.slidingUpPanel.panelState = PanelState.COLLAPSED
+                if (dataBidingView.slidingUpPanel.panelState != PanelState.COLLAPSED)
+                    dataBidingView.slidingUpPanel.panelState = PanelState.COLLAPSED
             }
         }
     }
     private fun showSlidingUpPanel(counter: Int?) {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
+        mDataBidingView?.let { dataBidingView ->
             if (counter == null || counter <= 0)
                 return
             MainScope().launch {
-                if (fragmentMainBinding.slidingUpPanel.panelState != PanelState.EXPANDED)
-                    fragmentMainBinding.slidingUpPanel.panelState = PanelState.EXPANDED
+                if (dataBidingView.slidingUpPanel.panelState != PanelState.EXPANDED)
+                    dataBidingView.slidingUpPanel.panelState = PanelState.EXPANDED
             }
         }
     }
 
     private fun updateMiniPlayerPlayPauseStateUI(isPlaying: Boolean?) {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
+        mDataBidingView?.let { dataBidingView ->
             MainScope().launch {
                 context?.let {
                     if (isPlaying == true) {
                         tryToUpdateMiniPlayerScrollStateUI(-2)
-                        fragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon =
+                        dataBidingView.constraintMiniPlayerInclude.buttonPlayPause.icon =
                             AppCompatResources.getDrawable(it, R.drawable.pause)
                     } else {
-                        fragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.icon =
+                        dataBidingView.constraintMiniPlayerInclude.buttonPlayPause.icon =
                             AppCompatResources.getDrawable(it, R.drawable.play_arrow)
                     }
                 }
@@ -340,11 +336,11 @@ import kotlinx.coroutines.launch
         }
     }
     private fun updateMiniPlayerSliderUI(currentDuration: Long) {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
+        mDataBidingView?.let { dataBidingView ->
             MainScope().launch {
                 val totalDuration: Long =
                     mPlayerFragmentViewModel.getCurrentPlayingSong().value?.duration ?: 0
-                fragmentMainBinding.constraintMiniPlayerInclude.progressMiniPlayerIndicator.progress =
+                dataBidingView.constraintMiniPlayerInclude.progressMiniPlayerIndicator.progress =
                     (FormattersAndParsersUtils.formatSongDurationToSliderProgress(
                         currentDuration,
                         totalDuration
@@ -353,17 +349,17 @@ import kotlinx.coroutines.launch
         }
     }
     private fun updateMiniPlayerUI(songItem : SongItem?) {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
+        mDataBidingView?.let { dataBidingView ->
             MainScope().launch {
                 if (songItem == null) {
-                    fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.text =
+                    dataBidingView.constraintMiniPlayerInclude.textMiniPlayerTitle.text =
                         context?.getString(R.string.unknown_title)
-                    fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text =
+                    dataBidingView.constraintMiniPlayerInclude.textMiniPlayerArtist.text =
                         context?.getString(R.string.unknown_artist)
                     context?.let {
                         ImageLoadersUtils.loadWithPlaceholderResourceID(
                             it,
-                            fragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer,
+                            dataBidingView.constraintMiniPlayerInclude.imageviewMiniPlayer,
                             0
                         )
                     }
@@ -371,9 +367,9 @@ import kotlinx.coroutines.launch
                 }
 
                 context?.let { ctx ->
-                    fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.text =
+                    dataBidingView.constraintMiniPlayerInclude.textMiniPlayerTitle.text =
                         songItem.title?.ifEmpty { songItem.fileName ?: ctx.getString(R.string.unknown_title) } ?: songItem.fileName ?: ctx.getString(R.string.unknown_title)
-                    fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.text =
+                    dataBidingView.constraintMiniPlayerInclude.textMiniPlayerArtist.text =
                         songItem.artist?.ifEmpty { ctx.getString(R.string.unknown_artist) } ?: ctx.getString(R.string.unknown_artist)
 
                     val tempUri = Uri.parse(songItem.uri ?: "")
@@ -382,12 +378,12 @@ import kotlinx.coroutines.launch
 
                     imageRequest.uri = tempUri
                     imageRequest.hashedCovertArtSignature = songItem.hashedCovertArtSignature
-                    imageRequest.imageView = fragmentMainBinding.constraintMiniPlayerInclude.imageviewMiniPlayer
+                    imageRequest.imageView = dataBidingView.constraintMiniPlayerInclude.imageviewMiniPlayer
                     ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
 
                     imageRequestBlurred.uri = tempUri
                     imageRequestBlurred.hashedCovertArtSignature = songItem.hashedCovertArtSignature
-                    imageRequestBlurred.imageView = fragmentMainBinding.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer
+                    imageRequestBlurred.imageView = dataBidingView.constraintMiniPlayerInclude.imageviewBlurredMiniPlayer
                     ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequestBlurred)
                 }
             }
@@ -395,33 +391,33 @@ import kotlinx.coroutines.launch
     }
 
     private fun checkInteractions() {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
-            fragmentMainBinding.constraintMiniPlayerInclude.buttonPlayPause.setOnClickListener {
+        mDataBidingView?.let { dataBidingView ->
+            dataBidingView.constraintMiniPlayerInclude.buttonPlayPause.setOnClickListener {
                 onClickButtonPlayPause()
             }
-            fragmentMainBinding.constraintMiniPlayerInclude.buttonSkipNext.setOnClickListener {
+            dataBidingView.constraintMiniPlayerInclude.buttonSkipNext.setOnClickListener {
                 onClickButtonSkipNextSong()
             }
-            fragmentMainBinding.includeBottomSelection.checkboxSelectAll.setOnClickListener {
+            dataBidingView.includeBottomSelection.checkboxSelectAll.setOnClickListener {
                 mMainFragmentViewModel.setReQuestToggleSelectAll()
             }
-            fragmentMainBinding.includeBottomSelection.buttonSelectRange.setOnClickListener {
+            dataBidingView.includeBottomSelection.buttonSelectRange.setOnClickListener {
                 mMainFragmentViewModel.setReQuestToggleSelectRange()
             }
-            fragmentMainBinding.includeBottomSelection.buttonClose.setOnClickListener {
+            dataBidingView.includeBottomSelection.buttonClose.setOnClickListener {
                 onClickButtonCloseSelectionMenu()
             }
-            fragmentMainBinding.constraintMiniPlayerInclude.constraintMiniPlayer.setOnClickListener {
+            dataBidingView.constraintMiniPlayerInclude.constraintMiniPlayer.setOnClickListener {
                 onClickMiniPlayerContainer()
             }
-            fragmentMainBinding.slidingUpPanel.addPanelSlideListener(object :
+            dataBidingView.slidingUpPanel.addPanelSlideListener(object :
                 com.sothree.slidinguppanel.PanelSlideListener {
                 override fun onPanelSlide(panel: View, slideOffset: Float) {
                     Log.i(ConstantValues.TAG, "On panel slide offset : $slideOffset")
                     if (slideOffset <= 0.21f) {
-                        fragmentMainBinding.slidingUpPanel.setDragView(fragmentMainBinding.constraintMiniPlayerContainer)
+                        dataBidingView.slidingUpPanel.setDragView(dataBidingView.constraintMiniPlayerContainer)
                     } else {
-                        fragmentMainBinding.slidingUpPanel.setDragView(fragmentMainBinding.mainFragmentContainer)
+                        dataBidingView.slidingUpPanel.setDragView(dataBidingView.mainFragmentContainer)
                     }
                 }
 
@@ -433,30 +429,25 @@ import kotlinx.coroutines.launch
                     mMainFragmentViewModel.setSlidingUpPanelState(newState)
                 }
             })
-            fragmentMainBinding.navigationView.setNavigationItemSelectedListener { menuItem ->
-                if (fragmentMainBinding.navigationView.checkedItem?.itemId != menuItem.itemId) {
+            dataBidingView.navigationView.setNavigationItemSelectedListener { menuItem ->
+                dataBidingView.drawerLayout.close()
+                if (dataBidingView.navigationView.checkedItem?.itemId != menuItem.itemId) {
                     when (menuItem.itemId) {
                         R.id.music_library -> {
                             showMusicLibraryFragment()
-                            fragmentMainBinding.drawerLayout.close()
                         }
                         R.id.folders_hierarchy -> {
                             showFolderHierarchyFragment()
-                            fragmentMainBinding.drawerLayout.close()
                         }
                         R.id.playlists -> {
                             showPlaylistsFragment()
-                            fragmentMainBinding.drawerLayout.close()
                         }
                         R.id.streams -> {
                             showStreamsFragment()
-                            fragmentMainBinding.drawerLayout.close()
                         }
-                    }
-                }
-                when (menuItem.itemId) {
-                    R.id.settings -> {
-                        startActivity(Intent(context, SettingsActivity::class.java).apply {})
+                        R.id.settings -> {
+                            startActivity(Intent(context, SettingsActivity::class.java).apply {})
+                        }
                     }
                 }
                 true
@@ -465,9 +456,9 @@ import kotlinx.coroutines.launch
     }
 
     private fun onClickMiniPlayerContainer() {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
-            if (fragmentMainBinding.slidingUpPanel.panelState != PanelState.EXPANDED)
-                fragmentMainBinding.slidingUpPanel.panelState = PanelState.EXPANDED
+        mDataBidingView?.let { dataBidingView ->
+            if (dataBidingView.slidingUpPanel.panelState != PanelState.EXPANDED)
+                dataBidingView.slidingUpPanel.panelState = PanelState.EXPANDED
         }
     }
 
@@ -489,68 +480,47 @@ import kotlinx.coroutines.launch
     }
 
     private fun setupFragments() {
-        if((activity?.supportFragmentManager?.fragments?.size ?: 0) >= 4)
-            return
-        activity?.supportFragmentManager?.commit {
-            setReorderingAllowed(true)
-            add(R.id.main_fragment_container, mMusicLibraryFragment)
-            add(R.id.main_fragment_container, mFoldersHierarchyFragment)
-            add(R.id.main_fragment_container, mPlaylistsFragment)
-            add(R.id.main_fragment_container, mStreamsFragment)
-        }
-        showMusicLibraryFragment()
-        activity?.supportFragmentManager?.commit {
+        childFragmentManager.commit {
             setReorderingAllowed(true)
             replace(R.id.player_fragment_container, PlayerFragment.newInstance())
         }
+        showMusicLibraryFragment()
     }
     private fun showMusicLibraryFragment() {
-        activity?.supportFragmentManager?.commit {
+        childFragmentManager.commit {
             setReorderingAllowed(true)
-            hide(mFoldersHierarchyFragment)
-            hide(mPlaylistsFragment)
-            hide(mStreamsFragment)
-            show(mMusicLibraryFragment)
+            replace(R.id.main_fragment_container, MusicLibraryFragment.newInstance())
         }
     }
     private fun showFolderHierarchyFragment() {
-        activity?.supportFragmentManager?.commit {
+        childFragmentManager.commit {
             setReorderingAllowed(true)
-            hide(mMusicLibraryFragment)
-            show(mFoldersHierarchyFragment)
-            hide(mPlaylistsFragment)
-            hide(mStreamsFragment)
+            replace(R.id.main_fragment_container, mFoldersHierarchyFragment)
         }
     }
     private fun showPlaylistsFragment() {
-        activity?.supportFragmentManager?.commit {
+        childFragmentManager.commit {
             setReorderingAllowed(true)
-            hide(mMusicLibraryFragment)
-            hide(mFoldersHierarchyFragment)
-            show(mPlaylistsFragment)
-            hide(mStreamsFragment)
+            replace(R.id.main_fragment_container, mPlaylistsFragment)
         }
     }
     private fun showStreamsFragment() {
-        activity?.supportFragmentManager?.commit {
+        childFragmentManager.commit {
             setReorderingAllowed(true)
-            hide(mMusicLibraryFragment)
-            hide(mFoldersHierarchyFragment)
-            hide(mPlaylistsFragment)
-            show(mStreamsFragment)
+            replace(R.id.main_fragment_container, mStreamsFragment)
         }
     }
 
     private fun initViews() {
-        mFragmentMainBinding?.let { fragmentMainBinding ->
-            fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerTitle.isSelected = true
-            fragmentMainBinding.constraintMiniPlayerInclude.textMiniPlayerArtist.isSelected = true
+        mDataBidingView?.let { dataBidingView ->
+            dataBidingView.constraintMiniPlayerInclude.textMiniPlayerTitle.isSelected = true
+            dataBidingView.constraintMiniPlayerInclude.textMiniPlayerArtist.isSelected = true
 
-            InsetModifiersUtils.updateTopViewInsets(fragmentMainBinding.includeTopSelection.constraintContainer)
-            InsetModifiersUtils.updateBottomViewInsets(fragmentMainBinding.constraintMiniPlayerInclude.constraintMiniPlayer)
-            InsetModifiersUtils.updateBottomViewInsets(fragmentMainBinding.includeBottomSelection.constraintContainer)
+            InsetModifiersUtils.updateTopViewInsets(dataBidingView.includeTopSelection.constraintContainer)
+            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.constraintMiniPlayerInclude.constraintMiniPlayer)
+            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.includeBottomSelection.constraintContainer)
 
-            fragmentMainBinding.navigationView.setCheckedItem(R.id.music_library)
+            dataBidingView.navigationView.setCheckedItem(R.id.music_library)
         }
     }
 

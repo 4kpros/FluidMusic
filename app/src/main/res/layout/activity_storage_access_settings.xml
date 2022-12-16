@@ -32,7 +32,7 @@
                 android:layout_height="?attr/actionBarSize"
                 app:layout_scrollFlags="enterAlways"
                 app:title="Folders selection"
-                app:menu="@menu/folder_selection_top_app_bar"
+                app:menu="@menu/app_bar_more_vert"
                 app:navigationIcon="@drawable/arrow_back" />
 
         </com.google.android.material.appbar.AppBarLayout>

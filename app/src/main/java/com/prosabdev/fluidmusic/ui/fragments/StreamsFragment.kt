@@ -14,14 +14,10 @@ import kotlinx.coroutines.launch
 
 class StreamsFragment : Fragment() {
 
-    private lateinit var mFragmentStreamsBinding: FragmentStreamsBinding
+    private var mDataBidingView: FragmentStreamsBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        exitTransition = MaterialFadeThrough()
-        reenterTransition = MaterialFadeThrough()
-
         arguments?.let {
         }
     }
@@ -29,9 +25,9 @@ class StreamsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        mFragmentStreamsBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_streams, container,false)
-        val view = mFragmentStreamsBinding.root
+    ): View? {
+        mDataBidingView = DataBindingUtil.inflate(inflater,R.layout.fragment_streams, container,false)
+        val view = mDataBidingView?.root
 
         initViews()
 

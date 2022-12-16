@@ -14,14 +14,10 @@ import kotlinx.coroutines.launch
 
 class PlaylistsFragment : Fragment() {
 
-    private lateinit var mFragmentPlaylistsBinding: FragmentPlaylistsBinding
+    private var mDataBidingView: FragmentPlaylistsBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        exitTransition = MaterialFadeThrough()
-        reenterTransition = MaterialFadeThrough()
-
         arguments?.let {
         }
     }
@@ -29,9 +25,9 @@ class PlaylistsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        mFragmentPlaylistsBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_playlists, container,false)
-        val view = mFragmentPlaylistsBinding.root
+    ): View? {
+        mDataBidingView = DataBindingUtil.inflate(inflater,R.layout.fragment_playlists, container,false)
+        val view = mDataBidingView?.root
 
         initViews()
 

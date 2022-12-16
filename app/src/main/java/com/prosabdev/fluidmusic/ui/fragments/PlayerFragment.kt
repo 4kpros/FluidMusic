@@ -15,6 +15,7 @@ import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.slider.Slider
@@ -39,6 +40,7 @@ import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.explore.*
 import com.prosabdev.fluidmusic.viewmodels.models.SongItemViewModel
+import com.prosabdev.fluidmusic.viewmodels.models.explore.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -49,11 +51,18 @@ import kotlinx.coroutines.withContext
 
     private var mDataBidingView: FragmentPlayerBinding? = null
 
-    private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
-    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
+    private val mAlbumItemViewModel: AlbumItemViewModel by viewModels()
+    private val mAlbumArtistItemViewModel: AlbumArtistItemViewModel by viewModels()
+    private val mArtistItemViewModel: ArtistItemViewModel by viewModels()
+    private val mComposerItemViewModel: ComposerItemViewModel by viewModels()
+    private val mFolderItemViewModel: FolderItemViewModel by viewModels()
+    private val mGenreItemViewModel: GenreItemViewModel by viewModels()
+    private val mYearItemViewModel: YearItemViewModel by viewModels()
+
+    private val mSongItemViewModel: SongItemViewModel by activityViewModels()
+
     private val mAllSongsFragmentViewModel: AllSongsFragmentViewModel by activityViewModels()
     private val mExploreContentsForFragmentViewModel: ExploreContentsForFragmentViewModel by activityViewModels()
-
     private val mAlbumArtistsFragmentViewModel: AlbumArtistsFragmentViewModel by activityViewModels()
     private val mAlbumsFragmentViewModel: AlbumsFragmentViewModel by activityViewModels()
     private val mArtistsFragmentViewModel: ArtistsFragmentViewModel by activityViewModels()
@@ -62,7 +71,8 @@ import kotlinx.coroutines.withContext
     private val mGenresFragmentViewModel: GenresFragmentViewModel by activityViewModels()
     private val mYearsFragmentViewModel: YearsFragmentViewModel by activityViewModels()
 
-    private val mSongItemViewModel: SongItemViewModel by activityViewModels()
+    private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
+    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 
     private var mQueueMusicBottomSheetDialog: QueueMusicBottomSheetDialog = QueueMusicBottomSheetDialog.newInstance()
     private var mPlayerMoreBottomSheetDialog: PlayerMoreFullBottomSheetDialog = PlayerMoreFullBottomSheetDialog.newInstance()
@@ -71,9 +81,6 @@ import kotlinx.coroutines.withContext
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enterTransition = MaterialFadeThrough()
-        exitTransition = MaterialFadeThrough()
-
         if(savedInstanceState == null){
             loadLastPlayerSession()
         }

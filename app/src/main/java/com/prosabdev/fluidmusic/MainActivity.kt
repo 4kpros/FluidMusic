@@ -46,13 +46,6 @@ import kotlinx.coroutines.launch
         }
     }
 
-    override fun onDestroy() {
-        MainScope().launch {
-            ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
-        }
-        super.onDestroy()
-    }
-
     private fun createMediaBrowserService() {
         mMediaBrowser = MediaBrowserCompat(
             applicationContext,
@@ -117,31 +110,42 @@ import kotlinx.coroutines.launch
         mediaController.registerCallback(mControllerCallback)
     }
 
-    override fun onPause() {
-        MainScope().launch {
-            ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
-        }
-        super.onPause()
+    override fun onLowMemory() {
+        super.onLowMemory()
+        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
     }
 
     public override fun onStart() {
-        ImageLoadersUtils.initializeJobWorker(applicationContext)
         super.onStart()
         mMediaBrowser?.connect()
+        ImageLoadersUtils.initializeJobWorker(applicationContext)
     }
     public override fun onResume() {
-        ImageLoadersUtils.initializeJobWorker(applicationContext)
         super.onResume()
         setupAudioSettings()
+        ImageLoadersUtils.initializeJobWorker(applicationContext)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
     }
 
     public override fun onStop() {
-        MainScope().launch {
-            ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
-        }
         super.onStop()
         MediaControllerCompat.getMediaController(this)?.unregisterCallback(mControllerCallback)
         mMediaBrowser?.disconnect()
+        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
     }
 
     companion object {
