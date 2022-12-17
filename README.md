@@ -16,7 +16,7 @@
   </a>
 </p>
 
-**Fluid music** is an open source audio player. Currently available on Android devices.
+**Fluid music** is an Android open source audio player.
 
 ## Features
 -  Play local songs : mp3, ogg, mp4, opus, etc...
@@ -30,9 +30,7 @@
 -  Manage playlists
 -  Home screen widgets
 
-## Some screenshoots
-
-![FM](https://user-images.githubusercontent.com/52242361/198338087-c90fd62b-5985-4a9b-bbef-6e568b4386b0.png)
+## Some screenshots
 
 Link to translation : https://poeditor.com/join/project/ytUUxGZtzz
 

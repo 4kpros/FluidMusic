@@ -16,4 +16,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Fluid Music"
 include ':app'
-include ':jaudiotagger2.2.6'

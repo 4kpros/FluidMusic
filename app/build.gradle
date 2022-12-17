@@ -80,6 +80,4 @@ dependencies {
     implementation "io.github.l4digital:fastscroll:2.1.0"
     implementation 'jp.wasabeef:blurry:4.0.1'
     implementation 'com.github.jbvincey:nestedradiobutton:1.1'
-
-    implementation project(path: ':jaudiotagger2.2.6')
 }
