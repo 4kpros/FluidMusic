@@ -30,7 +30,7 @@
 -  Manage playlists
 -  Home screen widgets
 
-## Some screenshoots
+## Some screenshots
 
 Link to translation : https://poeditor.com/join/project/ytUUxGZtzz
 
