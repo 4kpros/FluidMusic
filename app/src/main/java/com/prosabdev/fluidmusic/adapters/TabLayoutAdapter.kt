@@ -9,9 +9,8 @@ import androidx.viewpager2.adapter.FragmentViewHolder
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
 
 class TabLayoutAdapter(
-    fragmentManager : FragmentManager,
-    lifecycle: Lifecycle
-) : FragmentStateAdapter(fragmentManager, lifecycle) {
+    fragment : Fragment
+) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int {
         return 8
     }

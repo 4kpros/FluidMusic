@@ -489,7 +489,7 @@ import kotlinx.coroutines.launch
     private fun showMusicLibraryFragment() {
         childFragmentManager.commit {
             setReorderingAllowed(true)
-            replace(R.id.main_fragment_container, MusicLibraryFragment.newInstance())
+            replace(R.id.main_fragment_container, mMusicLibraryFragment)
         }
     }
     private fun showFolderHierarchyFragment() {

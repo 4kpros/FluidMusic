@@ -52,31 +52,34 @@ class MusicLibraryFragment : Fragment() {
         mDataBidingView = DataBindingUtil.inflate(inflater,R.layout.fragment_music_library,container,false)
         val view = mDataBidingView?.root
 
-        initViews()
-        setupTabLayoutViewPagerAdapter()
+        if(savedInstanceState == null){
+            initViews()
+            setupTabLayoutViewPagerAdapter()
+        }
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        checkInteractions()
-        observeLiveData()
+        if(savedInstanceState == null){
+            checkInteractions()
+            observeLiveData()
+        }
     }
 
     private fun setupTabLayoutViewPagerAdapter() {
         mDataBidingView?.let { dataBidingView ->
-            this.parentFragment?.let {
-                mTabLayoutAdapter = TabLayoutAdapter(childFragmentManager, lifecycle)
-                dataBidingView.viewPager.adapter = mTabLayoutAdapter
-                dataBidingView.viewPager.offscreenPageLimit = 8
-                TabLayoutMediator(
-                    dataBidingView.tabLayout,
-                    dataBidingView.viewPager
-                ) { tab, position ->
-                    applyToolBarTitle(position, tab)
-                }.attach()
-                dataBidingView.viewPager.currentItem = 0
-            }
+            mTabLayoutAdapter =
+                parentFragment?.let { fmt -> TabLayoutAdapter(fmt) }
+            dataBidingView.viewPager.adapter = mTabLayoutAdapter
+            dataBidingView.viewPager.offscreenPageLimit = 8
+            TabLayoutMediator(
+                dataBidingView.tabLayout,
+                dataBidingView.viewPager
+            ) { tab, position ->
+                applyToolBarTitle(position, tab)
+            }.attach()
+            dataBidingView.viewPager.currentItem = 0
         }
     }
     private fun applyToolBarTitle(position: Int, tab: TabLayout.Tab) {

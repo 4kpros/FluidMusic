@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentEditTagsBinding
 import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
@@ -54,7 +53,7 @@ class EditTagsFragment : Fragment() {
     private fun initViews() {
         mDataBidingView?.let { dataBidingView ->
             InsetModifiersUtils.updateTopViewInsets(dataBidingView.coordinatorLayout)
-//            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.coordinatorLayout)
+            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
         }
     }
 
