@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/margin_large_size"
+        >
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_range_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Material3.TitleMedium"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="@dimen/margin_large_size"
+            android:text="@string/disabled"
+            android:gravity="center"
+            />
+        <com.google.android.material.slider.Slider
+            android:id="@+id/slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/text_range_value"
+            android:layout_marginTop="@dimen/margin_medium_size"
+            android:valueFrom="0"
+            android:valueTo="180"
+            android:stepSize="10"
+            />
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linear_check_play_last_song_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/slider"
+            >
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/checkbox_play_last_song"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Play last song to end"
+                android:maxLines="1"
+                android:ellipsize="end"
+                />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

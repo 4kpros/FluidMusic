@@ -2,9 +2,243 @@
     <string name="app_name">Fluid Music</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="folders">Folders</string>
+    <string name="preference_file_key">fluidmusicpreferenceskey</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_storage_access">Storage access</string>
+    <string name="title_activity_equalizer">Equalizer</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <string name="fluid_music">Fluid Music</string>
+    <string name="music_player">Music player</string>
+
     <string name="songs">Songs</string>
-    <string name="albums">Albums</string>
-    <string name="artists">Artists</string>
+    <string name="explore">Explore</string>
+
+    //Songs info
+    <string name="album">Album</string>
+    <string name="artist">Artist</string>
     <string name="genre">Genre</string>
+    <string name="tracks">Tracks</string>
+    <string name="date">Date</string>
+    <string name="duration">Duration</string>
+    <string name="year">Year</string>
+    <string name="title">Title</string>
+    <string name="folder">Folder</string>
+    <string name="file">File</string>
+    <string name="file_name">File name</string>
+    <string name="file_path">File path</string>
+    <string name="file_size">File size</string>
+    <string name="track">Track</string>
+    <string name="disc">Disc</string>
+    <string name="album_artist">Album artist</string>
+    <string name="composer">Composer</string>
+    <string name="many_artists">Many artists</string>
+    <string name="track_number">Track number #</string>
+    <string name="disc_number">Disc number #</string>
+    <string name="added_date_to_library">Added date to library</string>
+    <string name="last_modified_date">Last modified date</string>
+    <string name="file_path_case_sensitive">File path case sensitive</string>
+    <string name="size">Size</string>
+    <string name="mime_type">Mime type</string>
+    <string name="rating">Rating</string>
+    <string name="author">Author</string>
+    <string name="writer">Writer</string>
+    <string name="language">Language</string>
+    <string name="sample_rate">Sample rate</string>
+    <string name="bitrate">Bitrate</string>
+    <string name="name">Name</string>
+    <string name="total_duration">Total duration</string>
+    <string name="song_count">Song count</string>
+    <string name="artist_count">Artist count</string>
+    <string name="album_artist_count">Album artist count</string>
+    <string name="composer_count">Composer count</string>
+    <string name="album_count">Album count</string>
+    <string name="album_name">Album name</string>
+    <string name="artist_name">Artist name</string>
+    <string name="composer_name">Composer name</string>
+    <string name="folder_name">Folder name</string>
+    //
+    <string name="unknown_artist">Unknown artist</string>
+    <string name="unknown_album_artist">Unknown album artist</string>
+    <string name="unknown_artists">Unknown artists</string>
+    <string name="unknown_title">Unknown title</string>
+    <string name="unknown_album">Unknown album</string>
+    <string name="unknown_composer">Unknown composer</string>
+    <string name="unknown_genre">Unknown genre</string>
+    <string name="unknown_folder">Unknown folder</string>
+    <string name="unknown_folder_parent">Unknown folder parent</string>
+    <string name="unknown_year">Unknown year</string>
+    //
+    <string name="songs_for_album">Songs for album</string>
+    <string name="songs_for_album_artist">Songs for album artist</string>
+    <string name="songs_for_artist">Songs for artist</string>
+    <string name="songs_for_composer">Songs for composer</string>
+    <string name="songs_for_folder">Songs for folder</string>
+    <string name="songs_for_genre">Songs for genre</string>
+    <string name="songs_for_year">Songs for year</string>
+    <string name="songs_for_playlist">Songs for playlist</string>
+    <string name="songs_for_favorites">Songs for favorites</string>
+    <string name="songs_for_stream">Songs for stream</string>
+    //
+    <string name="all_songs">All songs</string>
+    <string name="albums">Albums</string>
+    <string name="album_artists">Album artists</string>
+    <string name="artists">Artists</string>
+    <string name="composers">Composers</string>
+    <string name="folders">Folders</string>
+    <string name="genres">Genres</string>
+    <string name="years">Years</string>
+    <string name="playlists">Playlists</string>
+    <string name="favorites">Favorites</string>
+    <string name="streams">Streams</string>
+
+    <string name="pause">Pause</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="close">Close</string>
+    <string name="delete">Delete</string>
+    <string name="sort">Sort</string>
+    <string name="disposition">Disposition</string>
+    <string name="delete_forever">Delete forever</string>
+    <string name="delete_files">Delete files</string>
+    <string name="cancel">Cancel</string>
+    <string name="now_playing">Now playing</string>
+    <string name="playing">Playing</string>
+    <string name="all">All</string>
+    <string name="random">Random</string>
+    <string name="range">Range</string>
+    <string name="high_resolution">High resolution</string>
+    <string name="location">Location</string>
+    <string name="browse">Browse</string>
+    <string name="playing_date">Playing date</string>
+    <string name="play_count">Play count</string>
+    <string name="invert">Invert</string>
+    <string name="selection">Selection</string>
+    <string name="end_of_list">End of list</string>
+    <string name="decline">Decline</string>
+    <string name="more_settings">More settings</string>
+    <string name="organize">Organize</string>
+    <string name="others">Others</string>
+    <string name="added_updated">Added/Updated</string>
+    //Dialogs messages
+    //Main filter dialog
+    <string name="dialog_sort_title">Sort and set disposition option : </string>
+    <string name="dialog_small_list">Small list</string>
+    <string name="dialog_medium_list">List</string>
+    <string name="dialog_large_list">Large list</string>
+    <string name="dialog_small_grid">Small grid</string>
+    <string name="dialog_medium_grid">Grid</string>
+    <string name="dialog_large_grid">Large grid</string>
+    <string name="dialog_view_type_subtitle">This selection will be deleted. But the files will be conserved on device.</string>
+    //Delete selection dialog
+    <string name="dialog_delete_selection_title">Delete</string>
+    <string name="dialog_delete_selection_description">This selection will be deleted from your device. Do you really want to continue ?</string>
+    //Add to playlist dialog
+    <string name="dialog_add_to_playlist_title">Add on playlist</string>
+    //Covert art details dialog
+    <string name="dialog_covert_art_details_title">Covert art details</string>
+    <string name="get_started">Get started</string>
+    <string name="get_permissions">Get permissions</string>
+    <string name="queue_music">Queue music</string>
+    <string name="device_explorer">Device explorer</string>
+    <string name="music_library">Music library</string>
+    <string name="settings">Settings</string>
+    <string name="request_features">Request features</string>
+    <string name="change_log">Change log</string>
+    <string name="help">Help</string>
+    <string name="main">Main</string>
+    <string name="waiting_for_permissions">Waiting for permissions</string>
+    <string name="loading_configurations">Loading configurations</string>
+    <string name="title_activity_media_scanner">Media scanner</string>
+    <string name="rescan_device">Rescan device</string>
+    <string name="equalizer">Equalizer</string>
+    <string name="folders_hierarchy">Folders hierarchy</string>
+
+    ///
+    <string name="item_song_card_text_details">%1$s | %2$s</string>
+    <string name="item_content_explore_text_subtitle">%1$s Artist(s) | %2$s Album(s)</string>
+    <string name="item_content_explore_text_details">%1$s Min | %2$s Song(s)</string>
+    //
+    <string name="details">Details</string>
+    <string name="edit">Edit</string>
+    <string name="song_info_tags">Song info/Tags</string>
+    //
+    <string name="_song_details_tags">%1$s, %2$.2f Hz, %3$.2f Kbps</string>
+    <string name="_song_duration_tags">%1$s Min = %2$d Sec</string>
+    <string name="_song_size_tags">%1$.2f Mo = %2$d Kb</string>
+    <string name="ok">OK</string>
+    //
+    <string name="_timer_range_value">%1$d min</string>
+    //
+    <string name="_music_content_by">Music file : %1$s By %2$s</string>
+    //
+    <string name="play">Play</string>
+    <string name="shuffle">Shuffle</string>
+    <string name="paused">Paused</string>
+    //
+    <string name="disabled">Disabled</string>
+    <string name="delete_file">Delete file</string>
+    <string name="lets_go">Let\'s go</string>
+    <string name="share_file">Share file</string>
+    <string name="share_screenshot">Share screenshot</string>
+    <string name="currently_listening_icon">Currently listening 🎵</string>
+    <string name="Allow_Fluid_Music_to_modify_audio_settings">Allow Fluid Music to modify audio settings ?</string>
+    <string name="sleep_timer">Sleep timer</string>
+    <string name="go_to">Goto</string>
+    <string name="share_current_listening_song">Share current listening song</string>
+    <string name="info_tags">Info/tags</string>
+    <string name="set_as_ringtone">Set as ringtone</string>
+    <string name="share_song">Share song</string>
+    <string name="phone_ringtone">Phone ringtone</string>
+    <string name="alarm_ringtone">Alarm ringtone</string>
+    <string name="lyrics">Lyrics</string>
+    <string name="cover_art">Cover art</string>
+    <string name="timer">Timer</string>
+    <string name="info">Info</string>
+    <string name="share">Share</string>
+    <string name="add_to_playlist">Add to playlist</string>
+    <string name="new_playlist">New</string>
+    <string name="add_new_playlist">Add new playlist</string>
+    <string name="save">Save</string>
+    <string name="playlist_name">Playlist name</string>
+    <string name="edit_tags">Edit tags</string>
+    <string name="play_after">Play after</string>
+
+    //List grid organize
+    <string name="list">List</string>
+    <string name="list_extra_small">List extra small</string>
+    <string name="list_small">List small</string>
+    <string name="list_medium">List medium</string>
+    <string name="list_large">List large</string>
+    <string name="list_small_no_image">List small no image</string>
+    <string name="list_medium_no_image">List medium no image</string>
+    <string name="list_large_no_image">List large no image</string>
+    <string name="grid">Grid</string>
+    <string name="grid_extra_small">Grid extra small</string>
+    <string name="grid_small">Grid small</string>
+    <string name="grid_medium">Grid medium</string>
+    <string name="grid_large">Grid large</string>
+    <string name="grid_extra_large">Grid extra large</string>
+    <string name="grid_small_no_image">Grid small no image</string>
+    <string name="grid_medium_no_image">Grid medium no image</string>
+
+    //
+    <string name="add_to_top">Add to top</string>
+    <string name="play_next">Play next</string>
+    <string name="add_to_end">Add to end</string>
+
 </resources>

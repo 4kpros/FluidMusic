@@ -1,67 +1,154 @@
 package com.prosabdev.fluidmusic
 
-import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
+import android.content.ComponentName
+import android.media.AudioManager
 import android.os.Bundle
-import android.util.AttributeSet
-import android.view.View
-import android.view.ViewGroup
-import androidx.activity.viewModels
-import androidx.core.view.*
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.add
+import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaBrowserCompat.ConnectionCallback
+import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.BuildCompat
+import androidx.core.view.WindowCompat
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.google.android.material.color.DynamicColors
-import com.google.android.material.navigation.NavigationView
-import com.prosabdev.fluidmusic.ui.fragments.MainExploreFragment
+import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
+import com.prosabdev.fluidmusic.service.MediaPlaybackService
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
-import com.prosabdev.fluidmusic.viewmodels.MainExploreFragmentViewModel
+import com.prosabdev.fluidmusic.utils.ConstantValues
+import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity(){
 
-    private var mNavigationView : NavigationView? = null
-    private var mDrawerLayout : DrawerLayout? = null
-    private val mMainExploreFragmentViewModel: MainExploreFragmentViewModel by viewModels()
+@BuildCompat.PrereleaseSdkCheck class MainActivity : AppCompatActivity(){
+
+    private lateinit var mActivityMainBinding: ActivityMainBinding
+
+    private val mMainFragment = MainFragment.newInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //Setup UI
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        setContentView(R.layout.activity_main)
+        mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        initViews(savedInstanceState)
-        checkInteractions()
+        if(savedInstanceState == null){
+            initViews()
+            setupFragments()
+            setupAudioSettings()
+            createMediaBrowserService()
+        }
     }
 
-    private fun checkInteractions() {
-        mMainExploreFragmentViewModel.mActionBarState.observe(this, Observer { item ->
-            if(item){
-                mDrawerLayout?.open()
-            }
-        })
+    private fun createMediaBrowserService() {
+        mMediaBrowser = MediaBrowserCompat(
+            applicationContext,
+            ComponentName(applicationContext, MediaPlaybackService::class.java),
+            mConnectionCallbacks,
+            null
+        )
+    }
+    private fun setupAudioSettings() {
+        volumeControlStream = AudioManager.STREAM_MUSIC
     }
 
-    //Initialize views
-    private fun initViews(savedInstanceState : Bundle?) {
-        if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                add<MainFragment>(R.id.main_activity_fragment_container)
+    private fun setupFragments() {
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            replace(R.id.main_activity_fragment_container, mMainFragment)
+        }
+    }
+
+    private fun initViews(){
+    }
+
+    private var mMediaBrowser: MediaBrowserCompat? = null
+    private var mConnectionCallbacks: ConnectionCallback = object : ConnectionCallback(){
+        override fun onConnected() {
+            super.onConnected()
+            Log.i(ConstantValues.TAG, "ConnectionCallback onConnected")
+            mMediaBrowser?.sessionToken.also { token ->
+                val mediaController = MediaControllerCompat(
+                    this@MainActivity.applicationContext, // Context
+                    token!!
+                )
+                MediaControllerCompat.setMediaController(this@MainActivity, mediaController)
             }
+            buildTransportControls()
         }
-
-        mDrawerLayout = findViewById(R.id.drawer_layout)
-        mNavigationView = findViewById(R.id.navigation_view)
-
-        mNavigationView?.setNavigationItemSelectedListener { menuItem ->
-            // Handle menu item selected
-            menuItem.isChecked = true
-            mDrawerLayout?.close()
-            true
+        override fun onConnectionSuspended() {
+            super.onConnectionSuspended()
+            Log.i(ConstantValues.TAG, "ConnectionCallback onConnectionSuspended")
         }
+        override fun onConnectionFailed() {
+            super.onConnectionFailed()
+            Log.i(ConstantValues.TAG, "ConnectionCallback onConnectionFailed")
+        }
+    }
+    private var mControllerCallback = object : MediaControllerCompat.Callback() {
+        override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+            Log.i(ConstantValues.TAG, "MediaControllerCompat onMetadataChanged : $metadata")
+        }
+        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+            Log.i(ConstantValues.TAG, "MediaControllerCompat onPlaybackStateChanged : $state")
+        }
+    }
+
+    private fun buildTransportControls() {
+        val mediaController = MediaControllerCompat.getMediaController(this)
+        mediaController.transportControls.prepare()
+
+        val metadata = mediaController.metadata
+        val pbState = mediaController.playbackState
+
+        mediaController.registerCallback(mControllerCallback)
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
+    }
+
+    public override fun onStart() {
+        super.onStart()
+        mMediaBrowser?.connect()
+        ImageLoadersUtils.initializeJobWorker(applicationContext)
+    }
+    public override fun onResume() {
+        super.onResume()
+        setupAudioSettings()
+        ImageLoadersUtils.initializeJobWorker(applicationContext)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
+    }
+
+    public override fun onStop() {
+        super.onStop()
+        MediaControllerCompat.getMediaController(this)?.unregisterCallback(mControllerCallback)
+        mMediaBrowser?.disconnect()
+        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
+    }
+
+    companion object {
+        const val TAG = "MainActivity"
     }
 }

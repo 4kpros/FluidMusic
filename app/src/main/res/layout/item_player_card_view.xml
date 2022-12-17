@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/player_viewpager_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        style="@style/Widget.Material3.CardView.Filled"
+        android:backgroundTint="@color/transparent"
+        app:cardElevation="0dp"
+        android:layout_margin="@dimen/margin_large_size"
+        app:cardCornerRadius="@dimen/corner_radius_medium"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <ImageView
+                android:id="@+id/player_viewpager_imageview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_lyrics"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?attr/materialIconButtonFilledTonalStyle"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentBottom="true"
+                app:icon="@drawable/lyrics"
+                app:iconSize="24dp"
+                android:scaleType="centerInside"
+                android:layout_marginStart="10dp"
+                android:layout_marginBottom="10dp"
+                android:visibility="gone"
+                android:alpha="0" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_fullscreen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?attr/materialIconButtonFilledTonalStyle"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                app:icon="@drawable/fullscreen"
+                app:iconSize="24dp"
+                android:scaleType="centerInside"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:visibility="gone"
+                android:alpha="0" />
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+</layout>

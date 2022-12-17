@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_view_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.Material3.CardView.Elevated"
+        app:cardElevation="5dp"
+        android:layout_margin="2dp"
+        app:strokeWidth="0dp"
+        app:strokeColor="?attr/colorOutline"
+        >
+        <RelativeLayout
+            android:id="@+id/relative_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:clickable="true"
+            >
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_play_after"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                app:icon="@drawable/fast_forward"
+                android:layout_gravity="center"
+                android:contentDescription="@string/play_after"
+                android:tooltipText="@string/play_after"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_playlist_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_below="@+id/button_play_after"
+                android:layout_centerHorizontal="true"
+                app:icon="@drawable/playlist_add"
+                android:layout_gravity="center"
+                android:contentDescription="@string/add_to_playlist"
+                android:tooltipText="@string/add_to_playlist" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_edit_tags"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_below="@+id/button_playlist_add"
+                android:layout_centerHorizontal="true"
+                app:icon="@drawable/edit"
+                android:layout_gravity="center"
+                android:contentDescription="@string/edit_tags"
+                android:tooltipText="@string/edit_tags" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_share"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_below="@+id/button_edit_tags"
+                android:layout_centerHorizontal="true"
+                app:icon="@drawable/share"
+                android:contentDescription="@string/share"
+                android:tooltipText="@string/share"
+                android:layout_gravity="center" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_below="@+id/button_share"
+                android:layout_centerHorizontal="true"
+                app:icon="@drawable/delete"
+                android:layout_gravity="center"
+                android:contentDescription="@string/delete"
+                android:tooltipText="@string/delete" />
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+</layout>

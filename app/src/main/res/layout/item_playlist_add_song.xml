@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/relative_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/linear_imageview_container"
+            android:layout_width="@dimen/organize_list_small_image_size"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="@dimen/margin_large_size">
+
+            <com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
+                android:id="@+id/imageview_default_cover_art"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside"
+                android:src="@drawable/playlist_play"
+                app:srcCompat="@drawable/playlist_play"
+                app:shapeAppearanceOverlay="@style/ShapeFullRounded"
+                app:strokeWidth="0dp"
+                app:strokeColor="@color/transparent"
+                android:layout_margin="@dimen/margin_small_size" />
+
+            <com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
+                android:id="@+id/imageview_cover_art"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/ShapeFullRounded"
+                app:strokeWidth="0dp"
+                app:strokeColor="@color/transparent"
+                android:layout_margin="@dimen/margin_small_size" />
+        </RelativeLayout>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linear_text_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/linear_imageview_container"
+            android:layout_alignBottom="@+id/linear_imageview_container"
+            android:layout_toEndOf="@+id/linear_imageview_container"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:paddingVertical="@dimen/margin_small_size"
+            android:layout_marginStart="@dimen/margin_medium_size"
+            android:layout_marginEnd="@dimen/margin_large_size">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text=""
+                android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text_subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text=""
+                android:textAppearance="?attr/textAppearanceBodyMedium" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:alpha="0.5"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text=""
+                android:textAppearance="?attr/textAppearanceBodySmall" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_view_clickable"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignBottom="@+id/linear_imageview_container"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/transparent"
+            app:cardCornerRadius="@dimen/corner_radius_medium"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:strokeColor="@color/transparent">
+
+            <View
+                android:id="@+id/background_selected"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0"
+                android:visibility="gone"
+                android:background="?colorPrimary" />
+        </com.google.android.material.card.MaterialCardView>
+    </RelativeLayout>
+</layout>

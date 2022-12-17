@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.activities.SettingsActivity"
+        >
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/coordinator_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/app_bar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/top_app_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_scrollFlags="enterAlways"
+                    app:title="Settings"
+                    app:menu="@menu/app_bar_search"
+                    app:navigationIcon="@drawable/arrow_back" />
+
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginVertical="@dimen/margin_small_size">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/linear_items_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:orientation="vertical"
+                        android:paddingBottom="@dimen/margin_small_size">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/card_view_language"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.Material3.CardView.Filled"
+                            android:orientation="vertical"
+                            android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:transitionName="shared_content_language">
+
+                            <androidx.appcompat.widget.LinearLayoutCompat
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_large_size">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
+                                    android:src="@drawable/language" />
+
+                                <androidx.appcompat.widget.LinearLayoutCompat
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="@dimen/margin_large_size">
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        style="@style/TextAppearance.Material3.TitleMedium"
+                                        android:text="Language"
+                                        android:maxLines="1"
+                                        android:ellipsize="end" />
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Manually change language or select automatic mode"
+                                        android:maxLines="5"
+                                        android:ellipsize="end" />
+                                </androidx.appcompat.widget.LinearLayoutCompat>
+                            </androidx.appcompat.widget.LinearLayoutCompat>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/card_view_interface"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.Material3.CardView.Filled"
+                            android:orientation="vertical"
+                            android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:transitionName="shared_content_interface">
+
+                            <androidx.appcompat.widget.LinearLayoutCompat
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_large_size">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
+                                    android:src="@drawable/palette" />
+
+                                <androidx.appcompat.widget.LinearLayoutCompat
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="@dimen/margin_large_size">
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        style="@style/TextAppearance.Material3.TitleMedium"
+                                        android:text="Interface"
+                                        android:maxLines="1"
+                                        android:ellipsize="end" />
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Change theme and dynamic color palette"
+                                        android:maxLines="5"
+                                        android:ellipsize="end" />
+                                </androidx.appcompat.widget.LinearLayoutCompat>
+                            </androidx.appcompat.widget.LinearLayoutCompat>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/card_view_now_playing"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.Material3.CardView.Filled"
+                            android:orientation="vertical"
+                            android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:transitionName="shared_content_now_playing">
+
+                            <androidx.appcompat.widget.LinearLayoutCompat
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_large_size">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
+                                    android:src="@drawable/play_arrow" />
+
+                                <androidx.appcompat.widget.LinearLayoutCompat
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="@dimen/margin_large_size">
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        style="@style/TextAppearance.Material3.TitleMedium"
+                                        android:text="Now playing"
+                                        android:maxLines="1"
+                                        android:ellipsize="end" />
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Customize buttons, background blur and showed text"
+                                        android:maxLines="5"
+                                        android:ellipsize="end" />
+                                </androidx.appcompat.widget.LinearLayoutCompat>
+                            </androidx.appcompat.widget.LinearLayoutCompat>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/card_view_audio"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.Material3.CardView.Filled"
+                            android:orientation="vertical"
+                            android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:transitionName="shared_content_audio">
+
+                            <androidx.appcompat.widget.LinearLayoutCompat
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_large_size">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
+                                    android:src="@drawable/volume_up" />
+
+                                <androidx.appcompat.widget.LinearLayoutCompat
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="@dimen/margin_large_size">
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        style="@style/TextAppearance.Material3.TitleMedium"
+                                        android:text="Audio"
+                                        android:maxLines="1"
+                                        android:ellipsize="end" />
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Cross fade, replay, volume, output"
+                                        android:maxLines="5"
+                                        android:ellipsize="end" />
+                                </androidx.appcompat.widget.LinearLayoutCompat>
+                            </androidx.appcompat.widget.LinearLayoutCompat>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/card_view_library_scanner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.Material3.CardView.Filled"
+                            android:orientation="vertical"
+                            android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:transitionName="shared_content_library_scanner">
+
+                            <androidx.appcompat.widget.LinearLayoutCompat
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_large_size">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
+                                    android:src="@drawable/library_music" />
+
+                                <androidx.appcompat.widget.LinearLayoutCompat
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="@dimen/margin_large_size">
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        style="@style/TextAppearance.Material3.TitleMedium"
+                                        android:text="Library and scanner"
+                                        android:maxLines="1"
+                                        android:ellipsize="end" />
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Collection, folder permissions"
+                                        android:maxLines="5"
+                                        android:ellipsize="end" />
+                                </androidx.appcompat.widget.LinearLayoutCompat>
+                            </androidx.appcompat.widget.LinearLayoutCompat>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/card_view_cover_art"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.Material3.CardView.Filled"
+                            android:orientation="vertical"
+                            android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:transitionName="shared_content_lyrics">
+
+                            <androidx.appcompat.widget.LinearLayoutCompat
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_large_size">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
+                                    android:src="@drawable/lyrics" />
+
+                                <androidx.appcompat.widget.LinearLayoutCompat
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="@dimen/margin_large_size">
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        style="@style/TextAppearance.Material3.TitleMedium"
+                                        android:text="Lyrics and cover art"
+                                        android:maxLines="1"
+                                        android:ellipsize="end" />
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Automatic download cover art, lyrics"
+                                        android:maxLines="5"
+                                        android:ellipsize="end" />
+                                </androidx.appcompat.widget.LinearLayoutCompat>
+                            </androidx.appcompat.widget.LinearLayoutCompat>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/card_view_headset_bluetooth"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.Material3.CardView.Filled"
+                            android:orientation="vertical"
+                            android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:transitionName="shared_content_headset">
+
+                            <androidx.appcompat.widget.LinearLayoutCompat
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_large_size">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
+                                    android:src="@drawable/headphones" />
+
+                                <androidx.appcompat.widget.LinearLayoutCompat
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="@dimen/margin_large_size">
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        style="@style/TextAppearance.Material3.TitleMedium"
+                                        android:text="Headset,bluetooth, and speakers"
+                                        android:maxLines="1"
+                                        android:ellipsize="end" />
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="setup actions events"
+                                        android:maxLines="5"
+                                        android:ellipsize="end" />
+                                </androidx.appcompat.widget.LinearLayoutCompat>
+                            </androidx.appcompat.widget.LinearLayoutCompat>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/card_view_notifications"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.Material3.CardView.Filled"
+                            android:orientation="vertical"
+                            android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:transitionName="shared_content_notifications"
+                            >
+
+                            <androidx.appcompat.widget.LinearLayoutCompat
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_large_size"
+                                >
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
+                                    android:src="@drawable/notifications" />
+
+                                <androidx.appcompat.widget.LinearLayoutCompat
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="@dimen/margin_large_size">
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        style="@style/TextAppearance.Material3.TitleMedium"
+                                        android:text="Notifications"
+                                        android:maxLines="1"
+                                        android:ellipsize="end" />
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Style, show and hide buttons, reorder buttons, background"
+                                        android:maxLines="5"
+                                        android:ellipsize="end" />
+                                </androidx.appcompat.widget.LinearLayoutCompat>
+                            </androidx.appcompat.widget.LinearLayoutCompat>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/card_view_about"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.Material3.CardView.Filled"
+                            android:orientation="vertical"
+                            android:backgroundTint="@color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:transitionName="shared_content_about">
+
+                            <androidx.appcompat.widget.LinearLayoutCompat
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center"
+                                android:paddingHorizontal="@dimen/margin_large_size"
+                                android:paddingVertical="@dimen/margin_large_size">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/setting_item_icon_size"
+                                    android:layout_height="@dimen/setting_item_icon_size"
+                                    android:src="@drawable/info" />
+
+                                <androidx.appcompat.widget.LinearLayoutCompat
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="@dimen/margin_large_size">
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        style="@style/TextAppearance.Material3.TitleMedium"
+                                        android:text="About"
+                                        android:maxLines="1"
+                                        android:ellipsize="end" />
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Social media links, team"
+                                        android:maxLines="5"
+                                        android:ellipsize="end" />
+                                </androidx.appcompat.widget.LinearLayoutCompat>
+                            </androidx.appcompat.widget.LinearLayoutCompat>
+                        </com.google.android.material.card.MaterialCardView>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.core.widget.NestedScrollView>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

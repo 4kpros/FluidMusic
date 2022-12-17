@@ -1,32 +1,30 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.BuildCompat
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.databinding.FragmentEqualizerBinding
+import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
+import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+@BuildCompat.PrereleaseSdkCheck class EqualizerFragment : Fragment() {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [EqualizerFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class EqualizerFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var mDataBidingView: FragmentEqualizerBinding? = null
+
+    private val  mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
+    private val  mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
         }
     }
 
@@ -34,26 +32,57 @@ class EqualizerFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_equalizer, container, false)
+        mDataBidingView = DataBindingUtil.inflate(inflater,R.layout.fragment_equalizer, container,false)
+        val view = mDataBidingView?.root
+
+        initViews()
+        setupRecyclerViewAdapter()
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        observeLiveData()
+        checkInteractions()
+    }
+
+    private fun checkInteractions() {
+        mDataBidingView?.let { dataBidingView ->
+            dataBidingView.topAppBar.setNavigationOnClickListener {
+                activity?.onBackPressedDispatcher?.onBackPressed()
+            }
+        }
+    }
+
+    private fun observeLiveData() {
+        mDataBidingView?.let { dataBidingView ->
+            InsetModifiersUtils.updateTopViewInsets(dataBidingView.container)
+            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
+        }
+    }
+
+    private fun setupRecyclerViewAdapter() {
+        mDataBidingView?.let { dataBidingView ->
+            InsetModifiersUtils.updateTopViewInsets(dataBidingView.container)
+            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
+        }
+    }
+
+    private fun initViews() {
+        mDataBidingView?.let { dataBidingView ->
+            InsetModifiersUtils.updateTopViewInsets(dataBidingView.container)
+            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
+        }
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment EqualizerFragment.
-         */
-        // TODO: Rename and change types and number of parameters
+        const val TAG: String = "EqualizerFragment"
+
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance() =
             EqualizerFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
                 }
             }
     }
