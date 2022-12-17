@@ -33,7 +33,7 @@
 ## Some screenshots
 
 ![1](https://user-images.githubusercontent.com/52242361/208269209-68a77706-b78f-4cdf-b491-20f5c248d264.jpg)
-![2](https://user-images.githubusercontent.com/52242361/208269219-544ee25a-8e50-4946-a669-94a015c6c275.jpg)
+![2](https://user-images.githubusercontent.com/52242361/208269498-060a11ea-e076-497d-91e2-3a544eb5e45e.jpg)
 ![3-2](https://user-images.githubusercontent.com/52242361/208269224-10644271-b1d3-4a9e-98b2-9ceb9d9c9b5e.jpg)
 ![3-4](https://user-images.githubusercontent.com/52242361/208269226-59b61751-a909-4c84-b6bd-0d14dbf995cd.jpg)
 ![4-1](https://user-images.githubusercontent.com/52242361/208269227-9d9a0976-cb1b-46af-b050-f16e025c5c1a.jpg)
@@ -43,6 +43,10 @@
 ![7](https://user-images.githubusercontent.com/52242361/208269250-841bad2d-1a39-4cbf-943d-16fba4405d35.jpg)
 ![8](https://user-images.githubusercontent.com/52242361/208269253-91beb2be-0838-4a4c-8bdc-94017e117b93.jpg)
 ![9](https://user-images.githubusercontent.com/52242361/208269256-6be0654c-dd7d-4ff2-8a29-5d190f393da0.jpg)
+![10-1](https://user-images.githubusercontent.com/52242361/208269476-eaf77dda-f54d-490d-9331-7fa9be1efd2c.jpg)
+![10-2](https://user-images.githubusercontent.com/52242361/208269480-31ee73ed-5538-4bcc-a028-d792b4136d3c.jpg)
+![10-3](https://user-images.githubusercontent.com/52242361/208269484-dd608242-36c5-4420-86e2-33a0718ce30e.jpg)
+![10-4](https://user-images.githubusercontent.com/52242361/208269487-7c06a62d-af1e-483b-b403-9d3b99a05932.jpg)
 
 Link to translation : https://poeditor.com/join/project/ytUUxGZtzz
 
