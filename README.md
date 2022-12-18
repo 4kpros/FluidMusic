@@ -24,6 +24,8 @@
 -  Manage playlists
 -  Home screen widgets
 
+![Player](https://user-images.githubusercontent.com/52242361/208272517-44ce9537-b386-492a-bd10-3f4f18f2ef4e.gif)
+
 ## Some screenshots
 
 ![1](https://user-images.githubusercontent.com/52242361/208269209-68a77706-b78f-4cdf-b491-20f5c248d264.jpg)
