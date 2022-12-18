@@ -1,9 +1,3 @@
- <p align="">
-  <a href="https://retromusic.app](https://fluidmusic.vercel.app">
-    <img width="356" alt="fluid-music-bg-icon-square-dark" src="https://user-images.githubusercontent.com/52242361/198029825-67a9122a-deeb-4294-8eb7-e294a482493d.png"/>
-  </a>
-</p>
-
 <p align="">
   <a href="https://github.com/4kpros/FluidMusic" style="text-decoration:none" area-label="Android">
     <img src="https://img.shields.io/badge/Platform-Android-green.svg">
