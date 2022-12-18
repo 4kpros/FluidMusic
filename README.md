@@ -1,3 +1,5 @@
+# Fluid music - coming soon on Android !!!
+
 <p align="">
   <a href="https://github.com/4kpros/FluidMusic" style="text-decoration:none" area-label="Android">
     <img src="https://img.shields.io/badge/Platform-Android-green.svg">
@@ -10,21 +12,28 @@
   </a>
 </p>
 
-**Fluid music** is an Android open source audio player.
+Open source audio player.
 
 ## Features
--  Play local songs : mp3, ogg, mp4, opus, etc...
--  More than 5 themes
--  Headset/Bluetooth support
--  Music filters
--  Volume controls
+-  Play songs from yours devices (phone, external volumes, cast to Chromecast devices, stream from http server and playlist files support)
+-  Fast audio decoding with C++ ffmpeg library
+-  Powerfull equalizer with support from 5 to 10+ bands(depends on device)
+-  Amazing themes support (dark, gold, silver, Material You with custom color) and customization
+-  Headset/Bluetooth support with play/pause, next, stop commands with customs presets available
+-  Songs and contents filters
 -  Sleep timer
--  Lyrics supports
--  Tag editor
--  Manage playlists
+-  Lyrics supports(find, sync)
+-  Auto download albums art
+-  Lock screen
+-  Multiple tags editor
+-  Manage playlists and scan/export m3u, m3u8, pls, wpl, m3u8 playlists files
 -  Home screen widgets
+-  Crossfade
+-  Android Auto support
+-  Google Assistant support
 
 
+![Player](https://user-images.githubusercontent.com/52242361/208277309-0148797d-74bd-45b9-9f92-26800716fe6b.gif)
 ![Scroll-content](https://user-images.githubusercontent.com/52242361/208275209-e7f4a319-1a02-40ae-95f6-2e8e801aa24e.gif)
 ![Explore-contents](https://user-images.githubusercontent.com/52242361/208275228-8338190d-6847-42e4-aa83-8f7374ff01b5.gif)
 
@@ -35,24 +44,16 @@
 ## Some screenshots
 
 ![1](https://user-images.githubusercontent.com/52242361/208269209-68a77706-b78f-4cdf-b491-20f5c248d264.jpg)
-![2](https://user-images.githubusercontent.com/52242361/208269498-060a11ea-e076-497d-91e2-3a544eb5e45e.jpg)
-![3-2](https://user-images.githubusercontent.com/52242361/208269224-10644271-b1d3-4a9e-98b2-9ceb9d9c9b5e.jpg)
-
-![3-4](https://user-images.githubusercontent.com/52242361/208269226-59b61751-a909-4c84-b6bd-0d14dbf995cd.jpg)
 ![4-1](https://user-images.githubusercontent.com/52242361/208269227-9d9a0976-cb1b-46af-b050-f16e025c5c1a.jpg)
-![4-2](https://user-images.githubusercontent.com/52242361/208269230-146ff10c-04d1-41a1-9dba-4b83fc4ca661.jpg)
-
 ![5](https://user-images.githubusercontent.com/52242361/208269234-7abead5d-62cb-4e71-a9d7-16251f5e3a9f.jpg)
-![6](https://user-images.githubusercontent.com/52242361/208269241-854d1b94-0ad7-43d9-a06e-931c70e6e234.jpg)
-![7](https://user-images.githubusercontent.com/52242361/208269250-841bad2d-1a39-4cbf-943d-16fba4405d35.jpg)
 
+![3-1](https://user-images.githubusercontent.com/52242361/208278261-c677097a-9065-4240-9a2c-63f627f4ab7a.jpg)
+![3-2](https://user-images.githubusercontent.com/52242361/208269224-10644271-b1d3-4a9e-98b2-9ceb9d9c9b5e.jpg)
+![3-4](https://user-images.githubusercontent.com/52242361/208269226-59b61751-a909-4c84-b6bd-0d14dbf995cd.jpg)
+
+![7](https://user-images.githubusercontent.com/52242361/208269250-841bad2d-1a39-4cbf-943d-16fba4405d35.jpg)
 ![8](https://user-images.githubusercontent.com/52242361/208269253-91beb2be-0838-4a4c-8bdc-94017e117b93.jpg)
 ![9](https://user-images.githubusercontent.com/52242361/208269256-6be0654c-dd7d-4ff2-8a29-5d190f393da0.jpg)
-![10-1](https://user-images.githubusercontent.com/52242361/208269476-eaf77dda-f54d-490d-9331-7fa9be1efd2c.jpg)
-
-![10-2](https://user-images.githubusercontent.com/52242361/208269480-31ee73ed-5538-4bcc-a028-d792b4136d3c.jpg)
-![10-3](https://user-images.githubusercontent.com/52242361/208269484-dd608242-36c5-4420-86e2-33a0718ce30e.jpg)
-![10-4](https://user-images.githubusercontent.com/52242361/208269487-7c06a62d-af1e-483b-b403-9d3b99a05932.jpg)
 
 Link to translation : https://poeditor.com/join/project/ytUUxGZtzz
 
