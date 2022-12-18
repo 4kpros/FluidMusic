@@ -32,8 +32,7 @@ Open source audio player.
 -  Android Auto support
 -  Google Assistant support
 
-
-![Player](https://user-images.githubusercontent.com/52242361/208277309-0148797d-74bd-45b9-9f92-26800716fe6b.gif)
+![Player](https://user-images.githubusercontent.com/52242361/208319542-a7fa7688-f3ca-4de9-a043-b81a949cad00.gif)
 ![Scroll-content](https://user-images.githubusercontent.com/52242361/208275209-e7f4a319-1a02-40ae-95f6-2e8e801aa24e.gif)
 ![Explore-contents](https://user-images.githubusercontent.com/52242361/208275228-8338190d-6847-42e4-aa83-8f7374ff01b5.gif)
 
