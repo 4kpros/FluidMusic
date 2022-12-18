@@ -25,6 +25,8 @@
 -  Home screen widgets
 
 ![Player](https://user-images.githubusercontent.com/52242361/208272517-44ce9537-b386-492a-bd10-3f4f18f2ef4e.gif)
+![Explore-contents](https://user-images.githubusercontent.com/52242361/208272582-9f24eb36-864a-4ccb-8ead-2dc115e0f1fb.gif)
+![Scoll-content](https://user-images.githubusercontent.com/52242361/208272606-baf0bf77-316d-4181-a4ad-9e45d5639165.gif)
 
 ## Some screenshots
 
