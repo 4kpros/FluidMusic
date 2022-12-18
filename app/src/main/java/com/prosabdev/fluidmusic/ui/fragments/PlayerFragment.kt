@@ -695,7 +695,7 @@ import kotlinx.coroutines.withContext
                 dataBidingView.viewPagerPlayer.offscreenPageLimit = 3
                 dataBidingView.viewPagerPlayer.getChildAt(0)?.overScrollMode =
                     View.OVER_SCROLL_NEVER
-//                AnimatorsUtils.transformScaleViewPager(dataBidingView.viewPagerPlayer)
+                AnimatorsUtils.applyPageTransformer(dataBidingView.viewPagerPlayer)
             }
         }
     }
