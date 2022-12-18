@@ -15,7 +15,7 @@
 Open source audio player.
 
 ## Features
--  Play songs from yours devices (phone, external volumes, cast to Chromecast devices, stream from http server and playlist files support)
+-  Play songs from multiple sources (phone, external volumes, cast to Chromecast devices, stream from http server and playlist files support)
 -  Fast audio decoding with C++ ffmpeg library
 -  Powerfull equalizer with support from 5 to 10+ bands(depends on device)
 -  Amazing themes support (dark, gold, silver, Material You with custom color) and customization
