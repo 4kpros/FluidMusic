@@ -57,7 +57,7 @@ Open source audio player.
 
 Link to translation : https://poeditor.com/join/project/ytUUxGZtzz
 
-Link to design files (Figma) : https://www.figma.com/file/XwEoyQ1CvGClTxtUzq3PmI/Fluid-music?node-id=907%3A2
+Link to design files (Design file doesn't fully match current app for some user experience issues) : https://www.figma.com/file/XwEoyQ1CvGClTxtUzq3PmI/Fluid-music?node-id=907%3A2
 
 Link to website project : https://github.com/4kpros/fluidmusic-website
 
