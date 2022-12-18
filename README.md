@@ -1,9 +1,3 @@
- <p align="">
-  <a href="https://retromusic.app](https://fluidmusic.vercel.app">
-    <img width="356" alt="fluid-music-bg-icon-square-dark" src="https://user-images.githubusercontent.com/52242361/198029825-67a9122a-deeb-4294-8eb7-e294a482493d.png"/>
-  </a>
-</p>
-
 <p align="">
   <a href="https://github.com/4kpros/FluidMusic" style="text-decoration:none" area-label="Android">
     <img src="https://img.shields.io/badge/Platform-Android-green.svg">
@@ -29,6 +23,15 @@
 -  Tag editor
 -  Manage playlists
 -  Home screen widgets
+
+
+![Player](https://user-images.githubusercontent.com/52242361/208272799-21c6b378-b291-472a-ae15-de661dd2d8ef.gif)
+![Sort](https://user-images.githubusercontent.com/52242361/208272911-140a239c-cc2d-454e-b158-1f38c18a5c58.gif)
+![Settings](https://user-images.githubusercontent.com/52242361/208272794-d3a28de1-3528-4592-bc7f-7873d0f2588c.gif)
+
+![Explore-contents](https://user-images.githubusercontent.com/52242361/208272582-9f24eb36-864a-4ccb-8ead-2dc115e0f1fb.gif)
+![Scoll-content](https://user-images.githubusercontent.com/52242361/208272606-baf0bf77-316d-4181-a4ad-9e45d5639165.gif)
+![Organize](https://user-images.githubusercontent.com/52242361/208272648-a20d685c-0130-4575-bdd0-5e52d6bac9f5.gif)
 
 ## Some screenshots
 
