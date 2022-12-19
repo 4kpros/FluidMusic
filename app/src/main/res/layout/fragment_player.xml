@@ -11,9 +11,9 @@
         android:id="@+id/constraint_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.fragments.PlayerFragment"
         android:backgroundTint="?android:colorBackground"
         android:background="?android:colorBackground"
+        tools:context=".ui.fragments.PlayerFragment"
         >
         <ImageView
             android:id="@+id/blurred_imageview"
@@ -25,10 +25,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="?android:colorBackground"
-            android:alpha="0.35"
+            android:alpha="0"
+            android:visibility="gone"
             />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <RelativeLayout
             android:id="@+id/linear_viewpager"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -52,9 +53,10 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@+id/linear_viewpager"
-                app:layout_constraintEnd_toEndOf="@+id/linear_viewpager"
-                app:layout_constraintStart_toStartOf="@+id/linear_viewpager">
+                android:layout_alignBottom="@+id/view_pager_player"
+                android:layout_toStartOf="@+id/view_pager_player"
+                android:layout_toEndOf="@+id/view_pager_player"
+                >
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_rescan_device"
@@ -71,10 +73,10 @@
                     android:layout_marginVertical="@dimen/margin_large_size"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="No sound found !" />
+                    android:text="@string/no_sound_found" />
             </androidx.appcompat.widget.LinearLayoutCompat>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <androidx.constraintlayout.widget.ConstraintLayout
+        </RelativeLayout>
+        <RelativeLayout
             android:id="@+id/linear_controls"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -88,50 +90,115 @@
                 android:id="@+id/linear_song_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@+id/linear_progress_bar_container"
-                app:layout_constraintTop_toTopOf="parent"
+                android:layout_alignParentTop="true"
+                android:layout_above="@+id/linear_progress_bar_container"
                 android:layout_marginHorizontal="@dimen/margin_large_size"
+                android:gravity="center_vertical"
                 >
-
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_like"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="?attr/materialIconButtonStyle"
+                    app:icon="@drawable/thumb_up"
+                    />
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:layout_marginTop="1dp"
+                    >
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/text_title"
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/linear_text_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:ellipsize="marquee"
-                        android:focusable="true"
-                        android:focusableInTouchMode="true"
+                        android:layout_gravity="center"
                         android:gravity="center"
-                        android:marqueeRepeatLimit="marquee_forever"
-                        android:scrollHorizontally="true"
-                        android:singleLine="true"
-                        android:textAppearance="?attr/textAppearanceTitleLarge" />
+                        >
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/ShapeRoundedTextContainer"
+                            android:layout_toEndOf="@+id/button_equalizer"
+                            android:layout_toStartOf="@+id/button_more"
+                            android:layout_centerVertical="true"
+                            android:gravity="center"
+                            >
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/text_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="marquee"
+                                android:focusable="true"
+                                android:focusableInTouchMode="true"
+                                android:gravity="center"
+                                android:marqueeRepeatLimit="marquee_forever"
+                                android:scrollHorizontally="true"
+                                android:singleLine="true"
+                                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                                android:layout_alignParentStart="true"
+                                android:layout_centerVertical="true"
+                                android:text=""
+                                android:layout_marginHorizontal="@dimen/margin_medium_size"
+                                android:layout_marginVertical="@dimen/margin_extra_small_size"
+                                />
+                        </com.google.android.material.card.MaterialCardView>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/text_artist"
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/linear_text_artist"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:alpha="0.5"
-                        android:ellipsize="marquee"
-                        android:focusable="true"
-                        android:focusableInTouchMode="true"
+                        android:layout_gravity="center"
                         android:gravity="center"
-                        android:marqueeRepeatLimit="marquee_forever"
-                        android:scrollHorizontally="true"
-                        android:singleLine="true"
-                        android:textAppearance="?attr/textAppearanceTitleMedium" />
+                        android:layout_marginTop="1dp"
+                        >
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/ShapeRoundedTextContainer"
+                            android:layout_toEndOf="@+id/button_equalizer"
+                            android:layout_toStartOf="@+id/button_more"
+                            android:layout_centerVertical="true"
+                            android:gravity="center"
+                            >
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/text_artist"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="marquee"
+                                android:focusable="true"
+                                android:focusableInTouchMode="true"
+                                android:gravity="center"
+                                android:marqueeRepeatLimit="marquee_forever"
+                                android:scrollHorizontally="true"
+                                android:singleLine="true"
+                                android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+                                android:layout_alignParentStart="true"
+                                android:layout_centerVertical="true"
+                                android:text=""
+                                android:layout_marginHorizontal="@dimen/margin_medium_size"
+                                android:layout_marginVertical="@dimen/margin_extra_small_size"
+                                />
+                        </com.google.android.material.card.MaterialCardView>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
                 </androidx.appcompat.widget.LinearLayoutCompat>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_dislike"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="?attr/materialIconButtonStyle"
+                    app:icon="@drawable/thumb_down"
+                    />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/linear_progress_bar_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@+id/linear_buttons_container"
+                android:layout_above="@+id/linear_buttons_container"
                 android:layout_marginHorizontal="@dimen/margin_large_size"
                 >
 
@@ -139,35 +206,80 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/text_duration_current"
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/linear_text_duration_current"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
-                        android:text="00:00"
-                        android:textAppearance="?attr/textAppearanceLabelSmall" />
-
+                        >
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/ShapeRoundedTextContainer"
+                            android:layout_toEndOf="@+id/button_equalizer"
+                            android:layout_toStartOf="@+id/button_more"
+                            android:layout_centerVertical="true"
+                            android:gravity="center"
+                            >
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/text_duration_current"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentStart="true"
+                                android:layout_centerVertical="true"
+                                android:text=""
+                                android:textAppearance="?attr/textAppearanceLabelSmall"
+                                android:gravity="center"
+                                android:layout_marginHorizontal="@dimen/margin_medium_size"
+                                android:layout_marginVertical="@dimen/margin_extra_small_size"
+                                />
+                        </com.google.android.material.card.MaterialCardView>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
                     <com.google.android.material.slider.Slider
                         android:id="@+id/slider"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toStartOf="@+id/text_duration"
-                        android:layout_toEndOf="@+id/text_duration_current"
-                        android:value="0"
+                        android:layout_toStartOf="@+id/linear_text_duration"
+                        android:layout_toEndOf="@+id/linear_text_duration_current"
+                        app:tickVisible="false"
+                        app:labelBehavior="gone"
+                        app:thumbRadius="7dp"
+                        app:thumbElevation="0dp"
+                        android:value="50"
                         android:valueFrom="0"
                         android:valueTo="100"
                         app:trackHeight="2dp" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/text_duration"
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/linear_text_duration"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:text="00:00"
-                        android:textAppearance="?attr/textAppearanceLabelSmall" />
+                        >
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/ShapeRoundedTextContainer"
+                            android:layout_toEndOf="@+id/button_equalizer"
+                            android:layout_toStartOf="@+id/button_more"
+                            android:layout_centerVertical="true"
+                            android:gravity="center"
+                            >
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/text_duration"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text=""
+                                android:textAppearance="?attr/textAppearanceLabelSmall"
+                                android:layout_marginHorizontal="@dimen/margin_medium_size"
+                                android:layout_marginVertical="@dimen/margin_extra_small_size"
+                                />
+                        </com.google.android.material.card.MaterialCardView>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
                 </RelativeLayout>
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -175,44 +287,43 @@
                 android:id="@+id/linear_buttons_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true"
                 android:layout_marginHorizontal="@dimen/margin_large_size">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_shuffle"
-                    style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_gravity="center_vertical"
                     android:alpha="0.4"
                     app:icon="@drawable/shuffle" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_skip_prev"
-                    style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_gravity="center_vertical"
                     app:icon="@drawable/skip_previous"
                     app:iconSize="30dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_play_pause"
-                    style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_gravity="center_vertical"
                     android:padding="0dp"
                     app:icon="@drawable/play_circle"
-                    app:iconSize="70dp" />
+                    app:iconSize="60dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_skip_next"
-                    style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_gravity="center_vertical"
                     app:icon="@drawable/skip_next"
                     app:iconSize="30dp" />
@@ -226,7 +337,7 @@
                     android:alpha="0.4"
                     app:icon="@drawable/repeat" />
             </androidx.appcompat.widget.LinearLayoutCompat>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </RelativeLayout>
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/linear_more_buttons"
             android:layout_width="0dp"
@@ -239,36 +350,68 @@
                 android:id="@+id/constraint_bottom_buttons_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_large_size"
                 >
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_equalizer"
-                    style="?attr/materialIconButtonStyle"
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:id="@+id/relative_more_buttons"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/equalizer"
+                    android:layout_marginHorizontal="@dimen/margin_large_size"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    >
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/button_equalizer"
+                        android:layout_toStartOf="@+id/button_more"
+                        android:layout_centerVertical="true"
+                        android:layout_marginHorizontal="@dimen/margin_medium_size"
+                        android:gravity="center"
+                        >
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/ShapeRoundedTextContainer"
+                            android:layout_toEndOf="@+id/button_equalizer"
+                            android:layout_toStartOf="@+id/button_more"
+                            android:layout_centerVertical="true"
+                            android:layout_marginHorizontal="@dimen/margin_medium_size"
+                            android:gravity="center"
+                            android:clickable="true"
+                            >
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                                android:text="120kbps MP3 16bit"
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:layout_marginHorizontal="@dimen/margin_medium_size"
+                                android:layout_marginVertical="@dimen/margin_extra_small_size"
+                                />
+                        </com.google.android.material.card.MaterialCardView>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_equalizer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.Button.IconButton"
+                        app:icon="@drawable/equalizer"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_more"
-                    style="?attr/materialIconButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:icon="@drawable/more_horiz"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_more"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.Button.IconButton"
+                        app:icon="@drawable/more_horiz"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        />
+                </RelativeLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <View
-                android:id="@+id/constraint_hover_blurred_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:alpha="0.4"
-                android:background="?android:colorBackground" />
         </androidx.appcompat.widget.LinearLayoutCompat>
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/drag_handle_view_container"
@@ -282,6 +425,7 @@
             android:focusable="true"
             android:gravity="center"
             app:layout_constraintWidth_percent="0.35"
+            android:visibility="gone"
             >
             <View
                 android:layout_width="0dp"

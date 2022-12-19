@@ -240,5 +240,6 @@
     <string name="add_to_top">Add to top</string>
     <string name="play_next">Play next</string>
     <string name="add_to_end">Add to end</string>
+    <string name="no_sound_found">No sound found !</string>
 
 </resources>

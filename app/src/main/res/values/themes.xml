@@ -39,6 +39,11 @@
         <item name="cornerSizeBottomLeft">@dimen/corner_radius_medium</item>
         <item name="cornerSizeBottomRight">@dimen/corner_radius_medium</item>
     </style>
+    <style name="ShapeRoundedTextContainer" parent="Widget.Material3.CardView.Outlined">
+        <item name="strokeColor">@color/transparent</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="cardBackgroundColor">@color/semiWhite</item>
+    </style>
 
 
 

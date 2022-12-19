@@ -28,6 +28,8 @@ abstract class ImageLoadersUtils {
         var uri: Uri? = null
         var hashedCovertArtSignature: Int = -1
         var isBlurred: Boolean = false
+        var blurRadius: Int = 0
+        var blurSample: Int = 0
         var widthHeight: Int = 50
         var animate: Boolean = true
         var animationDuration: Int = 300
@@ -38,7 +40,6 @@ abstract class ImageLoadersUtils {
             fun newOriginalLargeCardInstance() =
                 ImageRequestItem().apply {
                     widthHeight = 1200
-                    isBlurred = false
                     animate = true
                     animationDuration = 300
                 }
@@ -47,7 +48,6 @@ abstract class ImageLoadersUtils {
             fun newOriginalMediumCardInstance() =
                 ImageRequestItem().apply {
                     widthHeight = 500
-                    isBlurred = false
                     animate = true
                     animationDuration = 300
                 }
@@ -56,7 +56,6 @@ abstract class ImageLoadersUtils {
             fun newOriginalCardInstance() =
                 ImageRequestItem().apply {
                     widthHeight = 200
-                    isBlurred = false
                     animate = true
                     animationDuration = 300
                 }
@@ -66,6 +65,8 @@ abstract class ImageLoadersUtils {
                 ImageRequestItem().apply {
                     widthHeight = 50
                     isBlurred = true
+                    blurRadius = 10
+                    blurSample = 2
                     animate = true
                     animationDuration = 200
                 }
@@ -180,8 +181,8 @@ abstract class ImageLoadersUtils {
             imageRequest.imageView?.let { imgView ->
                 MainScope().launch {
                     Blurry.with(ctx.applicationContext)
-                        .radius(25)
-                        .sampling(1)
+                        .radius(imageRequest.blurRadius)
+                        .sampling(imageRequest.blurSample)
                         .animate(
                             if(imageRequest.animate) imageRequest.animationDuration else 0
                         )
@@ -245,6 +246,7 @@ abstract class ImageLoadersUtils {
                         Glide.with(ctx.applicationContext)
                             .asBitmap()
                             .load(byteArray)
+                            .centerCrop()
                             .diskCacheStrategy(DiskCacheStrategy.NONE)
                             .override(imgReq.widthHeight, imgReq.widthHeight)
                             .transition(withCrossFade(factory))

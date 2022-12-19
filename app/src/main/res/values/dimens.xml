@@ -3,6 +3,7 @@
     <dimen name="fastscroll_scrollbar_margin_top">74dp</dimen>
     <dimen name="fastscroll_scrollbar_margin_bottom">74dp</dimen>
 
+    <dimen name="margin_extra_small_size">2dp</dimen>
     <dimen name="margin_small_size">5dp</dimen>
     <dimen name="margin_medium_size">10dp</dimen>
     <dimen name="margin_large_size">15dp</dimen>
