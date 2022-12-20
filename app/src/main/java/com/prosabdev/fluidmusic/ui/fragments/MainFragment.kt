@@ -13,7 +13,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
-import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentMainBinding
 import com.prosabdev.fluidmusic.models.songitem.SongItem
@@ -50,20 +49,24 @@ import kotlinx.coroutines.launch
         mDataBidingView = DataBindingUtil.inflate(inflater,R.layout.fragment_main,container,false)
         val view = mDataBidingView?.root
 
-        initViews()
-        setupFragments()
+        if(savedInstanceState == null){
+            initViews()
+            setupFragments()
+        }
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if(savedInstanceState == null){
+            checkInteractions()
+            observeLiveData()
+        }
     }
 
     override fun onResume() {
         updateDrawerMenuUI()
         super.onResume()
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        checkInteractions()
-        observeLiveData()
     }
 
     private fun updateDrawerMenuUI() {

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_gravity="bottom">
+
+        <me.tankery.lib.circularseekbar.CircularSeekBar
+            android:id="@+id/seekbar_bass_boost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cs_circle_style="round"
+            app:cs_circle_fill="@color/transparent"
+            app:cs_circle_color="?colorOutline"
+            app:cs_circle_progress_color="?colorPrimary"
+            app:cs_start_angle="145"
+            app:cs_end_angle="35"
+            app:cs_progress="50"
+            app:cs_negative_enabled="false"
+            app:cs_circle_stroke_width="4dp"
+            app:cs_pointer_stroke_width="20dp"
+
+            app:cs_move_outside_circle="true"
+            app:cs_disable_pointer="false"
+            app:cs_disable_progress_glow="true"
+            app:cs_hide_progress_when_empty="false"
+            app:cs_pointer_color="?colorPrimary"
+            app:cs_pointer_halo_color="@color/transparent"
+            app:cs_pointer_halo_color_ontouch="@color/transparent" />
+
+        <com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
+            android:id="@+id/shape_background_bass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:shapeAppearance="@style/ShapeFullCircle"
+            android:layout_alignStart="@+id/seekbar_bass_boost"
+            android:layout_alignTop="@+id/seekbar_bass_boost"
+            android:layout_alignEnd="@+id/seekbar_bass_boost"
+            android:layout_alignBottom="@+id/seekbar_bass_boost"
+            android:background="?colorOutline"
+            android:layout_margin="40dp" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_view_bass_boost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/shape_background_bass"
+            android:layout_alignTop="@+id/shape_background_bass"
+            android:layout_alignEnd="@+id/shape_background_bass"
+            android:layout_alignBottom="@+id/shape_background_bass"
+            android:layout_centerInParent="true"
+            android:layout_marginHorizontal="@dimen/margin_small_size"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="50%"
+            android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/seekbar_bass_boost"
+            android:layout_alignEnd="@+id/seekbar_bass_boost"
+            android:layout_alignBottom="@+id/seekbar_bass_boost"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="Bass"
+            android:layout_marginHorizontal="@dimen/margin_large_size"
+            android:layout_marginBottom="@dimen/margin_medium_size" />
+    </RelativeLayout>
+</layout>

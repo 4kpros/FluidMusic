@@ -46,7 +46,6 @@
     </style>
 
 
-
     <style name="MainTheme" parent="BaseThemeLight">
         <item name="colorPrimary">@color/black</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>

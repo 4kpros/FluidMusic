@@ -15,12 +15,12 @@ import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 
 @BuildCompat.PrereleaseSdkCheck class LanguageSettingsActivity : AppCompatActivity() {
 
-    private lateinit var mActivityLanguageSettingsBinding : ActivityLanguageSettingsBinding
+    private lateinit var mDataBidingView : ActivityLanguageSettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mActivityLanguageSettingsBinding = DataBindingUtil.setContentView(this, R.layout.activity_language_settings)
+        mDataBidingView = DataBindingUtil.setContentView(this, R.layout.activity_language_settings)
 
         initViews()
         checkInteractions()
@@ -63,14 +63,14 @@ import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
     }
 
     private fun checkInteractions() {
-        mActivityLanguageSettingsBinding.topAppBar.setNavigationOnClickListener {
+        mDataBidingView.topAppBar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
     }
 
     private fun initViews() {
-        InsetModifiersUtils.updateTopViewInsets(mActivityLanguageSettingsBinding.coordinatorSettingsActivity)
-        InsetModifiersUtils.updateBottomViewInsets(mActivityLanguageSettingsBinding.emptyView)
+        InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorSettingsActivity)
+        InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.emptyView)
     }
 
     companion object {

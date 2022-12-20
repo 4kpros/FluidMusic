@@ -15,13 +15,13 @@ import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 
 @BuildCompat.PrereleaseSdkCheck class InterfaceSettingsActivity : AppCompatActivity() {
 
-    private lateinit var mActivityInterfaceSettingsBinding : ActivityInterfaceSettingsBinding
+    private lateinit var mDataBidingView : ActivityInterfaceSettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
 
-        mActivityInterfaceSettingsBinding = DataBindingUtil.setContentView(this, R.layout.activity_interface_settings)
+        mDataBidingView = DataBindingUtil.setContentView(this, R.layout.activity_interface_settings)
 
         initViews()
         checkInteractions()
@@ -63,14 +63,14 @@ import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
     }
 
     private fun checkInteractions() {
-        mActivityInterfaceSettingsBinding.topAppBar.setNavigationOnClickListener {
+        mDataBidingView.topAppBar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
     }
 
     private fun initViews() {
-        InsetModifiersUtils.updateTopViewInsets(mActivityInterfaceSettingsBinding.coordinatorSettingsActivity)
-        InsetModifiersUtils.updateBottomViewInsets(mActivityInterfaceSettingsBinding.emptyView)
+        InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorSettingsActivity)
+        InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.emptyView)
     }
 
     companion object {

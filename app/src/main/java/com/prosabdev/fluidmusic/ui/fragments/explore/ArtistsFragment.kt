@@ -16,8 +16,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
-import com.google.android.material.transition.platform.MaterialFadeThrough
-import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
@@ -74,7 +72,9 @@ class ArtistsFragment : Fragment() {
         arguments?.let {
         }
 
-        loadPrefsAndInitViewModel()
+        if(savedInstanceState == null) {
+            loadPrefsAndInitViewModel()
+        }
     }
 
     override fun onCreateView(
@@ -84,9 +84,11 @@ class ArtistsFragment : Fragment() {
         mDataBidingView = DataBindingUtil.inflate(inflater,R.layout.fragment_artists,container,false)
         val view = mDataBidingView?.root
 
-        initViews()
-        MainScope().launch {
-            setupRecyclerViewAdapter()
+        if(savedInstanceState == null) {
+            initViews()
+            MainScope().launch {
+                setupRecyclerViewAdapter()
+            }
         }
         return view
     }

@@ -15,8 +15,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
-import com.google.android.material.transition.platform.MaterialFadeThrough
-import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.l4digital.fastscroll.FastScroller
 import com.l4digital.fastscroll.FastScroller.FastScrollListener
 import com.prosabdev.fluidmusic.R
@@ -34,8 +32,6 @@ import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomS
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortSongsBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
 import com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
-import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
-import com.prosabdev.fluidmusic.ui.fragments.PlayerFragment
 import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
@@ -76,7 +72,9 @@ class AllSongsFragment : Fragment() {
         arguments?.let {
         }
 
-        loadPrefsAndInitViewModel()
+        if(savedInstanceState == null) {
+            loadPrefsAndInitViewModel()
+        }
     }
 
     override fun onCreateView(
@@ -86,9 +84,11 @@ class AllSongsFragment : Fragment() {
         mDataBidingView = DataBindingUtil.inflate(inflater,R.layout.fragment_all_songs,container,false)
         val view = mDataBidingView?.root
 
-        initViews()
-        MainScope().launch {
-            setupRecyclerViewAdapter()
+        if(savedInstanceState == null) {
+            initViews()
+            MainScope().launch {
+                setupRecyclerViewAdapter()
+            }
         }
         return view
     }
@@ -96,8 +96,10 @@ class AllSongsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        checkInteractions()
-        observeLiveData()
+        if(savedInstanceState == null) {
+            checkInteractions()
+            observeLiveData()
+        }
     }
 
     override fun onDestroy() {

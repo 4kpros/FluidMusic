@@ -57,7 +57,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
     androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
-    implementation "androidx.fragment:fragment-ktx:1.5.4"
+    implementation "androidx.fragment:fragment-ktx:1.5.5"
     implementation "androidx.recyclerview:recyclerview:1.2.1"
 
     implementation 'androidx.core:core:1.9.0'
@@ -80,5 +80,8 @@ dependencies {
     implementation 'com.github.hannesa2:AndroidSlidingUpPanel:4.5.0'
     implementation "io.github.l4digital:fastscroll:2.1.0"
     implementation 'jp.wasabeef:blurry:4.0.1'
-    implementation 'com.github.jbvincey:nestedradiobutton:1.1'
+    implementation 'io.github.gautamchibde:audiovisualizer:2.2.5'
+    implementation 'me.tankery.lib:circularSeekBar:1.4.1'
+    implementation 'com.github.lukelorusso:VerticalSeekBar:1.2.7'
+
 }

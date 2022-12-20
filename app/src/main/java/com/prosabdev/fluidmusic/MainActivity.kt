@@ -20,15 +20,14 @@ import com.prosabdev.fluidmusic.service.MediaPlaybackService
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
 import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
+import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 
 @BuildCompat.PrereleaseSdkCheck class MainActivity : AppCompatActivity(){
 
-    private lateinit var mActivityMainBinding: ActivityMainBinding
-
-    private val mMainFragment = MainFragment.newInstance()
+    private lateinit var mDataBidingView: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +35,7 @@ import kotlinx.coroutines.launch
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        mDataBidingView = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         if(savedInstanceState == null){
             initViews()
@@ -61,7 +60,11 @@ import kotlinx.coroutines.launch
     private fun setupFragments() {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            replace(R.id.main_activity_fragment_container, mMainFragment)
+            replace(
+                R.id.main_activity_fragment_container,
+                MainFragment.newInstance(),
+                MainFragment.TAG
+            )
         }
     }
 

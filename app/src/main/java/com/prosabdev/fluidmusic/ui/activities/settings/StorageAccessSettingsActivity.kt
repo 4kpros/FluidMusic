@@ -37,7 +37,7 @@ import kotlinx.coroutines.withContext
 
 @BuildCompat.PrereleaseSdkCheck class StorageAccessSettingsActivity : AppCompatActivity() {
 
-    private lateinit var mActivityStorageAccessSettingsBinding: ActivityStorageAccessSettingsBinding
+    private lateinit var mDataBidingView: ActivityStorageAccessSettingsBinding
 
     private val mFolderUriTreeViewModel: FolderUriTreeViewModel by viewModels()
     private val mStorageAccessActivityViewModel: StorageAccessActivityViewModel by viewModels()
@@ -52,7 +52,7 @@ import kotlinx.coroutines.withContext
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        mActivityStorageAccessSettingsBinding = DataBindingUtil.setContentView(this, R.layout.activity_storage_access_settings)
+        mDataBidingView = DataBindingUtil.setContentView(this, R.layout.activity_storage_access_settings)
 
         initViews()
         MainScope().launch {
@@ -113,18 +113,18 @@ import kotlinx.coroutines.withContext
         MainScope().launch {
             Log.i(ConstantValues.TAG, "Add URI : ${folderUriTrees.size}")
             mFolderUriTreeAdapter?.submitList(folderUriTrees)
-            mActivityStorageAccessSettingsBinding.foldersCounter = folderUriTrees.size
+            mDataBidingView.foldersCounter = folderUriTrees.size
         }
     }
 
     private fun checkInteractions() {
-        mActivityStorageAccessSettingsBinding.buttonAddFolder.setOnClickListener{
+        mDataBidingView.buttonAddFolder.setOnClickListener{
             requestNewFolderFromSAF()
         }
-        mActivityStorageAccessSettingsBinding.topAppBar.setNavigationOnClickListener{
+        mDataBidingView.topAppBar.setNavigationOnClickListener{
             onBackPressedDispatcher.onBackPressed()
         }
-        mActivityStorageAccessSettingsBinding.topAppBar.setOnMenuItemClickListener {
+        mDataBidingView.topAppBar.setOnMenuItemClickListener {
             when(it.itemId) {
                 R.id.menu_remove_all -> {
                     showBottomSheetDialog()
@@ -156,10 +156,10 @@ import kotlinx.coroutines.withContext
         val concatAdapter = ConcatAdapter()
         concatAdapter.addAdapter(mFolderUriTreeAdapter!!)
         concatAdapter.addAdapter(mEmptyBottomAdapter!!)
-        mActivityStorageAccessSettingsBinding.recyclerView.adapter = concatAdapter
+        mDataBidingView.recyclerView.adapter = concatAdapter
 
         mLayoutManager = GridLayoutManager(this.baseContext, spanCount, GridLayoutManager.VERTICAL, false)
-        mActivityStorageAccessSettingsBinding.recyclerView.layoutManager = mLayoutManager
+        mDataBidingView.recyclerView.layoutManager = mLayoutManager
 
     }
     private fun onShowRemoveFolderDialog(position: Int) {
@@ -179,8 +179,8 @@ import kotlinx.coroutines.withContext
     }
 
     private fun initViews() {
-        InsetModifiersUtils.updateTopViewInsets(mActivityStorageAccessSettingsBinding.coordinatorLayout)
-        InsetModifiersUtils.updateBottomViewInsets(mActivityStorageAccessSettingsBinding.container)
+        InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
+        InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.container)
     }
 
     private var treeUri: String?

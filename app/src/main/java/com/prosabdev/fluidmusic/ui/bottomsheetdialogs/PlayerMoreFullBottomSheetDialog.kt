@@ -18,7 +18,6 @@ import com.prosabdev.fluidmusic.databinding.BottomSheetPlayerMoreBinding
 import com.prosabdev.fluidmusic.databinding.DialogGotoSongBinding
 import com.prosabdev.fluidmusic.databinding.DialogSetSleepTimerBinding
 import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
-import com.prosabdev.fluidmusic.models.generic.GenericItemListGrid
 import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
 import com.prosabdev.fluidmusic.models.songitem.SongItem

@@ -1,7 +1,6 @@
 package com.prosabdev.fluidmusic.ui.bottomsheetdialogs
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,12 +14,9 @@ import com.prosabdev.fluidmusic.adapters.QueueMusicItemListAdapter
 import com.prosabdev.fluidmusic.databinding.BottomSheetQueueMusicBinding
 import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
-import com.prosabdev.fluidmusic.utils.ConstantValues
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
 

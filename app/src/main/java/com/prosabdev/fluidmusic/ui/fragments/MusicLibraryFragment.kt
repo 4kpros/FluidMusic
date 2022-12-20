@@ -1,24 +1,25 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.commit
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
 import com.prosabdev.fluidmusic.databinding.DialogAddToQueueMusicBinding
 import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
+import com.prosabdev.fluidmusic.ui.activities.EditTagsActivity
 import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
 import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
@@ -28,7 +29,7 @@ import com.prosabdev.fluidmusic.viewmodels.workers.QueueMusicActionsWorkerViewMo
 import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
 import com.prosabdev.fluidmusic.workers.queuemusic.AddSongsToQueueMusicWorker
 
-class MusicLibraryFragment : Fragment() {
+@BuildCompat.PrereleaseSdkCheck class MusicLibraryFragment : Fragment() {
     private var mDataBidingView: FragmentMusicLibraryBinding? = null
 
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
@@ -61,6 +62,7 @@ class MusicLibraryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         if(savedInstanceState == null){
             checkInteractions()
             observeLiveData()
@@ -255,20 +257,23 @@ class MusicLibraryFragment : Fragment() {
         }
     }
     private fun openTagEditorFragment() {
-        activity?.let {
-            it.supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                add(
-                    R.id.main_activity_fragment_container,
-                    EditTagsFragment.newInstance(
-                        null,
-                        null,
-                        null
-                    )
-                )
-                addToBackStack(EditTagsFragment.TAG)
-            }
-        }
+
+        startActivity(Intent(context, EditTagsActivity::class.java).apply {})
+//        activity?.let {
+//            it.supportFragmentManager.commit {
+//                setReorderingAllowed(true)
+//                replace(
+//                    R.id.main_activity_fragment_container,
+//                    EditTagsFragment.newInstance(
+//                        null,
+//                        null,
+//                        null
+//                    ),
+//                    EditTagsFragment.TAG
+//                )
+//                addToBackStack(null)
+//            }
+//        }
     }
     private fun openPlaylistAddDialog() {
         //

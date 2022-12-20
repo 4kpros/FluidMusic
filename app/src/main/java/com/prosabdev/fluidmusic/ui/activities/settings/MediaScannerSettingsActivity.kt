@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 
 @BuildCompat.PrereleaseSdkCheck class MediaScannerSettingsActivity : AppCompatActivity() {
 
-    private lateinit var mActivityMediaScannerSettingsBinding : ActivityMediaScannerSettingsBinding
+    private lateinit var mDataBidingView : ActivityMediaScannerSettingsBinding
 
     private val mFolderUriTreeViewModel: FolderUriTreeViewModel by viewModels()
     private val mMediaScannerActivityViewModel: MediaScannerActivityViewModel by viewModels()
@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        mActivityMediaScannerSettingsBinding = DataBindingUtil.setContentView(this, R.layout.activity_media_scanner_settings)
+        mDataBidingView = DataBindingUtil.setContentView(this, R.layout.activity_media_scanner_settings)
 
         initViews()
         MainScope().launch {
@@ -70,44 +70,44 @@ import kotlinx.coroutines.launch
     }
 
     private fun checkInteractions() {
-        mActivityMediaScannerSettingsBinding.topAppBar.setNavigationOnClickListener {
+        mDataBidingView.topAppBar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
-        mActivityMediaScannerSettingsBinding.cardViewScanDevice.setOnClickListener{
+        mDataBidingView.cardViewScanDevice.setOnClickListener{
             tryToScanDevice()
         }
-        mActivityMediaScannerSettingsBinding.cardViewSelectFolders.setOnClickListener{
+        mDataBidingView.cardViewSelectFolders.setOnClickListener{
             startActivity(Intent(this, StorageAccessSettingsActivity::class.java).apply {})
         }
-        mActivityMediaScannerSettingsBinding.cardViewRescanAll.setOnClickListener{
+        mDataBidingView.cardViewRescanAll.setOnClickListener{
             onRescanAllButtonClicked()
         }
-        mActivityMediaScannerSettingsBinding.cardViewRestoreDefault.setOnClickListener{
+        mDataBidingView.cardViewRestoreDefault.setOnClickListener{
             onRestoreAllButtonClicked()
         }
-        mActivityMediaScannerSettingsBinding.switchM3uPlaylists.setOnClickListener{
+        mDataBidingView.switchM3uPlaylists.setOnClickListener{
             //
         }
-        mActivityMediaScannerSettingsBinding.switchIgnoreVideos.setOnClickListener{
+        mDataBidingView.switchIgnoreVideos.setOnClickListener{
             //
         }
-        mActivityMediaScannerSettingsBinding.switchAutomaticScanner.setOnClickListener{
+        mDataBidingView.switchAutomaticScanner.setOnClickListener{
             //
         }
-        mActivityMediaScannerSettingsBinding.seekbarIgnoreShortFiles.addOnChangeListener(object : Slider.OnChangeListener{
+        mDataBidingView.seekbarIgnoreShortFiles.addOnChangeListener(object : Slider.OnChangeListener{
             override fun onValueChange(slider: Slider, value: Float, fromUser: Boolean) {
                 //
             }
 
         })
-        mActivityMediaScannerSettingsBinding.cardViewScanM3uPlaylists.setOnClickListener{
-            mActivityMediaScannerSettingsBinding.switchM3uPlaylists.isChecked = !mActivityMediaScannerSettingsBinding.switchM3uPlaylists.isChecked
+        mDataBidingView.cardViewScanM3uPlaylists.setOnClickListener{
+            mDataBidingView.switchM3uPlaylists.isChecked = !mDataBidingView.switchM3uPlaylists.isChecked
         }
-        mActivityMediaScannerSettingsBinding.cardViewSkipVideos.setOnClickListener{
-            mActivityMediaScannerSettingsBinding.switchIgnoreVideos.isChecked = !mActivityMediaScannerSettingsBinding.switchIgnoreVideos.isChecked
+        mDataBidingView.cardViewSkipVideos.setOnClickListener{
+            mDataBidingView.switchIgnoreVideos.isChecked = !mDataBidingView.switchIgnoreVideos.isChecked
         }
-        mActivityMediaScannerSettingsBinding.cardViewAutomaticScan.setOnClickListener{
-            mActivityMediaScannerSettingsBinding.switchAutomaticScanner.isChecked = !mActivityMediaScannerSettingsBinding.switchAutomaticScanner.isChecked
+        mDataBidingView.cardViewAutomaticScan.setOnClickListener{
+            mDataBidingView.switchAutomaticScanner.isChecked = !mDataBidingView.switchAutomaticScanner.isChecked
         }
     }
 
@@ -212,8 +212,8 @@ import kotlinx.coroutines.launch
 
     private fun updateEmptyFolderUriTreeUI(it: Int?) {
         if((it ?: 0) > 0){
-            fadeInOut(mActivityMediaScannerSettingsBinding.textSelectFoldersSubTitle)
-            fadeInOut(mActivityMediaScannerSettingsBinding.textSelectFoldersTitle)
+            fadeInOut(mDataBidingView.textSelectFoldersSubTitle)
+            fadeInOut(mDataBidingView.textSelectFoldersTitle)
         }
     }
 
@@ -250,27 +250,27 @@ import kotlinx.coroutines.launch
     }
 
     private fun updatePlaylistCounterUI(it: Int?) {
-        mActivityMediaScannerSettingsBinding.playlistCounter = it
+        mDataBidingView.playlistCounter = it
         Log.i(ConstantValues.TAG, "Device scan playlists : $it")
     }
 
     private fun updateSongsCounterUI(it: Int?) {
-        mActivityMediaScannerSettingsBinding.songsCounter = it
+        mDataBidingView.songsCounter = it
         Log.i(ConstantValues.TAG, "Device scan songs : $it")
     }
 
     private fun updateFoldersCounterUI(it: Int) {
-        mActivityMediaScannerSettingsBinding.folderCounter = it
+        mDataBidingView.folderCounter = it
         Log.i(ConstantValues.TAG, "Device scan folders : $it")
     }
 
     private fun updateLoadingUI(it: Boolean?) {
-        mActivityMediaScannerSettingsBinding.isLoading = it
+        mDataBidingView.isLoading = it
     }
 
     private fun initViews() {
-        InsetModifiersUtils.updateTopViewInsets(mActivityMediaScannerSettingsBinding.coordinatorLayout)
-        InsetModifiersUtils.updateBottomViewInsets(mActivityMediaScannerSettingsBinding.container)
+        InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
+        InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.container)
     }
 
     companion object {

@@ -16,8 +16,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
-import com.google.android.material.transition.platform.MaterialFadeThrough
-import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
@@ -73,7 +71,10 @@ class AlbumsFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
         }
-        loadPrefsAndInitViewModel()
+
+        if(savedInstanceState == null) {
+            loadPrefsAndInitViewModel()
+        }
     }
 
     override fun onCreateView(
@@ -83,9 +84,11 @@ class AlbumsFragment : Fragment() {
         mDataBidingView = DataBindingUtil.inflate(inflater,R.layout.fragment_albums,container,false)
         val view = mDataBidingView?.root
 
-        initViews()
-        MainScope().launch {
-            setupRecyclerViewAdapter()
+        if(savedInstanceState == null) {
+            initViews()
+            MainScope().launch {
+                setupRecyclerViewAdapter()
+            }
         }
         return view
     }
@@ -93,8 +96,10 @@ class AlbumsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        checkInteractions()
-        observeLiveData()
+        if(savedInstanceState == null) {
+            checkInteractions()
+            observeLiveData()
+        }
     }
 
     override fun onDestroy() {

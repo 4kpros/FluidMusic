@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -20,7 +19,6 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.slider.Slider
 import com.google.android.material.slider.Slider.OnSliderTouchListener
-import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentPlayerBinding
@@ -30,6 +28,7 @@ import com.prosabdev.fluidmusic.models.view.*
 import com.prosabdev.fluidmusic.sharedprefs.SharedPreferenceManagerUtils
 import com.prosabdev.fluidmusic.sharedprefs.models.SleepTimerSP
 import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
+import com.prosabdev.fluidmusic.ui.activities.EqualizerActivity
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreFullBottomSheetDialog
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicBottomSheetDialog
@@ -761,7 +760,7 @@ import kotlinx.coroutines.withContext
                 showMoreOptionsDialog()
             }
             dataBidingView.buttonEqualizer.setOnClickListener {
-                openEqualizerFragment()
+                openEqualizerActivity()
             }
             dataBidingView.buttonRescanDevice.setOnClickListener {
                 openMediaScannerActivity()
@@ -801,8 +800,10 @@ import kotlinx.coroutines.withContext
     private fun openMediaScannerActivity() {
         startActivity(Intent(context, MediaScannerSettingsActivity::class.java).apply {})
     }
-    private fun openEqualizerFragment() {
-        //
+    private fun openEqualizerActivity() {
+        startActivity(Intent(context, EqualizerActivity::class.java).apply {
+
+        })
     }
     private fun showMoreOptionsDialog() {
         if(!mPlayerMoreBottomSheetDialog.isVisible) {
