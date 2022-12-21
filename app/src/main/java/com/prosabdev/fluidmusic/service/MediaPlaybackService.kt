@@ -379,4 +379,55 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         Log.i(ConstantValues.TAG, "allowBrowsing clientPackageName = $clientPackageName, clientUid = $clientUid")
         return result
     }
+
+    companion object {
+        val TAG: String = MediaPlaybackService::class.java.simpleName
+        const val MUSIC_PACKAGE_NAME = "com.android.music"
+        const val ACTION_TOGGLE_PAUSE = "${ConstantValues.PACKAGE_NAME}.ACTION_TOGGLE_PAUSE"
+        const val ACTION_PLAY = "${ConstantValues.PACKAGE_NAME}.ACTION_PLAY"
+        const val ACTION_PLAY_PLAYLIST = "${ConstantValues.PACKAGE_NAME}.ACTION_PLAY_PLAYLIST"
+        const val ACTION_PAUSE = "${ConstantValues.PACKAGE_NAME}.ACTION_PAUSE"
+        const val ACTION_STOP = "${ConstantValues.PACKAGE_NAME}.ACTION_STOP"
+        const val ACTION_SKIP = "${ConstantValues.PACKAGE_NAME}.ACTION_SKIP"
+        const val ACTION_REWIND = "${ConstantValues.PACKAGE_NAME}.ACTION_REWIND"
+        const val ACTION_QUIT = "${ConstantValues.PACKAGE_NAME}.ACTION_QUIT"
+        const val ACTION_PENDING_QUIT = "${ConstantValues.PACKAGE_NAME}.ACTION_PENDING_QUIT"
+        const val INTENT_EXTRA_PLAYLIST = "${ConstantValues.PACKAGE_NAME}.INTENT_EXTRA_PLAYLIST"
+        const val INTENT_EXTRA_SHUFFLE_MODE =
+            "${ConstantValues.PACKAGE_NAME}.INTENT_EXTRA_SHUFFLE_MODE"
+        const val APP_WIDGET_UPDATE = "${ConstantValues.PACKAGE_NAME}.APP_WIDGET_UPDATE"
+        const val EXTRA_APP_WIDGET_NAME = "${ConstantValues.PACKAGE_NAME}.EXTRA_APP_WIDGET_NAME"
+
+        // Do not change these three strings as it will break support with other apps (e.g. last.fm
+        // scrobbling)
+        const val META_CHANGED = "${ConstantValues.PACKAGE_NAME}.META_CHANGED"
+        const val QUEUE_CHANGED = "${ConstantValues.PACKAGE_NAME}.QUEUE_CHANGED"
+        const val PLAY_STATE_CHANGED = "${ConstantValues.PACKAGE_NAME}.PLAY_STATE_CHANGED"
+        const val FAVORITE_STATE_CHANGED = "${ConstantValues.PACKAGE_NAME}.FAVORITE_STATE_CHANGED"
+        const val REPEAT_MODE_CHANGED = "${ConstantValues.PACKAGE_NAME}.REPEAT_MODE_CHANGED"
+        const val SHUFFLE_MODE_CHANGED = "${ConstantValues.PACKAGE_NAME}.SHUFFLE_MODE_CHANGED"
+        const val MEDIA_STORE_CHANGED = "${ConstantValues.PACKAGE_NAME}.MEDIA_STORE_CHANGED"
+        const val CYCLE_REPEAT = "${ConstantValues.PACKAGE_NAME}.CYCLE_REPEAT"
+        const val TOGGLE_SHUFFLE = "${ConstantValues.PACKAGE_NAME}.TOGGLE_SHUFFLE"
+        const val TOGGLE_FAVORITE = "${ConstantValues.PACKAGE_NAME}.TOGGLE_FAVORITE"
+        const val SAVED_POSITION = "SAVED_POSITION"
+        const val SAVED_POSITION_IN_TRACK = "SAVED_POSITION_IN_TRACK"
+        const val SAVED_SHUFFLE_MODE = "SAVED_SHUFFLE_MODE"
+        const val SAVED_REPEAT_MODE = "SAVED_REPEAT_MODE"
+
+        private const val MEDIA_SESSION_ACTIONS = (
+                PlaybackStateCompat.ACTION_PLAY
+                or PlaybackStateCompat.ACTION_PAUSE
+                or PlaybackStateCompat.ACTION_PLAY_PAUSE
+                or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                or PlaybackStateCompat.ACTION_STOP
+                or PlaybackStateCompat.ACTION_SEEK_TO
+
+                or PlaybackStateCompat.ACTION_PLAY_FROM_URI
+                or PlaybackStateCompat.ACTION_SET_PLAYBACK_SPEED
+                or PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE
+                or PlaybackStateCompat.ACTION_SET_REPEAT_MODE
+                )
+    }
 }

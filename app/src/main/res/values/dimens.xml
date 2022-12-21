@@ -7,8 +7,8 @@
     <dimen name="margin_small_size">5dp</dimen>
     <dimen name="margin_medium_size">10dp</dimen>
     <dimen name="margin_large_size">15dp</dimen>
-    <dimen name="margin_very_large_size">20dp</dimen>
-    <dimen name="margin_very_very_large_size">25dp</dimen>
+    <dimen name="margin_extra_large_size">20dp</dimen>
+    <dimen name="margin_extra_extra_large_size">25dp</dimen>
 
     <dimen name="corner_radius_circle">100dp</dimen>
 

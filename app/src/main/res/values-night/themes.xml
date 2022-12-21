@@ -19,6 +19,7 @@
         <item name="cardBackgroundColor">@color/semiBlack</item>
     </style>
 
+
     <style name="MainTheme" parent="BaseThemeDark">
         <item name="colorPrimary">@color/white</item>
         <item name="colorOnPrimary">#131313</item>
@@ -69,17 +70,17 @@
         <item name="colorOnBackground">@color/white</item>
         <item name="colorSurface">@color/black</item>
         <item name="colorOnSurface">@color/white</item>
-        <item name="colorSurfaceVariant">#801C1C1C</item>
+        <item name="colorSurfaceVariant">#1C1C1C</item>
         <item name="colorOnSurfaceVariant">@color/white</item>
         <item name="colorSurfaceInverse">#E6E6E6</item>
         <item name="colorOnSurfaceInverse">#353535</item>
         <item name="colorPrimaryInverse">#B8B8B8</item>
 
         <item name="android:textColorHighlight">@color/white</item>
-
         <item name="android:textColor">@color/white</item>
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorSecondary">@color/white</item>
+
     </style>
 
     <style name="Gold" parent="BaseThemeDark">

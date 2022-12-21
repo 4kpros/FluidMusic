@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.prosabdev.fluidmusic.models.FolderUriTree
+import com.prosabdev.fluidmusic.models.equalizer.EqualizerPresetBandLevelItem
+import com.prosabdev.fluidmusic.models.equalizer.EqualizerPresetItem
 import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
 import com.prosabdev.fluidmusic.models.queuemusic.QueueMusicItem
@@ -12,6 +14,8 @@ import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.models.view.*
 import com.prosabdev.fluidmusic.roomdatabase.dao.FolderUriTreeDao
 import com.prosabdev.fluidmusic.roomdatabase.dao.SongItemDao
+import com.prosabdev.fluidmusic.roomdatabase.dao.equalizer.EqualizerPresetBandLevelItemDao
+import com.prosabdev.fluidmusic.roomdatabase.dao.equalizer.EqualizerPresetItemDao
 import com.prosabdev.fluidmusic.roomdatabase.dao.explore.*
 import com.prosabdev.fluidmusic.roomdatabase.dao.playlist.PlaylistItemDao
 import com.prosabdev.fluidmusic.roomdatabase.dao.playlist.PlaylistSongItemDao
@@ -25,6 +29,8 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
         QueueMusicItem::class,
         PlaylistItem::class,
         PlaylistSongItem::class,
+        EqualizerPresetItem::class,
+        EqualizerPresetBandLevelItem::class,
                ],
     views = [
         AlbumArtistItem::class,
@@ -35,7 +41,7 @@ import com.prosabdev.fluidmusic.utils.ConstantValues
         GenreItem::class,
         YearItem::class,
            ],
-    version = 88)
+    version = 90)
 
 abstract class AppDatabase : RoomDatabase() {
 
@@ -43,6 +49,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun playlistItemDao(): PlaylistItemDao
     abstract fun playlistSongItemDao(): PlaylistSongItemDao
     abstract fun queueMusicItemDao(): QueueMusicItemDao
+    abstract fun equalizerPresetItemDao(): EqualizerPresetItemDao
+    abstract fun equalizerPresetBandLevelItemDao(): EqualizerPresetBandLevelItemDao
 
     abstract fun albumArtistItemDao(): AlbumArtistItemDao
     abstract fun albumItemDao(): AlbumItemDao

@@ -149,39 +149,72 @@ class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private fun updateTitleUI() {
         when (mFromSource) {
             AllSongsFragment.TAG -> {
-                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.all_songs) ?: ""
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                    R.string._sort_for,
+                    context?.resources?.getString(R.string.all_songs) ?: ""
+                ) ?: ""
             }
             ExploreContentsForFragment.TAG -> {
                 when (mFromSourceValue) {
                     AlbumsFragment.TAG -> {
-                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.songs_for_album) ?: ""
+                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                            R.string._sort_for,
+                            context?.resources?.getString(R.string.songs_for_album) ?: ""
+                        ) ?: ""
                     }
                     AlbumArtistsFragment.TAG -> {
-                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.songs_for_album_artist) ?: ""
+                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                            R.string._sort_for,
+                            context?.resources?.getString(R.string.songs_for_album_artist) ?: ""
+                        ) ?: ""
                     }
                     ArtistsFragment.TAG -> {
-                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.songs_for_artist) ?: ""
+                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                            R.string._sort_for,
+                            context?.resources?.getString(R.string.songs_for_artist) ?: ""
+                        ) ?: ""
                     }
                     ComposersFragment.TAG -> {
-                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.songs_for_composer) ?: ""
+                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                            R.string._sort_for,
+                            context?.resources?.getString(R.string.songs_for_composer) ?: ""
+                        ) ?: ""
                     }
                     FoldersFragment.TAG -> {
-                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.songs_for_folder) ?: ""
+                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                            R.string._sort_for,
+                            context?.resources?.getString(R.string.songs_for_folder) ?: ""
+                        ) ?: ""
                     }
                     GenresFragment.TAG -> {
-                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.songs_for_genre) ?: ""
+                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                            R.string._sort_for,
+                            context?.resources?.getString(R.string.songs_for_genre) ?: ""
+                        ) ?: ""
                     }
                     YearsFragment.TAG -> {
-                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.songs_for_year) ?: ""
+                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                            R.string._sort_for,
+                            context?.resources?.getString(R.string.songs_for_year) ?: ""
+                        ) ?: ""
                     }
                     PlaylistsFragment.TAG -> {
-                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.songs_for_playlist) ?: ""
+                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                            R.string._sort_for,
+                            context?.resources?.getString(R.string.songs_for_playlist) ?: ""
+                        ) ?: ""
                     }
 //                    FavoritesFragment.TAG -> {
-//                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.songs_for_favorites) ?: ""
+//                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+//                            R.string._sort_for,
+//                            context?.resources?.getString(R.string.songs_for_favorites) ?: ""
+//                        ) ?: ""
 //                    }
                     StreamsFragment.TAG -> {
-                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.songs_for_stream) ?: ""
+                        mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                            R.string._sort_for,
+                            context?.resources?.getString(R.string.songs_for_stream) ?: ""
+                        ) ?: ""
                     }
                 }
             }

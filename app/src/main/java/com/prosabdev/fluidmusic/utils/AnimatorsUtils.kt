@@ -114,7 +114,8 @@ abstract class AnimatorsUtils {
         fun crossFadeUpClickable(
             contentView: View, animate: Boolean = false,
             duration: Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime),
-            maxAlpha: Float = 1.0f
+            maxAlpha: Float = 1.0f,
+            enableView: Boolean = true
         ) {
             MainScope().launch {
                 contentView.clearAnimation()
@@ -126,11 +127,17 @@ abstract class AnimatorsUtils {
                             .setDuration(duration.toLong())
                             .setListener(object : AnimatorListenerAdapter() {
                                 override fun onAnimationEnd(animation: Animator) {
+                                    if(enableView){
+                                        contentView.isEnabled = true
+                                    }
                                     contentView.isClickable = true
                                 }
                             })
                     }
                 }else{
+                    if(enableView){
+                        contentView.isEnabled = true
+                    }
                     contentView.isClickable = true
                     contentView.alpha = maxAlpha
                 }
@@ -140,7 +147,8 @@ abstract class AnimatorsUtils {
             contentView : View,
             animate : Boolean = true,
             duration : Int = contentView.resources.getInteger(android.R.integer.config_shortAnimTime),
-            minAlpha: Float = 0.35f
+            minAlpha: Float = 0.35f,
+            enableView: Boolean = true
         ) {
             MainScope().launch {
                 contentView.clearAnimation()
@@ -151,9 +159,18 @@ abstract class AnimatorsUtils {
                             .alpha(minAlpha)
                             .setInterpolator(AccelerateDecelerateInterpolator())
                             .setDuration(duration.toLong())
-                            .setListener(null)
+                            .setListener(object : AnimatorListenerAdapter() {
+                                override fun onAnimationEnd(animation: Animator) {
+                                    if(enableView){
+                                        contentView.isEnabled = false
+                                    }
+                                }
+                            })
                     }
                 }else{
+                    if(enableView){
+                        contentView.isEnabled = false
+                    }
                     contentView.isClickable = false
                     contentView.alpha = minAlpha
                 }

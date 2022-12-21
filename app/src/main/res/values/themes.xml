@@ -8,6 +8,8 @@
         <item name="android:windowContentTransitions">true</item>
 
         <item name="android:fontFamily">@font/roboto_bold</item>
+
+        <item name="spinnerStyle">@style/Widget.MyApp.Spinner</item>
     </style>
     <style name="BaseThemeLight" parent="BaseTheme">
         <item name="android:statusBarColor">@color/semiBlack</item>
@@ -44,14 +46,36 @@
         <item name="strokeWidth">0dp</item>
         <item name="cardBackgroundColor">@color/semiWhite</item>
     </style>
+<!--    Spinner theme-->
+    <style name="Widget.MyApp.Spinner" parent="Widget.Material3.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu">
+    </style>
+    <style name="Theme.MyApp.Spinner.ThemeOverlay" parent="">
+        <item name="autoCompleteTextViewStyle">@style/Widget.MyApp.Spinner.ThemeOverlay.AutoCompleteTextView</item>
+        <item name="colorSurface">?colorSurface</item>
+        <item name="colorOnSurface">?colorOnSurface</item>
+    </style>
+    <style name="Widget.MyApp.Spinner.ThemeOverlay.AutoCompleteTextView" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:background">@null</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textColor">?colorPrimary</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+    <!-- Material spinner 'item' layout style -->
+    <style name="Widget.MyApp.SpinnerItem" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">?colorPrimary</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:padding">16dp</item>
+    </style>
 
 
     <style name="MainTheme" parent="BaseThemeLight">
         <item name="colorPrimary">@color/black</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
-        <item name="colorPrimaryContainer">#FFFFFF</item>
-        <item name="colorOnPrimaryContainer">#000000</item>
-        <item name="colorSecondary">#000000</item>
+        <item name="colorPrimaryContainer">@color/white</item>
+        <item name="colorOnPrimaryContainer">@color/black</item>
+        <item name="colorSecondary">@color/black</item>
         <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
         <item name="colorSecondaryContainer">#DFDFDF</item>
         <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
@@ -84,28 +108,28 @@
 
     <style name="JustDark" parent="BaseThemeLight">
         <item name="colorPrimary">@color/black</item>
-        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
-        <item name="colorPrimaryContainer">#FFFFFF</item>
-        <item name="colorOnPrimaryContainer">#000000</item>
-        <item name="colorSecondary">#000000</item>
-        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/white</item>
+        <item name="colorOnPrimaryContainer">@color/black</item>
+        <item name="colorSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/white</item>
         <item name="colorSecondaryContainer">#DFDFDF</item>
-        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/black</item>
         <item name="colorOutline">#858585</item>
-        <item name="android:colorBackground">@color/md_theme_light_background</item>
-        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
-        <item name="colorSurface">@color/md_theme_light_surface</item>
-        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="android:colorBackground">@color/white</item>
+        <item name="colorOnBackground">@color/black</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">#202020</item>
         <item name="colorSurfaceVariant">#EFEFEF</item>
-        <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
-        <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
+        <item name="colorOnSurfaceVariant">#4A4A4A</item>
+        <item name="colorSurfaceInverse">#303030</item>
         <item name="colorOnSurfaceInverse">#F4F4F4</item>
         <item name="colorPrimaryInverse">#CFCFCF</item>
 
         <item name="android:textColorHighlight">#4D000000</item>
         <item name="android:textColor">@color/black</item>
-        <item name="android:textColorPrimary">#000000</item>
-        <item name="android:textColorSecondary">#000000</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@color/black</item>
     </style>
 
     <style name="AppTheme" parent="BaseThemeLight">

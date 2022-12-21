@@ -11,6 +11,37 @@ import kotlin.math.floor
 
 abstract class FormattersAndParsersUtils {
     companion object {
+        fun formatBandLevelToString(bandLevel: Short): String {
+            val tempValue = bandLevel/100
+            return if(tempValue > 0) "+${tempValue}dB" else "${tempValue}dB"
+        }
+        fun formatCenterFreqToString(centerFreq: Int): String {
+            val tempFormat = centerFreq / 1000.0f
+            val intPart: Int = tempFormat.toInt()
+            val decimalPart: Float = tempFormat - intPart
+            return if(tempFormat >= 1000){
+                formatCenterFreqToString(tempFormat)
+            }else{
+                "${if(decimalPart > 0.0f) tempFormat else intPart}Hz"
+            }
+        }
+        private fun formatCenterFreqToString(centerFreq: Float): String {
+            val tempFormat = centerFreq / 1000.0f
+            val intPart: Int = tempFormat.toInt()
+            val decimalPart: Float = tempFormat - intPart
+            return "${if(decimalPart > 0.0f) tempFormat else intPart}Hz"
+        }
+        fun formatPercentToBandFreq(progressLevel: Int, minBandLevelRange: Short, maxBandLevelRange: Short): Short {
+            val newMaxFreq = maxBandLevelRange + (minBandLevelRange * -1)
+            val tempCurrentConvertedFreq = progressLevel * newMaxFreq / 100
+            return (tempCurrentConvertedFreq - (minBandLevelRange * -1)).toShort()
+        }
+        fun formatBandToPercent(bandLevel: Short, minBandLevelRange: Short, maxBandLevelRange: Short): Int {
+            val newCurrentFreq = bandLevel + (minBandLevelRange * -1)
+            val newMaxFreq = maxBandLevelRange + (minBandLevelRange * -1)
+            return if (newMaxFreq > newCurrentFreq) newCurrentFreq * 100 / newMaxFreq else 100
+        }
+
         fun getSpecificWidthSizeForListType(ctx: Context, organizeListGrid: Int): Int {
             var dimen: Int = 0
             dimen =
@@ -40,7 +71,7 @@ abstract class FormattersAndParsersUtils {
         }
         //Return duration to formatted string
         fun formatSongDurationToSliderProgress(currentDuration: Long, totalDuration: Long): Float {
-            return if (totalDuration > currentDuration) currentDuration * 100.0f / totalDuration else 0.0f
+            return if (totalDuration > currentDuration) currentDuration * 100.0f / totalDuration else 100.0f
         }
         fun formatSliderProgressToLongDuration(sliderProgress : Int, totalDuration: Long) : Long{
             val tempProgress: Long = sliderProgress * totalDuration / 100

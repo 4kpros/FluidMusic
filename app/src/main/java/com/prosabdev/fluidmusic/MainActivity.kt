@@ -131,24 +131,21 @@ import kotlinx.coroutines.launch
     public override fun onResume() {
         super.onResume()
         setupAudioSettings()
-        ImageLoadersUtils.initializeJobWorker(applicationContext)
     }
 
     override fun onPause() {
         super.onPause()
-        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
     }
 
     public override fun onStop() {
         super.onStop()
         MediaControllerCompat.getMediaController(this)?.unregisterCallback(mControllerCallback)
         mMediaBrowser?.disconnect()
-        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
+        super.onDestroy()
     }
 
     companion object {
