@@ -3,8 +3,6 @@ package com.prosabdev.fluidmusic.ui.custom.visualizer
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import com.prosabdev.fluidmusic.ui.custom.visualizer.FFTAudioProcessor
-import com.prosabdev.fluidmusic.ui.custom.visualizer.FFTBandView
 
 /**
  * The visualizer is a view which listens to the FFT changes and forwards it to the band view.

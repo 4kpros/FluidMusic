@@ -11,7 +11,6 @@ import com.google.android.material.transition.platform.MaterialArcMotion
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityLanguageSettingsBinding
-import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 
 @BuildCompat.PrereleaseSdkCheck class LanguageSettingsActivity : AppCompatActivity() {
 
@@ -69,8 +68,8 @@ import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
     }
 
     private fun initViews() {
-        InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorSettingsActivity)
-        InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.emptyView)
+        com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorSettingsActivity)
+        com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.emptyView)
     }
 
     companion object {

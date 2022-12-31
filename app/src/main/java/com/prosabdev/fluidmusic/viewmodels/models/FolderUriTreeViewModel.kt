@@ -3,8 +3,8 @@ package com.prosabdev.fluidmusic.viewmodels.models
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.roomdatabase.repositories.FolderUriTreeRepository
+import com.prosabdev.common.models.FolderUriTree
+import com.prosabdev.common.roomdatabase.repositories.FolderUriTreeRepository
 
 class FolderUriTreeViewModel(app: Application) : AndroidViewModel(app) {
 

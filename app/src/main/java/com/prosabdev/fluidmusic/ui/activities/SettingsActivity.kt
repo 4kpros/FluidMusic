@@ -14,7 +14,6 @@ import com.prosabdev.fluidmusic.databinding.ActivitySettingsBinding
 import com.prosabdev.fluidmusic.ui.activities.settings.InterfaceSettingsActivity
 import com.prosabdev.fluidmusic.ui.activities.settings.LanguageSettingsActivity
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
-import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 
 @BuildCompat.PrereleaseSdkCheck class SettingsActivity : AppCompatActivity() {
 
@@ -93,8 +92,8 @@ import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
     }
 
     private fun initViews() {
-        InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
-        InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.container)
+        com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
+        com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.container)
     }
 
     companion object {

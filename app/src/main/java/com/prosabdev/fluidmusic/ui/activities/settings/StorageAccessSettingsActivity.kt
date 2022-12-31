@@ -24,10 +24,6 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.FolderUriTreeAdapter
 import com.prosabdev.fluidmusic.databinding.ActivityStorageAccessSettingsBinding
-import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.FormattersAndParsersUtils
-import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 import com.prosabdev.fluidmusic.viewmodels.activities.StorageAccessActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
 import kotlinx.coroutines.Dispatchers
@@ -109,9 +105,9 @@ import kotlinx.coroutines.withContext
         }
     }
 
-    private fun updateFolderUriTreesUI(folderUriTrees: List<FolderUriTree>) {
+    private fun updateFolderUriTreesUI(folderUriTrees: List<com.prosabdev.common.models.FolderUriTree>) {
         MainScope().launch {
-            Log.i(ConstantValues.TAG, "Add URI : ${folderUriTrees.size}")
+            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Add URI : ${folderUriTrees.size}")
             mFolderUriTreeAdapter?.submitList(folderUriTrees)
             mDataBidingView.foldersCounter = folderUriTrees.size
         }
@@ -179,8 +175,8 @@ import kotlinx.coroutines.withContext
     }
 
     private fun initViews() {
-        InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
-        InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.container)
+        com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
+        com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.container)
     }
 
     private var treeUri: String?
@@ -198,11 +194,11 @@ import kotlinx.coroutines.withContext
             this.contentResolver.takePersistableUriPermission(uri, takeFlags)
 
             MainScope().launch {
-                addToFolderList(FormattersAndParsersUtils.formatAndReturnFolderUriSAF(this@StorageAccessSettingsActivity, uri))
+                addToFolderList(com.prosabdev.common.utils.FormattersAndParsersUtils.formatAndReturnFolderUriSAF(this@StorageAccessSettingsActivity, uri))
             }
         }
     }
-    private suspend fun addToFolderList(it: FolderUriTree?) {
+    private suspend fun addToFolderList(it: com.prosabdev.common.models.FolderUriTree?) {
         if(!isFolderSAFExist(it)){
             if(it != null){
                 withContext(Dispatchers.IO){
@@ -216,11 +212,11 @@ import kotlinx.coroutines.withContext
         }
     }
 
-    private fun isFolderSAFExist(folderUriTree : FolderUriTree?): Boolean {
+    private fun isFolderSAFExist(folderUriTree : com.prosabdev.common.models.FolderUriTree?): Boolean {
         if((mFolderUriTreeAdapter?.currentList?.size ?: 0) > 0 && folderUriTree != null){
             val listSize : Int = mFolderUriTreeAdapter?.currentList?.size ?: 0
             for(i in listSize - 1 downTo  0){
-                val tempData : FolderUriTree? = mFolderUriTreeAdapter?.currentList?.get(i)
+                val tempData : com.prosabdev.common.models.FolderUriTree? = mFolderUriTreeAdapter?.currentList?.get(i)
                 if(tempData != null){
                     if(
                         tempData.normalizeScheme.toString() == folderUriTree.normalizeScheme.toString() ||
@@ -244,7 +240,7 @@ import kotlinx.coroutines.withContext
         }
         return false
     }
-    private fun removeFolderUriTree(folderUriTree: FolderUriTree?) {
+    private fun removeFolderUriTree(folderUriTree: com.prosabdev.common.models.FolderUriTree?) {
         lifecycleScope.launch(Dispatchers.IO){
             mFolderUriTreeViewModel.delete(folderUriTree)
         }

@@ -21,19 +21,16 @@ import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
 import com.prosabdev.fluidmusic.ui.activities.EditTagsActivity
 import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
-import com.prosabdev.fluidmusic.utils.AnimatorsUtils
-import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.NowPlayingFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.workers.QueueMusicActionsWorkerViewModel
 import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
-import com.prosabdev.fluidmusic.workers.queuemusic.AddSongsToQueueMusicWorker
 
 @BuildCompat.PrereleaseSdkCheck class MusicLibraryFragment : Fragment() {
     private var mDataBidingView: FragmentMusicLibraryBinding? = null
 
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
-    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
+    private val mNowPlayingFragmentViewModel: NowPlayingFragmentViewModel by activityViewModels()
 
     private val mQueueMusicActionsWorkerViewModel: QueueMusicActionsWorkerViewModel by activityViewModels()
     private val mSongActionsWorkerViewModel: SongActionsWorkerViewModel by activityViewModels()
@@ -139,12 +136,12 @@ import com.prosabdev.fluidmusic.workers.queuemusic.AddSongsToQueueMusicWorker
     }
     private fun showSideContentSelectionMenu(animate: Boolean = true) {
         mDataBidingView?.let { dataBidingView ->
-            AnimatorsUtils.crossFadeUp(
+            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUp(
                 dataBidingView.includeSideSelectionMenu.relativeContainer as View,
                 animate,
                 50
             )
-            AnimatorsUtils.crossFadeUp(
+            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUp(
                 dataBidingView.includeSideSelectionMenu.cardViewContainer as View,
                 animate,
                 200
@@ -153,12 +150,12 @@ import com.prosabdev.fluidmusic.workers.queuemusic.AddSongsToQueueMusicWorker
     }
     private fun hideSideContentSelectionMenu(animate: Boolean = true) {
         mDataBidingView?.let { dataBidingView ->
-            AnimatorsUtils.crossFadeDown(
+            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDown(
                 dataBidingView.includeSideSelectionMenu.relativeContainer as View,
                 animate,
                 25
             )
-            AnimatorsUtils.crossFadeDown(
+            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDown(
                 dataBidingView.includeSideSelectionMenu.cardViewContainer as View,
                 animate,
                 100
@@ -183,13 +180,13 @@ import com.prosabdev.fluidmusic.workers.queuemusic.AddSongsToQueueMusicWorker
         }
     }
     private fun disableSideSelectionActions(view : View) {
-        AnimatorsUtils.crossFadeDownClickable(
+        com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
             view,
             true
         )
     }
     private fun enableSideSelectionActions(view : View) {
-        AnimatorsUtils.crossFadeUpClickable(
+        com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
             view,
             true
         )
@@ -199,14 +196,14 @@ import com.prosabdev.fluidmusic.workers.queuemusic.AddSongsToQueueMusicWorker
         mDataBidingView?.let { dataBidingView ->
             if (isSelectMode) {
                 dataBidingView.viewPager.isUserInputEnabled = false
-                AnimatorsUtils.crossTranslateInFromHorizontal(
+                com.prosabdev.common.utils.AnimatorsUtils.crossTranslateInFromHorizontal(
                     dataBidingView.sideSelectionMenuContainer as View,
                     animate,
                     200
                 )
             } else {
                 dataBidingView.viewPager.isUserInputEnabled = true
-                AnimatorsUtils.crossTranslateOutFromHorizontal(
+                com.prosabdev.common.utils.AnimatorsUtils.crossTranslateOutFromHorizontal(
                     dataBidingView.sideSelectionMenuContainer as View,
                     1,
                     animate,
@@ -366,7 +363,7 @@ import com.prosabdev.fluidmusic.workers.queuemusic.AddSongsToQueueMusicWorker
         val dataList = mMainFragmentViewModel.getSelectedDataList().value ?: return
         mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
             modelTypeInfo[0],
-            AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_BOTTOM,
+            com.prosabdev.common.workers.queuemusic.AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_BOTTOM,
             -1,
             dataList.values,
             modelTypeInfo[1],
@@ -377,10 +374,10 @@ import com.prosabdev.fluidmusic.workers.queuemusic.AddSongsToQueueMusicWorker
     private fun addSelectionToPlayNextOfQueueMusic() {
         val modelTypeInfo = CommonPlaybackAction.getModelTypeInfo(mMainFragmentViewModel)
         val dataList = mMainFragmentViewModel.getSelectedDataList().value ?: return
-        val currentPlayingPosition = mPlayerFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
+        val currentPlayingPosition = mNowPlayingFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
         mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
             modelTypeInfo[0],
-            AddSongsToQueueMusicWorker.ADD_METHOD_ADD_AT_POSITION,
+            com.prosabdev.common.workers.queuemusic.AddSongsToQueueMusicWorker.ADD_METHOD_ADD_AT_POSITION,
             currentPlayingPosition,
             dataList.values,
             modelTypeInfo[1],
@@ -393,7 +390,7 @@ import com.prosabdev.fluidmusic.workers.queuemusic.AddSongsToQueueMusicWorker
         val dataList = mMainFragmentViewModel.getSelectedDataList().value ?: return
         mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
             modelTypeInfo[0],
-            AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_TOP,
+            com.prosabdev.common.workers.queuemusic.AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_TOP,
             0,
             dataList.values,
             modelTypeInfo[1],
@@ -434,7 +431,7 @@ import com.prosabdev.fluidmusic.workers.queuemusic.AddSongsToQueueMusicWorker
 
     private fun initViews() {
         mDataBidingView?.let { dataBidingView ->
-            InsetModifiersUtils.updateTopViewInsets(dataBidingView.coordinatorLayout)
+            com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(dataBidingView.coordinatorLayout)
         }
     }
 

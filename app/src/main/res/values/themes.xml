@@ -8,8 +8,6 @@
         <item name="android:windowContentTransitions">true</item>
 
         <item name="android:fontFamily">@font/roboto_bold</item>
-
-        <item name="spinnerStyle">@style/Widget.MyApp.Spinner</item>
     </style>
     <style name="BaseThemeLight" parent="BaseTheme">
         <item name="android:statusBarColor">@color/semiBlack</item>
@@ -46,27 +44,23 @@
         <item name="strokeWidth">0dp</item>
         <item name="cardBackgroundColor">@color/semiWhite</item>
     </style>
-<!--    Spinner theme-->
-    <style name="Widget.MyApp.Spinner" parent="Widget.Material3.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu">
-    </style>
-    <style name="Theme.MyApp.Spinner.ThemeOverlay" parent="">
-        <item name="autoCompleteTextViewStyle">@style/Widget.MyApp.Spinner.ThemeOverlay.AutoCompleteTextView</item>
-        <item name="colorSurface">?colorSurface</item>
-        <item name="colorOnSurface">?colorOnSurface</item>
-    </style>
-    <style name="Widget.MyApp.Spinner.ThemeOverlay.AutoCompleteTextView" parent="Widget.AppCompat.AutoCompleteTextView">
-        <item name="android:background">@null</item>
-        <item name="android:padding">16dp</item>
-        <item name="android:textColor">?colorPrimary</item>
-        <item name="android:textSize">20sp</item>
-    </style>
-    <!-- Material spinner 'item' layout style -->
-    <style name="Widget.MyApp.SpinnerItem" parent="Widget.AppCompat.TextView">
-        <item name="android:textColor">?colorPrimary</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:ellipsize">end</item>
-        <item name="android:maxLines">1</item>
-        <item name="android:padding">16dp</item>
+    <style name="CustomCircularProgress">
+        <item name="cs_circle_fill">@color/transparent</item>
+        <item name="cs_circle_color">?colorSurfaceVariant</item>
+        <item name="cs_circle_progress_color">?colorPrimary</item>
+        <item name="cs_start_angle">145</item>
+        <item name="cs_end_angle">35</item>
+        <item name="cs_negative_enabled">false</item>
+        <item name="cs_circle_stroke_width">2dp</item>
+        <item name="cs_pointer_stroke_width">14dp</item>
+
+        <item name="cs_move_outside_circle">true</item>
+        <item name="cs_disable_pointer">false</item>
+        <item name="cs_disable_progress_glow">true</item>
+        <item name="cs_hide_progress_when_empty">false</item>
+        <item name="cs_pointer_color">?colorPrimary</item>
+        <item name="cs_pointer_halo_color">@color/transparent</item>
+        <item name="cs_pointer_halo_color_ontouch">@color/transparent</item>
     </style>
 
 

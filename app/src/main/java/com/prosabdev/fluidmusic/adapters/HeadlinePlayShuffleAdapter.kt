@@ -4,9 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.prosabdev.common.utils.AnimatorsUtils
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemHeadlinePlayShuffleBinding
-import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 
 class HeadlinePlayShuffleAdapter(
     private val mHeadLines: ArrayList<Int>,

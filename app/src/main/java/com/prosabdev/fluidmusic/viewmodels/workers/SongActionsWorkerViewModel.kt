@@ -4,8 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.work.*
-import com.prosabdev.fluidmusic.workers.WorkerConstantValues
-import com.prosabdev.fluidmusic.workers.delete.DeleteSongsWorker
+import com.prosabdev.common.workers.WorkerConstantValues
+import com.prosabdev.common.workers.delete.DeleteSongsWorker
 
 class SongActionsWorkerViewModel(app: Application) : AndroidViewModel(app) {
     private val outputWorkInfoItems : LiveData<List<WorkInfo>>

@@ -4,15 +4,18 @@ import android.app.Application
 import android.content.Context
 import android.media.MediaPlayer
 import android.media.audiofx.Equalizer
+import android.os.Handler
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.*
+import com.google.android.exoplayer2.DefaultRenderersFactory
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Renderer
+import com.google.android.exoplayer2.audio.*
+import com.google.android.exoplayer2.mediacodec.MediaCodecSelector
+import com.prosabdev.common.models.equalizer.EqualizerPresetItem
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.models.equalizer.EqualizerPresetItem
-import com.prosabdev.fluidmusic.ui.activities.EqualizerActivity
+import com.prosabdev.fluidmusic.ui.custom.visualizer.ExoVisualizer
+import com.prosabdev.fluidmusic.ui.custom.visualizer.FFTAudioProcessor
 import com.prosabdev.fluidmusic.viewmodels.models.equalizer.EqualizerPresetBandLevelItemViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.equalizer.EqualizerPresetItemViewModel
 import kotlinx.coroutines.MainScope
@@ -28,12 +31,14 @@ class EqualizerActivityViewModel(app: Application) : AndroidViewModel(app)  {
     private val mMutableToneState = MutableLiveData<Boolean>(null)
     private val mMutableBassBoostProgress = MutableLiveData<Int>(null)
     private val mMutableVisualizerProgress = MutableLiveData<Int>(null)
+    private val mMutableVolumeProgress = MutableLiveData<Int>(null)
 
     //Equalizer bands
     private val mEqualizerState: LiveData<Boolean> get() = mMutableEqualizerState
     private val mCurrentPreset: LiveData<CharSequence?> get() = mMutableCurrentPreset
     private val mPresetBandsLevels: LiveData<Array<Short>?> get() = mMutablePresetBandsLevels
     private val mCustomPresets: MutableLiveData<List<EqualizerPresetItem>?> get() = mMutableCustomPresets
+    private val mVolumeProgress: LiveData<Int> get() = mMutableVolumeProgress
     //Tone
     private val mToneState: LiveData<Boolean> get() = mMutableToneState
     private val mBassBoostProgress: LiveData<Int> get() = mMutableBassBoostProgress
@@ -42,19 +47,68 @@ class EqualizerActivityViewModel(app: Application) : AndroidViewModel(app)  {
     //On time assign variables
     private var mLocalMediaPlayer: MediaPlayer? = null
     private var mEqualizer: Equalizer? = null
-    private var mPresets: Array<CharSequence>? = null
+    private val mFftAudioProcessor = FFTAudioProcessor()
+    private var mRenderersFactory: DefaultRenderersFactory? = null
 
-    fun initSilentEqualizer(ctx: Context) {
+    fun initSilentEqualizer(ctx: Context, visualizerView: ExoVisualizer) {
+        initFFTransform(ctx)
         try {
-            mLocalMediaPlayer = MediaPlayer.create(ctx, R.raw.monaldin_hold_me)
-            mLocalMediaPlayer?.let { mPlayer ->
-                mPlayer.start()
-                mEqualizer = Equalizer(0, mPlayer.audioSessionId)
+            mRenderersFactory?.let { renderersFactory ->
+                val player = ExoPlayer.Builder(ctx, renderersFactory)
+                    .build()
+                visualizerView.processor = mFftAudioProcessor
+
+                mLocalMediaPlayer = MediaPlayer.create(ctx, R.raw.sample_96khz_24bit)
+                mLocalMediaPlayer?.let { mPlayer ->
+                    mPlayer.start()
+                    mEqualizer = Equalizer(0, mPlayer.audioSessionId)
+                }
             }
         }catch (error: Throwable){
             error.printStackTrace()
         }
     }
+
+    private fun initFFTransform(ctx: Context) {
+        mRenderersFactory = object : DefaultRenderersFactory(ctx) {
+            override fun buildAudioRenderers(
+                context: Context,
+                extensionRendererMode: Int,
+                mediaCodecSelector: MediaCodecSelector,
+                enableDecoderFallback: Boolean,
+                audioSink: AudioSink,
+                eventHandler: Handler,
+                eventListener: AudioRendererEventListener,
+                out: ArrayList<Renderer>
+            ) {
+                out.add(
+                    MediaCodecAudioRenderer(
+                        context,
+                        mediaCodecSelector,
+                        enableDecoderFallback,
+                        eventHandler,
+                        eventListener,
+                        DefaultAudioSink(
+                            AudioCapabilities.getCapabilities(context),
+                            arrayOf(mFftAudioProcessor)
+                        )
+                    )
+                )
+
+                super.buildAudioRenderers(
+                    context,
+                    extensionRendererMode,
+                    mediaCodecSelector,
+                    enableDecoderFallback,
+                    audioSink,
+                    eventHandler,
+                    eventListener,
+                    out
+                )
+            }
+        }
+    }
+
     fun stopLocalMediaPlayer(){
         try {
             mEqualizer = null
@@ -100,7 +154,8 @@ class EqualizerActivityViewModel(app: Application) : AndroidViewModel(app)  {
 
             if(viewModel == null) return@launch
             val presetId = getPresetIdFromName(preset)
-            if(presetId >= 0){
+            val presetsCount = mEqualizer?.numberOfPresets ?: 0
+            if(presetId < presetsCount){
                 mEqualizer?.let { equ ->
                     equ.usePreset(presetId)
                     val tempPresetsLevels = Array<Short>(equ.numberOfBands.toInt()){0}
@@ -134,8 +189,9 @@ class EqualizerActivityViewModel(app: Application) : AndroidViewModel(app)  {
             return 0
         }
 
+        val presetsCount = mEqualizer?.numberOfPresets ?: 0
         val presetId = getPresetIdFromName(preset)
-        return if(presetId >= 0){
+        return if(presetId < presetsCount){
             mEqualizer?.usePreset(presetId)
             mEqualizer?.getBandLevel(bandId) ?: 0
         }else{
@@ -152,6 +208,24 @@ class EqualizerActivityViewModel(app: Application) : AndroidViewModel(app)  {
         MainScope().launch {
             mMutablePresetBandsLevels.value = tempPresetBandsLevels
         }
+    }
+    fun getVolume(): LiveData<Int> {
+        return mVolumeProgress
+    }
+    fun setVolume(value: Int){
+        mMutableVolumeProgress.value = value
+    }
+    fun getBassBoostProgress(): LiveData<Int> {
+        return mBassBoostProgress
+    }
+    fun setBassBoostProgress(value: Int){
+        mMutableBassBoostProgress.value = value
+    }
+    fun getVisualizerProgress(): LiveData<Int> {
+        return mVisualizerProgress
+    }
+    fun setVisualizerProgress(value: Int){
+        mMutableVisualizerProgress.value = value
     }
     /**
      * Getters
@@ -170,49 +244,63 @@ class EqualizerActivityViewModel(app: Application) : AndroidViewModel(app)  {
         return mEqualizer?.numberOfBands ?: 0
     }
     fun getPresetName(presetId: Short): CharSequence? {
-        if(mPresets != null){
-            return mPresets?.let {
-                it[presetId.toInt()]
-            }
-        }
         return mEqualizer?.getPresetName(presetId)
     }
     fun getPresets(): Array<CharSequence>? {
-        if(mPresets == null){
-            mEqualizer?.let { equ ->
-                val totalPreset: Short = mEqualizer?.numberOfPresets ?: 0
-                mPresets = Array(totalPreset.toInt()){""}
-                for (i in 0 until totalPreset){
-                    mPresets?.let{
-                        it[i] = equ.getPresetName(i.toShort())
-                    }
-                }
+        mEqualizer?.let { equ ->
+            val totalPreset: Short = mEqualizer?.numberOfPresets ?: 0
+            val tempPresets = Array<CharSequence>(totalPreset.toInt()){""}
+            for (i in 0 until totalPreset){
+                tempPresets[i] = equ.getPresetName(i.toShort())
             }
+            return tempPresets
         }
-        return mPresets
+        return null
     }
     fun getCenterFrequency(bandId: Short): Int {
         return (mEqualizer?.getCenterFreq(bandId) ?: 0)
     }
     fun getPresetIdFromName(presetName: CharSequence?): Short {
         if(presetName == null || presetName.isEmpty()) return -1
-        if(mPresets == null){
-            val presetsCount = mEqualizer?.numberOfPresets ?: 0
-            for (i in 0 until presetsCount){
-                if(presetName == mEqualizer?.getPresetName(i.toShort())){
-                    return i.toShort()
-                }
+
+        val presetsCount: Short = mEqualizer?.numberOfPresets ?: 0
+        //Check on integrated presets
+        for (i in 0 until presetsCount){
+            if(presetName == mEqualizer?.getPresetName(i.toShort())){
+                return i.toShort()
             }
-        }else{
-            for (i in mPresets?.indices ?: return -1){
-                if(presetName == mPresets?.get(i)){
-                    return i.toShort()
-                }
+        }
+        //Check on custom presets
+        val customPresetsCount: Int = mCustomPresets.value?.size ?: return -1
+        for (i in 0 until customPresetsCount){
+            if(presetName == mCustomPresets.value?.get(i)?.presetName){
+                return (presetsCount+i).toShort()
             }
         }
         return -1
     }
     fun getPresetBandsLevels(): LiveData<Array<Short>?> {
         return mPresetBandsLevels
+    }
+
+    fun checkIfPresetExists(presetName: String): Boolean {
+        val presetsCount: Short = mEqualizer?.numberOfPresets ?: 0
+        //Check on integrated presets
+        for (i in 0 until presetsCount){
+            val tempItemPreset: String = mEqualizer?.getPresetName(i.toShort()) ?: ""
+            if(presetName == tempItemPreset){
+                return true
+            }
+        }
+        Log.i("TAG", "CHECK ON CUSTOM PRESETS")
+        //Check on custom presets
+        val customPresetsCount: Int = mCustomPresets.value?.size ?: return false
+        for (i in 0 until customPresetsCount){
+            val tempItemPreset: String = mCustomPresets.value?.get(i)?.presetName ?: ""
+            if(presetName == tempItemPreset){
+                return true
+            }
+        }
+        return false
     }
 }

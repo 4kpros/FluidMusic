@@ -10,7 +10,6 @@ import androidx.databinding.DataBindingUtil
 import com.google.android.material.color.DynamicColors
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityEditTagsBinding
-import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 
 @BuildCompat.PrereleaseSdkCheck class EditTagsActivity : AppCompatActivity() {
     private lateinit var mDataBidingView : ActivityEditTagsBinding
@@ -48,8 +47,8 @@ import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
     }
 
     private fun initViews() {
-        InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
-        InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.constraintNestedScrollView)
+        com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
+        com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.constraintNestedScrollView)
     }
 
     companion object {

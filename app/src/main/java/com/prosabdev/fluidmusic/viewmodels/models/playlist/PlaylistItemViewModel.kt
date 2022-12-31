@@ -3,8 +3,8 @@ package com.prosabdev.fluidmusic.viewmodels.models.playlist
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
-import com.prosabdev.fluidmusic.roomdatabase.repositories.playlist.PlaylistItemRepository
+import com.prosabdev.common.models.playlist.PlaylistItem
+import com.prosabdev.common.roomdatabase.repositories.playlist.PlaylistItemRepository
 
 class PlaylistItemViewModel(app: Application) : AndroidViewModel(app) {
 

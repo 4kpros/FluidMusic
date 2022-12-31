@@ -3,8 +3,8 @@ package com.prosabdev.fluidmusic.viewmodels.models.explore
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.prosabdev.fluidmusic.models.view.YearItem
-import com.prosabdev.fluidmusic.roomdatabase.repositories.explore.YearItemRepository
+import com.prosabdev.common.models.view.YearItem
+import com.prosabdev.common.roomdatabase.repositories.explore.YearItemRepository
 
 class YearItemViewModel(app: Application) : AndroidViewModel(app) {
 

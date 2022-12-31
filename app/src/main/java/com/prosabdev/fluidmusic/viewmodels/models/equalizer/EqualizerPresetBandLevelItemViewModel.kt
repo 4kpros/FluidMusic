@@ -2,8 +2,8 @@ package com.prosabdev.fluidmusic.viewmodels.models.equalizer
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.prosabdev.fluidmusic.models.equalizer.EqualizerPresetBandLevelItem
-import com.prosabdev.fluidmusic.roomdatabase.repositories.equalizer.EqualizerPresetBandLevelItemRepository
+import com.prosabdev.common.models.equalizer.EqualizerPresetBandLevelItem
+import com.prosabdev.common.roomdatabase.repositories.equalizer.EqualizerPresetBandLevelItemRepository
 
 class EqualizerPresetBandLevelItemViewModel(app: Application) : AndroidViewModel(app) {
 

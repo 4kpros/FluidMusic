@@ -3,12 +3,8 @@ package com.prosabdev.fluidmusic.viewmodels.models.equalizer
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.models.equalizer.EqualizerPresetItem
-import com.prosabdev.fluidmusic.roomdatabase.repositories.FolderUriTreeRepository
-import com.prosabdev.fluidmusic.roomdatabase.repositories.equalizer.EqualizerPresetItemRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.prosabdev.common.models.equalizer.EqualizerPresetItem
+import com.prosabdev.common.roomdatabase.repositories.equalizer.EqualizerPresetItemRepository
 
 class EqualizerPresetItemViewModel(app: Application) : AndroidViewModel(app) {
 

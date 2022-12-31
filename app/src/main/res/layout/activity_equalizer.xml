@@ -23,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_scrollFlags="enterAlways"
-                app:title="Equalizer settings"
+                app:title="Equalizer"
                 app:menu="@menu/app_bar_more_vert"
                 app:navigationIcon="@drawable/arrow_back"
                 />
@@ -135,7 +135,7 @@
                             android:value="0"
                             app:tickVisible="false"
                             app:labelBehavior="gone"
-                            app:thumbRadius="5dp"
+                            app:thumbRadius="7dp"
                             app:thumbElevation="0dp"
                             app:trackHeight="2dp"
                             app:tickColor="@color/transparent"
@@ -200,24 +200,9 @@
                             android:id="@+id/seekbar_bass_boost"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            style="@style/CustomCircularProgress"
                             app:cs_circle_style="round"
-                            app:cs_circle_fill="@color/transparent"
-                            app:cs_circle_color="?colorSurfaceVariant"
-                            app:cs_circle_progress_color="?colorPrimary"
-                            app:cs_start_angle="145"
-                            app:cs_end_angle="35"
-                            app:cs_progress="0"
-                            app:cs_negative_enabled="false"
-                            app:cs_circle_stroke_width="2dp"
-                            app:cs_pointer_stroke_width="10dp"
-
-                            app:cs_move_outside_circle="true"
-                            app:cs_disable_pointer="false"
-                            app:cs_disable_progress_glow="true"
-                            app:cs_hide_progress_when_empty="false"
-                            app:cs_pointer_color="?colorPrimary"
-                            app:cs_pointer_halo_color="@color/transparent"
-                            app:cs_pointer_halo_color_ontouch="@color/transparent" />
+                            app:cs_progress="0"/>
 
                         <com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
                             android:id="@+id/shape_background_bass"
@@ -273,24 +258,10 @@
                             android:id="@+id/seekbar_visualizer"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            style="@style/CustomCircularProgress"
                             app:cs_circle_style="round"
-                            app:cs_circle_fill="@color/transparent"
-                            app:cs_circle_color="?colorSurfaceVariant"
-                            app:cs_circle_progress_color="?colorPrimary"
-                            app:cs_start_angle="145"
-                            app:cs_end_angle="35"
                             app:cs_progress="0"
-                            app:cs_negative_enabled="false"
-                            app:cs_circle_stroke_width="2dp"
-                            app:cs_pointer_stroke_width="10dp"
-
-                            app:cs_move_outside_circle="true"
-                            app:cs_disable_pointer="false"
-                            app:cs_disable_progress_glow="true"
-                            app:cs_hide_progress_when_empty="false"
-                            app:cs_pointer_color="?colorPrimary"
-                            app:cs_pointer_halo_color="@color/transparent"
-                            app:cs_pointer_halo_color_ontouch="@color/transparent" />
+                            />
 
                         <com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
                             android:id="@+id/shape_background_visualizer"

@@ -8,11 +8,11 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.prosabdev.common.models.songitem.SongItem
+import com.prosabdev.common.utils.AnimatorsUtils
+import com.prosabdev.common.utils.ImageLoadersUtils
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemPlayerCardViewBinding
-import com.prosabdev.fluidmusic.models.songitem.SongItem
-import com.prosabdev.fluidmusic.utils.AnimatorsUtils
-import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -22,7 +22,8 @@ import kotlinx.coroutines.launch
 class PlayerPageAdapter(
     private val mContext: Context,
     private val mListener: OnItemClickListener
-) : ListAdapter<SongItem, PlayerPageAdapter.PlayerPageHolder>(SongItem.diffCallbackViewPager) {
+) : ListAdapter<SongItem, PlayerPageAdapter.PlayerPageHolder>(
+    SongItem.diffCallbackViewPager) {
 
     interface OnItemClickListener {
         fun onButtonLyricsClicked(position: Int)

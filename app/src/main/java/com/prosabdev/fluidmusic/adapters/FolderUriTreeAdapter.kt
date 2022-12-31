@@ -8,12 +8,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemStorageAccessFolderBinding
-import com.prosabdev.fluidmusic.models.FolderUriTree
 
 
 class FolderUriTreeAdapter(
     private val mListener: OnItemClickListener
-) : ListAdapter<FolderUriTree, FolderUriTreeAdapter.FolderUriTreeHolder>(DiffCallback) {
+) : ListAdapter<com.prosabdev.common.models.FolderUriTree, FolderUriTreeAdapter.FolderUriTreeHolder>(DiffCallback) {
 
     interface OnItemClickListener {
         fun onRemoveFolder(position: Int)
@@ -33,7 +32,7 @@ class FolderUriTreeAdapter(
 
     class FolderUriTreeHolder(private val mItemStorageAccessFolderBinding: ItemStorageAccessFolderBinding) : RecyclerView.ViewHolder(mItemStorageAccessFolderBinding.root) {
 
-        fun bindData(folderUriTree: FolderUriTree, mListener: OnItemClickListener, position: Int) {
+        fun bindData(folderUriTree: com.prosabdev.common.models.FolderUriTree, mListener: OnItemClickListener, position: Int) {
             mItemStorageAccessFolderBinding.folderUriTree = folderUriTree
             mItemStorageAccessFolderBinding.executePendingBindings()
             mItemStorageAccessFolderBinding.textFolder.isSelected = true
@@ -44,12 +43,12 @@ class FolderUriTreeAdapter(
         }
     }
     companion object {
-        private val DiffCallback = object : DiffUtil.ItemCallback<FolderUriTree>() {
-            override fun areItemsTheSame(oldItem: FolderUriTree, newItem: FolderUriTree): Boolean {
+        private val DiffCallback = object : DiffUtil.ItemCallback<com.prosabdev.common.models.FolderUriTree>() {
+            override fun areItemsTheSame(oldItem: com.prosabdev.common.models.FolderUriTree, newItem: com.prosabdev.common.models.FolderUriTree): Boolean {
                 return oldItem.id == newItem.id
             }
 
-            override fun areContentsTheSame(oldItem: FolderUriTree, newItem: FolderUriTree): Boolean {
+            override fun areContentsTheSame(oldItem: com.prosabdev.common.models.FolderUriTree, newItem: com.prosabdev.common.models.FolderUriTree): Boolean {
                 return oldItem == newItem
             }
         }

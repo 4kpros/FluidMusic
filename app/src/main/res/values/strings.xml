@@ -246,10 +246,12 @@
     <string name="no_sound_found">No sound found !</string>
     <string name="tone">Tone</string>
     <string name="choose_preset">Choose Preset</string>
-    <string name="choose_default_preset">Choose Default Preset</string>
+    <string name="select_preset">Select Preset</string>
     <string name="save_preset">Save Preset</string>
     <string name="preset_name">Preset Name</string>
     <string name="preset">Preset</string>
     <string name="equ">Equ.</string>
+    <string name="invalid_name">Invalid Name</string>
+    <string name="name_already_exist">Name Already Exist</string>
 
 </resources>

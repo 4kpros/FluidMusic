@@ -1,14 +1,15 @@
 package com.prosabdev.fluidmusic.viewmodels.fragments
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
+import com.prosabdev.common.media.MusicServiceConnection
 import com.sothree.slidinguppanel.PanelState
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
+class MainFragmentViewModel(
+    app: Application
+) : AndroidViewModel(app) {
     private val mMutableCurrentSelectablePage = MutableLiveData<String>(null)
     private val mMutableSelectMode = MutableLiveData<Boolean>(false)
     private val mMutableRequestToggleSelectRange = MutableLiveData<Int>(0)
@@ -149,5 +150,9 @@ class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
     }
     fun getShowDrawerMenuCounter() : LiveData<Int> {
         return mShowDrawerMenuCounter
+    }
+
+    companion object {
+        private const val TAG = "MainFVM"
     }
 }

@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.*
-import com.prosabdev.fluidmusic.workers.mediascanner.MediaScannerWorker
+import com.prosabdev.common.workers.mediascanner.MediaScannerWorker
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 

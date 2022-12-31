@@ -10,16 +10,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentEqualizerBinding
-import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.NowPlayingFragmentViewModel
 
 @BuildCompat.PrereleaseSdkCheck class EqualizerFragment : Fragment() {
 
     private var mDataBidingView: FragmentEqualizerBinding? = null
 
     private val  mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
-    private val  mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
+    private val  mNowPlayingFragmentViewModel: NowPlayingFragmentViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,22 +55,22 @@ import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
 
     private fun observeLiveData() {
         mDataBidingView?.let { dataBidingView ->
-            InsetModifiersUtils.updateTopViewInsets(dataBidingView.container)
-            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
+            com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(dataBidingView.container)
+            com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
         }
     }
 
     private fun setupRecyclerViewAdapter() {
         mDataBidingView?.let { dataBidingView ->
-            InsetModifiersUtils.updateTopViewInsets(dataBidingView.container)
-            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
+            com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(dataBidingView.container)
+            com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
         }
     }
 
     private fun initViews() {
         mDataBidingView?.let { dataBidingView ->
-            InsetModifiersUtils.updateTopViewInsets(dataBidingView.container)
-            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
+            com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(dataBidingView.container)
+            com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
         }
     }
 

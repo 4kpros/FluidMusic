@@ -1,6 +1,5 @@
 package com.prosabdev.fluidmusic
 
-import android.content.ComponentName
 import android.media.AudioManager
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
@@ -16,13 +15,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
 import com.google.android.material.color.DynamicColors
 import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
-import com.prosabdev.fluidmusic.service.MediaPlaybackService
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.ImageLoadersUtils
-import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 
 
 @BuildCompat.PrereleaseSdkCheck class MainActivity : AppCompatActivity(){
@@ -46,12 +39,6 @@ import kotlinx.coroutines.launch
     }
 
     private fun createMediaBrowserService() {
-        mMediaBrowser = MediaBrowserCompat(
-            applicationContext,
-            ComponentName(applicationContext, MediaPlaybackService::class.java),
-            mConnectionCallbacks,
-            null
-        )
     }
     private fun setupAudioSettings() {
         volumeControlStream = AudioManager.STREAM_MUSIC
@@ -75,7 +62,7 @@ import kotlinx.coroutines.launch
     private var mConnectionCallbacks: ConnectionCallback = object : ConnectionCallback(){
         override fun onConnected() {
             super.onConnected()
-            Log.i(ConstantValues.TAG, "ConnectionCallback onConnected")
+            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "ConnectionCallback onConnected")
             mMediaBrowser?.sessionToken.also { token ->
                 val mediaController = MediaControllerCompat(
                     this@MainActivity.applicationContext, // Context
@@ -87,19 +74,19 @@ import kotlinx.coroutines.launch
         }
         override fun onConnectionSuspended() {
             super.onConnectionSuspended()
-            Log.i(ConstantValues.TAG, "ConnectionCallback onConnectionSuspended")
+            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "ConnectionCallback onConnectionSuspended")
         }
         override fun onConnectionFailed() {
             super.onConnectionFailed()
-            Log.i(ConstantValues.TAG, "ConnectionCallback onConnectionFailed")
+            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "ConnectionCallback onConnectionFailed")
         }
     }
     private var mControllerCallback = object : MediaControllerCompat.Callback() {
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-            Log.i(ConstantValues.TAG, "MediaControllerCompat onMetadataChanged : $metadata")
+            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "MediaControllerCompat onMetadataChanged : $metadata")
         }
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-            Log.i(ConstantValues.TAG, "MediaControllerCompat onPlaybackStateChanged : $state")
+            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "MediaControllerCompat onPlaybackStateChanged : $state")
         }
     }
 
@@ -115,18 +102,18 @@ import kotlinx.coroutines.launch
 
     override fun onLowMemory() {
         super.onLowMemory()
-        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
+        com.prosabdev.common.utils.ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
     }
 
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
-        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
+        com.prosabdev.common.utils.ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
     }
 
     public override fun onStart() {
         super.onStart()
         mMediaBrowser?.connect()
-        ImageLoadersUtils.initializeJobWorker(applicationContext)
+        com.prosabdev.common.utils.ImageLoadersUtils.initializeJobWorker(applicationContext)
     }
     public override fun onResume() {
         super.onResume()
@@ -144,7 +131,7 @@ import kotlinx.coroutines.launch
     }
 
     override fun onDestroy() {
-        ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
+        com.prosabdev.common.utils.ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
         super.onDestroy()
     }
 

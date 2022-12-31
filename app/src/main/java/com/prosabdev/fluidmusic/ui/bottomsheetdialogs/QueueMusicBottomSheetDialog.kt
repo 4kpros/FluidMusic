@@ -12,9 +12,8 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.GridSpacingItemDecoration
 import com.prosabdev.fluidmusic.adapters.QueueMusicItemListAdapter
 import com.prosabdev.fluidmusic.databinding.BottomSheetQueueMusicBinding
-import com.prosabdev.fluidmusic.models.songitem.SongItem
 import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
-import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.NowPlayingFragmentViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -22,13 +21,13 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
 
     private var mBottomSheetQueueMusicBinding: BottomSheetQueueMusicBinding? = null
 
-    private var mPlayerFragmentViewModel: PlayerFragmentViewModel? = null
+    private var mNowPlayingFragmentViewModel: NowPlayingFragmentViewModel? = null
 
     private var mQueueMusicItemAdapter :QueueMusicItemListAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
     private var mItemDecoration: GridSpacingItemDecoration? = null
 
-    private var mSongList: List<SongItem>? = null
+    private var mSongList: List<com.prosabdev.common.models.songitem.SongItem>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,7 +50,7 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
     }
 
     private fun observeLiveData() {
-        mPlayerFragmentViewModel?.let { playerFragmentViewModel ->
+        mNowPlayingFragmentViewModel?.let { playerFragmentViewModel ->
             playerFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner) {
                 updatePlayingSongUI(it)
             }
@@ -60,7 +59,7 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
             }
         }
     }
-    private fun updatePlayingSongUI(songItem: SongItem?) {
+    private fun updatePlayingSongUI(songItem: com.prosabdev.common.models.songitem.SongItem?) {
         val songPosition: Int = songItem?.position ?: -1
         if((mQueueMusicItemAdapter?.getPlayingPosition() ?: -1) != songPosition)
             mQueueMusicItemAdapter?.setPlayingPosition(songPosition)
@@ -117,10 +116,10 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
                 bottomSheetQueueMusicBinding.recyclerView.layoutManager = mLayoutManager
                 mQueueMusicItemAdapter?.submitList(mSongList)
                 //
-                mQueueMusicItemAdapter?.setIsPlaying(mPlayerFragmentViewModel?.getIsPlaying()?.value ?: false)
-                mQueueMusicItemAdapter?.setPlayingPosition(mPlayerFragmentViewModel?.getCurrentPlayingSong()?.value?.position ?: -1)
-                mPlayerFragmentViewModel?.let { playerFragmentViewModel ->
-                    val tempCurrentSong: SongItem =
+                mQueueMusicItemAdapter?.setIsPlaying(mNowPlayingFragmentViewModel?.getIsPlaying()?.value ?: false)
+                mQueueMusicItemAdapter?.setPlayingPosition(mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value?.position ?: -1)
+                mNowPlayingFragmentViewModel?.let { playerFragmentViewModel ->
+                    val tempCurrentSong: com.prosabdev.common.models.songitem.SongItem =
                         playerFragmentViewModel.getCurrentPlayingSong().value
                             ?: return
                     mLayoutManager?.scrollToPosition(tempCurrentSong.position)
@@ -149,10 +148,10 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
     }
 
     private fun onPlaySongAtPosition(position: Int) {
-        val tempSongItem: SongItem = mQueueMusicItemAdapter?.currentList?.get(position) as SongItem? ?: return
+        val tempSongItem: com.prosabdev.common.models.songitem.SongItem = mQueueMusicItemAdapter?.currentList?.get(position) as com.prosabdev.common.models.songitem.SongItem? ?: return
         tempSongItem.position = position
         CommonPlaybackAction.playSongAtPositionFromQueueMusic(
-            mPlayerFragmentViewModel,
+            mNowPlayingFragmentViewModel,
             tempSongItem
         )
     }
@@ -162,14 +161,14 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
     }
 
     fun updatePlayerFragmentViewModel(
-        playerFragmentViewModel: PlayerFragmentViewModel
+        nowPlayingFragmentViewModel: NowPlayingFragmentViewModel
     ){
-        if(mPlayerFragmentViewModel == null){
-            mPlayerFragmentViewModel = playerFragmentViewModel
+        if(mNowPlayingFragmentViewModel == null){
+            mNowPlayingFragmentViewModel = nowPlayingFragmentViewModel
         }
     }
     fun updateQueueMusicList(
-        songList: List<SongItem>?
+        songList: List<com.prosabdev.common.models.songitem.SongItem>?
     ){
         mSongList = songList
         mQueueMusicItemAdapter?.submitList(songList)

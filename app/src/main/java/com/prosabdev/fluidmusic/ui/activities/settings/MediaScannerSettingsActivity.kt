@@ -22,9 +22,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityMediaScannerSettingsBinding
-import com.prosabdev.fluidmusic.models.FolderUriTree
-import com.prosabdev.fluidmusic.utils.ConstantValues
-import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 import com.prosabdev.fluidmusic.viewmodels.activities.MediaScannerActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
 import kotlinx.coroutines.MainScope
@@ -186,10 +183,10 @@ import kotlinx.coroutines.launch
 
         mMediaScannerActivityViewModel.updateWorkInfoData(workInfo)
         if(workInfo.state.isFinished){
-            Log.i(ConstantValues.TAG, "Device scan finished.")
+            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Device scan finished.")
             mMediaScannerActivityViewModel.setIsLoadingInBackground(false)
         }else{
-            Log.i(ConstantValues.TAG, "Working on background ...")
+            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Working on background ...")
         }
     }
     private fun mediaScannerWorkInfoObserver(): Observer<List<WorkInfo>> {
@@ -201,11 +198,11 @@ import kotlinx.coroutines.launch
             val workInfo = it[0]
 
             if(workInfo.state.isFinished){
-                Log.i(ConstantValues.TAG, "Device scan finished.")
+                Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Device scan finished.")
                 mMediaScannerActivityViewModel.updateWorkInfoData(workInfo)
                 mMediaScannerActivityViewModel.setIsLoadingInBackground(false)
             }else{
-                Log.i(ConstantValues.TAG, "Working on background ...")
+                Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Working on background ...")
             }
         }
     }
@@ -245,23 +242,23 @@ import kotlinx.coroutines.launch
         }
     }
 
-    private fun updateFolderUriTrees(it: List<FolderUriTree>) {
+    private fun updateFolderUriTrees(it: List<com.prosabdev.common.models.FolderUriTree>) {
 
     }
 
     private fun updatePlaylistCounterUI(it: Int?) {
         mDataBidingView.playlistCounter = it
-        Log.i(ConstantValues.TAG, "Device scan playlists : $it")
+        Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Device scan playlists : $it")
     }
 
     private fun updateSongsCounterUI(it: Int?) {
         mDataBidingView.songsCounter = it
-        Log.i(ConstantValues.TAG, "Device scan songs : $it")
+        Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Device scan songs : $it")
     }
 
     private fun updateFoldersCounterUI(it: Int) {
         mDataBidingView.folderCounter = it
-        Log.i(ConstantValues.TAG, "Device scan folders : $it")
+        Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Device scan folders : $it")
     }
 
     private fun updateLoadingUI(it: Boolean?) {
@@ -269,8 +266,8 @@ import kotlinx.coroutines.launch
     }
 
     private fun initViews() {
-        InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
-        InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.container)
+        com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
+        com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.container)
     }
 
     companion object {

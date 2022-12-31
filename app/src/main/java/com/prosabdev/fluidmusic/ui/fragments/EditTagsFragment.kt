@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentEditTagsBinding
-import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 
 class EditTagsFragment : Fragment() {
 
@@ -55,8 +54,8 @@ class EditTagsFragment : Fragment() {
 
     private fun initViews() {
         mDataBidingView?.let { dataBidingView ->
-            InsetModifiersUtils.updateTopViewInsets(dataBidingView.coordinatorLayout)
-            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.constraintNestedScrollView)
+            com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(dataBidingView.coordinatorLayout)
+            com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(dataBidingView.constraintNestedScrollView)
         }
     }
 
