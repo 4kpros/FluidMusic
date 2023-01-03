@@ -16,7 +16,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.Player.*
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.cast.CastPlayer
 import com.google.android.exoplayer2.ext.cast.SessionAvailabilityListener
@@ -27,7 +26,9 @@ import com.google.android.exoplayer2.util.Util.constrainValue
 import com.google.android.gms.cast.framework.CastContext
 import com.prosabdev.common.R
 import com.prosabdev.common.extensions.*
+import com.prosabdev.common.library.LocalSource
 import com.prosabdev.common.library.MusicSource
+import com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -55,9 +56,7 @@ open class MusicService : MediaBrowserServiceCompat() {
     private val fluidMusicAudioAttributes = AudioAttributes.Builder()
         .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
         .setUsage(C.USAGE_MEDIA)
-//        .setFlags(C.FLAG_AUDIBILITY_ENFORCED) //Note this flag should only be used for sounds subject to regulatory behaviors in some countries, such as for camera shutter sound, and not for routing behaviors.
         .setAllowedCapturePolicy(C.ALLOW_CAPTURE_BY_ALL)
-//        .setSpatializationBehavior(C.SPATIALIZATION_BEHAVIOR_AUTO)
         .build()
 
     private val playerListener = PlayerEventListener()
@@ -110,8 +109,14 @@ open class MusicService : MediaBrowserServiceCompat() {
             PlayerNotificationListener()
         )
         // Load the media library out of main thread
+        // The media library is built from a remote JSON file. We'll create the source here,
+        // and then use a suspend function to perform the download off the main thread.
+        mediaSource = LocalSource(
+            applicationContext,
+            mediaSource
+        )
         serviceScope.launch {
-//            mediaSource.load()
+            mediaSource.load()
         }
         // ExoPlayer will manage the MediaSession for us.
         mediaSessionConnector = MediaSessionConnector(mediaSession)
@@ -129,10 +134,10 @@ open class MusicService : MediaBrowserServiceCompat() {
     }
 
     override fun onTaskRemoved(rootIntent: Intent) {
-        super.onTaskRemoved(rootIntent)
+//        super.onTaskRemoved(rootIntent)
 //        /**
-//         * By stopping playback, the player will transition to [Player.STATE_IDLE] triggering
-//         * [Player.EventListener.onPlayerStateChanged] to be called. This will cause the
+//         * By stopping playback, the player will transition to [STATE_IDLE] triggering
+//         * [EventListener.onPlayerStateChanged] to be called. This will cause the
 //         * notification to be hidden and trigger
 //         * [PlayerNotificationManager.NotificationListener.onNotificationCancelled] to be called.
 //         * The service will then remove itself as a foreground service, and will call
@@ -371,16 +376,15 @@ open class MusicService : MediaBrowserServiceCompat() {
             PlaybackStateCompat.ACTION_SET_RATING
 
 
-            override fun onPrepare(playWhenReady: Boolean) {
+        override fun onPrepare(playWhenReady: Boolean) {
             Log.i(TAG, "Player onPrepare: playWhenReady $playWhenReady")
-//            val recentSong = storage.loadRecentSong() ?: return
-//            onPrepareFromMediaId(
-//                recentSong.mediaId!!,
-//                playWhenReady,
-//                recentSong.description.extras
-//            )
+            val recentSong = SharedPreferenceManagerUtils.Player.loadCurrentPlayingSong(applicationContext, null) ?: return
+            onPrepareFromMediaId(
+                recentSong.mediaId!!,
+                playWhenReady,
+                recentSong.description.extras
+            )
         }
-
         override fun onPrepareFromMediaId(
             mediaId: String,
             playWhenReady: Boolean,
@@ -515,9 +519,9 @@ open class MusicService : MediaBrowserServiceCompat() {
         }
         override fun onEvents(player: Player, events: Player.Events) {
             Log.i(TAG, "Player onEvents: $events")
-            if (events.contains(EVENT_POSITION_DISCONTINUITY)
-                || events.contains(EVENT_MEDIA_ITEM_TRANSITION)
-                || events.contains(EVENT_PLAY_WHEN_READY_CHANGED)) {
+            if (events.contains(Player.EVENT_POSITION_DISCONTINUITY)
+                || events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)
+                || events.contains(Player.EVENT_PLAY_WHEN_READY_CHANGED)) {
                 currentMediaItemIndex = if (currentPlaylistItems.isNotEmpty()) {
                     constrainValue(
                         player.currentMediaItemIndex,

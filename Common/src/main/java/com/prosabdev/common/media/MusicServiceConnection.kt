@@ -42,7 +42,11 @@ class MusicServiceConnection(context: Context, serviceComponent: ComponentName) 
 
     val playbackState = MutableLiveData<PlaybackStateCompat>()
         .apply { postValue(EMPTY_PLAYBACK_STATE) }
-    val nowPlaying = MutableLiveData<MediaMetadataCompat>()
+    val shuffleState = MutableLiveData<Int>()
+        .apply { postValue(PlaybackStateCompat.SHUFFLE_MODE_NONE) }
+    val repeatState = MutableLiveData<Int>()
+        .apply { postValue(PlaybackStateCompat.REPEAT_MODE_NONE) }
+    val metaDataPlaying = MutableLiveData<MediaMetadataCompat>()
         .apply { postValue(NOTHING_PLAYING) }
 
     val transportControls: MediaControllerCompat.TransportControls
@@ -86,7 +90,6 @@ class MusicServiceConnection(context: Context, serviceComponent: ComponentName) 
         private val context: Context
     ) : MediaBrowserCompat.ConnectionCallback() {
         override fun onConnected() {
-            // Get a MediaController for the MediaSession.
             mediaController = MediaControllerCompat(context, mediaBrowser.sessionToken).apply {
                 registerCallback(MediaControllerCallback())
             }
@@ -104,8 +107,14 @@ class MusicServiceConnection(context: Context, serviceComponent: ComponentName) 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             playbackState.postValue(state ?: EMPTY_PLAYBACK_STATE)
         }
+        override fun onShuffleModeChanged(shuffleMode: Int) {
+            shuffleState.postValue(shuffleMode)
+        }
+        override fun onRepeatModeChanged(repeatMode: Int) {
+            repeatState.postValue(repeatMode)
+        }
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-            nowPlaying.postValue(
+            metaDataPlaying.postValue(
                 if (metadata?.id == null) {
                     NOTHING_PLAYING
                 } else {
@@ -114,6 +123,9 @@ class MusicServiceConnection(context: Context, serviceComponent: ComponentName) 
             )
         }
         override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
+        }
+
+        override fun onQueueTitleChanged(title: CharSequence?) {
         }
         override fun onSessionEvent(event: String?, extras: Bundle?) {
             super.onSessionEvent(event, extras)
@@ -127,21 +139,17 @@ class MusicServiceConnection(context: Context, serviceComponent: ComponentName) 
     }
 
     companion object {
-
         val EMPTY_PLAYBACK_STATE: PlaybackStateCompat = PlaybackStateCompat.Builder()
             .setState(PlaybackStateCompat.STATE_NONE, 0, 0f)
             .build()
-
         val NOTHING_PLAYING: MediaMetadataCompat = MediaMetadataCompat.Builder()
             .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "")
             .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 0)
             .build()
 
-
         // For Singleton instantiation.
         @Volatile
         private var instance: MusicServiceConnection? = null
-
         fun getInstance(context: Context, serviceComponent: ComponentName) =
             instance ?: synchronized(this) {
                 instance ?: MusicServiceConnection(context, serviceComponent)

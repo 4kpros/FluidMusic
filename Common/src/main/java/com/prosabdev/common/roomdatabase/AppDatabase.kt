@@ -67,11 +67,11 @@ abstract class AppDatabase : RoomDatabase() {
 
         private const val FLUID_MUSIC_DATABASE_NAME = "${ConstantValues.PACKAGE_NAME}.main_database_name"
 
-        fun getDatabase(context: Context): AppDatabase {
+        fun getDatabase(ctx: Context): AppDatabase {
             return INSTANCE
                 ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
-                    context,
+                    ctx,
                     AppDatabase::class.java,
                     FLUID_MUSIC_DATABASE_NAME
                 )

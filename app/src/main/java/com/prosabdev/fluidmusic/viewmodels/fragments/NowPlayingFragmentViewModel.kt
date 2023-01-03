@@ -1,247 +1,208 @@
 package com.prosabdev.fluidmusic.viewmodels.fragments
 
 import android.app.Application
+import android.net.Uri
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import androidx.lifecycle.*
+import com.prosabdev.common.extensions.*
 import com.prosabdev.common.media.MusicServiceConnection
-import com.prosabdev.common.models.PlaySongAtRequest
-import com.prosabdev.common.models.songitem.SongItem
 import com.prosabdev.common.sharedprefs.models.SleepTimerSP
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 
 class NowPlayingFragmentViewModel(
     app: Application,
     musicServiceConnection: MusicServiceConnection
 ) : AndroidViewModel(app) {
 
-    private val mMutableCurrentPlayingSong = MutableLiveData<SongItem?>(null)
-    private val mMutableIsPlaying = MutableLiveData<Boolean>(false)
-    private val mMutablePlayingProgressValue = MutableLiveData<Long>(0)
-    private val mMutableShuffle = MutableLiveData<Int>(PlaybackStateCompat.SHUFFLE_MODE_NONE)
-    private val mMutableRepeat = MutableLiveData<Int>(PlaybackStateCompat.REPEAT_MODE_NONE)
-    //
-    private val mMutableQueueListSource = MutableLiveData<String?>(null)
-    private val mMutableQueueListSourceColumnValue = MutableLiveData<String?>(null)
-    private val mMutableQueueListSourceColumnIndex = MutableLiveData<String?>(null)
-    private val mMutableSortBy = MutableLiveData<String?>(null)
-    private val mMutableIsInverted = MutableLiveData<Boolean>(false)
-    //
-    private val mMutableSleepTimer = MutableLiveData<SleepTimerSP?>(null)
-    private val mMutableSleepTimerStateStarted = MutableLiveData<Boolean>(false)
-    //
-    private val mMutableSkipNextTrackCounter = MutableLiveData<Int>(0)
-    private val mMutableSkipPrevTrackCounter = MutableLiveData<Int>(0)
-    private val mMutablePlaySongAtRequest = MutableLiveData<PlaySongAtRequest>(null)
-    private val mMutableRequestPlaySongShuffleCounter = MutableLiveData<Int>(null)
-    //
-    private val mMutableUpdatePlaylistCounter = MutableLiveData<Int>(0)
-    private val mMutableCanScrollSmoothViewpager = MutableLiveData<Boolean>(false)
-    private val mMutableCanScrollCurrentPlayingSong = MutableLiveData<Boolean>(false)
+    data class NowPlayingMetadata(
+        val id: String?,
+        val uri: Uri?,
+        val coverArtUri: Uri?,
+        val title: String?,
+        val subtitle: String?,
+        val duration: Long
+    )
 
+    //Mutable Variables
+    private val mPlaybackState = MutableLiveData<PlaybackStateCompat>()
+    private val mShuffleState = MutableLiveData<Int>()
+    private val mRepeatState = MutableLiveData<Int>()
+    private val mMediaMetadata = MutableLiveData<NowPlayingMetadata>()
+    private val mCurrentDuration = MutableLiveData<Long>().apply {
+        postValue(0L)
+    }
+    private val mQueueListSource = MutableLiveData<String?>(null)
+    private val mQueueListSourceColumnValue = MutableLiveData<String?>(null)
+    private val mQueueListSourceColumnIndex = MutableLiveData<String?>(null)
+    private val mSortBy = MutableLiveData<String?>(null)
+    private val mIsInverted = MutableLiveData<Boolean>(false)
+    private val mSleepTimer = MutableLiveData<SleepTimerSP?>(null)
+    private val mSleepTimerStateStarted = MutableLiveData<Boolean>(false)
+    private var mCanUpdateCurrentPlayingDuration = true
+    private val mHandler = Handler(Looper.getMainLooper())
 
-    private val mCurrentPlayingSong: LiveData<SongItem?> get() = mMutableCurrentPlayingSong
-    private val mIsPlaying: LiveData<Boolean> get() = mMutableIsPlaying
-    private val mPlayingProgressValue: LiveData<Long> get() = mMutablePlayingProgressValue
-    private val mShuffle: LiveData<Int> get() = mMutableShuffle
-    private val mRepeat: LiveData<Int> get() = mMutableRepeat
-    //
-    private val mQueueListSource: LiveData<String?> get() = mMutableQueueListSource
-    private val mQueueListSourceColumnValue: LiveData<String?> get() = mMutableQueueListSourceColumnValue
-    private val mQueueListSourceColumnIndex: LiveData<String?> get() = mMutableQueueListSourceColumnIndex
-    private val mSortBy: LiveData<String?> get() = mMutableSortBy
-    private val mIsInverted: LiveData<Boolean> get() = mMutableIsInverted
-    //
-    private val mSleepTimer: LiveData<SleepTimerSP?> get() = mMutableSleepTimer
-    private val mSleepTimerStateStarted: LiveData<Boolean> get() = mMutableSleepTimerStateStarted
-    //
-    private val mSkipNextTrackCounter: LiveData<Int> get() = mMutableSkipNextTrackCounter
-    private val mSkipPrevTrackCounter: LiveData<Int> get() = mMutableSkipPrevTrackCounter
-    private val mPlaySongAtRequest: LiveData<PlaySongAtRequest> get() = mMutablePlaySongAtRequest
-    private val mUpdatePlaylistCounter: LiveData<Int> get() = mMutableUpdatePlaylistCounter
-    //
-    private val mCanScrollSmoothViewpager: LiveData<Boolean> get() = mMutableCanScrollSmoothViewpager
-    private val mCanScrollCurrentPlayingSong: LiveData<Boolean> get() = mMutableCanScrollCurrentPlayingSong
-    private val mRequestPlaySongShuffleCounter: LiveData<Int> get() = mMutableRequestPlaySongShuffleCounter
-
-    fun getCurrentPlayingSong(): LiveData<SongItem?> {
-        return mCurrentPlayingSong
+    //Observers
+    private val mPlaybackStateObserver = Observer<PlaybackStateCompat> { playbackStateCompat ->
+        mPlaybackState.postValue(playbackStateCompat ?: MusicServiceConnection.EMPTY_PLAYBACK_STATE)
     }
-    fun setCurrentPlayingSong(songItem : SongItem?){
-        MainScope().launch {
-            mMutableCurrentPlayingSong.value = songItem
+    private val mShuffleStateObserver = Observer<Int> { shuffleMode ->
+        mShuffleState.postValue(shuffleMode)
+    }
+    private val mRepeatStateObserver = Observer<Int> { repeatMode ->
+        mRepeatState.postValue(repeatMode)
+    }
+    private val mMediaMetadataObserver = Observer<MediaMetadataCompat> { mediaMetadata ->
+        if (mediaMetadata != null && mediaMetadata.duration != 0L && mediaMetadata.id != null) {
+            val nowPlayingMetadata = NowPlayingMetadata(
+                mediaMetadata.id,
+                mediaMetadata.mediaUri,
+                mediaMetadata.albumArtUri,
+                mediaMetadata.title?.trim(),
+                mediaMetadata.displaySubtitle?.trim(),
+                mediaMetadata.duration
+            )
+            mMediaMetadata.postValue(nowPlayingMetadata)
         }
     }
-    fun toggleIsPlaying() {
-        if(mCurrentPlayingSong.value == null || mCurrentPlayingSong.value?.uri == null) return
-        MainScope().launch {
-            val tempIsPlaying: Boolean = mIsPlaying.value ?: false
-            mMutableIsPlaying.value = !tempIsPlaying
-        }
+    private val mMusicServiceConnection = musicServiceConnection.also {
+        it.playbackState.observeForever(mPlaybackStateObserver)
+        it.shuffleState.observeForever(mShuffleStateObserver)
+        it.repeatState.observeForever(mRepeatStateObserver)
+        it.metaDataPlaying.observeForever(mMediaMetadataObserver)
+        checkPlaybackPosition()
     }
-    fun getIsPlaying(): LiveData<Boolean> {
-        return mIsPlaying
-    }
-    fun setIsPlaying(value : Boolean){
-        MainScope().launch {
-            mMutableIsPlaying.value = value
-        }
-    }
-    fun getPlayingProgressValue(): LiveData<Long> {
-        return mPlayingProgressValue
-    }
-    fun setPlayingProgressValue(value : Long){
-        MainScope().launch {
-            mMutablePlayingProgressValue.value = value
-        }
-    }
-    fun getQueueListSource(): LiveData<String?> {
-        return mQueueListSource
-    }
-    fun setQueueListSource(source : String?){
-        MainScope().launch {
-            mMutableQueueListSource.value = source
-        }
-    }
-    fun getQueueListSourceColumnIndex(): LiveData<String?> {
-        return mQueueListSourceColumnIndex
-    }
-    fun setQueueListSourceColumnIndex(source : String?){
-        MainScope().launch {
-            mMutableQueueListSourceColumnIndex.value = source
-        }
-    }
-    fun getQueueListSourceColumnValue(): LiveData<String?> {
-        return mQueueListSourceColumnValue
-    }
-    fun setQueueListSourceColumnValue(source : String?){
-        MainScope().launch {
-            mMutableQueueListSourceColumnValue.value = source
-        }
-    }
-    fun getShuffle(): LiveData<Int> {
-        return mShuffle
-    }
-    fun setShuffle(newShuffleValue : Int){
-        MainScope().launch {
-            mMutableShuffle.value = newShuffleValue
-        }
-    }
-    fun getRepeat(): LiveData<Int> {
-        return mRepeat
-    }
-    fun setRepeat(newRepeatValue : Int){
-        MainScope().launch {
-            mMutableRepeat.value = newRepeatValue
-        }
-    }
-    fun getSleepTimer(): LiveData<SleepTimerSP?> {
-        return mSleepTimer
-    }
-    fun setSleepTimer(value : SleepTimerSP?){
-        MainScope().launch {
-            mMutableSleepTimer.value = value
-        }
-    }
-    fun getSleepTimerStateStarted(): LiveData<Boolean> {
-        return mSleepTimerStateStarted
-    }
-    fun setSleepTimerStateStarted(state : Boolean) {
-        MainScope().launch {
-            mMutableSleepTimerStateStarted.value = state
-        }
-    }
-    fun getSkipNextTrackCounter(): LiveData<Int> {
-        return mSkipNextTrackCounter
-    }
-    fun setSkipNextTrackCounter(){
-        MainScope().launch {
-            var tempCounter: Int = mSkipNextTrackCounter.value ?: 0
-            if(tempCounter >= 100)
-                tempCounter = 0
-            tempCounter++
-            mMutableSkipNextTrackCounter.value = tempCounter
-        }
-    }
-    fun getSkipPrevTrackCounter(): LiveData<Int> {
-        return mSkipPrevTrackCounter
-    }
-    fun setSkipPrevTrackCounter(){
-        MainScope().launch {
-            var tempCounter: Int = mSkipPrevTrackCounter.value ?: 0
-            if(tempCounter >= 100)
-                tempCounter = 0
-            tempCounter++
-            mMutableSkipPrevTrackCounter.value = tempCounter
-        }
-    }
-    fun getUpdatePlaylistCounter(): LiveData<Int> {
-        return mUpdatePlaylistCounter
-    }
-    fun setUpdatePlaylistCounter(){
-        MainScope().launch {
-            var tempCounter: Int = mUpdatePlaylistCounter.value ?: 0
-            if(tempCounter >= 100)
-                tempCounter = 0
-            tempCounter++
-            mMutableUpdatePlaylistCounter.value = tempCounter
-        }
-    }
-    fun getSortBy(): LiveData<String?> {
-        return mSortBy
-    }
-    fun setSortBy(sortBy : String?) {
-        if(sortBy == mSortBy.value) return
-        MainScope().launch {
-            mMutableSortBy.value = sortBy ?: "name"
-        }
-    }
-    fun getIsInverted(): LiveData<Boolean> {
-        return mIsInverted
-    }
-    fun setIsInverted(isInverted : Boolean) {
-        if(isInverted == mIsInverted.value) return
-        MainScope().launch {
-            mMutableIsInverted.value = isInverted
-        }
-    }
-    fun getCanScrollCurrentPlayingSong(): LiveData<Boolean> {
-        return mCanScrollSmoothViewpager
-    }
-    fun setCanScrollCurrentPlayingSong(value: Boolean) {
-        MainScope().launch {
-            mMutableCanScrollSmoothViewpager.value = value
-        }
-    }
-    fun getCanScrollSmoothViewpager(): LiveData<Boolean> {
-        return mCanScrollCurrentPlayingSong
-    }
-    fun setCanScrollSmoothViewpager(value: Boolean) {
-        MainScope().launch {
-            mMutableCanScrollCurrentPlayingSong.value = value
-        }
-    }
-    fun getRequestPlaySongAt(): LiveData<PlaySongAtRequest> {
-        return mPlaySongAtRequest
-    }
-    fun setRequestPlaySongAt(playSongAtRequest: PlaySongAtRequest) {
-        MainScope().launch {
-            mMutablePlaySongAtRequest.value = playSongAtRequest
-        }
-    }
-    fun getRequestPlaySongShuffleCounter(): LiveData<Int> {
-        return mRequestPlaySongShuffleCounter
-    }
-    fun setRequestPlaySongShuffleCounter() {
-        MainScope().launch {
-            var tempCounter: Int = mUpdatePlaylistCounter.value ?: 0
-            if(tempCounter >= 100)
-                tempCounter = 0
-            tempCounter++
-            mMutableRequestPlaySongShuffleCounter.value = tempCounter
-        }
+    private fun checkPlaybackPosition() {
+        mHandler.postDelayed(
+            {
+                val currentPosition = mPlaybackState.value?.currentPlayBackPosition
+                if (mCurrentDuration.value != currentPosition)
+                    mCurrentDuration.postValue(currentPosition)
+                if (mCanUpdateCurrentPlayingDuration)
+                    checkPlaybackPosition()
+            },
+            POSITION_UPDATE_INTERVAL_MILLIS
+        )
     }
 
+    //Player actions
+    fun prepare() {
+        val transportControls = mMusicServiceConnection.transportControls
+        transportControls.prepare()
+    }
+    fun play() {
+        val transportControls = mMusicServiceConnection.transportControls
+        transportControls.play()
+    }
+    fun pause() {
+        val transportControls = mMusicServiceConnection.transportControls
+        transportControls.pause()
+    }
+    fun stop() {
+        val transportControls = mMusicServiceConnection.transportControls
+        transportControls.stop()
+    }
+    fun skipToQueueItem(id: Long) {
+        val transportControls = mMusicServiceConnection.transportControls
+        transportControls.skipToQueueItem(id)
+    }
+    fun skipNext() {
+        val transportControls = mMusicServiceConnection.transportControls
+        transportControls.skipToNext()
+    }
+    fun skipPrev() {
+        val transportControls = mMusicServiceConnection.transportControls
+        transportControls.skipToPrevious()
+    }
+    fun playFromUri(mediaUri: Uri, extras: Bundle? = null, pauseAllowed: Boolean = true) {
+        val nowPlaying = mMusicServiceConnection.metaDataPlaying.value
+        val transportControls = mMusicServiceConnection.transportControls
+
+        val isPrepared = mMusicServiceConnection.playbackState.value?.isPrepared ?: false
+        if (isPrepared && mediaUri == nowPlaying?.mediaUri) {
+            mMusicServiceConnection.playbackState.value?.let { playbackState ->
+                when {
+                    playbackState.isPlaying ->
+                        if (pauseAllowed) transportControls.pause() else Unit
+                    playbackState.isPlayEnabled ->
+                        transportControls.play()
+                    else -> {
+                        Log.w(
+                            TAG, "Playable item clicked but neither play nor pause are enabled!" +
+                                    " (mediaUri=${mediaUri})"
+                        )
+                    }
+                }
+            }
+        } else {
+            transportControls.playFromUri(mediaUri, extras)
+        }
+    }
+    fun playFromMediaId(mediaId: String, extras: Bundle? = null) {
+        val nowPlaying = mMusicServiceConnection.metaDataPlaying.value
+        val transportControls = mMusicServiceConnection.transportControls
+
+        val isPrepared = mMusicServiceConnection.playbackState.value?.isPrepared ?: false
+        if (isPrepared && mediaId == nowPlaying?.id) {
+            mMusicServiceConnection.playbackState.value?.let { playbackState ->
+                when {
+                    playbackState.isPlaying -> transportControls.pause()
+                    playbackState.isPlayEnabled -> transportControls.play()
+                    else -> {
+                        Log.w(
+                            TAG, "Playable item clicked but neither play nor pause are enabled!" +
+                                    " (mediaId=$mediaId)"
+                        )
+                    }
+                }
+            }
+        } else {
+            transportControls.playFromMediaId(mediaId, extras)
+        }
+    }
+    fun setShuffleMode(mode: Int) {
+        val transportControls = mMusicServiceConnection.transportControls
+        transportControls.setShuffleMode(mode)
+    }
+    fun setRepeatMode(mode: Int) {
+        val transportControls = mMusicServiceConnection.transportControls
+        transportControls.setRepeatMode(mode)
+    }
+    fun seekTo(pos: Long) {
+        val transportControls = mMusicServiceConnection.transportControls
+        transportControls.seekTo(pos)
+    }
+    fun fastForward() {
+        val transportControls = mMusicServiceConnection.transportControls
+        transportControls.fastForward()
+    }
+    fun rewind() {
+        val transportControls = mMusicServiceConnection.transportControls
+        transportControls.rewind()
+    }
+    fun setPlaybackSpeed(speed: Float) {
+        val transportControls = mMusicServiceConnection.transportControls
+        transportControls.setPlaybackSpeed(speed)
+    }
+    fun setRating(rating: RatingCompat) {
+        val transportControls = mMusicServiceConnection.transportControls
+        transportControls.setRating(rating)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // Remove the permanent observers from the MusicServiceConnection.
+        mMusicServiceConnection.playbackState.removeObserver(mPlaybackStateObserver)
+        mMusicServiceConnection.shuffleState.removeObserver(mShuffleStateObserver)
+        mMusicServiceConnection.repeatState.removeObserver(mRepeatStateObserver)
+        mMusicServiceConnection.metaDataPlaying.removeObserver(mMediaMetadataObserver)
+        // Stop updating the current playing duration
+        mCanUpdateCurrentPlayingDuration = false
+    }
     class Factory(
         private val app: Application,
         private val musicServiceConnection: MusicServiceConnection
@@ -252,6 +213,7 @@ class NowPlayingFragmentViewModel(
     }
 
     companion object {
-        private const val TAG = "NowPlayingFVM"
+        const val TAG = "NowPlayingFVM"
+        const val POSITION_UPDATE_INTERVAL_MILLIS = 100L
     }
 }
