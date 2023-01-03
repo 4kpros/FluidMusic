@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentPlaylistsBinding
 import kotlinx.coroutines.MainScope

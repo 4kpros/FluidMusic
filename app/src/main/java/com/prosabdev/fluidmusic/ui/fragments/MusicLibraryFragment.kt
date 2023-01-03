@@ -1,38 +1,36 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.commit
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
 import com.prosabdev.fluidmusic.databinding.DialogAddToQueueMusicBinding
 import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
+import com.prosabdev.fluidmusic.ui.activities.EditTagsActivity
 import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
-import com.prosabdev.fluidmusic.utils.AnimatorsUtils
-import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.NowPlayingFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.workers.QueueMusicActionsWorkerViewModel
 import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
-import com.prosabdev.fluidmusic.workers.queuemusic.AddSongsToQueueMusicWorker
 
-class MusicLibraryFragment : Fragment() {
+@BuildCompat.PrereleaseSdkCheck class MusicLibraryFragment : Fragment() {
     private var mDataBidingView: FragmentMusicLibraryBinding? = null
 
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
-    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
+    private val mNowPlayingFragmentViewModel: NowPlayingFragmentViewModel by activityViewModels()
 
     private val mQueueMusicActionsWorkerViewModel: QueueMusicActionsWorkerViewModel by activityViewModels()
     private val mSongActionsWorkerViewModel: SongActionsWorkerViewModel by activityViewModels()
@@ -61,6 +59,7 @@ class MusicLibraryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         if(savedInstanceState == null){
             checkInteractions()
             observeLiveData()
@@ -137,12 +136,12 @@ class MusicLibraryFragment : Fragment() {
     }
     private fun showSideContentSelectionMenu(animate: Boolean = true) {
         mDataBidingView?.let { dataBidingView ->
-            AnimatorsUtils.crossFadeUp(
+            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUp(
                 dataBidingView.includeSideSelectionMenu.relativeContainer as View,
                 animate,
                 50
             )
-            AnimatorsUtils.crossFadeUp(
+            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUp(
                 dataBidingView.includeSideSelectionMenu.cardViewContainer as View,
                 animate,
                 200
@@ -151,12 +150,12 @@ class MusicLibraryFragment : Fragment() {
     }
     private fun hideSideContentSelectionMenu(animate: Boolean = true) {
         mDataBidingView?.let { dataBidingView ->
-            AnimatorsUtils.crossFadeDown(
+            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDown(
                 dataBidingView.includeSideSelectionMenu.relativeContainer as View,
                 animate,
                 25
             )
-            AnimatorsUtils.crossFadeDown(
+            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDown(
                 dataBidingView.includeSideSelectionMenu.cardViewContainer as View,
                 animate,
                 100
@@ -181,13 +180,13 @@ class MusicLibraryFragment : Fragment() {
         }
     }
     private fun disableSideSelectionActions(view : View) {
-        AnimatorsUtils.crossFadeDownClickable(
+        com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
             view,
             true
         )
     }
     private fun enableSideSelectionActions(view : View) {
-        AnimatorsUtils.crossFadeUpClickable(
+        com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
             view,
             true
         )
@@ -197,14 +196,14 @@ class MusicLibraryFragment : Fragment() {
         mDataBidingView?.let { dataBidingView ->
             if (isSelectMode) {
                 dataBidingView.viewPager.isUserInputEnabled = false
-                AnimatorsUtils.crossTranslateInFromHorizontal(
+                com.prosabdev.common.utils.AnimatorsUtils.crossTranslateInFromHorizontal(
                     dataBidingView.sideSelectionMenuContainer as View,
                     animate,
                     200
                 )
             } else {
                 dataBidingView.viewPager.isUserInputEnabled = true
-                AnimatorsUtils.crossTranslateOutFromHorizontal(
+                com.prosabdev.common.utils.AnimatorsUtils.crossTranslateOutFromHorizontal(
                     dataBidingView.sideSelectionMenuContainer as View,
                     1,
                     animate,
@@ -255,20 +254,23 @@ class MusicLibraryFragment : Fragment() {
         }
     }
     private fun openTagEditorFragment() {
-        activity?.let {
-            it.supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                add(
-                    R.id.main_activity_fragment_container,
-                    EditTagsFragment.newInstance(
-                        null,
-                        null,
-                        null
-                    )
-                )
-                addToBackStack(EditTagsFragment.TAG)
-            }
-        }
+
+        startActivity(Intent(context, EditTagsActivity::class.java).apply {})
+//        activity?.let {
+//            it.supportFragmentManager.commit {
+//                setReorderingAllowed(true)
+//                replace(
+//                    R.id.main_activity_fragment_container,
+//                    EditTagsFragment.newInstance(
+//                        null,
+//                        null,
+//                        null
+//                    ),
+//                    EditTagsFragment.TAG
+//                )
+//                addToBackStack(null)
+//            }
+//        }
     }
     private fun openPlaylistAddDialog() {
         //
@@ -361,7 +363,7 @@ class MusicLibraryFragment : Fragment() {
         val dataList = mMainFragmentViewModel.getSelectedDataList().value ?: return
         mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
             modelTypeInfo[0],
-            AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_BOTTOM,
+            com.prosabdev.common.workers.queuemusic.AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_BOTTOM,
             -1,
             dataList.values,
             modelTypeInfo[1],
@@ -372,10 +374,10 @@ class MusicLibraryFragment : Fragment() {
     private fun addSelectionToPlayNextOfQueueMusic() {
         val modelTypeInfo = CommonPlaybackAction.getModelTypeInfo(mMainFragmentViewModel)
         val dataList = mMainFragmentViewModel.getSelectedDataList().value ?: return
-        val currentPlayingPosition = mPlayerFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
+        val currentPlayingPosition = mNowPlayingFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
         mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
             modelTypeInfo[0],
-            AddSongsToQueueMusicWorker.ADD_METHOD_ADD_AT_POSITION,
+            com.prosabdev.common.workers.queuemusic.AddSongsToQueueMusicWorker.ADD_METHOD_ADD_AT_POSITION,
             currentPlayingPosition,
             dataList.values,
             modelTypeInfo[1],
@@ -388,7 +390,7 @@ class MusicLibraryFragment : Fragment() {
         val dataList = mMainFragmentViewModel.getSelectedDataList().value ?: return
         mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
             modelTypeInfo[0],
-            AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_TOP,
+            com.prosabdev.common.workers.queuemusic.AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_TOP,
             0,
             dataList.values,
             modelTypeInfo[1],
@@ -429,7 +431,7 @@ class MusicLibraryFragment : Fragment() {
 
     private fun initViews() {
         mDataBidingView?.let { dataBidingView ->
-            InsetModifiersUtils.updateTopViewInsets(dataBidingView.coordinatorLayout)
+            com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(dataBidingView.coordinatorLayout)
         }
     }
 

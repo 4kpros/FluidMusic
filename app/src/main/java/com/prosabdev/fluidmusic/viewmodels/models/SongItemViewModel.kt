@@ -2,8 +2,8 @@ package com.prosabdev.fluidmusic.viewmodels.models
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.prosabdev.fluidmusic.models.songitem.SongItem
-import com.prosabdev.fluidmusic.roomdatabase.repositories.songitem.SongItemRepository
+import com.prosabdev.common.models.songitem.SongItem
+import com.prosabdev.common.roomdatabase.repositories.songitem.SongItemRepository
 
 
 class SongItemViewModel(app: Application) : AndroidViewModel(app) {

@@ -4,9 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.work.*
-import com.prosabdev.fluidmusic.workers.WorkerConstantValues
-import com.prosabdev.fluidmusic.workers.playlist.AddSongsToPlaylistWorker
-import com.prosabdev.fluidmusic.workers.playlist.RemoveSongsFromPlaylistWorker
+import com.prosabdev.common.workers.WorkerConstantValues
+import com.prosabdev.common.workers.playlist.AddSongsToPlaylistWorker
+import com.prosabdev.common.workers.playlist.RemoveSongsFromPlaylistWorker
 
 class PlaylistActionsWorkerViewModel(app: Application) : AndroidViewModel(app) {
     private val outputWorkInfoAddSongsToPlaylist : LiveData<List<WorkInfo>>
@@ -15,7 +15,8 @@ class PlaylistActionsWorkerViewModel(app: Application) : AndroidViewModel(app) {
     private val workManager : WorkManager = WorkManager.getInstance(app.applicationContext)
     init {
         outputWorkInfoAddSongsToPlaylist = workManager.getWorkInfosByTagLiveData(AddSongsToPlaylistWorker.TAG)
-        outputWorkInfoRemoveSongFromPlaylist = workManager.getWorkInfosByTagLiveData(RemoveSongsFromPlaylistWorker.TAG)
+        outputWorkInfoRemoveSongFromPlaylist = workManager.getWorkInfosByTagLiveData(
+            RemoveSongsFromPlaylistWorker.TAG)
     }
     fun addSongsToPlaylist(
         playlistId: Long,

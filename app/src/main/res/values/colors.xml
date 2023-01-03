@@ -4,6 +4,10 @@
     <color name="white">#FFFFFFFF</color>
     <color name="transparent">#00000000</color>
 
+    <color name="goldDarkL">#FAF8F1</color>
+    <color name="goldDark">#FAEAB1</color>
+    <color name="goldDarkH">#E5BA73</color>
+
     <color name="semiBlack">#33000000</color>
     <color name="semiWhite">#33FFFFFF</color>
 

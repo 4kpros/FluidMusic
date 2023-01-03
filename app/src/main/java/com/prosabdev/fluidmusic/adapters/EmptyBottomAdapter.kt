@@ -8,7 +8,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemEmptyBottomSpaceBinding
-import com.prosabdev.fluidmusic.utils.AnimatorsUtils
 
 class EmptyBottomAdapter(
     private val mEmptyList: ArrayList<String>
@@ -49,7 +48,7 @@ class EmptyBottomAdapter(
             if(textVisible){
                 mItemEmptyBottomSpaceBinding.constraintContainer.visibility = VISIBLE
                 if(scrollState == 2) {
-                    AnimatorsUtils.crossFadeUp(mItemEmptyBottomSpaceBinding.textEnd, true, 500)
+                    com.prosabdev.common.utils.AnimatorsUtils.crossFadeUp(mItemEmptyBottomSpaceBinding.textEnd, true, 500)
                 }
             }else{
                 mItemEmptyBottomSpaceBinding.constraintContainer.visibility = INVISIBLE

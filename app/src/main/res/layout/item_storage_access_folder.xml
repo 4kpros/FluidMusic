@@ -5,7 +5,7 @@
     <data>
         <variable
             name="folderUriTree"
-            type="com.prosabdev.fluidmusic.models.FolderUriTree" />
+            type="com.prosabdev.common.models.FolderUriTree" />
     </data>
 
     <com.google.android.material.card.MaterialCardView

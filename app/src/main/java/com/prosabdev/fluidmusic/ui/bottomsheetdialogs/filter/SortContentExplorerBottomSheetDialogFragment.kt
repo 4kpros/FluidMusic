@@ -121,34 +121,64 @@ class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment()
     private fun updateTitleUI() {
         when (mFromSource) {
             AlbumsFragment.TAG -> {
-                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.albums) ?: ""
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                    R.string._sort_for,
+                    context?.resources?.getString(R.string.albums) ?: ""
+                ) ?: ""
             }
             AlbumArtistsFragment.TAG -> {
-                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.album_artists) ?: ""
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                    R.string._sort_for,
+                    context?.resources?.getString(R.string.album_artists) ?: ""
+                ) ?: ""
             }
             ArtistsFragment.TAG -> {
-                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.artists) ?: ""
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                    R.string._sort_for,
+                    context?.resources?.getString(R.string.artists) ?: ""
+                ) ?: ""
             }
             ComposersFragment.TAG -> {
-                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.composers) ?: ""
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                    R.string._sort_for,
+                    context?.resources?.getString(R.string.composers) ?: ""
+                ) ?: ""
             }
             FoldersFragment.TAG -> {
-                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.folders) ?: ""
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                    R.string._sort_for,
+                    context?.resources?.getString(R.string.folders) ?: ""
+                ) ?: ""
             }
             GenresFragment.TAG -> {
-                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.genres) ?: ""
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                    R.string._sort_for,
+                    context?.resources?.getString(R.string.genres) ?: ""
+                ) ?: ""
             }
             YearsFragment.TAG -> {
-                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.years) ?: ""
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                    R.string._sort_for,
+                    context?.resources?.getString(R.string.years) ?: ""
+                ) ?: ""
             }
             PlaylistsFragment.TAG -> {
-                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.playlists) ?: ""
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                    R.string._sort_for,
+                    context?.resources?.getString(R.string.playlists) ?: ""
+                ) ?: ""
             }
 //            FavoritesFragment.TAG -> {
-//                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.favorites) ?: ""
+//                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+//                    R.string._sort_for,
+//                    context?.resources?.getString(R.string.favorites) ?: ""
+//                ) ?: ""
 //            }
             StreamsFragment.TAG -> {
-                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(R.string.streams) ?: ""
+                mDataBidingView?.textSortDetails?.text = context?.resources?.getString(
+                    R.string._sort_for,
+                    context?.resources?.getString(R.string.streams) ?: ""
+                ) ?: ""
             }
         }
     }

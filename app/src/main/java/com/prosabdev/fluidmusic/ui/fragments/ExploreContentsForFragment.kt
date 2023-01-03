@@ -1,7 +1,6 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
@@ -9,7 +8,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.app.SharedElementCallback
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -17,15 +15,9 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.Transition
-import androidx.transition.TransitionInflater
 import com.google.android.material.textview.MaterialTextView
-import com.google.android.material.transition.platform.FadeThroughProvider
-import com.google.android.material.transition.platform.MaterialContainerTransform
-import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.l4digital.fastscroll.FastScroller
-import com.prosabdev.fluidmusic.MainActivity
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.GridSpacingItemDecoration
@@ -33,21 +25,15 @@ import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.generic.GenericListGridItemAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentExploreContentsForBinding
-import com.prosabdev.fluidmusic.models.generic.GenericItemListGrid
-import com.prosabdev.fluidmusic.models.songitem.SongItem
-import com.prosabdev.fluidmusic.sharedprefs.SharedPreferenceManagerUtils
-import com.prosabdev.fluidmusic.sharedprefs.models.SortOrganizeItemSP
-import com.prosabdev.fluidmusic.ui.activities.SettingsActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortSongsBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
 import com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
 import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
-import com.prosabdev.fluidmusic.utils.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.ExploreContentsForFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.fragments.PlayerFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.NowPlayingFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.SongItemViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -61,7 +47,7 @@ class ExploreContentsForFragment : Fragment() {
 
     private val mExploreContentsForFragmentViewModel: ExploreContentsForFragmentViewModel by activityViewModels()
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
-    private val mPlayerFragmentViewModel: PlayerFragmentViewModel by activityViewModels()
+    private val mNowPlayingFragmentViewModel: NowPlayingFragmentViewModel by activityViewModels()
 
     private val mSongItemViewModel: SongItemViewModel by activityViewModels()
 
@@ -125,11 +111,11 @@ class ExploreContentsForFragment : Fragment() {
 
     private fun saveAllDataToPref(){
         context?.let { ctx ->
-            val tempSortOrganize = SortOrganizeItemSP()
+            val tempSortOrganize = com.prosabdev.common.sharedprefs.models.SortOrganizeItemSP()
             tempSortOrganize.sortOrderBy = mExploreContentsForFragmentViewModel.getSortBy().value ?: SORT_LIST_GRID_DEFAULT_VALUE
             tempSortOrganize.organizeListGrid = mExploreContentsForFragmentViewModel.getOrganizeListGrid().value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
             tempSortOrganize.isInvertSort = mExploreContentsForFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
-            SharedPreferenceManagerUtils
+            com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
                 .SortAnOrganizeForExploreContents
                 .saveSortOrganizeItemsFor(
                     ctx,
@@ -140,8 +126,8 @@ class ExploreContentsForFragment : Fragment() {
     }
     private fun loadPrefsAndInitViewModel() {
         context?.let { ctx ->
-            val tempSortOrganize: SortOrganizeItemSP? =
-                SharedPreferenceManagerUtils
+            val tempSortOrganize: com.prosabdev.common.sharedprefs.models.SortOrganizeItemSP? =
+                com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
                     .SortAnOrganizeForExploreContents
                     .loadSortOrganizeItemsFor(
                         ctx,
@@ -173,10 +159,10 @@ class ExploreContentsForFragment : Fragment() {
         }
 
         //Listen to player changes
-        mPlayerFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner) {
+        mNowPlayingFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner) {
             updatePlayingSongUI(it)
         }
-        mPlayerFragmentViewModel.getIsPlaying().observe(viewLifecycleOwner) {
+        mNowPlayingFragmentViewModel.getIsPlaying().observe(viewLifecycleOwner) {
             updatePlaybackStateUI(it)
         }
 
@@ -217,14 +203,14 @@ class ExploreContentsForFragment : Fragment() {
             mGenericListGridItemAdapter?.submitList(mExploreContentsForFragmentViewModel.getAll().value)
         }
         if(
-            mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
-            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == mWhereColumnIndex &&
-            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == mWhereColumnValue &&
-            mPlayerFragmentViewModel.getSortBy().value == mExploreContentsForFragmentViewModel.getSortBy().value &&
-            mPlayerFragmentViewModel.getIsInverted().value == mExploreContentsForFragmentViewModel.getIsInverted().value
+            mNowPlayingFragmentViewModel.getQueueListSource().value == TAG &&
+            mNowPlayingFragmentViewModel.getQueueListSourceColumnIndex().value == mWhereColumnIndex &&
+            mNowPlayingFragmentViewModel.getQueueListSourceColumnValue().value == mWhereColumnValue &&
+            mNowPlayingFragmentViewModel.getSortBy().value == mExploreContentsForFragmentViewModel.getSortBy().value &&
+            mNowPlayingFragmentViewModel.getIsInverted().value == mExploreContentsForFragmentViewModel.getIsInverted().value
         ){
-            mGenericListGridItemAdapter?.setPlayingPosition(mPlayerFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0)
-            mGenericListGridItemAdapter?.setIsPlaying(mPlayerFragmentViewModel.getIsPlaying().value ?: false)
+            mGenericListGridItemAdapter?.setPlayingPosition(mNowPlayingFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0)
+            mGenericListGridItemAdapter?.setIsPlaying(mNowPlayingFragmentViewModel.getIsPlaying().value ?: false)
         }else{
             mGenericListGridItemAdapter?.setPlayingPosition(-1)
             mGenericListGridItemAdapter?.setIsPlaying(false)
@@ -250,14 +236,14 @@ class ExploreContentsForFragment : Fragment() {
             mMainFragmentViewModel.setTotalCount(dataList?.size ?: 0)
         }
         if(
-            mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
-            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == mWhereColumnIndex &&
-            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == mWhereColumnValue &&
-            mPlayerFragmentViewModel.getSortBy().value == mExploreContentsForFragmentViewModel.getSortBy().value &&
-            mPlayerFragmentViewModel.getIsInverted().value == mExploreContentsForFragmentViewModel.getIsInverted().value
+            mNowPlayingFragmentViewModel.getQueueListSource().value == TAG &&
+            mNowPlayingFragmentViewModel.getQueueListSourceColumnIndex().value == mWhereColumnIndex &&
+            mNowPlayingFragmentViewModel.getQueueListSourceColumnValue().value == mWhereColumnValue &&
+            mNowPlayingFragmentViewModel.getSortBy().value == mExploreContentsForFragmentViewModel.getSortBy().value &&
+            mNowPlayingFragmentViewModel.getIsInverted().value == mExploreContentsForFragmentViewModel.getIsInverted().value
         ){
-            mGenericListGridItemAdapter?.setPlayingPosition(mPlayerFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0)
-            mGenericListGridItemAdapter?.setIsPlaying(mPlayerFragmentViewModel.getIsPlaying().value ?: false)
+            mGenericListGridItemAdapter?.setPlayingPosition(mNowPlayingFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0)
+            mGenericListGridItemAdapter?.setIsPlaying(mNowPlayingFragmentViewModel.getIsPlaying().value ?: false)
         }else{
             mGenericListGridItemAdapter?.setPlayingPosition(-1)
             mGenericListGridItemAdapter?.setIsPlaying(false)
@@ -297,19 +283,19 @@ class ExploreContentsForFragment : Fragment() {
             mHeadlineTopPlayShuffleAdapter?.onSelectModeValue(it ?: false)
         }
     }
-    private fun updatePlayingSongUI(songItem: SongItem?) {
+    private fun updatePlayingSongUI(songItem: com.prosabdev.common.models.songitem.SongItem?) {
         val songPosition: Int = songItem?.position ?: -1
 
         if (
-            mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
-            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == mWhereColumnIndex &&
-            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == mWhereColumnValue &&
-            mPlayerFragmentViewModel.getSortBy().value == mExploreContentsForFragmentViewModel.getSortBy().value &&
-            mPlayerFragmentViewModel.getIsInverted().value == mExploreContentsForFragmentViewModel.getIsInverted().value
+            mNowPlayingFragmentViewModel.getQueueListSource().value == TAG &&
+            mNowPlayingFragmentViewModel.getQueueListSourceColumnIndex().value == mWhereColumnIndex &&
+            mNowPlayingFragmentViewModel.getQueueListSourceColumnValue().value == mWhereColumnValue &&
+            mNowPlayingFragmentViewModel.getSortBy().value == mExploreContentsForFragmentViewModel.getSortBy().value &&
+            mNowPlayingFragmentViewModel.getIsInverted().value == mExploreContentsForFragmentViewModel.getIsInverted().value
         ) {
             mGenericListGridItemAdapter?.setPlayingPosition(songPosition)
             mGenericListGridItemAdapter?.setIsPlaying(
-                mPlayerFragmentViewModel.getIsPlaying().value ?: false
+                mNowPlayingFragmentViewModel.getIsPlaying().value ?: false
             )
             tryToScrollOnCurrentItem(songPosition)
         } else {
@@ -320,9 +306,9 @@ class ExploreContentsForFragment : Fragment() {
     private fun tryToScrollOnCurrentItem(position: Int) {
         if (position >= 0) {
             val tempCanScrollToPlayingSong: Boolean =
-                mPlayerFragmentViewModel.getCanScrollCurrentPlayingSong().value ?: false
+                mNowPlayingFragmentViewModel.getCanScrollCurrentPlayingSong().value ?: false
             if (!tempCanScrollToPlayingSong) return
-            mPlayerFragmentViewModel.setCanScrollCurrentPlayingSong(false)
+            mNowPlayingFragmentViewModel.setCanScrollCurrentPlayingSong(false)
             val tempFV: Int = (mLayoutManager?.findFirstVisibleItemPosition() ?: 0) - 1
             val tempLV: Int = mLayoutManager?.findLastVisibleItemPosition() ?: +1
             val tempVisibility: Boolean = position in tempFV..tempLV
@@ -346,18 +332,18 @@ class ExploreContentsForFragment : Fragment() {
 
     private fun updatePlaybackStateUI(isPlaying: Boolean) {
         if (
-            mPlayerFragmentViewModel.getQueueListSource().value == TAG &&
-            mPlayerFragmentViewModel.getQueueListSourceColumnIndex().value == mWhereColumnIndex &&
-            mPlayerFragmentViewModel.getQueueListSourceColumnValue().value == mWhereColumnValue &&
-            mPlayerFragmentViewModel.getSortBy().value == mExploreContentsForFragmentViewModel.getSortBy().value &&
-            mPlayerFragmentViewModel.getIsInverted().value == mExploreContentsForFragmentViewModel.getIsInverted().value
+            mNowPlayingFragmentViewModel.getQueueListSource().value == TAG &&
+            mNowPlayingFragmentViewModel.getQueueListSourceColumnIndex().value == mWhereColumnIndex &&
+            mNowPlayingFragmentViewModel.getQueueListSourceColumnValue().value == mWhereColumnValue &&
+            mNowPlayingFragmentViewModel.getSortBy().value == mExploreContentsForFragmentViewModel.getSortBy().value &&
+            mNowPlayingFragmentViewModel.getIsInverted().value == mExploreContentsForFragmentViewModel.getIsInverted().value
         ) {
             mGenericListGridItemAdapter?.setPlayingPosition(
-                mPlayerFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
+                mNowPlayingFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
             )
             mGenericListGridItemAdapter?.setIsPlaying(isPlaying)
             tryToScrollOnCurrentItem(
-                mPlayerFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
+                mNowPlayingFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
             )
         } else {
             if (mGenericListGridItemAdapter?.getIsPlaying() == true) {
@@ -438,7 +424,7 @@ class ExploreContentsForFragment : Fragment() {
             mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
                 override fun onPlayButtonClicked() {
                     CommonPlaybackAction.playSongAtPositionFromGenericAdapterView(
-                        mPlayerFragmentViewModel,
+                        mNowPlayingFragmentViewModel,
                         mExploreContentsForFragmentViewModel,
                         mGenericListGridItemAdapter,
                         TAG,
@@ -462,14 +448,14 @@ class ExploreContentsForFragment : Fragment() {
             mGenericListGridItemAdapter = GenericListGridItemAdapter(
                 ctx,
                 object : GenericListGridItemAdapter.OnItemRequestDataInfo{
-                    override fun onRequestDataInfo(dataItem: Any, position: Int): GenericItemListGrid? {
-                        return SongItem.castDataItemToGeneric(ctx, dataItem)
+                    override fun onRequestDataInfo(dataItem: Any, position: Int): com.prosabdev.common.models.generic.GenericItemListGrid? {
+                        return com.prosabdev.common.models.songitem.SongItem.castDataItemToGeneric(ctx, dataItem)
                     }
                     override fun onRequestTextIndexForFastScroller(
                         dataItem: Any,
                         position: Int
                     ): String {
-                        return SongItem.getStringIndexForFastScroller(dataItem)
+                        return com.prosabdev.common.models.songitem.SongItem.getStringIndexForFastScroller(dataItem)
                     }
                 },
                 object : GenericListGridItemAdapter.OnItemClickListener{
@@ -484,7 +470,7 @@ class ExploreContentsForFragment : Fragment() {
                             mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
                         }else{
                             CommonPlaybackAction.playSongAtPositionFromGenericAdapterView(
-                                mPlayerFragmentViewModel,
+                                mNowPlayingFragmentViewModel,
                                 mExploreContentsForFragmentViewModel,
                                 mGenericListGridItemAdapter,
                                 TAG,
@@ -506,7 +492,7 @@ class ExploreContentsForFragment : Fragment() {
                         mMainFragmentViewModel.setSelectMode(selectMode)
                     }
                     override fun onRequestGetStringIndex(position: Int): String {
-                        return SongItem.getStringIndexForSelection(
+                        return com.prosabdev.common.models.songitem.SongItem.getStringIndexForSelection(
                             mGenericListGridItemAdapter?.currentList?.get(position)
                         )
                     }
@@ -514,7 +500,7 @@ class ExploreContentsForFragment : Fragment() {
                         mMainFragmentViewModel.setSelectedDataList(selectedList)
                     }
                 },
-                SongItem.diffCallback as DiffUtil.ItemCallback<Any>,
+                com.prosabdev.common.models.songitem.SongItem.diffCallback as DiffUtil.ItemCallback<Any>,
                 mExploreContentsForFragmentViewModel.getOrganizeListGrid().value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE,
                 mIsSelectable = true,
                 mHavePlaybackState = true,
@@ -617,13 +603,13 @@ class ExploreContentsForFragment : Fragment() {
         MainScope().launch {
             withContext(Dispatchers.Default){
                 val randomExcludedNumber: Int =
-                    MathComputationsUtils.randomExcluded(
+                    com.prosabdev.common.utils.MathComputationsUtils.randomExcluded(
                         mGenericListGridItemAdapter?.getPlayingPosition() ?: -1,
                         (mGenericListGridItemAdapter?.currentList?.size ?: 0) -1
                     )
                 mGenericListGridItemAdapter?.let { genericListGridItemAdapter ->
                     CommonPlaybackAction.playSongAtPositionFromGenericAdapterView(
-                        mPlayerFragmentViewModel,
+                        mNowPlayingFragmentViewModel,
                         mExploreContentsForFragmentViewModel,
                         genericListGridItemAdapter,
                         TAG,
@@ -648,7 +634,7 @@ class ExploreContentsForFragment : Fragment() {
     private fun initViews() {
         mDataBidingView?.recyclerView?.setHasFixedSize(true)
         mDataBidingView?.constraintFastScrollerContainer?.let {
-            InsetModifiersUtils.updateBottomViewInsets(
+            com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(
                 it
             )
         }
@@ -670,11 +656,11 @@ class ExploreContentsForFragment : Fragment() {
     private suspend fun updateCoverArts() {
         withContext(Dispatchers.Default){
             context?.let { ctx ->
-                val imageRequestLargeImage = ImageLoadersUtils.ImageRequestItem.newOriginalMediumCardInstance()
+                val imageRequestLargeImage = com.prosabdev.common.utils.ImageLoadersUtils.ImageRequestItem.newOriginalMediumCardInstance()
                 imageRequestLargeImage.uri = Uri.parse(mImageUri ?: return@withContext)
                 imageRequestLargeImage.hashedCovertArtSignature = mHashedCoverArtSignature
                 imageRequestLargeImage.imageView = mDataBidingView?.imageViewCoverArt
-                ImageLoadersUtils.startExploreContentImageLoaderJob(
+                com.prosabdev.common.utils.ImageLoadersUtils.startExploreContentImageLoaderJob(
                     ctx,
                     imageRequestLargeImage
                 )
@@ -748,8 +734,8 @@ class ExploreContentsForFragment : Fragment() {
 
     companion object {
         const val TAG = "ExploreContentsFor"
-        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = ConstantValues.ORGANIZE_LIST_SMALL
-        private const val SORT_LIST_GRID_DEFAULT_VALUE: String = SongItem.DEFAULT_INDEX
+        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = com.prosabdev.common.utils.ConstantValues.ORGANIZE_LIST_SMALL
+        private const val SORT_LIST_GRID_DEFAULT_VALUE: String = com.prosabdev.common.models.songitem.SongItem.DEFAULT_INDEX
         private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 
         @JvmStatic

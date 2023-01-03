@@ -3,8 +3,8 @@ package com.prosabdev.fluidmusic.viewmodels.models.explore
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.prosabdev.fluidmusic.models.view.GenreItem
-import com.prosabdev.fluidmusic.roomdatabase.repositories.explore.GenreItemRepository
+import com.prosabdev.common.models.view.GenreItem
+import com.prosabdev.common.roomdatabase.repositories.explore.GenreItemRepository
 
 class GenreItemViewModel(app: Application) : AndroidViewModel(app) {
 

@@ -13,6 +13,12 @@
         <item name="colorErrorContainer">@color/md_theme_dark_errorContainer</item>
         <item name="colorOnErrorContainer">@color/md_theme_dark_onErrorContainer</item>
     </style>
+    <style name="ShapeRoundedTextContainer" parent="Widget.Material3.CardView.Outlined">
+        <item name="strokeColor">@color/transparent</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="cardBackgroundColor">@color/semiBlack</item>
+    </style>
+
 
     <style name="MainTheme" parent="BaseThemeDark">
         <item name="colorPrimary">@color/white</item>
@@ -29,7 +35,7 @@
         <item name="colorSurface">#131313</item>
         <item name="colorOnSurface">@color/white</item>
         <item name="colorSurfaceVariant">#393939</item>--
-        <item name="colorOnSurfaceVariant">#FFFFFF</item>
+        <item name="colorOnSurfaceVariant">@color/white</item>
         <item name="colorSurfaceInverse">#E6E6E6</item>
         <item name="colorOnSurfaceInverse">#353535</item>
         <item name="colorPrimaryInverse">#B8B8B8</item>
@@ -65,16 +71,44 @@
         <item name="colorSurface">@color/black</item>
         <item name="colorOnSurface">@color/white</item>
         <item name="colorSurfaceVariant">#1C1C1C</item>
-        <item name="colorOnSurfaceVariant">#CDCDCD</item>
+        <item name="colorOnSurfaceVariant">@color/white</item>
         <item name="colorSurfaceInverse">#E6E6E6</item>
         <item name="colorOnSurfaceInverse">#353535</item>
         <item name="colorPrimaryInverse">#B8B8B8</item>
 
-        <item name="android:textColorHighlight">#4DFFFFFF</item>
+        <item name="android:textColorHint">#80FFFFFF</item>
+        <item name="android:textColorHighlight">#59FFFFFF</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
 
-        <item name="android:textColor">#FFFFFF</item>
-        <item name="android:textColorPrimary">#FFFFFF</item>
-        <item name="android:textColorSecondary">#FFFFFF</item>
+    </style>
+
+    <style name="Gold" parent="BaseThemeDark">
+        <item name="colorPrimary">@color/goldDark</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimaryContainer">@color/black</item>
+        <item name="colorOnPrimaryContainer">@color/goldDark</item>
+        <item name="colorSecondary">@color/goldDarkH</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondaryContainer">#333333</item>
+        <item name="colorOnSecondaryContainer">@color/goldDark</item>
+        <item name="colorOutline">#333333</item>
+        <item name="android:colorBackground">@color/black</item>
+        <item name="colorOnBackground">@color/goldDark</item>
+        <item name="colorSurface">@color/black</item>
+        <item name="colorOnSurface">@color/goldDark</item>
+        <item name="colorSurfaceVariant">#401C1C1C</item>
+        <item name="colorOnSurfaceVariant">@color/goldDark</item>
+        <item name="colorSurfaceInverse">@color/goldDarkH</item>
+        <item name="colorOnSurfaceInverse">#353535</item>
+        <item name="colorPrimaryInverse">@color/goldDarkL</item>
+
+        <item name="android:textColorHighlight">@color/goldDark</item>
+
+        <item name="android:textColor">@color/goldDark</item>
+        <item name="android:textColorPrimary">@color/goldDark</item>
+        <item name="android:textColorSecondary">@color/goldDark</item>
     </style>
 
     <style name="AppTheme" parent="BaseThemeDark">

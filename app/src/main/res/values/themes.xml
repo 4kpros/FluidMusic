@@ -39,15 +39,37 @@
         <item name="cornerSizeBottomLeft">@dimen/corner_radius_medium</item>
         <item name="cornerSizeBottomRight">@dimen/corner_radius_medium</item>
     </style>
+    <style name="ShapeRoundedTextContainer" parent="Widget.Material3.CardView.Outlined">
+        <item name="strokeColor">@color/transparent</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="cardBackgroundColor">@color/semiWhite</item>
+    </style>
+    <style name="CustomCircularProgress">
+        <item name="cs_circle_fill">@color/transparent</item>
+        <item name="cs_circle_color">?colorSurfaceVariant</item>
+        <item name="cs_circle_progress_color">?colorPrimary</item>
+        <item name="cs_start_angle">145</item>
+        <item name="cs_end_angle">35</item>
+        <item name="cs_negative_enabled">false</item>
+        <item name="cs_circle_stroke_width">2dp</item>
+        <item name="cs_pointer_stroke_width">14dp</item>
 
+        <item name="cs_move_outside_circle">true</item>
+        <item name="cs_disable_pointer">false</item>
+        <item name="cs_disable_progress_glow">true</item>
+        <item name="cs_hide_progress_when_empty">false</item>
+        <item name="cs_pointer_color">?colorPrimary</item>
+        <item name="cs_pointer_halo_color">@color/transparent</item>
+        <item name="cs_pointer_halo_color_ontouch">@color/transparent</item>
+    </style>
 
 
     <style name="MainTheme" parent="BaseThemeLight">
         <item name="colorPrimary">@color/black</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
-        <item name="colorPrimaryContainer">#FFFFFF</item>
-        <item name="colorOnPrimaryContainer">#000000</item>
-        <item name="colorSecondary">#000000</item>
+        <item name="colorPrimaryContainer">@color/white</item>
+        <item name="colorOnPrimaryContainer">@color/black</item>
+        <item name="colorSecondary">@color/black</item>
         <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
         <item name="colorSecondaryContainer">#DFDFDF</item>
         <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
@@ -80,28 +102,28 @@
 
     <style name="JustDark" parent="BaseThemeLight">
         <item name="colorPrimary">@color/black</item>
-        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
-        <item name="colorPrimaryContainer">#FFFFFF</item>
-        <item name="colorOnPrimaryContainer">#000000</item>
-        <item name="colorSecondary">#000000</item>
-        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/white</item>
+        <item name="colorOnPrimaryContainer">@color/black</item>
+        <item name="colorSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/white</item>
         <item name="colorSecondaryContainer">#DFDFDF</item>
-        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/black</item>
         <item name="colorOutline">#858585</item>
-        <item name="android:colorBackground">@color/md_theme_light_background</item>
-        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
-        <item name="colorSurface">@color/md_theme_light_surface</item>
-        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="android:colorBackground">@color/white</item>
+        <item name="colorOnBackground">@color/black</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">#202020</item>
         <item name="colorSurfaceVariant">#EFEFEF</item>
-        <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
-        <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
+        <item name="colorOnSurfaceVariant">#4A4A4A</item>
+        <item name="colorSurfaceInverse">#303030</item>
         <item name="colorOnSurfaceInverse">#F4F4F4</item>
         <item name="colorPrimaryInverse">#CFCFCF</item>
 
         <item name="android:textColorHighlight">#4D000000</item>
         <item name="android:textColor">@color/black</item>
-        <item name="android:textColorPrimary">#000000</item>
-        <item name="android:textColorSecondary">#000000</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@color/black</item>
     </style>
 
     <style name="AppTheme" parent="BaseThemeLight">

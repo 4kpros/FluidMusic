@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentEditTagsBinding
-import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 
 class EditTagsFragment : Fragment() {
 
@@ -20,6 +20,7 @@ class EditTagsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Y, true)
         arguments?.let {
         }
     }
@@ -30,12 +31,13 @@ class EditTagsFragment : Fragment() {
     ): View? {
         mDataBidingView = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_tags, container, false)
 
+        initViews()
         return mDataBidingView?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initViews()
+
         setupSongInfoData()
         observeLiveData()
         checkInteractions()
@@ -52,8 +54,8 @@ class EditTagsFragment : Fragment() {
 
     private fun initViews() {
         mDataBidingView?.let { dataBidingView ->
-            InsetModifiersUtils.updateTopViewInsets(dataBidingView.coordinatorLayout)
-            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.container)
+            com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(dataBidingView.coordinatorLayout)
+            com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(dataBidingView.constraintNestedScrollView)
         }
     }
 

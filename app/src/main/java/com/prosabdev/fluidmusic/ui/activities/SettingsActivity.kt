@@ -14,11 +14,10 @@ import com.prosabdev.fluidmusic.databinding.ActivitySettingsBinding
 import com.prosabdev.fluidmusic.ui.activities.settings.InterfaceSettingsActivity
 import com.prosabdev.fluidmusic.ui.activities.settings.LanguageSettingsActivity
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
-import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 
 @BuildCompat.PrereleaseSdkCheck class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var mActivitySettingsBinding : ActivitySettingsBinding
+    private lateinit var mDataBidingView : ActivitySettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +25,7 @@ import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        mActivitySettingsBinding = DataBindingUtil.setContentView(this, R.layout.activity_settings)
+        mDataBidingView = DataBindingUtil.setContentView(this, R.layout.activity_settings)
 
         initViews()
         checkInteractions()
@@ -50,11 +49,11 @@ import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
     }
 
     private fun checkInteractions() {
-        mActivitySettingsBinding.topAppBar.setNavigationOnClickListener {
+        mDataBidingView.topAppBar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        mActivitySettingsBinding.topAppBar.setOnMenuItemClickListener { menuItem ->
+        mDataBidingView.topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.search -> {
                     //
@@ -63,38 +62,38 @@ import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
                 else -> false
             }
         }
-        mActivitySettingsBinding.cardViewLanguage.setOnClickListener{
+        mDataBidingView.cardViewLanguage.setOnClickListener{
             startActivity(Intent(this, LanguageSettingsActivity::class.java).apply {})
         }
-        mActivitySettingsBinding.cardViewInterface.setOnClickListener{
+        mDataBidingView.cardViewInterface.setOnClickListener{
             startActivity(Intent(this, InterfaceSettingsActivity::class.java).apply {})
         }
-        mActivitySettingsBinding.cardViewCoverArt.setOnClickListener{
+        mDataBidingView.cardViewCoverArt.setOnClickListener{
             //
         }
-        mActivitySettingsBinding.cardViewNowPlaying.setOnClickListener{
+        mDataBidingView.cardViewNowPlaying.setOnClickListener{
             //
         }
-        mActivitySettingsBinding.cardViewAudio.setOnClickListener{
+        mDataBidingView.cardViewAudio.setOnClickListener{
             //
         }
-        mActivitySettingsBinding.cardViewNotifications.setOnClickListener{
+        mDataBidingView.cardViewNotifications.setOnClickListener{
             //
         }
-        mActivitySettingsBinding.cardViewLibraryScanner.setOnClickListener{
+        mDataBidingView.cardViewLibraryScanner.setOnClickListener{
             startActivity(Intent(this, MediaScannerSettingsActivity::class.java).apply {})
         }
-        mActivitySettingsBinding.cardViewHeadsetBluetooth.setOnClickListener{
+        mDataBidingView.cardViewHeadsetBluetooth.setOnClickListener{
             //
         }
-        mActivitySettingsBinding.cardViewAbout.setOnClickListener{
+        mDataBidingView.cardViewAbout.setOnClickListener{
             //
         }
     }
 
     private fun initViews() {
-        InsetModifiersUtils.updateTopViewInsets(mActivitySettingsBinding.coordinatorLayout)
-        InsetModifiersUtils.updateBottomViewInsets(mActivitySettingsBinding.container)
+        com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
+        com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.container)
     }
 
     companion object {

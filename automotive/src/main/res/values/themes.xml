@@ -1,0 +1,4 @@
+<resources>
+
+    <style name="Theme.FluidMusic" parent="android:Theme.Material.Light.DarkActionBar" />
+</resources>

@@ -11,17 +11,16 @@ import com.google.android.material.transition.platform.MaterialArcMotion
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityInterfaceSettingsBinding
-import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
 
 @BuildCompat.PrereleaseSdkCheck class InterfaceSettingsActivity : AppCompatActivity() {
 
-    private lateinit var mActivityInterfaceSettingsBinding : ActivityInterfaceSettingsBinding
+    private lateinit var mDataBidingView : ActivityInterfaceSettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
 
-        mActivityInterfaceSettingsBinding = DataBindingUtil.setContentView(this, R.layout.activity_interface_settings)
+        mDataBidingView = DataBindingUtil.setContentView(this, R.layout.activity_interface_settings)
 
         initViews()
         checkInteractions()
@@ -63,14 +62,14 @@ import com.prosabdev.fluidmusic.utils.InsetModifiersUtils
     }
 
     private fun checkInteractions() {
-        mActivityInterfaceSettingsBinding.topAppBar.setNavigationOnClickListener {
+        mDataBidingView.topAppBar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
     }
 
     private fun initViews() {
-        InsetModifiersUtils.updateTopViewInsets(mActivityInterfaceSettingsBinding.coordinatorSettingsActivity)
-        InsetModifiersUtils.updateBottomViewInsets(mActivityInterfaceSettingsBinding.emptyView)
+        com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorSettingsActivity)
+        com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.emptyView)
     }
 
     companion object {

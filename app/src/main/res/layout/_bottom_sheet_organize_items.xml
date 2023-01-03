@@ -28,16 +28,6 @@
                 app:srcCompat="@drawable/table_view" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/text_organize"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/TextAppearance.Material3.TitleMedium"
-                android:text="@string/organize"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:layout_marginStart="@dimen/margin_small_size" />
-
-            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/text_organize_details"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

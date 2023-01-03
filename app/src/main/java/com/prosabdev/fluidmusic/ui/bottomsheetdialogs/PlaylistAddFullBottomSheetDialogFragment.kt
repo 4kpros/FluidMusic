@@ -7,37 +7,30 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.playlist.PlaylistItemAdapter
 import com.prosabdev.fluidmusic.databinding.BottomSheetAddToPlaylistBinding
-import com.prosabdev.fluidmusic.databinding.DialogNewPlaylistBinding
-import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
-import com.prosabdev.fluidmusic.models.playlist.PlaylistSongItem
-import com.prosabdev.fluidmusic.utils.SystemSettingsUtils
+import com.prosabdev.fluidmusic.databinding.ComponentDialogEditTextBinding
+import com.prosabdev.fluidmusic.databinding.ComponentDialogTitleBinding
 import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistItemViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistSongItemViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 
 class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFragment() {
 
     private lateinit var mBottomSheetAddToPlaylistBinding: BottomSheetAddToPlaylistBinding
 
-    private lateinit var mPlaylistItemViewModel: PlaylistItemViewModel
-    private lateinit var mPlaylistSongItemViewModel: PlaylistSongItemViewModel
+    private var mPlaylistItemViewModel: PlaylistItemViewModel? = null
 
     private var mPlaylistItemAdapter: PlaylistItemAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
 
-    private var mSongsToAddOnPlaylist : ArrayList<PlaylistSongItem>? = null
-    private var mPlaylists : ArrayList<PlaylistItem>? = null
+    private var mSongsToAddOnPlaylist : ArrayList<com.prosabdev.common.models.playlist.PlaylistSongItem>? = null
+    private var mPlaylists : ArrayList<com.prosabdev.common.models.playlist.PlaylistItem>? = null
     private var mDefaultPlaylistCount : Long = 0
 
     override fun onCreateView(
@@ -69,9 +62,8 @@ class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFra
                     val playlistName : String = mPlaylistItemAdapter?.currentList?.get(position)?.name ?: ""
                     if(playlistId > 0){
                         MainScope().launch {
-                            val insertResult = insertMultiplesSongsToPlaylist(ctx, playlistId, playlistName)
-                            if(insertResult)
-                                dismiss()
+                            insertMultiplesSongsToPlaylist(ctx, playlistId, playlistName)
+                            dismiss()
                         }
                     }
                 }
@@ -96,139 +88,124 @@ class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFra
 
     private suspend fun showAddNewPlaylistDialog() {
         context?.let { ctx->
-            val dialogNewPlaylistBinding : DialogNewPlaylistBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_new_playlist, null, false)
-            if(dialogNewPlaylistBinding.textInputEditText.requestFocus()){
-                dialogNewPlaylistBinding.textInputEditText.setText("$DEFAULT_PLAYLIST_NAME ${mDefaultPlaylistCount+1}")
-                dialogNewPlaylistBinding.textInputEditText.selectAll()
-                SystemSettingsUtils.SoftInputService(ctx, dialogNewPlaylistBinding.textInputEditText).show(5)
-            }
-            dialogNewPlaylistBinding.textInputEditText.addTextChangedListener(object : TextWatcher{
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
-
-                override fun onTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    before: Int,
-                    count: Int
-                ) {
-                    MainScope().launch {
-                        handlePlaylistInputChanges(dialogNewPlaylistBinding, s)
-                    }
-                }
-
-                override fun afterTextChanged(s: Editable?) {
-                    //
-                }
-
-            })
-
+            val dialogDataBidingView : ComponentDialogEditTextBinding = DataBindingUtil.inflate(layoutInflater, R.layout._component_dialog_edit_text, null, false)
+            val dialogTitleDataBidingView : ComponentDialogTitleBinding = DataBindingUtil.inflate(layoutInflater, R.layout._component_dialog_title, null, false)
             MaterialAlertDialogBuilder(ctx)
-                .setTitle(ctx.getString(R.string.add_new_playlist))
+                .setCustomTitle(dialogTitleDataBidingView.root)
                 .setIcon(R.drawable.playlist_add)
-                .setView(dialogNewPlaylistBinding.root)
-                .setNegativeButton(ctx.getString(R.string.cancel)) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .setPositiveButton(ctx.getString(R.string.save)) { dialog, _ ->
-                    val errorText = dialogNewPlaylistBinding.textInputLayout.error
-                    val playlistNameText = dialogNewPlaylistBinding.textInputEditText.text
-                    if((errorText == null || errorText.isEmpty()) && playlistNameText != null && playlistNameText.isNotEmpty()){
-                        var hasSaved = false
-                        MainScope().launch {
-                            hasSaved = savePlaylistAndAddSong(ctx, dialogNewPlaylistBinding.textInputEditText.text.toString())
-                        }
-                        if(hasSaved){
-                            dialog.dismiss()
-                        }
-                    }else{
-                        MainScope().launch {
-                            Toast.makeText(ctx, "Please enter valid playlist name !", Toast.LENGTH_SHORT).show()
-                        }
+                .setView(dialogDataBidingView.root)
+                .show().apply {
+                    //Apply title
+                    dialogTitleDataBidingView.imageViewIcon.setImageDrawable(
+                        ResourcesCompat.getDrawable(
+                            ctx.resources,
+                            R.drawable.playlist_add,
+                            null
+                        )
+                    )
+                    dialogTitleDataBidingView.textTitle.text = ctx.resources.getString(R.string.add_new_playlist)
+                    //Listen clicks events
+                    dialogDataBidingView.buttonCancel.setOnClickListener {
+                        dismiss()
                     }
+                    dialogDataBidingView.buttonSave.setOnClickListener {
+                        MainScope().launch {
+                            savePlaylistAndAddSong(ctx, dialogDataBidingView.textInputEditText.text.toString())
+                        }
+                        dismiss()
+                    }
+                    //Listen clicks events
+                    if(dialogDataBidingView.textInputEditText.requestFocus()){
+                        dialogDataBidingView.textInputEditText.setText("$DEFAULT_PLAYLIST_NAME ${mDefaultPlaylistCount+1}")
+                        dialogDataBidingView.textInputEditText.hint = ctx.resources.getString(R.string.playlist_name)
+                        dialogDataBidingView.textInputEditText.selectAll()
+                        com.prosabdev.common.utils.SystemSettingsUtils.SoftInputService(context, dialogDataBidingView.textInputEditText).show(5)
+                    }
+                    dialogDataBidingView.textInputEditText.addTextChangedListener(object : TextWatcher{
+                        override fun beforeTextChanged(
+                            s: CharSequence?,
+                            start: Int,
+                            count: Int,
+                            after: Int
+                        ) {
+                        }
+                        override fun onTextChanged(
+                            s: CharSequence?,
+                            start: Int,
+                            before: Int,
+                            count: Int
+                        ) {
+                            handleOnInputChanges(dialogDataBidingView, s)
+                        }
+                        override fun afterTextChanged(s: Editable?) {
+                        }
+                    })
                 }
-                .show()
         }
         dismiss()
     }
 
     private suspend fun savePlaylistAndAddSong(ctx : Context, playlistName: String): Boolean {
         return withContext(Dispatchers.Default){
-            val pI = PlaylistItem()
+            val pI = com.prosabdev.common.models.playlist.PlaylistItem()
             pI.name = playlistName
-            pI.lastAddedDateToLibrary = SystemSettingsUtils.getCurrentDateInMilli()
-            val insertedPlaylistResult : Long = mPlaylistItemViewModel.insert(pI) ?: -1
+            pI.lastAddedDateToLibrary = com.prosabdev.common.utils.SystemSettingsUtils.getCurrentDateInMilli()
+            val insertedPlaylistResult : Long = mPlaylistItemViewModel?.insert(pI) ?: -1
             if(insertedPlaylistResult > 0){
                 insertMultiplesSongsToPlaylist(ctx, insertedPlaylistResult, playlistName)
             }
             return@withContext false
         }
     }
-    private suspend fun insertMultiplesSongsToPlaylist(ctx : Context, playlistId : Long, playlistName : String = ""): Boolean {
-        return withContext(Dispatchers.Default){
+    private suspend fun insertMultiplesSongsToPlaylist(ctx : Context, playlistId : Long, playlistName : String = "") {
+        withContext(Dispatchers.Default){
             if(mSongsToAddOnPlaylist == null || (mSongsToAddOnPlaylist?.size ?: 0) <= 0)
-                return@withContext false
-
-            for (i in 0 until (mSongsToAddOnPlaylist?.size ?: 0)){
-                mSongsToAddOnPlaylist!![i].playlistId = playlistId
-            }
-            val insertedSongsResult : List<Long> = mPlaylistSongItemViewModel.insertMultiple(mSongsToAddOnPlaylist) ?: ArrayList()
-            var insertedCount = 0
-            for (i in insertedSongsResult.indices){
-                if(insertedSongsResult[i] > 0)
-                    insertedCount++
-            }
-            if(insertedSongsResult.isNotEmpty()  && insertedCount > 0){
-                MainScope().launch {
-                    Toast.makeText(ctx, "$insertedCount Song(s) added to playlist $playlistName", Toast.LENGTH_SHORT).show()
-                }
-                return@withContext true
-            }
-            return@withContext false
+                return@withContext
+            //
         }
     }
 
-    private suspend fun handlePlaylistInputChanges(
-        dialogNewPlaylistBinding: DialogNewPlaylistBinding,
+    private var mCheckerJob: Job? =null
+    private fun handleOnInputChanges(
+        dialogDataBidingView: ComponentDialogEditTextBinding,
         sequence: CharSequence?
     ) {
-        withContext(Dispatchers.Default){
+        if(mCheckerJob != null && mCheckerJob?.isActive == true)
+            mCheckerJob?.cancel()
+        mCheckerJob = CoroutineScope(Dispatchers.Default).launch {
             if(sequence == null || sequence.isEmpty()){
-                updateInputUI(dialogNewPlaylistBinding, false)
+                updateInputUI(dialogDataBidingView, true)
             }else{
                 val playlistExist = checkIfPlaylistExist(sequence.toString())
                 if(playlistExist){
-                    updateInputUI(dialogNewPlaylistBinding, false)
+                    updateInputUI(dialogDataBidingView, true)
                 }else{
-                    updateInputUI(dialogNewPlaylistBinding, true)
+                    updateInputUI(dialogDataBidingView, false)
                 }
             }
         }
     }
     private fun updateInputUI(
-        dialogNewPlaylistBinding: DialogNewPlaylistBinding,
-        nameOk: Boolean,
+        dialogDataBidingView: ComponentDialogEditTextBinding,
+        haveErrors: Boolean,
         nameLength : Int = 0
     ) {
         MainScope().launch {
-            if(nameOk){
-                dialogNewPlaylistBinding.textInputLayout.error = null
-            }else{
-                if(nameLength <= 0){
-                    dialogNewPlaylistBinding.textInputLayout.error = "Invalid playlist name !"
+            context?.let { ctx ->
+                if(!haveErrors){
+                    dialogDataBidingView.textInputLayout.error = null
                 }else{
-                    dialogNewPlaylistBinding.textInputLayout.error = "Name already exists !"
+                    if(nameLength <= 0){
+                        dialogDataBidingView.textInputLayout.error = ctx.resources.getString(R.string.invalid_name)
+                    }else{
+                        dialogDataBidingView.textInputLayout.error = ctx.resources.getString(R.string.name_already_exist)
+                    }
                 }
             }
         }
     }
     private suspend fun checkIfPlaylistExist(name : String): Boolean {
-        val result = mPlaylistItemViewModel.getWithName(name)
+        val result = mPlaylistItemViewModel?.getWithName(name)
         return result != null && result.name == name
     }
 
@@ -240,7 +217,7 @@ class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFra
         const val DEFAULT_PLAYLIST_NAME : String = "Playlist"
 
         @JvmStatic
-        fun newInstance(songsToAddOnPlaylist : ArrayList<PlaylistSongItem>?, playlists : ArrayList<PlaylistItem>?, defaultPlaylistCount : Long = 0) =
+        fun newInstance(songsToAddOnPlaylist : ArrayList<com.prosabdev.common.models.playlist.PlaylistSongItem>?, playlists : ArrayList<com.prosabdev.common.models.playlist.PlaylistItem>?, defaultPlaylistCount : Long = 0) =
             PlaylistAddFullBottomSheetDialogFragment().apply {
                 mSongsToAddOnPlaylist = songsToAddOnPlaylist
                 mPlaylists = playlists

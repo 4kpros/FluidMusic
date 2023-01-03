@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:gravity="center"
+        >
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_view_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?textAppearanceBodySmall"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="0dB"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <com.lukelorusso.verticalseekbar.VerticalSeekBar
+            android:id="@+id/vertical_seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:vsb_click_to_set_progress="true"
+            app:vsb_bar_corner_radius="5dp"
+            app:vsb_bar_width="2dp"
+            app:vsb_bar_background="?colorSurfaceVariant"
+            app:vsb_bar_progress_gradient_end="?colorPrimary"
+            app:vsb_bar_progress_gradient_start="?colorPrimary"
+            app:vsb_show_thumb="true"
+            app:vsb_progress="0"
+            app:vsb_max_value="100"
+            app:vsb_thumb_container_tint="?colorPrimary"
+            app:vsb_thumb_container_corner_radius="15dp"
+            app:vsb_thumb_placeholder_src="@drawable/custom_thumb_equ_bars" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_view_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?textAppearanceBodySmall"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="60Hz"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:maxLength="6"
+            android:layout_marginHorizontal="@dimen/margin_small_size"
+            />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>

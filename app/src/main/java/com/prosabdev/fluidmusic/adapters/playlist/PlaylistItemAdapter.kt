@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.prosabdev.common.models.playlist.PlaylistItem
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemPlaylistAddSongBinding
-import com.prosabdev.fluidmusic.models.playlist.PlaylistItem
 
 class PlaylistItemAdapter(
     private val mListener: OnItemClickListener

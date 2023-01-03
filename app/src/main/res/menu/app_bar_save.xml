@@ -4,6 +4,7 @@
 
     <item android:id="@+id/save"
         android:title="Save"
+        android:titleCondensed="Save"
         android:contentDescription="Save"
         app:showAsAction="ifRoom"
         android:icon="@drawable/save"

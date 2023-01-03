@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="organize_grid_no_image_span_count">2</integer>
+    <integer name="organize_grid_extra_small_span_count">5</integer>
+    <integer name="organize_grid_small_span_count">4</integer>
+    <integer name="organize_grid_medium_span_count">3</integer>
+    <integer name="organize_grid_large_span_count">2</integer>
+    <integer name="organize_grid_extra_large_span_count">1</integer>
+
+    <item type="integer" name="viewpager_height" format="float">0.55</item>
+
+    <integer name="corner_radius_circle">50</integer>
+</resources>
