@@ -28,7 +28,7 @@ import com.prosabdev.common.R
 import com.prosabdev.common.extensions.*
 import com.prosabdev.common.library.LocalSource
 import com.prosabdev.common.library.MusicSource
-import com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
+import com.prosabdev.common.sharedprefs.PersistentStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -93,7 +93,8 @@ open class MusicService : MediaBrowserServiceCompat() {
         // Build a PendingIntent that can be used to launch the UI.
         val sessionActivityPendingIntent =
             packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
-                PendingIntent.getActivity(this, 0, sessionIntent, 0)
+                PendingIntent.getActivity(this, 0, sessionIntent,
+                    PendingIntent.FLAG_IMMUTABLE)
             }
         // Create a new MediaSession.
         mediaSession = MediaSessionCompat(this, TAG)
@@ -111,10 +112,9 @@ open class MusicService : MediaBrowserServiceCompat() {
         // Load the media library out of main thread
         // The media library is built from a remote JSON file. We'll create the source here,
         // and then use a suspend function to perform the download off the main thread.
-        mediaSource = LocalSource(
-            applicationContext,
-            mediaSource
-        )
+//        mediaSource = LocalSource(
+//            applicationContext,
+//        )
         serviceScope.launch {
             mediaSource.load()
         }
@@ -378,7 +378,7 @@ open class MusicService : MediaBrowserServiceCompat() {
 
         override fun onPrepare(playWhenReady: Boolean) {
             Log.i(TAG, "Player onPrepare: playWhenReady $playWhenReady")
-            val recentSong = SharedPreferenceManagerUtils.Player.loadCurrentPlayingSong(applicationContext, null) ?: return
+            val recentSong = PersistentStorage.Player.loadRecentSong() ?: return
             onPrepareFromMediaId(
                 recentSong.mediaId!!,
                 playWhenReady,
