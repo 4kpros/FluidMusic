@@ -7,13 +7,13 @@
         <option name="testRunner" value="GRADLE" />
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="JDK" />
+        <option name="gradleJvm" value="20" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/Common" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/automotive" />
+            <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/wearos" />
           </set>
         </option>

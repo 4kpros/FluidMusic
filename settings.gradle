@@ -18,4 +18,4 @@ rootProject.name = "Fluid Music"
 include ':app'
 include ':automotive'
 include ':wearos'
-include ':Common'
+include ':common'
