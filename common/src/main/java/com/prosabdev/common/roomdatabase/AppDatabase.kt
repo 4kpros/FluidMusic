@@ -20,7 +20,7 @@ import com.prosabdev.common.roomdatabase.dao.explore.*
 import com.prosabdev.common.roomdatabase.dao.playlist.PlaylistItemDao
 import com.prosabdev.common.roomdatabase.dao.playlist.PlaylistSongItemDao
 import com.prosabdev.common.roomdatabase.dao.queuemusic.QueueMusicItemDao
-import com.prosabdev.common.utils.ConstantValues
+import com.prosabdev.common.constants.MainConst
 
 @Database(
     entities = [
@@ -63,12 +63,12 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         @Volatile
-        private var INSTANCE: AppDatabase? = null
+        private var mInstance: AppDatabase? = null
 
-        private const val FLUID_MUSIC_DATABASE_NAME = "${ConstantValues.PACKAGE_NAME}.main_database_name"
+        private const val FLUID_MUSIC_DATABASE_NAME = "${MainConst.PACKAGE_NAME}.fluidmusic_sqlite"
 
         fun getDatabase(ctx: Context): AppDatabase {
-            return INSTANCE
+            return mInstance
                 ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     ctx,
@@ -77,7 +77,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                     .fallbackToDestructiveMigration()
                     .build()
-                INSTANCE = instance
+                    mInstance = instance
 
                 instance
             }

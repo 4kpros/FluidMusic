@@ -11,11 +11,11 @@ import androidx.room.PrimaryKey
     ],
     indices = [Index(value = ["presetName"], unique = true)]
 )
-class EqualizerPresetBandLevelItem {
+data class EqualizerPresetBandLevelItem (
     @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
-    var presetName: String? = ""
-    var bandId: Short = -1
-    var bandCenterFreq: Int = -1
+    var id: Long = 0,
+    var presetName: String? = "",
+    var bandId: Short = -1,
+    var bandCenterFreq: Int = -1,
     var bandLevel: Short = 0
-}
+)

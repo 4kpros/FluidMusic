@@ -16,22 +16,22 @@ class SongItemRepository(ctx : Context) {
             mDao?.insert(songItem)
         }
     }
-    suspend fun update(songItem: SongItem?) {
-        withContext(Dispatchers.IO){
+    suspend fun update(songItem: SongItem?): Int? {
+        return withContext(Dispatchers.IO){
             mDao?.update(songItem)
         }
     }
-    suspend fun delete(songItem: SongItem?) {
-        withContext(Dispatchers.IO){
+    suspend fun delete(songItem: SongItem?): Int? {
+        return withContext(Dispatchers.IO){
             mDao?.delete(songItem)
         }
     }
-    suspend fun deleteAll() {
-        withContext(Dispatchers.IO){
+    suspend fun deleteAll(): Int? {
+        return withContext(Dispatchers.IO){
             mDao?.deleteAll()
         }
     }
-    //Getters
+
     suspend fun getFirstSong() : SongItem? {
         return withContext(Dispatchers.IO){
             mDao?.getFirstSong()

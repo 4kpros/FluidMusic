@@ -12,7 +12,7 @@ import com.prosabdev.fluidmusic.databinding.FragmentEditTagsBinding
 
 class EditTagsFragment : Fragment() {
 
-    private var mDataBidingView: FragmentEditTagsBinding? = null
+    private var mDataBiding: FragmentEditTagsBinding? = null
 
     private var mDataList: List<String>? = null
     private var mModelType: String? = null
@@ -20,27 +20,27 @@ class EditTagsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //Apply transition animation
         enterTransition = MaterialSharedAxis(MaterialSharedAxis.Y, true)
-        arguments?.let {
-        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mDataBidingView = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_tags, container, false)
 
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.inflate(inflater,R.layout.fragment_edit_tags, container,false)
+        val view = mDataBiding?.root
+
+        //Load your UI content
         initViews()
-        return mDataBidingView?.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
         setupSongInfoData()
         observeLiveData()
         checkInteractions()
+
+        return view
     }
 
     private fun checkInteractions() {
@@ -53,9 +53,9 @@ class EditTagsFragment : Fragment() {
     }
 
     private fun initViews() {
-        mDataBidingView?.let { dataBidingView ->
-            com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(dataBidingView.coordinatorLayout)
-            com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(dataBidingView.constraintNestedScrollView)
+        mDataBiding?.let { dataBidingView ->
+            com.prosabdev.common.utils.InsetModifiers.updateTopViewInsets(dataBidingView.coordinatorLayout)
+            com.prosabdev.common.utils.InsetModifiers.updateBottomViewInsets(dataBidingView.constraintNestedScrollView)
         }
     }
 

@@ -25,6 +25,16 @@ class SongInfoFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFragme
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.inflate(inflater, R.layout._bottom_sheet_organize_items, container, false)
+        val view = mDataBiding?.root
+
+        //Load your UI content
+        initViews()
+        checkInteractions()
+
+        return view
         mBottomSheetDialogSongInfoBinding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_dialog_song_info, container, false)
         val view = mBottomSheetDialogSongInfoBinding.root
 
@@ -49,7 +59,7 @@ class SongInfoFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFragme
         MainScope().launch {
             val ctx : Context = this@SongInfoFullBottomSheetDialogFragment.context ?: return@launch
 
-            mBottomSheetDialogSongInfoBinding.textSongFilePath.text = com.prosabdev.common.utils.FormattersAndParsersUtils.getUnderLinedWord(songItem.uriPath)
+            mBottomSheetDialogSongInfoBinding.textSongFilePath.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(songItem.uriPath)
 
             //MP3, 44100Hz, 320kbps
             mBottomSheetDialogSongInfoBinding.textSongDetails.text = ctx.getString(
@@ -61,7 +71,7 @@ class SongInfoFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFragme
             //3:27min = 207sec
             mBottomSheetDialogSongInfoBinding.textSongDuration.text = ctx.getString(
                 R.string._song_duration_tags,
-                com.prosabdev.common.utils.FormattersAndParsersUtils.formatSongDurationToString(songItem.duration),
+                com.prosabdev.common.utils.FormattersAndParsers.formatSongDurationToString(songItem.duration),
                 songItem.duration/1000
             )
             //3.5mb = 3730kb
@@ -75,15 +85,15 @@ class SongInfoFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFragme
 
             mBottomSheetDialogSongInfoBinding.textSongTrack.text = songItem.cdTrackNumber
             mBottomSheetDialogSongInfoBinding.textSongDisc.text = songItem.diskNumber
-            mBottomSheetDialogSongInfoBinding.textSongYear.text = com.prosabdev.common.utils.FormattersAndParsersUtils.getUnderLinedWord(songItem.year)
+            mBottomSheetDialogSongInfoBinding.textSongYear.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(songItem.year)
 
             mBottomSheetDialogSongInfoBinding.textSongFileName.text = songItem.fileName
             mBottomSheetDialogSongInfoBinding.textSongTitle.text = songItem.title
-            mBottomSheetDialogSongInfoBinding.textSongArtist.text = com.prosabdev.common.utils.FormattersAndParsersUtils.getUnderLinedWord(songItem.artist)
-            mBottomSheetDialogSongInfoBinding.textSongAlbum.text = com.prosabdev.common.utils.FormattersAndParsersUtils.getUnderLinedWord(songItem.album)
-            mBottomSheetDialogSongInfoBinding.textSongAlbumArtist.text = com.prosabdev.common.utils.FormattersAndParsersUtils.getUnderLinedWord(songItem.albumArtist)
-            mBottomSheetDialogSongInfoBinding.textSongGenre.text = com.prosabdev.common.utils.FormattersAndParsersUtils.getUnderLinedWord(songItem.genre)
-            mBottomSheetDialogSongInfoBinding.textSongComposer.text = com.prosabdev.common.utils.FormattersAndParsersUtils.getUnderLinedWord(songItem.composer)
+            mBottomSheetDialogSongInfoBinding.textSongArtist.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(songItem.artist)
+            mBottomSheetDialogSongInfoBinding.textSongAlbum.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(songItem.album)
+            mBottomSheetDialogSongInfoBinding.textSongAlbumArtist.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(songItem.albumArtist)
+            mBottomSheetDialogSongInfoBinding.textSongGenre.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(songItem.genre)
+            mBottomSheetDialogSongInfoBinding.textSongComposer.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(songItem.composer)
         }
     }
 

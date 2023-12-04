@@ -3,11 +3,15 @@ package com.prosabdev.common.models.songitem
 import android.content.Context
 import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
-import androidx.room.*
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Ignore
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.prosabdev.common.R
 import com.prosabdev.common.models.FolderUriTree
 import com.prosabdev.common.models.generic.GenericItemListGrid
-import com.prosabdev.common.utils.FormattersAndParsersUtils
+import com.prosabdev.common.utils.FormattersAndParsers
 
 @Entity(
     foreignKeys = [
@@ -15,57 +19,57 @@ import com.prosabdev.common.utils.FormattersAndParsersUtils
     ],
     indices = [Index(value = ["uri"], unique = true)]
 )
-class SongItem {
+data class SongItem (
     @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
-    var uriTreeId: Long = 0
-    var uri: String? = ""
-    var fileName: String? = ""
-    var title: String? = ""
-    var artist: String? = ""
-    var albumArtist: String? = ""
-    var composer: String? = ""
-    var album: String? = ""
-    var genre: String? = ""
-    var uriPath: String? = ""
-    var folder: String? = ""
-    var folderParent: String? = ""
-    var folderUri: String? = ""
-    var year: String? = ""
-    var duration: Long = 0
-    var language: String? = ""
+    var id: Long = 0,
+    var uriTreeId: Long = 0,
+    var uri: String? = "",
+    var fileName: String? = "",
+    var title: String? = "",
+    var artist: String? = "",
+    var albumArtist: String? = "",
+    var composer: String? = "",
+    var album: String? = "",
+    var genre: String? = "",
+    var uriPath: String? = "",
+    var folder: String? = "",
+    var folderParent: String? = "",
+    var folderUri: String? = "",
+    var year: String? = "",
+    var duration: Long = 0,
+    var language: String? = "",
 
-    var typeMime: String? = ""
-    var sampleRate: Int = 0
-    var bitrate: Double = 0.0
+    var typeMime: String? = "",
+    var sampleRate: Int = 0,
+    var bitrate: Double = 0.0,
 
-    var size: Long = 0
+    var size: Long = 0,
 
-    var channelCount: Int = 0
-    var fileExtension: String? = ""
-    var bitPerSample: String? = ""
+    var channelCount: Int = 0,
+    var fileExtension: String? = "",
+    var bitPerSample: String? = "",
 
-    var lastUpdateDate: Long = 0
-    var lastAddedDateToLibrary: Long = 0
+    var lastUpdateDate: Long = 0,
+    var lastAddedDateToLibrary: Long = 0,
 
-    var author: String? = ""
-    var diskNumber: String? = ""
-    var writer: String? = ""
-    var cdTrackNumber: String? = ""
-    var numberTracks: String? = ""
+    var author: String? = "",
+    var diskNumber: String? = "",
+    var writer: String? = "",
+    var cdTrackNumber: String? = "",
+    var numberTracks: String? = "",
 
-    var comments: String? = ""
+    var comments: String? = "",
 
-    var rating: Int = 0
-    var playCount: Int = 0
-    var lastPlayed: Long = 0
+    var rating: Int = 0,
+    var playCount: Int = 0,
+    var lastPlayed: Long = 0,
 
-    var hashedCovertArtSignature: Int = -1
-    var isValid: Boolean = true
+    var hashedCovertArtSignature: Int = -1,
+    var isValid: Boolean = true,
 
     @Ignore
     var position: Int = -1
-
+){
     companion object {
         const val TAG = "SongItem"
         const val DEFAULT_INDEX = "title"
@@ -90,7 +94,7 @@ class SongItem {
                 tempResult.subtitle = dataItem.artist?.ifEmpty { ctx.getString(R.string.unknown_artist) } ?: ctx.getString(R.string.unknown_artist)
                 tempResult.details = ctx.getString(
                     R.string.item_song_card_text_details,
-                    FormattersAndParsersUtils.formatSongDurationToString(dataItem.duration),
+                    FormattersAndParsers.formatSongDurationToString(dataItem.duration),
                     dataItem.fileExtension
                 )
                 if(dataItem.uri?.isNotEmpty() == true){

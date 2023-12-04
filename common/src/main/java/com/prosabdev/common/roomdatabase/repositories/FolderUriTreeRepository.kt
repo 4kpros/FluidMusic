@@ -18,22 +18,22 @@ class FolderUriTreeRepository(ctx : Context) {
         }
     }
     suspend fun update(folderUriTree: FolderUriTree?) {
-        withContext(Dispatchers.IO){
+        return withContext(Dispatchers.IO){
             mDao?.update(folderUriTree)
         }
     }
     suspend fun delete(folderUriTree: FolderUriTree?) {
-        withContext(Dispatchers.IO){
+        return withContext(Dispatchers.IO){
             mDao?.delete(folderUriTree)
         }
     }
     suspend fun deleteAtId(id: Long) {
-        return withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO){
             mDao?.deleteAtId(id)
         }
     }
     suspend fun deleteAtUriTree(uri: String?) {
-        return withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO){
             mDao?.deleteAtUriTree(uri)
         }
     }
@@ -47,15 +47,14 @@ class FolderUriTreeRepository(ctx : Context) {
             mDao?.deleteAll()
         }
     }
-    //Getters
     suspend fun getAtId(id: Long) : FolderUriTree? {
         return withContext(Dispatchers.IO){
             mDao?.getAtId(id)
         }
     }
-    suspend fun getAll(order_by: String?) : LiveData<List<FolderUriTree>>? {
+    suspend fun getAll(orderBy: String?) : LiveData<List<FolderUriTree>>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAll(order_by)
+            mDao?.getAll(orderBy)
         }
     }
 }

@@ -14,7 +14,7 @@ import com.prosabdev.fluidmusic.viewmodels.activities.StorageAccessActivityViewM
 
 class StorageAccessFullBottomSheetDialog : BottomSheetDialogFragment() {
 
-    private lateinit var mBottomSheetStorageAccessBinding : BottomSheetStorageAccessBinding
+    private lateinit var mDataBiding : BottomSheetStorageAccessBinding
 
     private lateinit var mStorageAccessActivityViewModel: StorageAccessActivityViewModel
 
@@ -24,21 +24,19 @@ class StorageAccessFullBottomSheetDialog : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        mBottomSheetStorageAccessBinding = DataBindingUtil.inflate(inflater,R.layout.bottom_sheet_storage_access,container,false)
-        val view = mBottomSheetStorageAccessBinding.root
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_storage_access, container, false)
+        val view = mDataBiding.root
+
+        //Load your UI content
+        initViews()
+        checkInteractions()
 
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        initViews()
-        checkInteractions()
-    }
-
     private fun checkInteractions() {
-        mBottomSheetStorageAccessBinding.buttonRemoveAll.setOnClickListener(){
+        mDataBiding.buttonRemoveAll.setOnClickListener(){
             showRemoveAllDialog()
         }
     }
@@ -46,21 +44,23 @@ class StorageAccessFullBottomSheetDialog : BottomSheetDialogFragment() {
         MaterialAlertDialogBuilder(this.requireContext())
             .setTitle("Remove all folders ?")
             .setMessage("All folders with songs(on your database, not on device) will be removed from your accessible files. Do you want to remove all anyway ?")
-            .setNegativeButton(resources.getString(R.string.decline)) { dialog, which ->
+            .setNegativeButton(resources.getString(R.string.decline)) { dialog, _ ->
                 dialog.dismiss()
             }
-            .setPositiveButton("Remove") { dialog, which ->
+            .setPositiveButton("Remove") { dialog, _ ->
                 removeAllFolder(dialog)
             }
             .show()
         dismiss()
     }
     private fun removeAllFolder(dialog: DialogInterface) {
-        mStorageAccessActivityViewModel.setRemoveAllFoldersCounter()
+        mStorageAccessActivityViewModel.requestRemoveAllFolderUriTrees.value =
+            (mStorageAccessActivityViewModel.requestRemoveAllFolderUriTrees.value ?: 0) + 1
         dialog.dismiss()
     }
 
     private fun initViews() {
+        //
     }
 
     companion object {

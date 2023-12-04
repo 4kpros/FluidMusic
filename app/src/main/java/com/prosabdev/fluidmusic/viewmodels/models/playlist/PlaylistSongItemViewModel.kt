@@ -8,29 +8,29 @@ import com.prosabdev.common.roomdatabase.repositories.playlist.PlaylistSongItemR
 
 class PlaylistSongItemViewModel(app: Application) : AndroidViewModel(app) {
 
-    private var repository: PlaylistSongItemRepository? = PlaylistSongItemRepository(app)
+    private var mRepository: PlaylistSongItemRepository? = PlaylistSongItemRepository(app)
 
     suspend fun insert(playlistItem: PlaylistSongItem?) : Long? {
-        return repository?.insert(playlistItem)
+        return mRepository?.insert(playlistItem)
     }
     suspend fun insertMultiple(playlistSongItems: ArrayList<PlaylistSongItem>?) : List<Long>? {
-        return repository?.insertMultiple(playlistSongItems)
+        return mRepository?.insertMultiple(playlistSongItems)
     }
     suspend fun update(playlistItem: PlaylistSongItem?) {
-        repository?.update(playlistItem)
+        mRepository?.update(playlistItem)
     }
     suspend fun delete(playlistItem: PlaylistSongItem?) {
-        repository?.delete(playlistItem)
+        mRepository?.delete(playlistItem)
     }
     suspend fun deleteAll() {
-        repository?.deleteAll()
+        mRepository?.deleteAll()
     }
 
     //Getters
     suspend fun getAtId(id: Long) : PlaylistSongItem? {
-        return repository?.getAtId(id)
+        return mRepository?.getAtId(id)
     }
     suspend fun getAll(orderBy: String = "id") : LiveData<List<PlaylistSongItem>?>? {
-        return repository?.getAll(orderBy)
+        return mRepository?.getAll(orderBy)
     }
 }

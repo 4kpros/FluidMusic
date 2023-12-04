@@ -6,6 +6,7 @@
         android:required="true" />
 
     <application
+        android:name=".application.AutomotiveApplication"
         android:allowBackup="true"
         android:appCategory="audio"
         android:icon="@mipmap/ic_launcher"
@@ -24,7 +25,7 @@
         -->
         <service
             android:name=".AutomotiveMusicService"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>

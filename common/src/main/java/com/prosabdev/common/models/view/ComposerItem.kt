@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.room.DatabaseView
 import com.prosabdev.common.R
 import com.prosabdev.common.models.generic.GenericItemListGrid
-import com.prosabdev.common.utils.FormattersAndParsersUtils
+import com.prosabdev.common.utils.FormattersAndParsers
 
 @DatabaseView(
     "SELECT songItem.composer as name, " +
@@ -27,19 +27,19 @@ import com.prosabdev.common.utils.FormattersAndParsersUtils
             "FROM SongItem as songItem " +
             "GROUP BY SongItem.composer ORDER BY SongItem.composer"
 )
-class ComposerItem {
-    var name: String? = ""
-    var year: String? = ""
-    var lastUpdateDate: Long = 0
-    var lastAddedDateToLibrary: Long = 0
-    var numberArtists: Int = 0
-    var numberAlbums: Int = 0
-    var numberAlbumArtists: Int = 0
-    var numberTracks: Int = 0
-    var totalDuration: Long = 0
-    var hashedCovertArtSignature: Int = -1
+data class ComposerItem (
+    var name: String? = "",
+    var year: String? = "",
+    var lastUpdateDate: Long = 0,
+    var lastAddedDateToLibrary: Long = 0,
+    var numberArtists: Int = 0,
+    var numberAlbums: Int = 0,
+    var numberAlbumArtists: Int = 0,
+    var numberTracks: Int = 0,
+    var totalDuration: Long = 0,
+    var hashedCovertArtSignature: Int = -1,
     var uriImage: String? = ""
-
+){
     companion object {
         const val TAG = "ComposerItem"
         const val DEFAULT_INDEX = "name"
@@ -73,7 +73,7 @@ class ComposerItem {
                     if(setAllText)
                         ctx.getString(
                             R.string.item_content_explore_text_details,
-                            FormattersAndParsersUtils.formatSongDurationToString(dataItem.totalDuration),
+                            FormattersAndParsers.formatSongDurationToString(dataItem.totalDuration),
                             dataItem.numberTracks.toString()
                         )
                     else

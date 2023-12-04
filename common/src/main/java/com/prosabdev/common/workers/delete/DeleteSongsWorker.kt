@@ -7,10 +7,10 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.prosabdev.common.constants.WorkManagerConst
 import com.prosabdev.common.models.songitem.SongItem
 import com.prosabdev.common.models.songitem.SongItemUri
 import com.prosabdev.common.roomdatabase.AppDatabase
-import com.prosabdev.common.workers.WorkerConstantValues
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -22,13 +22,13 @@ class DeleteSongsWorker(
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
             try {
-                Log.i(TAG, "WORKER $TAG : started")
+                Log.i(TAG, "Worker $TAG started")
 
                 //Extract worker params
-                val modelType = inputData.getString(WorkerConstantValues.ITEM_LIST_MODEL_TYPE)
-                val itemsList = inputData.getStringArray(WorkerConstantValues.ITEM_LIST)
-                val whereClause = inputData.getString(WorkerConstantValues.ITEM_LIST_WHERE)
-                val whereColumn = inputData.getString(WorkerConstantValues.WHERE_COLUMN_INDEX)
+                val modelType = inputData.getString(WorkManagerConst.ITEM_LIST_MODEL_TYPE)
+                val itemsList = inputData.getStringArray(WorkManagerConst.ITEM_LIST)
+                val whereClause = inputData.getString(WorkManagerConst.ITEM_LIST_WHERE)
+                val whereColumn = inputData.getString(WorkManagerConst.WHERE_COLUMN_INDEX)
                 //Delete songs from database and on device
                 val dataResult = tryToDeleteSongsFromSource(
                     modelType,
@@ -36,70 +36,27 @@ class DeleteSongsWorker(
                     whereClause,
                     whereColumn
                 )
-                Log.i(TAG, "WORKER $TAG : DELETED SONGS ON DATABASE : ${dataResult[0]} ")
-                Log.i(TAG, "WORKER $TAG : DELETED SONGS ON DEVICE : ${dataResult[1]}")
+                Log.i(TAG, "Worker $TAG result 1 -> ${dataResult[0]}")
+                Log.i(TAG, "Worker $TAG result 2 -> ${dataResult[1]}")
 
-                Log.i(TAG, "WORKER $TAG : ended")
+                Log.i(TAG, "Worker $TAG ended")
 
                 Result.success(
                     workDataOf(
-                        WorkerConstantValues.WORKER_OUTPUT_DATA to dataResult,
+                        WorkManagerConst.WORKER_OUTPUT_DATA to dataResult,
                     )
                 )
             } catch (error: Throwable) {
-                Log.i(TAG, "Error loading... ${error.stackTrace}")
-                Log.i(TAG, "Error loading... ${error.message}")
+                Log.i(TAG, "Error stack trace -> ${error.stackTrace}")
+                Log.i(TAG, "Error message -> ${error.message}")
                 Result.failure()
             }
         }
     }
 
-    private fun deleteSongsFromDevice(stringUriList: Array<String>?): Int {
-        if(stringUriList == null) return 0
-        var deleteResult = 0
-        for (i in stringUriList.indices){
-            deleteResult += deleteSongItemAtUriOnDevice(stringUriList[i])
-        }
-        return deleteResult
-    }
-    private fun deleteSongsFromDevice(stringUriList: List<SongItemUri>?): Int {
-        if(stringUriList == null) return 0
-        var deleteResult = 0
-        for (i in stringUriList.indices){
-            deleteResult += deleteSongItemAtUriOnDevice(stringUriList[i].uri)
-        }
-        return deleteResult
-    }
-    private fun deleteSongItemAtUriOnDevice(uri: String?): Int {
-        if(uri == null || uri.isEmpty()) return 0
-        val uriTree = Uri.parse(uri)
-        val tempDocFile: DocumentFile? =
-            DocumentFile.fromTreeUri(applicationContext, uriTree)
-        val deleteResult = tempDocFile?.delete() ?: false
-        return if(deleteResult) 1 else 0
-    }
-
-    private fun deleteSongsFromDatabase(stringUriList: Array<String>?): Int {
-        if(stringUriList == null) return 0
-        var deleteResult = 0
-        for (i in stringUriList.indices){
-            deleteResult += deleteSongItemAtUriOnDatabase(stringUriList[i])
-        }
-        return deleteResult
-    }
-    private fun deleteSongsFromDatabase(songUriList: List<SongItemUri>?): Int {
-        if(songUriList == null) return 0
-        var deleteResult = 0
-        for (i in songUriList.indices){
-            deleteResult += deleteSongItemAtUriOnDatabase(songUriList[i].uri)
-        }
-        return deleteResult
-    }
-    private fun deleteSongItemAtUriOnDatabase(uri: String?): Int {
-        if(uri == null || uri.isEmpty()) return 0
-        return AppDatabase.getDatabase(applicationContext).songItemDao().deleteAtUri(uri)
-    }
-
+    /**
+     * Delete songs form on database and device. Return an [Array] of [Int] who is the counter of deleted songs on database at index 0 and deleted songs on device at index 1
+     */
     private fun tryToDeleteSongsFromSource(
         modelType: String?,
         itemsList: Array<String>?,
@@ -107,40 +64,33 @@ class DeleteSongsWorker(
         whereColumn: String?
     ): Array<Int> {
         val resultList = Array(2){0}
-        if(
-            itemsList == null || itemsList.isEmpty() ||
-            modelType == null || modelType.isEmpty()
-        ) return resultList
+        if(itemsList.isNullOrEmpty() || modelType.isNullOrEmpty()) return resultList
 
         if(modelType == SongItem.TAG){
             resultList[0] = deleteSongsFromDatabase(itemsList)
             resultList[1] = deleteSongsFromDevice(itemsList)
         }else{
-            if(
-                whereClause == null || whereClause.isEmpty() ||
-                whereColumn == null || whereColumn.isEmpty()
-            ) return resultList
+            if(whereClause.isNullOrEmpty() || whereColumn.isNullOrEmpty()) return resultList
 
             for (i in itemsList.indices){
                 val tempFieldValue = itemsList[i]
                 val tempSongUriList =
                     when (whereClause) {
                         //If it is standard content explorer, then get all songs uri directly
-                        WorkerConstantValues.ITEM_LIST_WHERE_EQUAL ->
+                        WorkManagerConst.ITEM_LIST_WHERE_EQUAL ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereEqual(
                                 whereColumn,
                                 tempFieldValue
                             )
                         //If it is from search view, get songs uri directly with "where like" clause
-                        WorkerConstantValues.ITEM_LIST_WHERE_LIKE ->
+                        WorkManagerConst.ITEM_LIST_WHERE_LIKE ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereLike(
                                 whereColumn,
                                 tempFieldValue
                             )
                         else -> null
                     }
-                Log.i(TAG, "WORKER $TAG : tempSongUriList size ${tempSongUriList?.size}")
-                if(tempSongUriList != null && tempSongUriList.isNotEmpty()){
+                if(!tempSongUriList.isNullOrEmpty()){
                     resultList[0] += deleteSongsFromDatabase(tempSongUriList)
                     resultList[1] += deleteSongsFromDevice(tempSongUriList)
                     return resultList
@@ -148,6 +98,77 @@ class DeleteSongsWorker(
             }
         }
         return resultList
+    }
+
+    /**
+     * Delete songs from device by passing [Array] of [String] as song list
+     */
+    private fun deleteSongsFromDevice(stringUriList: Array<String>?): Int {
+        if(stringUriList == null) return 0
+
+        var count = 0
+        for (i in stringUriList.indices){
+            count += deleteSongItemAtUriOnDevice(stringUriList[i])
+        }
+        return count
+    }
+
+    /**
+     * Delete songs from device by passing [Array] of [SongItemUri] as song list
+     */
+    private fun deleteSongsFromDevice(stringUriList: List<SongItemUri>?): Int {
+        if(stringUriList == null) return 0
+
+        var count = 0
+        for (i in stringUriList.indices){
+            count += deleteSongItemAtUriOnDevice(stringUriList[i].uri)
+        }
+        return count
+    }
+
+    /**
+     * Delete song form [Uri] as [String] on device and return 1 if true or 0 else
+     */
+    private fun deleteSongItemAtUriOnDevice(uri: String?): Int {
+        if(uri.isNullOrEmpty()) return 0
+
+        val uriTree = Uri.parse(uri)
+        val tempDocFile: DocumentFile? =
+            DocumentFile.fromTreeUri(applicationContext, uriTree)
+        val count = tempDocFile?.delete() ?: false
+        return if(count) 1 else 0
+    }
+
+    /**
+     * Delete songs form [Array] of [String] as song list on database and return 1 or more if true or 0 else
+     */
+    private fun deleteSongsFromDatabase(stringUriList: Array<String>?): Int {
+        if(stringUriList == null) return 0
+        var count = 0
+        for (i in stringUriList.indices){
+            count += deleteSongItemAtUriOnDatabase(stringUriList[i])
+        }
+        return count
+    }
+
+    /**
+     * Delete songs form [Array] of [SongItemUri] as song list on database and return 1 or more if true or 0 else
+     */
+    private fun deleteSongsFromDatabase(songUriList: List<SongItemUri>?): Int {
+        if(songUriList == null) return 0
+        var count = 0
+        for (i in songUriList.indices){
+            count += deleteSongItemAtUriOnDatabase(songUriList[i].uri)
+        }
+        return count
+    }
+
+    /**
+     * Delete song form [Uri] as [String] on database and return 1 if true or 0 else
+     */
+    private fun deleteSongItemAtUriOnDatabase(uri: String?): Int {
+        if(uri.isNullOrEmpty()) return 0
+        return AppDatabase.getDatabase(applicationContext).songItemDao().deleteAtUri(uri)
     }
 
     companion object {

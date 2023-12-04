@@ -2,7 +2,6 @@ package com.prosabdev.fluidmusic.viewmodels.fragments
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.prosabdev.common.media.MusicServiceConnection
 import com.sothree.slidinguppanel.PanelState
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -10,146 +9,61 @@ import kotlinx.coroutines.launch
 class MainFragmentViewModel(
     app: Application
 ) : AndroidViewModel(app) {
-    private val mMutableCurrentSelectablePage = MutableLiveData<String>(null)
-    private val mMutableSelectMode = MutableLiveData<Boolean>(false)
-    private val mMutableRequestToggleSelectRange = MutableLiveData<Int>(0)
-    private val mMutableRequestToggleSelectAll = MutableLiveData<Int>(0)
-    private val mMutableTotalCount = MutableLiveData<Int>(0)
-    private val mMutableShowDrawerMenuCounter = MutableLiveData<Int>()
-    private val mMutableSlidingUpPanelState = MutableLiveData<PanelState>(PanelState.COLLAPSED)
-    private val mMutableIsFastScrolling = MutableLiveData<Boolean>(false)
-    private val mMutableScrollingState = MutableLiveData<Int>(-2)
-    private val mMutableShowSlidingUpPanelCounter = MutableLiveData<Int>(0)
-    private val mMutableHideSlidingUpPanelCounter = MutableLiveData<Int>(0)
-    private val mMutableSelectedDataList = MutableLiveData<HashMap<Int, String>>(HashMap())
+    val currentSelectablePage = MutableLiveData<String>(null)
+    val selectMode = MutableLiveData<Boolean>(false)
+    val requestToggleSelectRange = MutableLiveData<Int>(0)
+    val requestToggleSelectAll = MutableLiveData<Int>(0)
+    val totalCount = MutableLiveData<Int>(0)
+    val showDrawerMenuCounter = MutableLiveData<Int>()
+    val slidingUpPanelState = MutableLiveData<PanelState>(PanelState.COLLAPSED)
+    val isFastScrolling = MutableLiveData<Boolean>(false)
+    val scrollingState = MutableLiveData<Int>(-2)
+    val showSlidingUpPanelCounter = MutableLiveData<Int>(0)
+    val hideSlidingUpPanelCounter = MutableLiveData<Int>(0)
+    val selectedDataList = MutableLiveData<HashMap<Int, String>>(HashMap())
 
-    private val mCurrentSelectablePage: LiveData<String> get() = mMutableCurrentSelectablePage
-    private val mSelectMode: LiveData<Boolean> get() = mMutableSelectMode
-    private val mRequestToggleSelectRange: LiveData<Int> get() = mMutableRequestToggleSelectRange
-    private val mRequestToggleSelectAll: LiveData<Int> get() = mMutableRequestToggleSelectAll
-    private val mTotalCount: LiveData<Int> get() = mMutableTotalCount
-    private val mShowDrawerMenuCounter: LiveData<Int> get() = mMutableShowDrawerMenuCounter
-    private val mSlidingUpPanelState: LiveData<PanelState> get() = mMutableSlidingUpPanelState
-    private val mIsFastScrolling: LiveData<Boolean> get() = mMutableIsFastScrolling
-    private val mScrollingState: LiveData<Int> get() = mMutableScrollingState
-    private val mShowSlidingUpPanelCounter: LiveData<Int> get() = mMutableShowSlidingUpPanelCounter
-    private val mHideSlidingUpPanelCounter: LiveData<Int> get() = mMutableHideSlidingUpPanelCounter
-    private val mSelectedDataList: LiveData<HashMap<Int, String>> get() = mMutableSelectedDataList
-
-    fun setIsFastScrolling(isFastScrolling : Boolean) {
-        MainScope().launch {
-            mMutableIsFastScrolling.value = isFastScrolling
-        }
-    }
-    fun getIsFastScrolling(): LiveData<Boolean> {
-        return mIsFastScrolling
-    }
-    fun setCurrentSelectablePage(page : String) {
-        MainScope().launch {
-            mMutableCurrentSelectablePage.value = page
-        }
-    }
-    fun getCurrentSelectablePage(): LiveData<String> {
-        return mCurrentSelectablePage
-    }
-    fun setSlidingUpPanelState(state : PanelState) {
-        MainScope().launch {
-            mMutableSlidingUpPanelState.value = state
-        }
-    }
-    fun getSlidingUpPanelState(): LiveData<PanelState> {
-        return mSlidingUpPanelState
-    }
     fun setShowSlidingPanelCounter() {
-        MainScope().launch {
-            if(mSlidingUpPanelState.value != PanelState.EXPANDED){
-                val tempValue : Int = (mShowSlidingUpPanelCounter.value ?: 0)+1
-                mMutableShowSlidingUpPanelCounter.value = tempValue
+        viewModelScope.launch {
+            if(slidingUpPanelState.value != PanelState.EXPANDED) {
+                val tempValue: Int = (showSlidingUpPanelCounter.value ?: 0) + 1
+                showSlidingUpPanelCounter.value = tempValue
             }
         }
-    }
-    fun getShowSlidingPanelCounter(): LiveData<Int> {
-        return mShowSlidingUpPanelCounter
     }
     fun setHideSlidingPanelCounter() {
-        MainScope().launch {
-            if(mSlidingUpPanelState.value != PanelState.COLLAPSED) {
-                val tempValue: Int = (mShowSlidingUpPanelCounter.value ?: 0) + 1
-                mMutableHideSlidingUpPanelCounter.value = tempValue
+        viewModelScope.launch {
+            if(slidingUpPanelState.value != PanelState.COLLAPSED) {
+                val tempValue: Int = (showSlidingUpPanelCounter.value ?: 0) + 1
+                showSlidingUpPanelCounter.value = tempValue
             }
-        }
-    }
-    fun getHideSlidingPanelCounter(): LiveData<Int> {
-        return mHideSlidingUpPanelCounter
-    }
-
-    fun setScrollingState(value : Int) {
-        MainScope().launch {
-            mMutableScrollingState.value = value
-        }
-    }
-    fun getScrollingState(): LiveData<Int> {
-        return mScrollingState
-    }
-    fun getSelectMode(): LiveData<Boolean> {
-        return mSelectMode
-    }
-    fun setSelectMode(value : Boolean) {
-        MainScope().launch {
-            mMutableSelectMode.value = value
         }
     }
     fun setReQuestToggleSelectRange() {
-        var tempValue: Int = mRequestToggleSelectRange.value ?: 0
-        if(tempValue >= 100)
-            tempValue = 0
-        tempValue++
-        MainScope().launch {
-            mMutableRequestToggleSelectRange.value = tempValue
+        viewModelScope.launch {
+            requestToggleSelectRange.value =
+                if((requestToggleSelectRange.value ?: 0) >= 100)
+                    0
+                else
+                    (requestToggleSelectRange.value ?: 0) + 1
         }
-    }
-    fun getReQuestToggleSelectRange(): LiveData<Int> {
-        return mRequestToggleSelectRange
     }
     fun setReQuestToggleSelectAll(){
-        var tempValue: Int = mRequestToggleSelectAll.value ?: 0
-        if(tempValue >= 100)
-            tempValue = 0
-        tempValue++
-        MainScope().launch {
-            mMutableRequestToggleSelectAll.value = tempValue
+        viewModelScope.launch {
+            requestToggleSelectAll.value =
+                if((requestToggleSelectAll.value ?: 0) >= 100)
+                    0
+                else
+                    (requestToggleSelectAll.value ?: 0) + 1
         }
-    }
-    fun getReQuestToggleSelectAll(): LiveData<Int> {
-        return mRequestToggleSelectAll
-    }
-    fun getSelectedDataList() : LiveData<HashMap<Int, String>> {
-        return mSelectedDataList
-    }
-    fun setSelectedDataList(value : HashMap<Int, String>) {
-        MainScope().launch {
-            mMutableSelectedDataList.value = value
-        }
-    }
-    fun setTotalCount(value : Int) {
-        MainScope().launch {
-            mMutableTotalCount.value = value
-        }
-    }
-    fun getTotalCount(): LiveData<Int> {
-        return mTotalCount
     }
     fun setShowDrawerMenuCounter() {
-        var tempValue: Int = mShowDrawerMenuCounter.value ?: 0
-        if(tempValue >= 100)
-            tempValue = 0
-        tempValue++
-        MainScope().launch {
-            mMutableShowDrawerMenuCounter.value = tempValue
+        viewModelScope.launch {
+            showDrawerMenuCounter.value =
+                if((showDrawerMenuCounter.value ?: 0) >= 100)
+                    0
+                else
+                    (showDrawerMenuCounter.value ?: 0) + 1
         }
-    }
-    fun getShowDrawerMenuCounter() : LiveData<Int> {
-        return mShowDrawerMenuCounter
     }
 
     companion object {

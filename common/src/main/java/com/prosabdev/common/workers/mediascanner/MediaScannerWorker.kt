@@ -11,8 +11,8 @@ import com.prosabdev.common.models.FolderUriTree
 import com.prosabdev.common.models.playlist.PlaylistItem
 import com.prosabdev.common.models.songitem.SongItem
 import com.prosabdev.common.roomdatabase.AppDatabase
-import com.prosabdev.common.utils.AudioInfoExtractorUtils
-import com.prosabdev.common.utils.SystemSettingsUtils
+import com.prosabdev.common.utils.AudioInfoExtractor
+import com.prosabdev.common.utils.SystemSettings
 import com.prosabdev.common.workers.playlist.AddSongsToPlaylistWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,18 +26,20 @@ class MediaScannerWorker(
     ctx: Context,
     params: WorkerParameters
 ) : CoroutineWorker(ctx, params) {
+
     override suspend fun doWork(): Result {
-        val scannedFolders: ConcurrentHashMap<String, String> = ConcurrentHashMap()
-        val scannedSongs: ConcurrentLinkedQueue<String> = ConcurrentLinkedQueue()
-        val scannedPlaylists: ConcurrentLinkedQueue<String> = ConcurrentLinkedQueue()
         return withContext(Dispatchers.IO) {
             try {
-                Log.i(AddSongsToPlaylistWorker.TAG, "WORKER $TAG : started")
+                Log.i(AddSongsToPlaylistWorker.TAG, "Worker $TAG started")
+
+                val scannedFolders: ConcurrentHashMap<String, String> = ConcurrentHashMap()
+                val scannedSongs: ConcurrentLinkedQueue<String> = ConcurrentLinkedQueue()
+                val scannedPlaylists: ConcurrentLinkedQueue<String> = ConcurrentLinkedQueue()
 
                 //Start to scan folders
                 scanSongsAndPlaylists(scannedFolders, scannedSongs, scannedPlaylists)
 
-                Log.i(AddSongsToPlaylistWorker.TAG, "WORKER $TAG : ended")
+                Log.i(AddSongsToPlaylistWorker.TAG, "Worker $TAG ended")
 
                 Result.success(
                     workDataOf(
@@ -47,12 +49,16 @@ class MediaScannerWorker(
                     )
                 )
             } catch (error: Throwable) {
-                Log.i(AddSongsToPlaylistWorker.TAG, "Error loading... ${error.stackTrace}")
-                Log.i(AddSongsToPlaylistWorker.TAG, "Error loading... ${error.message}")
+                Log.i(TAG, "Error stack trace -> ${error.stackTrace}")
+                Log.i(TAG, "Error message -> ${error.message}")
                 Result.failure()
             }
         }
     }
+
+    /**
+     * Scan songs and playlists from device
+     */
     private suspend fun scanSongsAndPlaylists(
         scannedFolders: ConcurrentHashMap<String, String>,
         scannedSongs: ConcurrentLinkedQueue<String>,
@@ -60,7 +66,7 @@ class MediaScannerWorker(
     ) {
         //Get all folder uri trees
         val tempFolderSelected: List<FolderUriTree>? = AppDatabase.getDatabase(applicationContext).folderUriTreeDao().getAllDirectly()
-        if (tempFolderSelected == null || tempFolderSelected.isEmpty()) return
+        if (tempFolderSelected.isNullOrEmpty()) return
         //Fetch song and playlists
 
         for (i in tempFolderSelected.indices) {
@@ -76,6 +82,10 @@ class MediaScannerWorker(
             )
         }
     }
+
+    /**
+     * Method used to scan content of document [Uri]
+     */
     private suspend fun scanDocumentUriContent(
         scannedFolders: ConcurrentHashMap<String, String>,
         scannedSongs: ConcurrentLinkedQueue<String>,
@@ -115,7 +125,7 @@ class MediaScannerWorker(
                                 ).use { afd ->
                                     if(afd != null){
                                         scannedFolders[tempDocFile.uri.toString()] = tempDocFile.name ?: ""
-                                        val tempSong = AudioInfoExtractorUtils.extractAudioInfoFromUri(
+                                        val tempSong = AudioInfoExtractor.extractAudioInfoFromUri(
                                             applicationContext,
                                             tempFFF,
                                             afd.fileDescriptor
@@ -134,7 +144,7 @@ class MediaScannerWorker(
                                 scannedPlaylists.add(tempFFF.name)
                                 val playlistItem = PlaylistItem()
                                 playlistItem.isRealFile = true
-                                playlistItem.lastAddedDateToLibrary = SystemSettingsUtils.getCurrentDateInMilli()
+                                playlistItem.lastAddedDateToLibrary = SystemSettings.getCurrentDateInMillis()
                                 playlistItem.lastUpdateDate = tempFFF.lastModified()
                                 playlistItem.uri = tempFFF.uri.toString()
                                 savePlaylistToDatabase(playlistItem)
@@ -145,9 +155,13 @@ class MediaScannerWorker(
             }
         }
     }
-    private fun saveSongToDatabase(songItem: SongItem) {
-        if(songItem.uri?.isEmpty() ?: return) return
-        val updateResult = AppDatabase.getDatabase(applicationContext).songItemDao().updateAtUri(
+
+    /**
+     * Save song to database and return an [Int] 1 if the song is saved or 0 else
+     */
+    private fun saveSongToDatabase(songItem: SongItem): Long {
+        if(songItem.uri?.isEmpty() ?: return 0) return 0
+        val updateCount = AppDatabase.getDatabase(applicationContext).songItemDao().updateAtUri(
             songItem.uri,
             songItem.uriTreeId,
             songItem.fileName,
@@ -182,10 +196,13 @@ class MediaScannerWorker(
             songItem.hashedCovertArtSignature,
             songItem.isValid
         )
-        if(updateResult <= 0){
-            AppDatabase.getDatabase(applicationContext).songItemDao().insert(songItem)
-        }
+        return if(updateCount <= 0) AppDatabase.getDatabase(applicationContext).songItemDao().insert(songItem)
+        else updateCount.toLong()
     }
+
+    /**
+     * Save playlist to database
+     */
     private fun savePlaylistToDatabase(playlistItem: PlaylistItem) {
 //        val updateResult = AppDatabase.getDatabase(applicationContext).playlistItemDao().updateAtUri(
 //

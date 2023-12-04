@@ -1,16 +1,17 @@
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp")
 }
 
 android {
-    namespace 'com.prosabdev.wearos'
-    compileSdk 32
+    namespace "com.prosabdev.wearos"
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.prosabdev.wearos"
         minSdk 25
-        targetSdk 32
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -28,11 +29,10 @@ android {
 }
 
 dependencies {
-
-    implementation 'androidx.core:core-ktx:1.10.1'
-    implementation 'com.google.android.gms:play-services-wearable:18.0.0'
-    implementation 'androidx.percentlayout:percentlayout:1.0.0'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.3.1'
-    implementation 'androidx.wear:wear:1.3.0'
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("com.google.android.gms:play-services-wearable:18.1.0")
+    implementation("androidx.percentlayout:percentlayout:1.0.0")
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    implementation("androidx.wear:wear:1.3.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
 }

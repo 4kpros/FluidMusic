@@ -5,43 +5,32 @@ import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BuildCompat
+import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import com.google.android.material.transition.platform.MaterialArcMotion
-import com.google.android.material.transition.platform.MaterialContainerTransform
+import com.google.android.material.color.DynamicColors
+import com.prosabdev.common.utils.InsetModifiers
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityInterfaceSettingsBinding
 
 @BuildCompat.PrereleaseSdkCheck class InterfaceSettingsActivity : AppCompatActivity() {
 
-    private lateinit var mDataBidingView : ActivityInterfaceSettingsBinding
+    private lateinit var mDataBiding : ActivityInterfaceSettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
 
-        mDataBidingView = DataBindingUtil.setContentView(this, R.layout.activity_interface_settings)
+        //Apply UI settings and dynamics colors
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        initViews()
-        checkInteractions()
-        registerOnBackPressedCallback()
-    }
-    private fun buildEnterTransition(): MaterialContainerTransform {
-        return MaterialContainerTransform().apply {
-            addTarget(R.id.coordinator_settings_activity)
-            duration = 250
-            pathMotion = MaterialArcMotion()
-            interpolator = FastOutSlowInInterpolator()
-            fadeMode = MaterialContainerTransform.FADE_MODE_IN
-        }
-    }
-    private fun buildExitTransition(): MaterialContainerTransform {
-        return MaterialContainerTransform().apply {
-            addTarget(R.id.coordinator_settings_activity)
-            duration = 250
-            pathMotion = MaterialArcMotion()
-            interpolator = FastOutSlowInInterpolator()
-            fadeMode = MaterialContainerTransform.FADE_MODE_OUT
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.setContentView(this, R.layout.activity_interface_settings)
+
+        //Load your UI content
+        if(savedInstanceState == null){
+            initViews()
+            checkInteractions()
+            registerOnBackPressedCallback()
         }
     }
 
@@ -62,14 +51,14 @@ import com.prosabdev.fluidmusic.databinding.ActivityInterfaceSettingsBinding
     }
 
     private fun checkInteractions() {
-        mDataBidingView.topAppBar.setNavigationOnClickListener {
+        mDataBiding.topAppBar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
     }
 
     private fun initViews() {
-        com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorSettingsActivity)
-        com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.emptyView)
+        InsetModifiers.updateTopViewInsets(mDataBiding.coordinatorSettingsActivity)
+        InsetModifiers.updateBottomViewInsets(mDataBiding.emptyView)
     }
 
     companion object {

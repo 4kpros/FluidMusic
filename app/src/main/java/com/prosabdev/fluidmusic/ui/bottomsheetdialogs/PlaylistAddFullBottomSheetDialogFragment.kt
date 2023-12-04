@@ -119,7 +119,7 @@ class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFra
                         dialogDataBidingView.textInputEditText.setText("$DEFAULT_PLAYLIST_NAME ${mDefaultPlaylistCount+1}")
                         dialogDataBidingView.textInputEditText.hint = ctx.resources.getString(R.string.playlist_name)
                         dialogDataBidingView.textInputEditText.selectAll()
-                        com.prosabdev.common.utils.SystemSettingsUtils.SoftInputService(context, dialogDataBidingView.textInputEditText).show(5)
+                        com.prosabdev.common.utils.SystemSettings.SoftInputService(context, dialogDataBidingView.textInputEditText).show(5)
                     }
                     dialogDataBidingView.textInputEditText.addTextChangedListener(object : TextWatcher{
                         override fun beforeTextChanged(
@@ -149,7 +149,7 @@ class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFra
         return withContext(Dispatchers.Default){
             val pI = com.prosabdev.common.models.playlist.PlaylistItem()
             pI.name = playlistName
-            pI.lastAddedDateToLibrary = com.prosabdev.common.utils.SystemSettingsUtils.getCurrentDateInMilli()
+            pI.lastAddedDateToLibrary = com.prosabdev.common.utils.SystemSettings.getCurrentDateInMilli()
             val insertedPlaylistResult : Long = mPlaylistItemViewModel?.insert(pI) ?: -1
             if(insertedPlaylistResult > 0){
                 insertMultiplesSongsToPlaylist(ctx, insertedPlaylistResult, playlistName)

@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
 import com.l4digital.fastscroll.FastScroller
+import com.prosabdev.common.constants.MainConst
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.GridSpacingItemDecoration
@@ -101,27 +102,27 @@ class GenresFragment : Fragment() {
 
     private fun saveAllDataToPref(){
         context?.let { ctx ->
-            val tempSortOrganize = com.prosabdev.common.sharedprefs.models.SortOrganizeItemSP()
+            val tempSortOrganize = com.prosabdev.common.persistence.models.SortOrganizeItemSP()
             tempSortOrganize.sortOrderBy = mGenresFragmentViewModel.getSortBy().value ?: SORT_LIST_GRID_DEFAULT_VALUE
             tempSortOrganize.organizeListGrid = mGenresFragmentViewModel.getOrganizeListGrid().value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
             tempSortOrganize.isInvertSort = mGenresFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
-            com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
+            com.prosabdev.common.persistence.SharedPreferenceManagerUtils
                 .SortAnOrganizeForExploreContents
                 .saveSortOrganizeItemsFor(
                     ctx,
-                    com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SORT_ORGANIZE_GENRES,
+                    com.prosabdev.common.persistence.SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SORT_ORGANIZE_GENRES,
                     tempSortOrganize
                 )
         }
     }
     private fun loadPrefsAndInitViewModel() {
         context?.let { ctx ->
-            val tempSortOrganize: com.prosabdev.common.sharedprefs.models.SortOrganizeItemSP? =
-                com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
+            val tempSortOrganize: com.prosabdev.common.persistence.models.SortOrganizeItemSP? =
+                com.prosabdev.common.persistence.SharedPreferenceManagerUtils
                     .SortAnOrganizeForExploreContents
                     .loadSortOrganizeItemsFor(
                         ctx,
-                        com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SORT_ORGANIZE_GENRES
+                        com.prosabdev.common.persistence.SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SORT_ORGANIZE_GENRES
                     )
             tempSortOrganize?.let { sortOrganize ->
                 mGenresFragmentViewModel.setSortBy(sortOrganize.sortOrderBy)
@@ -545,7 +546,7 @@ class GenresFragment : Fragment() {
                 add(
                     R.id.main_fragment_container,
                     ExploreContentsForFragment.newInstance(
-                        com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
+                        com.prosabdev.common.persistence.SharedPreferenceManagerUtils
                             .SortAnOrganizeForExploreContents
                             .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_GENRE,
                         TAG,
@@ -590,7 +591,7 @@ class GenresFragment : Fragment() {
         MainScope().launch {
             withContext(Dispatchers.Default){
                 val randomExcludedNumber: Int =
-                    com.prosabdev.common.utils.MathComputationsUtils.randomExcluded(
+                    com.prosabdev.common.utils.MathComputations.randomExcluded(
                         mGenericListGridItemAdapter?.getPlayingPosition() ?: -1,
                         (mGenericListGridItemAdapter?.currentList?.size ?: 0) -1
                     )
@@ -615,7 +616,7 @@ class GenresFragment : Fragment() {
     private fun initViews() {
         mDataBidingView?.recyclerView?.setHasFixedSize(true)
         mDataBidingView?.constraintFastScrollerContainer?.let {
-            com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(
+            com.prosabdev.common.utils.InsetModifiers.updateBottomViewInsets(
                 it
             )
         }
@@ -623,7 +624,7 @@ class GenresFragment : Fragment() {
 
     companion object {
         const val TAG = "GenresFragment"
-        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = com.prosabdev.common.utils.ConstantValues.ORGANIZE_GRID_LARGE
+        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = MainConst.ORGANIZE_GRID_LARGE
         private const val SORT_LIST_GRID_DEFAULT_VALUE: String = com.prosabdev.common.models.view.GenreItem.DEFAULT_INDEX
         private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 

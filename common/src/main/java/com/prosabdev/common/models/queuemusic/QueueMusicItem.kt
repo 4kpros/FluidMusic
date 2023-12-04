@@ -10,10 +10,10 @@ import com.prosabdev.common.models.songitem.SongItem
         ForeignKey(entity = SongItem::class, parentColumns = ["uri"], childColumns = ["songUri"], onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.NO_ACTION)
     ]
 )
-class QueueMusicItem {
+data class QueueMusicItem (
     @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
-    var songUri: String? = ""
-    var addedDate: Long = 0
+    var id: Long = 0,
+    var songUri: String? = "",
+    var addedDate: Long = 0,
     var playOrder: Int = 0
-}
+)

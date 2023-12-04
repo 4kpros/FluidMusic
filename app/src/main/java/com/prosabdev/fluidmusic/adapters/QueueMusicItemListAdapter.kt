@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.color.MaterialColors
+import com.prosabdev.common.constants.MainConst
 import com.prosabdev.common.models.songitem.SongItem
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.callbacks.QueueMusicItemCallback
@@ -68,11 +69,11 @@ class QueueMusicItemListAdapter(
             for (payload in payloads) {
                 when (payload) {
                     PAYLOAD_PLAYBACK_STATE -> {
-                        Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "PAYLOAD_PLAYBACK_STATE")
+                        Log.i(MainConst.TAG, "PAYLOAD_PLAYBACK_STATE")
                         holder.updateIsPlayingStateUI(getPlayingPosition(), true)
                     }
                     PAYLOAD_IS_COVERT_ART_TEXT -> {
-                        Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
+                        Log.i(MainConst.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
                         holder.updateCovertArtAndTitleUI(mContext, getItem(position) as SongItem)
                     }
                     else -> {
@@ -141,11 +142,11 @@ class QueueMusicItemListAdapter(
             mItemQueueMusicBinding.textDetails.text = genericDetails?.details
 
             val tempUri: Uri? = Uri.parse(songItem.uri)
-            val imageRequest: com.prosabdev.common.utils.ImageLoadersUtils.ImageRequestItem = com.prosabdev.common.utils.ImageLoadersUtils.ImageRequestItem.newOriginalCardInstance()
+            val imageRequest: com.prosabdev.common.utils.ImageLoaders.ImageRequestItem = com.prosabdev.common.utils.ImageLoaders.ImageRequestItem.newOriginalCardInstance()
             imageRequest.uri = tempUri
             imageRequest.imageView = mItemQueueMusicBinding.imageviewCoverArt
             imageRequest.hashedCovertArtSignature = songItem.hashedCovertArtSignature
-            com.prosabdev.common.utils.ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
+            com.prosabdev.common.utils.ImageLoaders.startExploreContentImageLoaderJob(ctx, imageRequest)
         }
         fun updateIsPlayingStateUI(
             playingPosition: Int,
@@ -166,9 +167,9 @@ class QueueMusicItemListAdapter(
             mItemQueueMusicBinding.textSubtitle.setTextColor(textColorRes)
             mItemQueueMusicBinding.textDetails.setTextColor(textColorRes)
             if(isUnderlined){
-                mItemQueueMusicBinding.textTitle.text = com.prosabdev.common.utils.FormattersAndParsersUtils.getUnderLinedWord(mItemQueueMusicBinding.textTitle.text.toString())
-                mItemQueueMusicBinding.textSubtitle.text = com.prosabdev.common.utils.FormattersAndParsersUtils.getUnderLinedWord(mItemQueueMusicBinding.textSubtitle.text.toString())
-                mItemQueueMusicBinding.textDetails.text = com.prosabdev.common.utils.FormattersAndParsersUtils.getUnderLinedWord(mItemQueueMusicBinding.textDetails.text.toString())
+                mItemQueueMusicBinding.textTitle.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(mItemQueueMusicBinding.textTitle.text.toString())
+                mItemQueueMusicBinding.textSubtitle.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(mItemQueueMusicBinding.textSubtitle.text.toString())
+                mItemQueueMusicBinding.textDetails.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(mItemQueueMusicBinding.textDetails.text.toString())
             }else{
                 mItemQueueMusicBinding.textTitle.text = mItemQueueMusicBinding.textTitle.text.toString()
                 mItemQueueMusicBinding.textSubtitle.text = mItemQueueMusicBinding.textSubtitle.text.toString()
@@ -177,13 +178,13 @@ class QueueMusicItemListAdapter(
         }
         private fun showPlayingPositionImageHover(animate: Boolean){
             if(animate){
-                com.prosabdev.common.utils.AnimatorsUtils.crossFadeUp(
+                com.prosabdev.common.utils.Animators.crossFadeUp(
                     mItemQueueMusicBinding.imageviewBackgroundIsPlaying,
                     true,
                     150,
                     0.65f
                 )
-                com.prosabdev.common.utils.AnimatorsUtils.crossFadeUp(
+                com.prosabdev.common.utils.Animators.crossFadeUp(
                     mItemQueueMusicBinding.linearIsPlayingAnimContainer,
                     true,
                     200,
@@ -198,12 +199,12 @@ class QueueMusicItemListAdapter(
         }
         private fun hidePlayingPositionImageHover(animate: Boolean){
             if(animate){
-                com.prosabdev.common.utils.AnimatorsUtils.crossFadeDown(
+                com.prosabdev.common.utils.Animators.crossFadeDown(
                     mItemQueueMusicBinding.imageviewBackgroundIsPlaying,
                     true,
                     200
                 )
-                com.prosabdev.common.utils.AnimatorsUtils.crossFadeDown(
+                com.prosabdev.common.utils.Animators.crossFadeDown(
                     mItemQueueMusicBinding.linearIsPlayingAnimContainer,
                     true,
                     150

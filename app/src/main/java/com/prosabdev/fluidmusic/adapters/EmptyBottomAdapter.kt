@@ -48,7 +48,7 @@ class EmptyBottomAdapter(
             if(textVisible){
                 mItemEmptyBottomSpaceBinding.constraintContainer.visibility = VISIBLE
                 if(scrollState == 2) {
-                    com.prosabdev.common.utils.AnimatorsUtils.crossFadeUp(mItemEmptyBottomSpaceBinding.textEnd, true, 500)
+                    com.prosabdev.common.utils.Animators.crossFadeUp(mItemEmptyBottomSpaceBinding.textEnd, true, 500)
                 }
             }else{
                 mItemEmptyBottomSpaceBinding.constraintContainer.visibility = INVISIBLE

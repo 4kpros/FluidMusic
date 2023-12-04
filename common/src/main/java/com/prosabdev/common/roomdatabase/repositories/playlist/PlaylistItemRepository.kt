@@ -17,40 +17,40 @@ class PlaylistItemRepository(ctx : Context) {
             mDao?.insert(playlistItem)
         }
     }
-    suspend fun update(playlistItem: PlaylistItem?) {
-        withContext(Dispatchers.IO){
+    suspend fun update(playlistItem: PlaylistItem?): Int? {
+        return withContext(Dispatchers.IO){
             mDao?.update(playlistItem)
         }
     }
-    suspend fun delete(playlistItem: PlaylistItem?) {
-        withContext(Dispatchers.IO){
+    suspend fun delete(playlistItem: PlaylistItem?): Int? {
+        return withContext(Dispatchers.IO){
             mDao?.delete(playlistItem)
         }
     }
-    suspend fun deleteAll() {
-        withContext(Dispatchers.IO){
+    suspend fun deleteAll(): Int? {
+        return withContext(Dispatchers.IO){
             mDao?.deleteAll()
         }
     }
-    //Getters
+
     suspend fun getMaxIdLikeName(playlistName: String?) : Long? {
         return withContext(Dispatchers.IO){
-            return@withContext mDao?.getMaxIdLikeName(playlistName)
+            mDao?.getMaxIdLikeName(playlistName)
         }
     }
     suspend fun getWithName(name: String?) : PlaylistItem? {
         return withContext(Dispatchers.IO){
-            return@withContext mDao?.getWithName(name)
+            mDao?.getWithName(name)
         }
     }
     suspend fun getAtId(id: Long) : PlaylistItem? {
         return withContext(Dispatchers.IO){
-            return@withContext mDao?.getAtId(id)
+            mDao?.getAtId(id)
         }
     }
     suspend fun getAll(orderBy: String?) : LiveData<List<PlaylistItem>>? {
         return withContext(Dispatchers.IO){
-            return@withContext mDao?.getAll(orderBy)
+            mDao?.getAll(orderBy)
         }
     }
 }

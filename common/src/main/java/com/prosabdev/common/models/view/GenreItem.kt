@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.room.DatabaseView
 import com.prosabdev.common.R
 import com.prosabdev.common.models.generic.GenericItemListGrid
-import com.prosabdev.common.utils.FormattersAndParsersUtils
+import com.prosabdev.common.utils.FormattersAndParsers
 
 @DatabaseView(
     "SELECT songItem.genre as name, " +
@@ -28,20 +28,20 @@ import com.prosabdev.common.utils.FormattersAndParsersUtils
             "FROM SongItem as songItem " +
             "GROUP BY SongItem.genre ORDER BY SongItem.genre"
 )
-class GenreItem {
-    var name: String? = ""
-    var year: String? = ""
-    var lastUpdateDate: Long = 0
-    var lastAddedDateToLibrary: Long = 0
-    var numberArtists: Int = 0
-    var numberAlbums: Int = 0
-    var numberAlbumArtists: Int = 0
-    var numberComposers: Int = 0
-    var numberTracks: Int = 0
-    var totalDuration: Long = 0
-    var hashedCovertArtSignature: Int = -1
+data class GenreItem (
+    var name: String? = "",
+    var year: String? = "",
+    var lastUpdateDate: Long = 0,
+    var lastAddedDateToLibrary: Long = 0,
+    var numberArtists: Int = 0,
+    var numberAlbums: Int = 0,
+    var numberAlbumArtists: Int = 0,
+    var numberComposers: Int = 0,
+    var numberTracks: Int = 0,
+    var totalDuration: Long = 0,
+    var hashedCovertArtSignature: Int = -1,
     var uriImage: String? = ""
-
+){
     companion object {
         const val TAG = "GenreItem"
         const val DEFAULT_INDEX = "name"
@@ -75,7 +75,7 @@ class GenreItem {
                     if(setAllText)
                         ctx.getString(
                             R.string.item_content_explore_text_details,
-                            FormattersAndParsersUtils.formatSongDurationToString(dataItem.totalDuration),
+                            FormattersAndParsers.formatSongDurationToString(dataItem.totalDuration),
                             dataItem.numberTracks.toString()
                         )
                     else

@@ -1,23 +1,18 @@
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp")
 }
 
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
-
 android {
-    namespace 'com.prosabdev.common'
-    compileSdk 33
+    namespace "com.prosabdev.common"
+    compileSdk 34
 
     defaultConfig {
         minSdk 21
-        targetSdk 33
+        targetSdk 34
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {
@@ -31,44 +26,54 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = "1.8"
     }
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.10.1'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
-    implementation 'androidx.preference:preference-ktx:1.2.1'
-    implementation 'androidx.work:work-runtime-ktx:2.8.1'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    //MVVM
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+    //Room database
+    implementation("androidx.room:room-runtime:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    //Document file
+    implementation("androidx.documentfile:documentfile:1.0.1")
+    //Work manager
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    //Preference
+    implementation("androidx.preference:preference-ktx:1.2.1")
+    //Multidex
+    implementation("androidx.multidex:multidex:2.0.1")
+    //Viewpager2
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+    //Media3
+    implementation("androidx.media:media:1.7.0")
+    implementation("androidx.media3:media3-exoplayer:1.2.0")
+    implementation("androidx.media3:media3-session:1.2.0")
+    implementation("androidx.media3:media3-common:1.2.0")
+    implementation("androidx.media3:media3-extractor:1.2.0")
 
-    implementation 'androidx.media:media:1.6.0'
-    androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
-    implementation "androidx.room:room-runtime:2.5.2"
-    kapt "androidx.room:room-compiler:2.5.2"
-    implementation "androidx.room:room-ktx:2.5.2"
-    implementation "androidx.multidex:multidex:2.0.1"
+    //Google gson
+    implementation("com.google.code.gson:gson:2.10")
+    //Dagger hilt
+    implementation ("com.google.dagger:dagger:2.44.2")
+    implementation("com.google.dagger:hilt-android:2.44")
+    ksp("com.google.dagger:dagger-compiler:2.44.2")
+    ksp("com.google.dagger:hilt-android-compiler:2.38.1")
 
-    if (findProject(':exoplayer-library-core') != null) {
-        api project(':exoplayer-library-core')
-        api project(':exoplayer-library-ui')
-        api project(':exoplayer-extension-mediasession')
-        api project(':exoplayer-extension-cast')
-    } else {
-        api "com.google.android.exoplayer:exoplayer-core:2.18.2"
-        api "com.google.android.exoplayer:exoplayer-ui:2.18.2"
-        api "com.google.android.exoplayer:extension-mediasession:2.18.2"
-        api "com.google.android.exoplayer:extension-cast:2.18.2"
-    }
-    implementation 'com.google.dagger:dagger:2.44.2'
-    kapt 'com.google.dagger:dagger-compiler:2.44.2'
-    implementation 'com.google.code.gson:gson:2.10'
-    implementation 'com.github.bumptech.glide:glide:4.12.0'
-    kapt 'com.github.bumptech.glide:compiler:4.12.0'
+    //Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    //Leak canary
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.10")
 
-    implementation 'jp.wasabeef:blurry:4.0.1'
-    implementation 'com.github.paramsen:noise:2.0.0'
+    //Glide
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+    ksp("com.github.bumptech.glide:compiler:4.12.0")
+    //Blurry
+    implementation("jp.wasabeef:blurry:4.0.1")
+    //FTT Noise
+    implementation("com.github.paramsen:noise:2.0.0")
 }

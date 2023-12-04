@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 @Entity(
     indices = [Index(value = ["presetName"], unique = true)]
 )
-class EqualizerPresetItem {
+data class EqualizerPresetItem (
     @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
+    var id: Long = 0,
     var presetName: String? = ""
-}
+)
