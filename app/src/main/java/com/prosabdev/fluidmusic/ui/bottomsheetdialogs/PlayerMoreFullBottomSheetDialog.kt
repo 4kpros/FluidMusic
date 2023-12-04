@@ -13,7 +13,23 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
+import com.prosabdev.common.models.playlist.PlaylistItem
+import com.prosabdev.common.models.playlist.PlaylistSongItem
+import com.prosabdev.common.models.songitem.SongItem
+import com.prosabdev.common.models.view.AlbumArtistItem
+import com.prosabdev.common.models.view.AlbumItem
+import com.prosabdev.common.models.view.ArtistItem
+import com.prosabdev.common.models.view.ComposerItem
+import com.prosabdev.common.models.view.FolderItem
+import com.prosabdev.common.models.view.GenreItem
+import com.prosabdev.common.models.view.YearItem
+import com.prosabdev.common.persistence.PersistentStorage
+import com.prosabdev.common.persistence.models.SleepTimerSP
+import com.prosabdev.common.utils.FormattersAndParsers
+import com.prosabdev.common.utils.ImageLoaders
 import com.prosabdev.common.utils.IntentActionsManager
+import com.prosabdev.common.utils.PermissionsManager
+import com.prosabdev.common.utils.SystemSettings
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetPlayerMoreBinding
 import com.prosabdev.fluidmusic.databinding.DialogGotoSongBinding
@@ -36,16 +52,16 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     private var mMainFragmentViewModel: MainFragmentViewModel? = null
     private var mScreenShotPlayerView : View? = null
 
-    private var mPlaylists: ArrayList<com.prosabdev.common.models.playlist.PlaylistItem> = ArrayList()
+    private var mPlaylists: ArrayList<PlaylistItem> = ArrayList()
     private var mDefaultPlaylistCount: Long = 0
 
-    private var mAlbumItem: com.prosabdev.common.models.view.AlbumItem? = null
-    private var mAlbumArtistItem: com.prosabdev.common.models.view.AlbumArtistItem? = null
-    private var mArtistItem: com.prosabdev.common.models.view.ArtistItem? = null
-    private var mComposerItem: com.prosabdev.common.models.view.ComposerItem? = null
-    private var mFolderItem: com.prosabdev.common.models.view.FolderItem? = null
-    private var mGenreItem: com.prosabdev.common.models.view.GenreItem? = null
-    private var mYearItem: com.prosabdev.common.models.view.YearItem? = null
+    private var mAlbumItem: AlbumItem? = null
+    private var mAlbumArtistItem: AlbumArtistItem? = null
+    private var mArtistItem: ArtistItem? = null
+    private var mComposerItem: ComposerItem? = null
+    private var mFolderItem: FolderItem? = null
+    private var mGenreItem: GenreItem? = null
+    private var mYearItem: YearItem? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,7 +86,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     private fun observeLiveData() {
         MainScope().launch {
             mPlaylistItemViewModel.getAll()?.observe(viewLifecycleOwner){
-                mPlaylists = it as ArrayList<com.prosabdev.common.models.playlist.PlaylistItem>
+                mPlaylists = it as ArrayList<PlaylistItem>
                 mPlaylists.reverse()
                 this.cancel(null)
             }
@@ -78,7 +94,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         }
     }
 
-    private fun updateCurrentPlayingSongUI(songItem: com.prosabdev.common.models.songitem.SongItem?) {
+    private fun updateCurrentPlayingSongUI(songItem: SongItem?) {
         if(songItem == null)
             return
         context?.let { ctx ->
@@ -89,16 +105,16 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                 dataBidingView.textDescription.text =
                     ctx.getString(
                         R.string.item_song_card_text_details,
-                        com.prosabdev.common.utils.FormattersAndParsersUtils.formatSongDurationToString(songItem.duration ),
+                        FormattersAndParsers.formatSongDurationToString(songItem.duration ),
                         songItem.typeMime
                     )
 
                 val tempUri: Uri? = Uri.parse(songItem.uri)
-                val imageRequest: com.prosabdev.common.utils.ImageLoadersUtils.ImageRequestItem = com.prosabdev.common.utils.ImageLoadersUtils.ImageRequestItem.newOriginalCardInstance()
+                val imageRequest: ImageLoaders.ImageRequestItem = ImageLoaders.ImageRequestItem.newOriginalCardInstance()
                 imageRequest.uri = tempUri
                 imageRequest.imageView = dataBidingView.covertArt
                 imageRequest.hashedCovertArtSignature = songItem.hashedCovertArtSignature
-                com.prosabdev.common.utils.ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequest)
+                ImageLoaders.startExploreContentImageLoaderJob(ctx, imageRequest)
             }
         }
     }
@@ -133,7 +149,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun showDeleteSelectionDialog() {
-        val tempSongItem: com.prosabdev.common.models.songitem.SongItem =
+        val tempSongItem: SongItem =
             mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
         context?.let { ctx ->
             MaterialAlertDialogBuilder(this.requireContext())
@@ -150,16 +166,16 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         }
         dismiss()
     }
-    private fun deleteSelectedSongs(songItem: com.prosabdev.common.models.songitem.SongItem) {
+    private fun deleteSelectedSongs(songItem: SongItem) {
         //
     }
 
     private fun setSongAsRingtone() {
-        val tempSongItem : com.prosabdev.common.models.songitem.SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val tempSongItem : SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
         context?.let { ctx ->
-            if(com.prosabdev.common.utils.PermissionsManagerUtils.haveWriteSystemSettingsPermission(ctx)){
+            if(PermissionsManager.haveWriteSystemSettingsPermission(ctx)){
                 val tempUri : Uri = Uri.parse(tempSongItem.uri ?: "") ?: return
-                com.prosabdev.common.utils.SystemSettingsUtils.setRingtone(ctx, tempUri, tempSongItem.fileName, true)
+                SystemSettings.setRingtone(ctx, tempUri, tempSongItem.fileName, true)
             }else{
                 MaterialAlertDialogBuilder(this.requireContext())
                     .setTitle(ctx.getString(R.string.set_as_ringtone))
@@ -170,7 +186,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     }
                     .setPositiveButton(ctx.getString(R.string.lets_go)) { dialog, _ ->
                         activity?.let { scopeActivity ->
-                            com.prosabdev.common.utils.PermissionsManagerUtils.requestWriteSystemSettingsPermission(
+                            PermissionsManager.requestWriteSystemSettingsPermission(
                                 scopeActivity
                             )
                         }
@@ -183,7 +199,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun showGoToSongDialog() {
-        val tempSongItem : com.prosabdev.common.models.songitem.SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val tempSongItem : SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
 
         val mDialogGotoSongBinding : DialogGotoSongBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_goto_song, null, false)
         val tempFragmentManager = activity?.supportFragmentManager ?: return
@@ -198,18 +214,18 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                 .show().apply {
                     mDialogGotoSongBinding.buttonAlbum.setOnClickListener{
                         this.dismiss()
-                        val temGenericItem = com.prosabdev.common.models.view.AlbumItem.castDataItemToGeneric(context, mAlbumItem, true)
+                        val temGenericItem = AlbumItem.castDataItemToGeneric(context, mAlbumItem, true)
                         mMainFragmentViewModel?.setHideSlidingPanelCounter()
                         tempFragmentManager.commit {
                             setReorderingAllowed(true)
                             add(
                                 R.id.main_fragment_container,
                                 ExploreContentsForFragment.newInstance(
-                                    com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
+                                    PersistentStorage
                                         .SortAnOrganizeForExploreContents
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ALBUM,
                                     AlbumsFragment.TAG,
-                                    com.prosabdev.common.models.view.AlbumItem.INDEX_COLUM_TO_SONG_ITEM,
+                                    AlbumItem.INDEX_COLUM_TO_SONG_ITEM,
                                     tempSongItem.album,
                                     mAlbumItem?.uriImage,
                                     mAlbumItem?.hashedCovertArtSignature ?: -1,
@@ -223,18 +239,18 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     }
                     mDialogGotoSongBinding.buttonAlbumArtist.setOnClickListener{
                         this.dismiss()
-                        val temGenericItem = com.prosabdev.common.models.view.AlbumArtistItem.castDataItemToGeneric(context, mAlbumArtistItem, true)
+                        val temGenericItem = AlbumArtistItem.castDataItemToGeneric(context, mAlbumArtistItem, true)
                         mMainFragmentViewModel?.setHideSlidingPanelCounter()
                         tempFragmentManager.commit {
                             setReorderingAllowed(true)
                             add(
                                 R.id.main_fragment_container,
                                 ExploreContentsForFragment.newInstance(
-                                    com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
+                                    PersistentStorage
                                         .SortAnOrganizeForExploreContents
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ALBUM_ARTIST,
                                     AlbumArtistsFragment.TAG,
-                                    com.prosabdev.common.models.view.AlbumArtistItem.INDEX_COLUM_TO_SONG_ITEM,
+                                    AlbumArtistItem.INDEX_COLUM_TO_SONG_ITEM,
                                     tempSongItem.albumArtist,
                                     mAlbumArtistItem?.uriImage,
                                     mAlbumArtistItem?.hashedCovertArtSignature ?: -1,
@@ -248,18 +264,18 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     }
                     mDialogGotoSongBinding.buttonArtist.setOnClickListener{
                         this.dismiss()
-                        val temGenericItem = com.prosabdev.common.models.view.ArtistItem.castDataItemToGeneric(context, mArtistItem, true)
+                        val temGenericItem = ArtistItem.castDataItemToGeneric(context, mArtistItem, true)
                         mMainFragmentViewModel?.setHideSlidingPanelCounter()
                         tempFragmentManager.commit {
                             setReorderingAllowed(true)
                             add(
                                 R.id.main_fragment_container,
                                 ExploreContentsForFragment.newInstance(
-                                    com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
+                                    PersistentStorage
                                         .SortAnOrganizeForExploreContents
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ARTIST,
                                     ArtistsFragment.TAG,
-                                    com.prosabdev.common.models.view.ArtistItem.INDEX_COLUM_TO_SONG_ITEM,
+                                    ArtistItem.INDEX_COLUM_TO_SONG_ITEM,
                                     tempSongItem.artist,
                                     mArtistItem?.uriImage,
                                     mArtistItem?.hashedCovertArtSignature ?: -1,
@@ -273,18 +289,18 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     }
                     mDialogGotoSongBinding.buttonComposer.setOnClickListener{
                         this.dismiss()
-                        val temGenericItem = com.prosabdev.common.models.view.ComposerItem.castDataItemToGeneric(context, mComposerItem, true)
+                        val temGenericItem = ComposerItem.castDataItemToGeneric(context, mComposerItem, true)
                         mMainFragmentViewModel?.setHideSlidingPanelCounter()
                         tempFragmentManager.commit {
                             setReorderingAllowed(true)
                             add(
                                 R.id.main_fragment_container,
                                 ExploreContentsForFragment.newInstance(
-                                    com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
+                                    PersistentStorage
                                         .SortAnOrganizeForExploreContents
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_COMPOSER,
                                     ComposersFragment.TAG,
-                                    com.prosabdev.common.models.view.ComposerItem.INDEX_COLUM_TO_SONG_ITEM,
+                                    ComposerItem.INDEX_COLUM_TO_SONG_ITEM,
                                     tempSongItem.composer,
                                     mComposerItem?.uriImage,
                                     mComposerItem?.hashedCovertArtSignature ?: -1,
@@ -298,18 +314,18 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     }
                     mDialogGotoSongBinding.buttonFolder.setOnClickListener{
                         this.dismiss()
-                        val temGenericItem = com.prosabdev.common.models.view.FolderItem.castDataItemToGeneric(context, mFolderItem, true)
+                        val temGenericItem = FolderItem.castDataItemToGeneric(context, mFolderItem, true)
                         mMainFragmentViewModel?.setHideSlidingPanelCounter()
                         tempFragmentManager.commit {
                             setReorderingAllowed(true)
                             add(
                                 R.id.main_fragment_container,
                                 ExploreContentsForFragment.newInstance(
-                                    com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
+                                    PersistentStorage
                                         .SortAnOrganizeForExploreContents
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_FOLDER,
                                     FoldersFragment.TAG,
-                                    com.prosabdev.common.models.view.FolderItem.INDEX_COLUM_TO_SONG_ITEM,
+                                    FolderItem.INDEX_COLUM_TO_SONG_ITEM,
                                     tempSongItem.folder,
                                     mFolderItem?.uriImage,
                                     mFolderItem?.hashedCovertArtSignature ?: -1,
@@ -323,18 +339,18 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     }
                     mDialogGotoSongBinding.buttonGenre.setOnClickListener{
                         this.dismiss()
-                        val temGenericItem = com.prosabdev.common.models.view.GenreItem.castDataItemToGeneric(context, mGenreItem, true)
+                        val temGenericItem = GenreItem.castDataItemToGeneric(context, mGenreItem, true)
                         mMainFragmentViewModel?.setHideSlidingPanelCounter()
                         tempFragmentManager.commit {
                             setReorderingAllowed(true)
                             add(
                                 R.id.main_fragment_container,
                                 ExploreContentsForFragment.newInstance(
-                                    com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
+                                    PersistentStorage
                                         .SortAnOrganizeForExploreContents
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_GENRE,
                                     GenresFragment.TAG,
-                                    com.prosabdev.common.models.view.GenreItem.INDEX_COLUM_TO_SONG_ITEM,
+                                    GenreItem.INDEX_COLUM_TO_SONG_ITEM,
                                     tempSongItem.genre,
                                     mGenreItem?.uriImage,
                                     mGenreItem?.hashedCovertArtSignature ?: -1,
@@ -394,8 +410,8 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     )
                 }
                 .show().apply {
-                    val tempSleepTimer: Float = mNowPlayingFragmentViewModel?.getSleepTimer()?.value?.sliderValue ?: 0.0f
-                    val tempPlayLastSong: Boolean = mNowPlayingFragmentViewModel?.getSleepTimer()?.value?.playLastSong ?: false
+                    val tempSleepTimer: Float = mNowPlayingFragmentViewModel?.sleepTimer?.value?.sliderValue ?: 0.0f
+                    val tempPlayLastSong: Boolean = mNowPlayingFragmentViewModel?.sleepTimer?.value?.playLastSong ?: false
                     mDialogSetSleepTimerBinding.slider.value = tempSleepTimer
                     mDialogSetSleepTimerBinding.textRangeValue.text =
                         if(tempSleepTimer <= 0)
@@ -418,14 +434,14 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun saveSleepTimer(value: Float, playLastSong: Boolean = false) {
-        val tempSleepTimerSP = com.prosabdev.common.sharedprefs.models.SleepTimerSP()
+        val tempSleepTimerSP = SleepTimerSP()
         tempSleepTimerSP.sliderValue = value
         tempSleepTimerSP.playLastSong = playLastSong
-        mNowPlayingFragmentViewModel?.setSleepTimer(tempSleepTimerSP)
+        mNowPlayingFragmentViewModel?.sleepTimer?.value = tempSleepTimerSP
     }
 
     private fun shareSong() {
-        val tempSongItem : com.prosabdev.common.models.songitem.SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val tempSongItem : SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
         context?.let { ctx ->
             val dialogShareSongBinding : DialogShareSongBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_share_song, null, false)
             MaterialAlertDialogBuilder(this.requireContext())
@@ -477,16 +493,16 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun fetchLyrics() {
-        val tempSongItem : com.prosabdev.common.models.songitem.SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val tempSongItem : SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
     }
 
     private fun showAddToPlaylistDialog() {
-        val tempSongItem : com.prosabdev.common.models.songitem.SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val tempSongItem : SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
 
-        val songsToAddOnPlaylist : ArrayList<com.prosabdev.common.models.playlist.PlaylistSongItem> = ArrayList()
-        val psI = com.prosabdev.common.models.playlist.PlaylistSongItem()
+        val songsToAddOnPlaylist : ArrayList<PlaylistSongItem> = ArrayList()
+        val psI = PlaylistSongItem()
         psI.songUri = tempSongItem.uri
-        psI.lastAddedDateToLibrary = com.prosabdev.common.utils.SystemSettingsUtils.getCurrentDateInMilli()
+        psI.lastAddedDateToLibrary = SystemSettings.getCurrentDateInMillis()
         songsToAddOnPlaylist.add(psI)
 
         val playlistAddBottomSheetDialog = PlaylistAddFullBottomSheetDialogFragment.newInstance(
@@ -504,7 +520,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun showSongInfoDialog() {
-        val tempSongItem : com.prosabdev.common.models.songitem.SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val tempSongItem : SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
         val songInfoBottomSheetDialog = SongInfoFullBottomSheetDialogFragment.newInstance(tempSongItem)
         activity ?.supportFragmentManager?.let { songInfoBottomSheetDialog.show(it, SongInfoFullBottomSheetDialogFragment.TAG) }
         dismiss()
@@ -520,13 +536,13 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         mScreenShotPlayerView = screenShootPlayerView
     }
     fun updateContentExploreDetails(
-        albumItem: com.prosabdev.common.models.view.AlbumItem,
-        albumArtistItem: com.prosabdev.common.models.view.AlbumArtistItem,
-        artistItem: com.prosabdev.common.models.view.ArtistItem,
-        composerItem: com.prosabdev.common.models.view.ComposerItem,
-        folderItem: com.prosabdev.common.models.view.FolderItem,
-        genreItem: com.prosabdev.common.models.view.GenreItem,
-        yearItem: com.prosabdev.common.models.view.YearItem,
+        albumItem: AlbumItem,
+        albumArtistItem: AlbumArtistItem,
+        artistItem: ArtistItem,
+        composerItem: ComposerItem,
+        folderItem: FolderItem,
+        genreItem: GenreItem,
+        yearItem: YearItem,
     ){
         mAlbumItem = albumItem
         mAlbumArtistItem = albumArtistItem

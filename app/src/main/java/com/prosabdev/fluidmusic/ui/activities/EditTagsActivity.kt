@@ -8,23 +8,30 @@ import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.color.DynamicColors
+import com.prosabdev.common.utils.InsetModifiers
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityEditTagsBinding
 
 @BuildCompat.PrereleaseSdkCheck class EditTagsActivity : AppCompatActivity() {
-    private lateinit var mDataBidingView : ActivityEditTagsBinding
+
+    private lateinit var mDataBiding : ActivityEditTagsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //Apply UI settings and dynamics colors
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        mDataBidingView = DataBindingUtil.setContentView(this, R.layout.activity_edit_tags)
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.setContentView(this, R.layout.activity_edit_tags)
 
-        initViews()
-        checkInteractions()
-        registerOnBackPressedCallback()
+        //Load your UI content
+        if(savedInstanceState == null){
+            initViews()
+            checkInteractions()
+            registerOnBackPressedCallback()
+        }
     }
 
     private fun registerOnBackPressedCallback() {
@@ -47,8 +54,8 @@ import com.prosabdev.fluidmusic.databinding.ActivityEditTagsBinding
     }
 
     private fun initViews() {
-        com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
-        com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.constraintNestedScrollView)
+        InsetModifiers.updateTopViewInsets(mDataBiding.coordinatorLayout)
+        InsetModifiers.updateBottomViewInsets(mDataBiding.constraintNestedScrollView)
     }
 
     companion object {

@@ -12,7 +12,7 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.GridSpacingItemDecoration
 import com.prosabdev.fluidmusic.adapters.QueueMusicItemListAdapter
 import com.prosabdev.fluidmusic.databinding.BottomSheetQueueMusicBinding
-import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
+import com.prosabdev.fluidmusic.ui.fragments.actions.PlaybackActions
 import com.prosabdev.fluidmusic.viewmodels.fragments.NowPlayingFragmentViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -150,7 +150,7 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
     private fun onPlaySongAtPosition(position: Int) {
         val tempSongItem: com.prosabdev.common.models.songitem.SongItem = mQueueMusicItemAdapter?.currentList?.get(position) as com.prosabdev.common.models.songitem.SongItem? ?: return
         tempSongItem.position = position
-        CommonPlaybackAction.playSongAtPositionFromQueueMusic(
+        PlaybackActions.playSongAtPositionFromQueueMusic(
             mNowPlayingFragmentViewModel,
             tempSongItem
         )

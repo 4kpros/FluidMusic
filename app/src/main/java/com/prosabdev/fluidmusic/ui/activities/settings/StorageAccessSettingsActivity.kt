@@ -20,20 +20,26 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.models.FolderUriTree
+import com.prosabdev.common.utils.FormattersAndParsers
+import com.prosabdev.common.utils.InsetModifiers
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.FolderUriTreeAdapter
 import com.prosabdev.fluidmusic.databinding.ActivityStorageAccessSettingsBinding
+import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.StorageAccessFullBottomSheetDialog
 import com.prosabdev.fluidmusic.viewmodels.activities.StorageAccessActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @BuildCompat.PrereleaseSdkCheck class StorageAccessSettingsActivity : AppCompatActivity() {
 
-    private lateinit var mDataBidingView: ActivityStorageAccessSettingsBinding
+    private lateinit var mDataBiding: ActivityStorageAccessSettingsBinding
 
     private val mFolderUriTreeViewModel: FolderUriTreeViewModel by viewModels()
     private val mStorageAccessActivityViewModel: StorageAccessActivityViewModel by viewModels()
@@ -45,17 +51,22 @@ import kotlinx.coroutines.withContext
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //Apply UI settings and dynamics colors
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        mDataBidingView = DataBindingUtil.setContentView(this, R.layout.activity_storage_access_settings)
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.setContentView(this, R.layout.activity_storage_access_settings)
 
-        initViews()
-        MainScope().launch {
-            setupAdapter()
-            observeLiveData()
-            checkInteractions()
-            registerOnBackPressedCallback()
+        //Load your UI content
+        if(savedInstanceState == null){
+            runBlocking {
+                initViews()
+                setupAdapter()
+                observeLiveData()
+                checkInteractions()
+                registerOnBackPressedCallback()
+            }
         }
     }
 
@@ -89,7 +100,7 @@ import kotlinx.coroutines.withContext
         mFolderUriTreeViewModel.getAll()?.observe(this as LifecycleOwner){
             updateFolderUriTreesUI(it)
         }
-        mStorageAccessActivityViewModel.getRemoveAllFoldersCounter().observe(this){
+        mStorageAccessActivityViewModel.requestRemoveAllFolderUriTrees.observe(this){
             MainScope().launch {
                 removeAllFolders(it)
             }
@@ -105,22 +116,22 @@ import kotlinx.coroutines.withContext
         }
     }
 
-    private fun updateFolderUriTreesUI(folderUriTrees: List<com.prosabdev.common.models.FolderUriTree>) {
+    private fun updateFolderUriTreesUI(folderUriTrees: List<FolderUriTree>) {
         MainScope().launch {
-            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Add URI : ${folderUriTrees.size}")
+            Log.i(MainConst.TAG, "Add URI : ${folderUriTrees.size}")
             mFolderUriTreeAdapter?.submitList(folderUriTrees)
-            mDataBidingView.foldersCounter = folderUriTrees.size
+            mDataBiding.foldersCounter = folderUriTrees.size
         }
     }
 
     private fun checkInteractions() {
-        mDataBidingView.buttonAddFolder.setOnClickListener{
+        mDataBiding.buttonAddFolder.setOnClickListener{
             requestNewFolderFromSAF()
         }
-        mDataBidingView.topAppBar.setNavigationOnClickListener{
+        mDataBiding.topAppBar.setNavigationOnClickListener{
             onBackPressedDispatcher.onBackPressed()
         }
-        mDataBidingView.topAppBar.setOnMenuItemClickListener {
+        mDataBiding.topAppBar.setOnMenuItemClickListener {
             when(it.itemId) {
                 R.id.menu_remove_all -> {
                     showBottomSheetDialog()
@@ -131,7 +142,7 @@ import kotlinx.coroutines.withContext
     }
 
     private fun showBottomSheetDialog() {
-//        StorageAccessFullBottomSheetDialog(mStorageAccessActivityViewModel).show(supportFragmentManager, StorageAccessFullBottomSheetDialog.TAG)
+        StorageAccessFullBottomSheetDialog.newInstance(mStorageAccessActivityViewModel).show(supportFragmentManager, StorageAccessFullBottomSheetDialog.TAG)
     }
 
     private fun requestNewFolderFromSAF() {
@@ -152,10 +163,10 @@ import kotlinx.coroutines.withContext
         val concatAdapter = ConcatAdapter()
         concatAdapter.addAdapter(mFolderUriTreeAdapter!!)
         concatAdapter.addAdapter(mEmptyBottomAdapter!!)
-        mDataBidingView.recyclerView.adapter = concatAdapter
+        mDataBiding.recyclerView.adapter = concatAdapter
 
         mLayoutManager = GridLayoutManager(this.baseContext, spanCount, GridLayoutManager.VERTICAL, false)
-        mDataBidingView.recyclerView.layoutManager = mLayoutManager
+        mDataBiding.recyclerView.layoutManager = mLayoutManager
 
     }
     private fun onShowRemoveFolderDialog(position: Int) {
@@ -175,8 +186,8 @@ import kotlinx.coroutines.withContext
     }
 
     private fun initViews() {
-        com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
-        com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.container)
+        InsetModifiers.updateTopViewInsets(mDataBiding.coordinatorLayout)
+        InsetModifiers.updateBottomViewInsets(mDataBiding.container)
     }
 
     private var treeUri: String?
@@ -194,11 +205,11 @@ import kotlinx.coroutines.withContext
             this.contentResolver.takePersistableUriPermission(uri, takeFlags)
 
             MainScope().launch {
-                addToFolderList(com.prosabdev.common.utils.FormattersAndParsersUtils.formatAndReturnFolderUriSAF(this@StorageAccessSettingsActivity, uri))
+                addToFolderList(FormattersAndParsers.formatAndReturnFolderUriSAF(this@StorageAccessSettingsActivity, uri))
             }
         }
     }
-    private suspend fun addToFolderList(it: com.prosabdev.common.models.FolderUriTree?) {
+    private suspend fun addToFolderList(it: FolderUriTree?) {
         if(!isFolderSAFExist(it)){
             if(it != null){
                 withContext(Dispatchers.IO){
@@ -212,11 +223,11 @@ import kotlinx.coroutines.withContext
         }
     }
 
-    private fun isFolderSAFExist(folderUriTree : com.prosabdev.common.models.FolderUriTree?): Boolean {
+    private fun isFolderSAFExist(folderUriTree : FolderUriTree?): Boolean {
         if((mFolderUriTreeAdapter?.currentList?.size ?: 0) > 0 && folderUriTree != null){
             val listSize : Int = mFolderUriTreeAdapter?.currentList?.size ?: 0
             for(i in listSize - 1 downTo  0){
-                val tempData : com.prosabdev.common.models.FolderUriTree? = mFolderUriTreeAdapter?.currentList?.get(i)
+                val tempData : FolderUriTree? = mFolderUriTreeAdapter?.currentList?.get(i)
                 if(tempData != null){
                     if(
                         tempData.normalizeScheme.toString() == folderUriTree.normalizeScheme.toString() ||
@@ -240,7 +251,7 @@ import kotlinx.coroutines.withContext
         }
         return false
     }
-    private fun removeFolderUriTree(folderUriTree: com.prosabdev.common.models.FolderUriTree?) {
+    private fun removeFolderUriTree(folderUriTree: FolderUriTree?) {
         lifecycleScope.launch(Dispatchers.IO){
             mFolderUriTreeViewModel.delete(folderUriTree)
         }

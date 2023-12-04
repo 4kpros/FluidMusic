@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
 import com.l4digital.fastscroll.FastScroller
 import com.l4digital.fastscroll.FastScroller.FastScrollListener
+import com.prosabdev.common.constants.MainConst
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.GridSpacingItemDecoration
@@ -28,7 +29,7 @@ import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomS
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortSongsBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
 import com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
-import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
+import com.prosabdev.fluidmusic.ui.fragments.actions.PlaybackActions
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.NowPlayingFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AllSongsFragmentViewModel
@@ -102,27 +103,27 @@ class AllSongsFragment : Fragment() {
 
     private fun saveAllDataToPref(){
         context?.let { ctx ->
-            val tempSortOrganize = com.prosabdev.common.sharedprefs.models.SortOrganizeItemSP()
+            val tempSortOrganize = com.prosabdev.common.persistence.models.SortOrganizeItemSP()
             tempSortOrganize.sortOrderBy = mAllSongsFragmentViewModel.getSortBy().value ?: SORT_LIST_GRID_DEFAULT_VALUE
             tempSortOrganize.organizeListGrid = mAllSongsFragmentViewModel.getOrganizeListGrid().value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
             tempSortOrganize.isInvertSort = mAllSongsFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
-            com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
+            com.prosabdev.common.persistence.SharedPreferenceManagerUtils
                 .SortAnOrganizeForExploreContents
                 .saveSortOrganizeItemsFor(
                     ctx,
-                    com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SORT_ORGANIZE_ALL_SONGS,
+                    com.prosabdev.common.persistence.SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SORT_ORGANIZE_ALL_SONGS,
                     tempSortOrganize
                 )
         }
     }
     private fun loadPrefsAndInitViewModel() {
         context?.let { ctx ->
-            val tempSortOrganize: com.prosabdev.common.sharedprefs.models.SortOrganizeItemSP? =
-                com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
+            val tempSortOrganize: com.prosabdev.common.persistence.models.SortOrganizeItemSP? =
+                com.prosabdev.common.persistence.SharedPreferenceManagerUtils
                     .SortAnOrganizeForExploreContents
                     .loadSortOrganizeItemsFor(
                         ctx,
-                        com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SORT_ORGANIZE_ALL_SONGS
+                        com.prosabdev.common.persistence.SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SORT_ORGANIZE_ALL_SONGS
                     )
             if(tempSortOrganize != null){
                 mAllSongsFragmentViewModel.setSortBy(tempSortOrganize.sortOrderBy)
@@ -393,7 +394,7 @@ class AllSongsFragment : Fragment() {
             listHeadlines.add(0)
             mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(listHeadlines, object : HeadlinePlayShuffleAdapter.OnItemClickListener{
                 override fun onPlayButtonClicked() {
-                    CommonPlaybackAction.playSongAtPositionFromGenericAdapterView(
+                    PlaybackActions.playSongAtPositionFromGenericAdapterView(
                         mNowPlayingFragmentViewModel,
                         mAllSongsFragmentViewModel,
                         mGenericListGridItemAdapter,
@@ -439,7 +440,7 @@ class AllSongsFragment : Fragment() {
                         if(mMainFragmentViewModel.getSelectMode().value == true){
                             mGenericListGridItemAdapter?.selectableSelectFromPosition(position, mLayoutManager)
                         }else{
-                            CommonPlaybackAction.playSongAtPositionFromGenericAdapterView(
+                            PlaybackActions.playSongAtPositionFromGenericAdapterView(
                                 mNowPlayingFragmentViewModel,
                                 mAllSongsFragmentViewModel,
                                 mGenericListGridItemAdapter,
@@ -573,12 +574,12 @@ class AllSongsFragment : Fragment() {
         MainScope().launch {
             withContext(Dispatchers.Default){
                 val randomExcludedNumber: Int =
-                    com.prosabdev.common.utils.MathComputationsUtils.randomExcluded(
+                    com.prosabdev.common.utils.MathComputations.randomExcluded(
                         mGenericListGridItemAdapter?.getPlayingPosition() ?: -1,
                         (mGenericListGridItemAdapter?.currentList?.size ?: 0) -1
                     )
                 mGenericListGridItemAdapter?.let { genericListGridItemAdapter ->
-                    CommonPlaybackAction.playSongAtPositionFromGenericAdapterView(
+                    PlaybackActions.playSongAtPositionFromGenericAdapterView(
                         mNowPlayingFragmentViewModel,
                         mAllSongsFragmentViewModel,
                         genericListGridItemAdapter,
@@ -604,7 +605,7 @@ class AllSongsFragment : Fragment() {
     private fun initViews() {
         mDataBidingView?.recyclerView?.setHasFixedSize(true)
         mDataBidingView?.constraintFastScrollerContainer?.let {
-            com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(
+            com.prosabdev.common.utils.InsetModifiers.updateBottomViewInsets(
                 it
             )
         }
@@ -612,7 +613,7 @@ class AllSongsFragment : Fragment() {
 
     companion object {
         const val TAG = "AllSongsFragment"
-        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = com.prosabdev.common.utils.ConstantValues.ORGANIZE_LIST_MEDIUM
+        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = MainConst.ORGANIZE_LIST_MEDIUM
         private const val SORT_LIST_GRID_DEFAULT_VALUE: String = com.prosabdev.common.models.songitem.SongItem.DEFAULT_INDEX
         private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 

@@ -8,48 +8,48 @@ import com.prosabdev.common.roomdatabase.repositories.equalizer.EqualizerPresetI
 
 class EqualizerPresetItemViewModel(app: Application) : AndroidViewModel(app) {
 
-    private var repository: EqualizerPresetItemRepository? = EqualizerPresetItemRepository(app)
+    private var mRepository: EqualizerPresetItemRepository? = EqualizerPresetItemRepository(app)
 
     suspend fun insert(item: EqualizerPresetItem?): Long?{
-        return repository?.insert(item)
+        return mRepository?.insert(item)
     }
 
     suspend fun insertMultiple(itemList: List<EqualizerPresetItem>?): List<Long>?{
-        return repository?.insertMultiple(itemList)
+        return mRepository?.insertMultiple(itemList)
     }
 
     suspend fun update(item: EqualizerPresetItem?): Int?{
-        return repository?.update(item)
+        return mRepository?.update(item)
     }
 
     suspend fun delete(item: EqualizerPresetItem?): Int?{
-        return repository?.delete(item)
+        return mRepository?.delete(item)
     }
 
     suspend fun deleteMultiple(itemList: List<EqualizerPresetItem>?): Int?{
-        return repository?.deleteMultiple(itemList)
+        return mRepository?.deleteMultiple(itemList)
     }
 
     suspend fun deleteAll(): Int?{
-        return repository?.deleteAll()
+        return mRepository?.deleteAll()
     }
 
     suspend fun deleteAtId(id: Long): Int?{
-        return repository?.deleteAtId(id)
+        return mRepository?.deleteAtId(id)
     }
 
     suspend fun deleteAtPresetName(presetName: String?): Int?{
-        return repository?.deleteAtPresetName(presetName)
+        return mRepository?.deleteAtPresetName(presetName)
     }
 
     suspend fun getAtId(id: Long): EqualizerPresetItem?{
-        return repository?.getAtId(id)
+        return mRepository?.getAtId(id)
     }
 
     suspend fun getAtPresetName(presetName: String?): EqualizerPresetItem?{
-        return repository?.getAtPresetName(presetName)
+        return mRepository?.getAtPresetName(presetName)
     }
     suspend fun getAll(): LiveData<List<EqualizerPresetItem>?>?{
-        return repository?.getAll()
+        return mRepository?.getAll()
     }
 }

@@ -5,11 +5,11 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.prosabdev.common.constants.WorkManagerConst
 import com.prosabdev.common.models.playlist.PlaylistSongItem
 import com.prosabdev.common.models.songitem.SongItem
 import com.prosabdev.common.roomdatabase.AppDatabase
-import com.prosabdev.common.utils.SystemSettingsUtils
-import com.prosabdev.common.workers.WorkerConstantValues
+import com.prosabdev.common.utils.SystemSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -19,17 +19,16 @@ class AddSongsToPlaylistWorker(
 ) : CoroutineWorker(ctx, params) {
 
     override suspend fun doWork(): Result {
-        var dataResult: List<Long>?
         return withContext(Dispatchers.IO) {
             try {
-                Log.i(TAG, "WORKER $TAG : started")
+                Log.i(TAG, "Worker $TAG started")
 
                 //Extract worker params
                 val playlistId = inputData.getInt(PLAYLIST_ID, -1)
-                val modelType = inputData.getString(WorkerConstantValues.ITEM_LIST_MODEL_TYPE)
-                val itemsList = inputData.getStringArray(WorkerConstantValues.ITEM_LIST)
-                val whereClause = inputData.getString(WorkerConstantValues.ITEM_LIST_WHERE)
-                val whereColumn = inputData.getString(WorkerConstantValues.WHERE_COLUMN_INDEX)
+                val modelType = inputData.getString(WorkManagerConst.ITEM_LIST_MODEL_TYPE)
+                val itemsList = inputData.getStringArray(WorkManagerConst.ITEM_LIST)
+                val whereClause = inputData.getString(WorkManagerConst.ITEM_LIST_WHERE)
+                val whereColumn = inputData.getString(WorkManagerConst.WHERE_COLUMN_INDEX)
                 //Retrieve song list from items list of worker params
                 val playlistItemList: List<PlaylistSongItem>? =
                     getPlayListItemsFromParams(
@@ -40,23 +39,26 @@ class AddSongsToPlaylistWorker(
                         whereColumn
                     )
                 //Insert to database
-                dataResult = AppDatabase.getDatabase(applicationContext).playlistSongItemDao().insertMultiple(playlistItemList)
+                val indexList = AppDatabase.getDatabase(applicationContext).playlistSongItemDao().insertMultiple(playlistItemList)
 
-                Log.i(TAG, "WORKER $TAG : ended")
+                Log.i(TAG, "Worker $TAG ended")
 
                 Result.success(
                     workDataOf(
-                        WorkerConstantValues.WORKER_OUTPUT_DATA to dataResult,
+                        WorkManagerConst.WORKER_OUTPUT_DATA to indexList,
                     )
                 )
             } catch (error: Throwable) {
-                Log.i(TAG, "Error loading... ${error.stackTrace}")
-                Log.i(TAG, "Error loading... ${error.message}")
+                Log.i(TAG, "Error stack trace -> ${error.stackTrace}")
+                Log.i(TAG, "Error message -> ${error.message}")
                 Result.failure()
             }
         }
     }
 
+    /**
+     * Return a playlist of type [List] of [PlaylistSongItem]
+     */
     private fun getPlayListItemsFromParams(
         playlistId: Int,
         modelType: String?,
@@ -64,11 +66,7 @@ class AddSongsToPlaylistWorker(
         whereClause: String?,
         whereColumn: String?
     ): List<PlaylistSongItem>? {
-        if(
-            itemsList == null || itemsList.isEmpty() ||
-            modelType == null || modelType.isEmpty() ||
-            playlistId <= 0
-        ) return null
+        if(itemsList.isNullOrEmpty() || modelType.isNullOrEmpty() || playlistId <= 0) return null
 
         val playlistSongs: ArrayList<PlaylistSongItem> = ArrayList()
         //Check model type to add on queue music
@@ -78,39 +76,36 @@ class AddSongsToPlaylistWorker(
                 val tempPlaylistSongItem = PlaylistSongItem()
                 tempPlaylistSongItem.playlistId = playlistId.toLong()
                 tempPlaylistSongItem.songUri = itemsList[i]
-                tempPlaylistSongItem.lastAddedDateToLibrary = SystemSettingsUtils.getCurrentDateInMilli()
+                tempPlaylistSongItem.lastAddedDateToLibrary = SystemSettings.getCurrentDateInMillis()
                 playlistSongs.add(tempPlaylistSongItem)
             }
         }else{
-            if(
-                whereClause == null || whereClause.isEmpty() ||
-                whereColumn == null || whereColumn.isEmpty()
-            ) return null
+            if(whereClause.isNullOrEmpty() || whereColumn.isNullOrEmpty()) return null
 
             for (i in itemsList.indices){
                 val tempFieldValue = itemsList[i]
                 val tempSongUriList =
                     when (whereClause) {
                         //If it is standard content explorer, then get all songs uri directly
-                        WorkerConstantValues.ITEM_LIST_WHERE_EQUAL ->
+                        WorkManagerConst.ITEM_LIST_WHERE_EQUAL ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereEqual(
                                 whereColumn,
                                 tempFieldValue
                         )
                         //If it is from search view, get songs uri directly with "where like" clause
-                        WorkerConstantValues.ITEM_LIST_WHERE_LIKE ->
+                        WorkManagerConst.ITEM_LIST_WHERE_LIKE ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereLike(
                                 whereColumn,
                                 tempFieldValue
                         )
                         else -> null
                     }
-                if(tempSongUriList != null && tempSongUriList.isNotEmpty()){
+                if(!tempSongUriList.isNullOrEmpty()){
                     for (j in tempSongUriList.indices){
                         val tempPlaylistSongItem = PlaylistSongItem()
                         tempPlaylistSongItem.playlistId = playlistId.toLong()
                         tempPlaylistSongItem.songUri = itemsList[i]
-                        tempPlaylistSongItem.lastAddedDateToLibrary = SystemSettingsUtils.getCurrentDateInMilli()
+                        tempPlaylistSongItem.lastAddedDateToLibrary = SystemSettings.getCurrentDateInMillis()
                         playlistSongs.add(tempPlaylistSongItem)
                     }
                 }

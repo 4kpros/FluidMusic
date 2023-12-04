@@ -8,15 +8,15 @@ import com.prosabdev.common.roomdatabase.repositories.explore.ArtistItemReposito
 
 class ArtistItemViewModel(app: Application) : AndroidViewModel(app) {
 
-    private var repository: ArtistItemRepository? = ArtistItemRepository(app)
+    private var mRepository: ArtistItemRepository? = ArtistItemRepository(app)
 
     suspend fun getAtName(name : String) : ArtistItem? {
-        return repository?.getAtName(name)
+        return mRepository?.getAtName(name)
     }
-    suspend fun getAll(order_by: String = "name") : LiveData<List<ArtistItem>>? {
-        return repository?.getAll(order_by)
+    suspend fun getAll(orderBy: String = "name") : LiveData<List<ArtistItem>>? {
+        return mRepository?.getAll(orderBy)
     }
-    suspend fun getAllDirectly(order_by: String) : List<ArtistItem>? {
-        return repository?.getAllDirectly(order_by)
+    suspend fun getAllDirectly(orderBy: String) : List<ArtistItem>? {
+        return mRepository?.getAllDirectly(orderBy)
     }
 }

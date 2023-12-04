@@ -9,18 +9,5 @@ import kotlinx.coroutines.launch
 
 class StorageAccessActivityViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val mMutableRequestRemoveAllFolderUriTrees = MutableLiveData<Int>(0)
-
-    private val mRequestRemoveAllFolderUriTrees: LiveData<Int> get() = mMutableRequestRemoveAllFolderUriTrees
-
-    fun getRemoveAllFoldersCounter(): LiveData<Int> {
-        return mRequestRemoveAllFolderUriTrees
-    }
-    fun setRemoveAllFoldersCounter(){
-        var tempValue : Int = mRequestRemoveAllFolderUriTrees.value ?: 0
-        tempValue++
-        MainScope().launch {
-            mMutableRequestRemoveAllFolderUriTrees.value = tempValue
-        }
-    }
+    val requestRemoveAllFolderUriTrees = MutableLiveData<Int>(0)
 }

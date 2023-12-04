@@ -8,26 +8,26 @@ import com.prosabdev.common.roomdatabase.repositories.queuemusic.QueueMusicItemR
 
 class QueueMusicItemViewModel(app: Application) : AndroidViewModel(app) {
 
-    private var repository: QueueMusicItemRepository? = QueueMusicItemRepository(app)
+    private var mRepository: QueueMusicItemRepository? = QueueMusicItemRepository(app)
 
     suspend fun insert(queueMusicItem: QueueMusicItem?) : Long? {
-        return repository?.insert(queueMusicItem)
+        return mRepository?.insert(queueMusicItem)
     }
     suspend fun update(queueMusicItem: QueueMusicItem?) {
-        repository?.update(queueMusicItem)
+        mRepository?.update(queueMusicItem)
     }
     suspend fun delete(queueMusicItem: QueueMusicItem?) {
-        repository?.delete(queueMusicItem)
+        mRepository?.delete(queueMusicItem)
     }
     suspend fun deleteAll() {
-        repository?.deleteAll()
+        mRepository?.deleteAll()
     }
 
     //Getters
     suspend fun getAtId(id: Long) : QueueMusicItem? {
-        return repository?.getAtId(id)
+        return mRepository?.getAtId(id)
     }
     suspend fun getAll() : LiveData<List<QueueMusicItem>>? {
-        return repository?.getAll()
+        return mRepository?.getAll()
     }
 }

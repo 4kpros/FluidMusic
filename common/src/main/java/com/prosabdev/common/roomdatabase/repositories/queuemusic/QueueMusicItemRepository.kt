@@ -22,7 +22,7 @@ class QueueMusicItemRepository(ctx : Context) {
             mDao?.update(queueMusicItem)
         }
     }
-    suspend fun delete(queueMusicItem: QueueMusicItem?) {
+    suspend fun delete(queueMusicItem: QueueMusicItem?): Int? {
         return withContext(Dispatchers.IO){
             mDao?.delete(queueMusicItem)
         }
@@ -42,7 +42,7 @@ class QueueMusicItemRepository(ctx : Context) {
             mDao?.deleteAll()
         }
     }
-    //Getters
+
     suspend fun getAtId(id: Long) : QueueMusicItem? {
         return withContext(Dispatchers.IO){
             mDao?.getAtId(id)

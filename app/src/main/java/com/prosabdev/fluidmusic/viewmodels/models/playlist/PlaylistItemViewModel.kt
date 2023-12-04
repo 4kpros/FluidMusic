@@ -8,27 +8,27 @@ import com.prosabdev.common.roomdatabase.repositories.playlist.PlaylistItemRepos
 
 class PlaylistItemViewModel(app: Application) : AndroidViewModel(app) {
 
-    private var repository: PlaylistItemRepository? = PlaylistItemRepository(app)
+    private var mRepository: PlaylistItemRepository? = PlaylistItemRepository(app)
 
     suspend fun insert(playlistItem: PlaylistItem?) : Long? {
-        return repository?.insert(playlistItem)
+        return mRepository?.insert(playlistItem)
     }
     suspend fun update(playlistItem: PlaylistItem?) {
-        repository?.update(playlistItem)
+        mRepository?.update(playlistItem)
     }
     suspend fun delete(playlistItem: PlaylistItem?) {
-        repository?.delete(playlistItem)
+        mRepository?.delete(playlistItem)
     }
     suspend fun deleteAll() {
-        repository?.deleteAll()
+        mRepository?.deleteAll()
     }
 
     //Getters
-    suspend fun getMaxIdLikeName(playlistName: String) : Long? = repository?.getMaxIdLikeName(playlistName)
+    suspend fun getMaxIdLikeName(playlistName: String) : Long? = mRepository?.getMaxIdLikeName(playlistName)
 
-    suspend fun getAtId(id: Long) : PlaylistItem? = repository?.getAtId(id)
+    suspend fun getAtId(id: Long) : PlaylistItem? = mRepository?.getAtId(id)
 
-    suspend fun getWithName(name: String) : PlaylistItem? = repository?.getWithName(name)
+    suspend fun getWithName(name: String) : PlaylistItem? = mRepository?.getWithName(name)
 
-    suspend fun getAll(order_by: String = "id") : LiveData<List<PlaylistItem>>? = repository?.getAll(order_by)
+    suspend fun getAll(order_by: String = "id") : LiveData<List<PlaylistItem>>? = mRepository?.getAll(order_by)
 }

@@ -3,6 +3,7 @@ package com.prosabdev.fluidmusic.adapters.callbacks
 import android.util.Log
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.prosabdev.common.constants.MainConst
 import com.prosabdev.fluidmusic.adapters.QueueMusicItemListAdapter
 
 class QueueMusicItemCallback(adapter : QueueMusicItemListAdapter) : ItemTouchHelper.Callback() {
@@ -44,10 +45,10 @@ class QueueMusicItemCallback(adapter : QueueMusicItemListAdapter) : ItemTouchHel
         if(!mDragStarted){
             mDragStarted = true
             mFromPosition = viewHolder.bindingAdapterPosition
-            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "From position : $mFromPosition = $mFromValue")
+            Log.i(MainConst.TAG, "From position : $mFromPosition = $mFromValue")
         }
         mToPosition = target.bindingAdapterPosition
-        Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "To position : $mToPosition = $mToValue")
+        Log.i(MainConst.TAG, "To position : $mToPosition = $mToValue")
 
         mAdapter.onRowMoved(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
 
@@ -72,7 +73,7 @@ class QueueMusicItemCallback(adapter : QueueMusicItemListAdapter) : ItemTouchHel
                 viewHolder
 
             mDragStarted = false
-            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Finally : from = $mFromPosition = $mToValue and to = $mToPosition = $mFromValue")
+            Log.i(MainConst.TAG, "Finally : from = $mFromPosition = $mToValue and to = $mToPosition = $mFromValue")
             mDragStarted = false
             if (mFromPosition < mToPosition) {
                 mAdapter.notifyItemRangeChanged(mFromPosition, mToPosition+1)

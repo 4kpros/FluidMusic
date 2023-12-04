@@ -12,13 +12,13 @@ import com.prosabdev.common.models.songitem.SongItem
         ForeignKey(entity = SongItem::class, parentColumns = ["uri"], childColumns = ["songUri"], onDelete = ForeignKey.NO_ACTION, onUpdate = ForeignKey.NO_ACTION)
     ]
 )
-class PlaylistSongItem {
+data class PlaylistSongItem (
     @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
-    var playlistId: Long = 0
-    var songUri: String? = ""
+    var id: Long = 0,
+    var playlistId: Long = 0,
+    var songUri: String? = "",
     var lastAddedDateToLibrary: Long = 0
-
+){
     companion object {
         const val TAG = "PlaylistSongItem"
 

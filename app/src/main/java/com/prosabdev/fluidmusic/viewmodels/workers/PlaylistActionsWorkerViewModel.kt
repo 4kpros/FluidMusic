@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.work.*
-import com.prosabdev.common.workers.WorkerConstantValues
+import com.prosabdev.common.constants.WorkManagerConst
 import com.prosabdev.common.workers.playlist.AddSongsToPlaylistWorker
 import com.prosabdev.common.workers.playlist.RemoveSongsFromPlaylistWorker
 
@@ -29,10 +29,10 @@ class PlaylistActionsWorkerViewModel(app: Application) : AndroidViewModel(app) {
             .setInputData(
                 workDataOf(
                     AddSongsToPlaylistWorker.PLAYLIST_ID to playlistId,
-                    WorkerConstantValues.ITEM_LIST_MODEL_TYPE to modelType,
-                    WorkerConstantValues.ITEM_LIST to itemList,
-                    WorkerConstantValues.ITEM_LIST_WHERE to whereClause,
-                    WorkerConstantValues.WHERE_COLUMN_INDEX to indexColumn
+                    WorkManagerConst.ITEM_LIST_MODEL_TYPE to modelType,
+                    WorkManagerConst.ITEM_LIST to itemList,
+                    WorkManagerConst.ITEM_LIST_WHERE to whereClause,
+                    WorkManagerConst.WHERE_COLUMN_INDEX to indexColumn
                 )
             )
             .addTag(AddSongsToPlaylistWorker.TAG)

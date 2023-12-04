@@ -1,51 +1,51 @@
 package com.prosabdev.fluidmusic
 
-import android.media.AudioManager
+import android.content.ComponentName
+import android.media.browse.MediaBrowser
 import android.os.Bundle
-import android.support.v4.media.MediaBrowserCompat
-import android.support.v4.media.MediaBrowserCompat.ConnectionCallback
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
+import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
 import com.google.android.material.color.DynamicColors
+import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.MoreExecutors
+import com.prosabdev.common.utils.ImageLoaders
 import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
+import com.prosabdev.fluidmusic.media.PlaybackService
 import com.prosabdev.fluidmusic.ui.fragments.MainFragment
 
+@OptIn(BuildCompat.PrereleaseSdkCheck::class) @UnstableApi class MainActivity : AppCompatActivity(){
 
-@BuildCompat.PrereleaseSdkCheck class MainActivity : AppCompatActivity(){
+    private lateinit var mDataBiding: ActivityMainBinding
 
-    private lateinit var mDataBidingView: ActivityMainBinding
+    private var mSessionToken: SessionToken? = null
+    private var mMediaControllerFuture: ListenableFuture<MediaController>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //Apply UI settings and dynamics colors
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        DynamicColors.applyToActivitiesIfAvailable(this.application)
+        DynamicColors.applyToActivitiesIfAvailable(this@MainActivity.application)
 
-        mDataBidingView = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.setContentView(this@MainActivity, R.layout.activity_main)
 
+        //Load your UI content
         if(savedInstanceState == null){
             initViews()
             setupFragments()
-            setupAudioSettings()
-            createMediaBrowserService()
         }
     }
 
-    private fun createMediaBrowserService() {
-    }
-    private fun setupAudioSettings() {
-        volumeControlStream = AudioManager.STREAM_MUSIC
-    }
-
     private fun setupFragments() {
-        supportFragmentManager.commit {
+        this.supportFragmentManager.commit {
             setReorderingAllowed(true)
             replace(
                 R.id.main_activity_fragment_container,
@@ -56,83 +56,41 @@ import com.prosabdev.fluidmusic.ui.fragments.MainFragment
     }
 
     private fun initViews(){
+        //There are no views to be initialized
     }
 
-    private var mMediaBrowser: MediaBrowserCompat? = null
-    private var mConnectionCallbacks: ConnectionCallback = object : ConnectionCallback(){
-        override fun onConnected() {
-            super.onConnected()
-            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "ConnectionCallback onConnected")
-            mMediaBrowser?.sessionToken.also { token ->
-                val mediaController = MediaControllerCompat(
-                    this@MainActivity.applicationContext, // Context
-                    token!!
-                )
-                MediaControllerCompat.setMediaController(this@MainActivity, mediaController)
-            }
-            buildTransportControls()
-        }
-        override fun onConnectionSuspended() {
-            super.onConnectionSuspended()
-            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "ConnectionCallback onConnectionSuspended")
-        }
-        override fun onConnectionFailed() {
-            super.onConnectionFailed()
-            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "ConnectionCallback onConnectionFailed")
-        }
-    }
-    private var mControllerCallback = object : MediaControllerCompat.Callback() {
-        override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "MediaControllerCompat onMetadataChanged : $metadata")
-        }
-        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "MediaControllerCompat onPlaybackStateChanged : $state")
-        }
-    }
-
-    private fun buildTransportControls() {
-        val mediaController = MediaControllerCompat.getMediaController(this)
-        mediaController.transportControls.prepare()
-
-        val metadata = mediaController.metadata
-        val pbState = mediaController.playbackState
-
-        mediaController.registerCallback(mControllerCallback)
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        com.prosabdev.common.utils.ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
-    }
-
-    override fun onTrimMemory(level: Int) {
-        super.onTrimMemory(level)
-        com.prosabdev.common.utils.ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
+    private fun setupMediaController() {
+        mSessionToken = SessionToken(this@MainActivity, ComponentName(this@MainActivity, PlaybackService::class.java))
+        mMediaControllerFuture = MediaController.Builder(this@MainActivity, mSessionToken!!).buildAsync()
+        mMediaControllerFuture?.addListener(
+            {
+                // Call controllerFuture.get() to retrieve the MediaController.
+                // MediaController implements the Player interface, so it can be
+                // attached to the PlayerView UI component.
+                // mMediaControllerFuture.get()
+            },
+            MoreExecutors.directExecutor()
+        )
+        ImageLoaders.initializeJobs(applicationContext)
     }
 
     public override fun onStart() {
         super.onStart()
-        mMediaBrowser?.connect()
-        com.prosabdev.common.utils.ImageLoadersUtils.initializeJobWorker(applicationContext)
+        setupMediaController()
     }
+
     public override fun onResume() {
         super.onResume()
-        setupAudioSettings()
+        ImageLoaders.resumeJobs()
     }
-
     override fun onPause() {
         super.onPause()
+        ImageLoaders.pauseJobs()
     }
-
     public override fun onStop() {
+        mMediaControllerFuture?.get()?.release()
+        ImageLoaders.stopAllJobs(applicationContext)
         super.onStop()
-        MediaControllerCompat.getMediaController(this)?.unregisterCallback(mControllerCallback)
-        mMediaBrowser?.disconnect()
-    }
-
-    override fun onDestroy() {
-        com.prosabdev.common.utils.ImageLoadersUtils.stopAllJobsWorkers(applicationContext)
-        super.onDestroy()
     }
 
     companion object {

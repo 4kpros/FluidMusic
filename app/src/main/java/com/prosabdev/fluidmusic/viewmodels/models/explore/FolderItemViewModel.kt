@@ -8,15 +8,15 @@ import com.prosabdev.common.roomdatabase.repositories.explore.FolderItemReposito
 
 class FolderItemViewModel(app: Application) : AndroidViewModel(app) {
 
-    private var repository: FolderItemRepository? = FolderItemRepository(app)
+    private var mRepository: FolderItemRepository? = FolderItemRepository(app)
 
     suspend fun getAtName(name : String) : FolderItem? {
-        return repository?.getAtName(name)
+        return mRepository?.getAtName(name)
     }
     suspend fun getAll(orderBy: String) : LiveData<List<FolderItem>>? {
-        return repository?.getAll(orderBy)
+        return mRepository?.getAll(orderBy)
     }
     suspend fun getAllDirectly(orderBy: String) : List<FolderItem>? {
-        return repository?.getAllDirectly(orderBy)
+        return mRepository?.getAllDirectly(orderBy)
     }
 }

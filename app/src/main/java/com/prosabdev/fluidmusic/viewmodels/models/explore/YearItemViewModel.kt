@@ -8,15 +8,15 @@ import com.prosabdev.common.roomdatabase.repositories.explore.YearItemRepository
 
 class YearItemViewModel(app: Application) : AndroidViewModel(app) {
 
-    private var repository: YearItemRepository? = YearItemRepository(app)
+    private var mRepository: YearItemRepository? = YearItemRepository(app)
 
     suspend fun getAtName(name : String) : YearItem? {
-        return repository?.getAtName(name)
+        return mRepository?.getAtName(name)
     }
-    suspend fun getAll(order_by: String) : LiveData<List<YearItem>>? {
-        return repository?.getAll(order_by)
+    suspend fun getAll(orderBy: String) : LiveData<List<YearItem>>? {
+        return mRepository?.getAll(orderBy)
     }
-    suspend fun getAllDirectly(order_by: String) : List<YearItem>? {
-        return repository?.getAllDirectly(order_by)
+    suspend fun getAllDirectly(orderBy: String) : List<YearItem>? {
+        return mRepository?.getAllDirectly(orderBy)
     }
 }

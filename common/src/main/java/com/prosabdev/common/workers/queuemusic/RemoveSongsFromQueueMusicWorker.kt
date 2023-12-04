@@ -6,10 +6,10 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.prosabdev.common.constants.WorkManagerConst
 import com.prosabdev.common.models.songitem.SongItem
 import com.prosabdev.common.models.songitem.SongItemUri
 import com.prosabdev.common.roomdatabase.AppDatabase
-import com.prosabdev.common.workers.WorkerConstantValues
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -22,103 +22,112 @@ class RemoveSongsFromQueueMusicWorker(
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
             try {
-                Log.i(TAG, "WORKER $TAG : started")
+                Log.d(TAG, "Worker $TAG started")
 
                 //Extract worker params
-                val modelType = inputData.getString(WorkerConstantValues.ITEM_LIST_MODEL_TYPE)
-                val itemsList = inputData.getStringArray(WorkerConstantValues.ITEM_LIST)
-                val whereClause = inputData.getString(WorkerConstantValues.ITEM_LIST_WHERE)
-                val whereColumn = inputData.getString(WorkerConstantValues.WHERE_COLUMN_INDEX)
+                val modelType = inputData.getString(WorkManagerConst.ITEM_LIST_MODEL_TYPE)
+                val itemsList = inputData.getStringArray(WorkManagerConst.ITEM_LIST)
+                val whereClause = inputData.getString(WorkManagerConst.ITEM_LIST_WHERE)
+                val whereColumn = inputData.getString(WorkManagerConst.WHERE_COLUMN_INDEX)
                 //Delete songs from queue music
-                val dataResult = tryToDeleteSongsFromSource(
+                val count = tryToDeleteSongsFromSource(
                     modelType,
                     itemsList,
                     whereClause,
                     whereColumn
                 )
-                Log.i(TAG, "WORKER $TAG : DELETED SONGS ON QUEUE MUSIC : ${dataResult} ")
 
-                Log.i(TAG, "WORKER $TAG : ended")
+                Log.i(AddSongsToQueueMusicWorker.TAG, "Worker $TAG ended")
+                Log.i(AddSongsToQueueMusicWorker.TAG, "Worker $TAG result -> $count")
 
                 Result.success(
                     workDataOf(
-                        WorkerConstantValues.WORKER_OUTPUT_DATA to dataResult,
+                        WorkManagerConst.WORKER_OUTPUT_DATA to count,
                     )
                 )
             } catch (error: Throwable) {
-                Log.i(TAG, "Error loading... ${error.stackTrace}")
-                Log.i(TAG, "Error loading... ${error.message}")
+                Log.i(TAG, "Error stack trace -> ${error.stackTrace}")
+                Log.i(TAG, "Error message -> ${error.message}")
                 Result.failure()
             }
         }
     }
 
+
+    /**
+     * Remove songs from queue music of type [Array] of [String]. Return an [Int] who is the number of item who get removed
+     */
     private fun removeSongsFromQueueMusic(stringUriList: Array<String>?): Int {
         if(stringUriList == null) return 0
-        var deleteResult = 0
+        var count = 0
         for (i in stringUriList.indices){
-            deleteResult += deleteQueueMusicItemAtUri(stringUriList[i])
+            count += deleteQueueMusicItemAtUri(stringUriList[i])
         }
-        return deleteResult
+        return count
     }
+
+    /**
+     * Remove songs from queue music of type [Array] of [SongItemUri]. Return an [Int] who is the number of item who get removed
+     */
     private fun removeSongsFromQueueMusic(songUriList: List<SongItemUri>?): Int {
-        if(songUriList == null || songUriList.isEmpty()) return 0
-        var deleteResult = 0
+        if(songUriList.isNullOrEmpty()) return 0
+        var count = 0
         for (i in songUriList.indices){
-            deleteResult += deleteQueueMusicItemAtUri(songUriList[i].uri)
+            count += deleteQueueMusicItemAtUri(songUriList[i].uri)
         }
-        return deleteResult
+        return count
     }
+
+    /**
+     * Delete specific song from [String] uri. Return 1 if the item is deleted and 0 else
+     */
     private fun deleteQueueMusicItemAtUri(uri: String?): Int {
-        if(uri == null || uri.isEmpty()) return 0
+        if(uri.isNullOrEmpty()) return 0
         return AppDatabase.getDatabase(applicationContext).queueMusicItemDao().deleteAtSongUri(uri)
     }
 
+    /**
+     * Delete song from array list(who is the source). Return an [Int] who is the number of item who get deleted
+     */
     private fun tryToDeleteSongsFromSource(
         modelType: String?,
         itemsList: Array<String>?,
         whereClause: String?,
         whereColumn: String?
     ): Int {
-        var resultList = 0
-        if(
-            itemsList == null || itemsList.isEmpty() ||
-            modelType == null || modelType.isEmpty()
-        ) return 0
+        var count = 0
+        if(itemsList.isNullOrEmpty() || modelType.isNullOrEmpty()) return 0
 
         if(modelType == SongItem.TAG){
-            resultList = removeSongsFromQueueMusic(itemsList)
+            count = removeSongsFromQueueMusic(itemsList)
         }else{
-            if(
-                whereClause == null || whereClause.isEmpty() ||
-                whereColumn == null || whereColumn.isEmpty()
-            ) return 0
+            if(whereClause.isNullOrEmpty() || whereColumn.isNullOrEmpty()) return 0
 
             for (i in itemsList.indices){
                 val tempFieldValue = itemsList[i]
                 val tempSongUriList =
                     when (whereClause) {
                         //If it is standard content explorer, then get all songs uri directly
-                        WorkerConstantValues.ITEM_LIST_WHERE_EQUAL ->
+                        WorkManagerConst.ITEM_LIST_WHERE_EQUAL ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereEqual(
                                 whereColumn,
                                 tempFieldValue
                             )
                         //If it is from search view, get songs uri directly with "where like" clause
-                        WorkerConstantValues.ITEM_LIST_WHERE_LIKE ->
+                        WorkManagerConst.ITEM_LIST_WHERE_LIKE ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereLike(
                                 whereColumn,
                                 tempFieldValue
                             )
                         else -> null
                     }
-                if(tempSongUriList != null && tempSongUriList.isNotEmpty()){
-                    resultList += removeSongsFromQueueMusic(tempSongUriList)
-                    return resultList
+                if(!tempSongUriList.isNullOrEmpty()){
+                    count += removeSongsFromQueueMusic(tempSongUriList)
+                    return count
                 }
             }
         }
-        return resultList
+        return count
     }
 
     companion object {

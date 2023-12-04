@@ -21,10 +21,16 @@ import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.media3.common.util.UnstableApi
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textview.MaterialTextView
 import com.lukelorusso.verticalseekbar.VerticalSeekBar
+import com.prosabdev.common.persistence.PersistentStorage
+import com.prosabdev.common.utils.Animators
+import com.prosabdev.common.utils.FormattersAndParsers
+import com.prosabdev.common.utils.InsetModifiers
+import com.prosabdev.common.utils.SystemSettings
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityEqualizerBinding
 import com.prosabdev.fluidmusic.databinding.ComponentDialogEditTextBinding
@@ -35,8 +41,9 @@ import com.prosabdev.fluidmusic.viewmodels.models.equalizer.EqualizerPresetItemV
 import kotlinx.coroutines.*
 import me.tankery.lib.circularseekbar.CircularSeekBar
 
-@BuildCompat.PrereleaseSdkCheck class EqualizerActivity : AppCompatActivity() {
-    private lateinit var mDataBidingView : ActivityEqualizerBinding
+@UnstableApi @BuildCompat.PrereleaseSdkCheck class EqualizerActivity : AppCompatActivity() {
+
+    private lateinit var mDataBiding : ActivityEqualizerBinding
 
     private val mEqualizerPresetItemViewModel: EqualizerPresetItemViewModel by viewModels()
     private val mEqualizerPresetBandLevelItemViewModel: EqualizerPresetBandLevelItemViewModel by viewModels()
@@ -45,72 +52,36 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
 
     private var mSettingsContentObserver: SettingsContentObserver? = null
 
-    class SettingsContentObserver(
-        private val mContext: Context,
-        Handler: Handler?,
-        private val mViewModel: EqualizerActivityViewModel
-    ) :
-        ContentObserver(Handler) {
-        var previousVolume: Int
-        var maxVolume: Int
-
-        init {
-            val audio = mContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            val currentVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
-            maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-            previousVolume = currentVolume
-            mViewModel.setVolume(currentVolume)
-            Log.i(TAG, "AUDIO VOLUME PERCENT SET $currentVolume")
-        }
-
-        override fun onChange(selfChange: Boolean) {
-            super.onChange(selfChange)
-            try {
-                val audio = mContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                val currentVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
-                val delta = previousVolume - currentVolume
-                if (delta > 0) {
-                    previousVolume = currentVolume
-                    mViewModel.setVolume(currentVolume)
-                    Log.i(TAG, "AUDIO VOLUME PERCENT INCREASED $currentVolume")
-                } else if (delta < 0) {
-                    previousVolume = currentVolume
-                    mViewModel.setVolume(currentVolume)
-                    Log.i(TAG, "AUDIO VOLUME PERCENT INCREASED $currentVolume")
-                }
-            }catch (error: Throwable){
-                error.printStackTrace()
-            }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //Apply UI settings and dynamics colors
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        mDataBidingView = DataBindingUtil.setContentView(this, R.layout.activity_equalizer)
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.setContentView(this, R.layout.activity_equalizer)
 
-        if(savedInstanceState == null) {
+        //Load your UI content
+        if(savedInstanceState == null){
             initViews()
-            loadSharedPrefsAnInitEqualizer()
+            loadSettingsAndInitEqualizer()
             checkInteractions()
             observeLiveData()
             registerOnBackPressedCallback()
         }
     }
     override fun onStop() {
-        mEqualizerActivityViewModel.stopLocalMediaPlayer()
-        unregisterCustomVolumeEvenListener()
+        mEqualizerActivityViewModel.stopEqualizer()
+        unregisterEventListeners()
         super.onStop()
     }
     override fun onStart() {
-        registerCustomVolumeEvenListener()
         super.onStart()
+        registerEventListeners()
     }
 
-    private fun registerCustomVolumeEvenListener() {
+    private fun registerEventListeners() {
         if(mSettingsContentObserver != null) return
 
         mSettingsContentObserver = SettingsContentObserver(this, Handler(Looper.getMainLooper()), mEqualizerActivityViewModel)
@@ -122,7 +93,7 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
             )
         }
     }
-    private fun unregisterCustomVolumeEvenListener() {
+    private fun unregisterEventListeners() {
         mSettingsContentObserver?.let { observer ->
             applicationContext.contentResolver.unregisterContentObserver(observer)
         }
@@ -130,49 +101,54 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
     }
 
     private fun observeLiveData() {
-        MainScope().launch {
-            mEqualizerActivityViewModel.listenCustomPresets(this@EqualizerActivity, mEqualizerPresetItemViewModel)
+        mEqualizerActivityViewModel.customPresets.observe(this@EqualizerActivity) {
+            //
         }
-        mEqualizerActivityViewModel.getEqualizerState().observe(this, Observer {
-            onEqualizerStateChanged(it)
-        })
-        mEqualizerActivityViewModel.getToneState().observe(this, Observer {
-            onTonalStateChange(it)
-        })
-        mEqualizerActivityViewModel.getCurrentPreset().observe(this, Observer {
-            onCurrentPresetChange(it)
-        })
-        mEqualizerActivityViewModel.getPresetBandsLevels().observe(this, Observer {
-            onPresetBandsLevelsChange()
-        })
-        mEqualizerActivityViewModel.getVolume().observe(this, Observer {
-            onVolumeChanged(it)
-        })
-        mEqualizerActivityViewModel.getBassBoostProgress().observe(this, Observer {
-            onBassBoostChanged(it)
-        })
-        mEqualizerActivityViewModel.getVisualizerProgress().observe(this, Observer {
-            onVisualizerChanged(it)
-        })
+        mEqualizerActivityViewModel.equalizerState.observe(this) {
+            if(it != null) {
+                updateEnableEquUI(it)
+            }
+        }
+        mEqualizerActivityViewModel.toneState.observe(this) {
+            if(it != null) {
+                updateEnableToneUI(it)
+            }
+        }
+        mEqualizerActivityViewModel.currentPreset.observe(this) {
+            if(it != null) {
+                updateEqualizerBands(it)
+            }
+        }
+        mEqualizerActivityViewModel.presetBandsLevels.observe(this) {
+            if(it != null) {
+                updateEqualizerBands(mEqualizerActivityViewModel.getCurrentPreset().value)
+            }
+        }
+        mEqualizerActivityViewModel.volumeProgress.observe(this) {
+            if(it != null) {
+                onVolumeChanged(it)
+            }
+        }
+        mEqualizerActivityViewModel.bassBoostProgress.observe(this) {
+            if(it != null) {
+                updateBassBoostUI(it)
+            }
+        }
+        mEqualizerActivityViewModel.visualizerProgress.observe(this) {
+            if(it != null) {
+                updateVisualizerUI(it)
+            }
+        }
     }
 
-    private fun onVisualizerChanged(it: Int?) {
-        if(it == null) return
-        updateVisualizerUI(it)
-    }
     private fun updateVisualizerUI(it: Int) {
-        mDataBidingView.seekbarVisualizer.progress = it.toFloat()
-        mDataBidingView.textViewVisualizerProgress.text = "${it}%"
-    }
-
-    private fun onBassBoostChanged(it: Int?) {
-        if(it == null) return
-        updateBassBoostUI(it)
+        mDataBiding.seekbarVisualizer.progress = it.toFloat()
+        mDataBiding.textViewVisualizerProgress.text = "${it}%"
     }
     @SuppressLint("SetTextI18n")
     private fun updateBassBoostUI(it: Int) {
-        mDataBidingView.seekbarBassBoost.progress = it.toFloat()
-        mDataBidingView.textViewBassBoostProgress.text = "${it}%"
+        mDataBiding.seekbarBassBoost.progress = it.toFloat()
+        mDataBiding.textViewBassBoostProgress.text = "${it}%"
     }
 
     private fun onVolumeChanged(it: Int?) {
@@ -199,28 +175,20 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
         }
     }
     private fun updateVolumeUI(it: Float) {
-        mDataBidingView.volumeSlider.value = it
-        mDataBidingView.textViewVolumeProgress.text = "${it.toInt()}%"
-    }
-
-    private fun onPresetBandsLevelsChange() {
-        updateEqualizerBands(mEqualizerActivityViewModel.getCurrentPreset().value)
+        mDataBiding.volumeSlider.value = it
+        mDataBiding.textViewVolumeProgress.text = "${it.toInt()}%"
     }
 
     private fun onTonalStateChange(it: Boolean?) {
-        val animate = if(it == null) false else true
+        val animate = it != null
         updateEnableToneUI(
             it ?: false,
             animate
         )
     }
 
-    private fun onCurrentPresetChange(it: CharSequence?) {
-        updateEqualizerBands(it)
-    }
-
     private fun onEqualizerStateChanged(it: Boolean?) {
-        val animate = if(it == null) false else true
+        val animate = it != null
         updateEnableEquUI(
             it ?: false,
             animate
@@ -244,7 +212,7 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
     }
 
     fun checkInteractions() {
-        mDataBidingView.switchEqualizer.setOnCheckedChangeListener { _, isChecked ->
+        mDataBiding.switchEqualizer.setOnCheckedChangeListener { _, isChecked ->
             mEqualizerActivityViewModel.setEqualizerState(isChecked)
             if(mEqualizerActivityViewModel.getCurrentPreset().value == null){
                 val defaultActivatedPreset = mEqualizerActivityViewModel.getPresetName(0)
@@ -254,30 +222,30 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
                 )
             }
         }
-        mDataBidingView.switchTone.setOnCheckedChangeListener { _, isChecked ->
-            mEqualizerActivityViewModel.setToneState(isChecked)
+        mDataBiding.switchTone.setOnCheckedChangeListener { _, isChecked ->
+            mEqualizerActivityViewModel.toneState.value = isChecked
         }
-        mDataBidingView.buttonChoosePreset.setOnClickListener{
+        mDataBiding.buttonChoosePreset.setOnClickListener{
             openPresetSelectorDialog()
         }
-        mDataBidingView.buttonSavePreset.setOnClickListener{
+        mDataBiding.buttonSavePreset.setOnClickListener{
             openSavePresetDialog()
         }
-        mDataBidingView.volumeSlider.addOnChangeListener { _, value, fromUser ->
+        mDataBiding.volumeSlider.addOnChangeListener { _, value, fromUser ->
             if(fromUser){
                 val maxVolume = mSettingsContentObserver?.maxVolume ?: 0
                 val newVolume = value / 100f * maxVolume
-                mEqualizerActivityViewModel.setVolume(newVolume.toInt())
+                mEqualizerActivityViewModel.volumeProgress.value = newVolume.toInt()
             }
         }
-        mDataBidingView.seekbarBassBoost.setOnSeekBarChangeListener(object : CircularSeekBar.OnCircularSeekBarChangeListener{
+        mDataBiding.seekbarBassBoost.setOnSeekBarChangeListener(object : CircularSeekBar.OnCircularSeekBarChangeListener{
             override fun onProgressChanged(
                 circularSeekBar: CircularSeekBar?,
                 progress: Float,
                 fromUser: Boolean
             ) {
                 if(fromUser){
-                    mEqualizerActivityViewModel.setBassBoostProgress(progress.toInt())
+                    mEqualizerActivityViewModel.bassBoostProgress.value = progress.toInt()
                 }
             }
             override fun onStartTrackingTouch(seekBar: CircularSeekBar?) {
@@ -285,14 +253,14 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
             override fun onStopTrackingTouch(seekBar: CircularSeekBar?) {
             }
         })
-        mDataBidingView.seekbarVisualizer.setOnSeekBarChangeListener(object : CircularSeekBar.OnCircularSeekBarChangeListener{
+        mDataBiding.seekbarVisualizer.setOnSeekBarChangeListener(object : CircularSeekBar.OnCircularSeekBarChangeListener{
             override fun onProgressChanged(
                 circularSeekBar: CircularSeekBar?,
                 progress: Float,
                 fromUser: Boolean
             ) {
                 if(fromUser){
-                    mEqualizerActivityViewModel.setVisualizerProgress(progress.toInt())
+                    mEqualizerActivityViewModel.visualizerProgress.value = progress.toInt()
                 }
             }
             override fun onStartTrackingTouch(seekBar: CircularSeekBar?) {
@@ -333,7 +301,7 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
                     dialogDataBidingView.textInputEditText.text = null
                     dialogDataBidingView.textInputEditText.hint = baseContext.resources.getString(R.string.preset_name)
                     dialogDataBidingView.textInputEditText.selectAll()
-                    com.prosabdev.common.utils.SystemSettingsUtils.SoftInputService(this@EqualizerActivity, dialogDataBidingView.textInputEditText).show(5)
+                    SystemSettings.SoftInputService(this@EqualizerActivity, dialogDataBidingView.textInputEditText).show(5)
                 }
                 dialogDataBidingView.textInputEditText.addTextChangedListener(object : TextWatcher {
                     override fun beforeTextChanged(
@@ -393,14 +361,14 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
                     dialogDataBidingView.textInputLayout.error = baseContext.resources.getString(R.string.name_already_exist)
                 }
             }
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
+            Animators.crossFadeDownClickable(
                 dialogDataBidingView.buttonSave
             )
         }else{
             MainScope().launch {
                 dialogDataBidingView.textInputLayout.error = null
             }
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
+            Animators.crossFadeUpClickable(
                 dialogDataBidingView.buttonSave
             )
         }
@@ -440,212 +408,212 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
         val bandsCount: Short = mEqualizerActivityViewModel.getBandsCount()
         for(i in 0 until bandsCount){
             val textTop =
-                mDataBidingView.linearVerticalSeekbars.findViewById<MaterialTextView>(R.id.text_view_top + INDEX_TEXT_VIEW_TOP_ADD + i)
+                mDataBiding.linearVerticalSeekbars.findViewById<MaterialTextView>(R.id.text_view_top + INDEX_TEXT_VIEW_TOP_ADD + i)
             val verticalSeekBar =
-                mDataBidingView.linearVerticalSeekbars.findViewById<VerticalSeekBar>(R.id.vertical_seekbar + INDEX_VERTICAL_SEEKBAR_ADD +i)
+                mDataBiding.linearVerticalSeekbars.findViewById<VerticalSeekBar>(R.id.vertical_seekbar + INDEX_VERTICAL_SEEKBAR_ADD +i)
             var bandLevel: Short
             runBlocking {
                 bandLevel = mEqualizerActivityViewModel.getBandLevel(currentPreset, i.toShort(), mEqualizerPresetBandLevelItemViewModel)
             }
-            if(textTop.text == com.prosabdev.common.utils.FormattersAndParsersUtils.formatBandLevelToString(bandLevel)) continue //If view have been already updated, pass
-            textTop.text = com.prosabdev.common.utils.FormattersAndParsersUtils.formatBandLevelToString(bandLevel)
-            verticalSeekBar.progress = com.prosabdev.common.utils.FormattersAndParsersUtils.formatBandToPercent(
+            if(textTop.text == FormattersAndParsers.formatBandLevelToString(bandLevel)) continue //If view have been already updated, pass
+            textTop.text = FormattersAndParsers.formatBandLevelToString(bandLevel)
+            verticalSeekBar.progress = FormattersAndParsers.formatBandToPercent(
                 bandLevel,
-                mEqualizerActivityViewModel.getBandLevelRangeMin(),
-                mEqualizerActivityViewModel.getBandLevelRangeMax()
+                mEqualizerActivityViewModel.presetBandsLevels.value?.get(0) ?: 0,
+                mEqualizerActivityViewModel.presetBandsLevels.value?.get(1) ?: 0
             )
         }
     }
 
-    private fun updateEnableEquUI(isChecked: Boolean, animate: Boolean) {
+    private fun updateEnableEquUI(isChecked: Boolean, animate: Boolean = true) {
         if(isChecked){
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
-                mDataBidingView.buttonChoosePreset,
+            Animators.crossFadeUpClickable(
+                mDataBiding.buttonChoosePreset,
                 animate,
                 200,
                 1.0f,
                 false
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
-                mDataBidingView.buttonSavePreset,
+            Animators.crossFadeUpClickable(
+                mDataBiding.buttonSavePreset,
                 animate,
                 200,
                 1.0f,
                 false
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
-                mDataBidingView.volumeSlider,
+            Animators.crossFadeUpClickable(
+                mDataBiding.volumeSlider,
                 animate
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
-                mDataBidingView.imageViewVolume,
+            Animators.crossFadeUpClickable(
+                mDataBiding.imageViewVolume,
                 animate
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
-                mDataBidingView.textViewVolumeProgress,
+            Animators.crossFadeUpClickable(
+                mDataBiding.textViewVolumeProgress,
                 animate
             )
         }else{
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
-                mDataBidingView.buttonChoosePreset,
+            Animators.crossFadeDownClickable(
+                mDataBiding.buttonChoosePreset,
                 animate,
                 200,
                 0.35f,
                 false
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
-                mDataBidingView.buttonSavePreset,
+            Animators.crossFadeDownClickable(
+                mDataBiding.buttonSavePreset,
                 animate,
                 200,
                 0.35f,
                 false
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
-                mDataBidingView.volumeSlider,
+            Animators.crossFadeDownClickable(
+                mDataBiding.volumeSlider,
                 animate
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
-                mDataBidingView.imageViewVolume,
+            Animators.crossFadeDownClickable(
+                mDataBiding.imageViewVolume,
                 animate
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
-                mDataBidingView.textViewVolumeProgress,
+            Animators.crossFadeDownClickable(
+                mDataBiding.textViewVolumeProgress,
                 animate
             )
         }
         val bandsCount: Short = mEqualizerActivityViewModel.getBandsCount()
         for(i in 0 until bandsCount) {
             val textTop =
-                mDataBidingView.linearVerticalSeekbars.findViewById<MaterialTextView>(R.id.text_view_top + INDEX_TEXT_VIEW_TOP_ADD + i)
+                mDataBiding.linearVerticalSeekbars.findViewById<MaterialTextView>(R.id.text_view_top + INDEX_TEXT_VIEW_TOP_ADD + i)
             val textBottom =
-                mDataBidingView.linearVerticalSeekbars.findViewById<MaterialTextView>(R.id.text_view_bottom + INDEX_TEXT_VIEW_BOTTOM_ADD + i)
+                mDataBiding.linearVerticalSeekbars.findViewById<MaterialTextView>(R.id.text_view_bottom + INDEX_TEXT_VIEW_BOTTOM_ADD + i)
             val verticalSeekBar =
-                mDataBidingView.linearVerticalSeekbars.findViewById<VerticalSeekBar>(R.id.vertical_seekbar + INDEX_VERTICAL_SEEKBAR_ADD +i)
+                mDataBiding.linearVerticalSeekbars.findViewById<VerticalSeekBar>(R.id.vertical_seekbar + INDEX_VERTICAL_SEEKBAR_ADD +i)
             verticalSeekBar.useThumbToSetProgress = isChecked
             verticalSeekBar.clickToSetProgress = isChecked
             if(isChecked){
-                com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
+                Animators.crossFadeUpClickable(
                     textTop,
                     animate
                 )
-                com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
+                Animators.crossFadeUpClickable(
                     textBottom,
                     animate
                 )
-                com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
+                Animators.crossFadeUpClickable(
                     verticalSeekBar,
                     animate
                 )
             }else{
-                com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
+                Animators.crossFadeDownClickable(
                     textTop,
                     animate
                 )
-                com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
+                Animators.crossFadeDownClickable(
                     textBottom,
                     animate
                 )
-                com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
+                Animators.crossFadeDownClickable(
                     verticalSeekBar,
                     animate
                 )
             }
         }
     }
-    private fun updateEnableToneUI(isChecked: Boolean, animate: Boolean) {
+    private fun updateEnableToneUI(isChecked: Boolean, animate: Boolean = true) {
         if(isChecked){
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
-                mDataBidingView.seekbarBassBoost,
+            Animators.crossFadeUpClickable(
+                mDataBiding.seekbarBassBoost,
                 animate
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
-                mDataBidingView.seekbarVisualizer,
+            Animators.crossFadeUpClickable(
+                mDataBiding.seekbarVisualizer,
                 animate
             )
             //update text views
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
-                mDataBidingView.textViewVisualizer,
+            Animators.crossFadeUpClickable(
+                mDataBiding.textViewVisualizer,
                 animate
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
-                mDataBidingView.textViewVisualizerProgress,
+            Animators.crossFadeUpClickable(
+                mDataBiding.textViewVisualizerProgress,
                 animate
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
-                mDataBidingView.textViewBassBoost,
+            Animators.crossFadeUpClickable(
+                mDataBiding.textViewBassBoost,
                 animate
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
-                mDataBidingView.textViewBassBoostProgress,
+            Animators.crossFadeUpClickable(
+                mDataBiding.textViewBassBoostProgress,
                 animate
             )
             //update shape background
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
-                mDataBidingView.shapeBackgroundBass,
+            Animators.crossFadeUpClickable(
+                mDataBiding.shapeBackgroundBass,
                 animate
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
-                mDataBidingView.shapeBackgroundVisualizer,
+            Animators.crossFadeUpClickable(
+                mDataBiding.shapeBackgroundVisualizer,
                 animate
             )
         }else{
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
-                mDataBidingView.seekbarBassBoost,
+            Animators.crossFadeDownClickable(
+                mDataBiding.seekbarBassBoost,
                 animate
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
-                mDataBidingView.seekbarVisualizer,
+            Animators.crossFadeDownClickable(
+                mDataBiding.seekbarVisualizer,
                 animate
             )
             //update text views
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
-                mDataBidingView.textViewVisualizer,
+            Animators.crossFadeDownClickable(
+                mDataBiding.textViewVisualizer,
                 animate
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
-                mDataBidingView.textViewVisualizerProgress,
+            Animators.crossFadeDownClickable(
+                mDataBiding.textViewVisualizerProgress,
                 animate
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
-                mDataBidingView.textViewBassBoost,
+            Animators.crossFadeDownClickable(
+                mDataBiding.textViewBassBoost,
                 animate
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
-                mDataBidingView.textViewBassBoostProgress,
+            Animators.crossFadeDownClickable(
+                mDataBiding.textViewBassBoostProgress,
                 animate
             )
             //update shape background
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
-                mDataBidingView.shapeBackgroundBass,
+            Animators.crossFadeDownClickable(
+                mDataBiding.shapeBackgroundBass,
                 animate
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
-                mDataBidingView.shapeBackgroundVisualizer,
+            Animators.crossFadeDownClickable(
+                mDataBiding.shapeBackgroundVisualizer,
                 animate
             )
         }
     }
 
-    private fun loadSharedPrefsAnInitEqualizer() {
-//        val equEnable = SharedPreferenceManagerUtils.AudioEffects.loadEqualizerState(baseContext)
-//        val toneEnable = SharedPreferenceManagerUtils.AudioEffects.loadToneState(baseContext)
-//        mEqualizerActivityViewModel.initSilentEqualizer(baseContext)
-//        initEqualizerUI(equEnable)
-//        initToneUI(toneEnable)
+    private fun loadSettingsAndInitEqualizer() {
+        val equEnable = PersistentStorage.AudioEffects.loadEqualizerState()
+        val toneEnable = PersistentStorage.AudioEffects.loadToneState()
+        mEqualizerActivityViewModel.initSilentEqualizer(mDataBiding.exoVisualizerBands)
+        initEqualizerUI(equEnable)
+        initToneUI(toneEnable)
     }
     private fun initToneUI(toneEnable: Boolean) {
-        mDataBidingView.switchTone.isChecked = toneEnable
+        mDataBiding.switchTone.isChecked = toneEnable
         updateEnableToneUI(
             toneEnable,
             false
         )
     }
     private fun initEqualizerUI(equEnable: Boolean) {
-        mDataBidingView.switchEqualizer.isChecked = equEnable
+        mDataBiding.switchEqualizer.isChecked = equEnable
         setupEqualizerBandsUI()
     }
     private fun setupEqualizerBandsUI() {
-        val bandsCount: Short = mEqualizerActivityViewModel.getBandsCount()
+        val bandsCount: Short = mEqualizerActivityViewModel.presetBandsLevels.value?.size ?: 0
         for(i in 0 until bandsCount){
             val inflater = LayoutInflater.from(this@EqualizerActivity).inflate(R.layout._component_vertical_seek_bar, null)
             val textTop = inflater.findViewById<MaterialTextView>(R.id.text_view_top)
@@ -657,18 +625,18 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
             var bandLevel: Short
             runBlocking {
                 bandLevel = mEqualizerActivityViewModel.getBandLevel(
-                    mEqualizerActivityViewModel.getCurrentPreset().value,
+                    mEqualizerActivityViewModel.currentPreset.value,
                     i.toShort(),
                     mEqualizerPresetBandLevelItemViewModel
                 )
             }
             val centerFreq: Int = mEqualizerActivityViewModel.getCenterFrequency(i.toShort())
-            textTop.text = com.prosabdev.common.utils.FormattersAndParsersUtils.formatBandLevelToString(bandLevel)
-            textBottom.text = com.prosabdev.common.utils.FormattersAndParsersUtils.formatCenterFreqToString(centerFreq)
-            verticalSeekBar.progress = com.prosabdev.common.utils.FormattersAndParsersUtils.formatBandToPercent(
+            textTop.text = FormattersAndParsers.formatBandLevelToString(bandLevel)
+            textBottom.text = FormattersAndParsers.formatCenterFreqToString(centerFreq)
+            verticalSeekBar.progress = FormattersAndParsers.formatBandToPercent(
                 bandLevel,
-                mEqualizerActivityViewModel.getBandLevelRangeMin(),
-                mEqualizerActivityViewModel.getBandLevelRangeMax()
+                mEqualizerActivityViewModel.presetBandsLevels.value?.get(0) ?: 0,
+                mEqualizerActivityViewModel.presetBandsLevels.value?.get(1) ?: 0
             )
             var havePressed = false
             verticalSeekBar.setOnPressListener {
@@ -686,7 +654,7 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
                     }
                 }
             }
-            mDataBidingView.linearVerticalSeekbars.addView(inflater, mDataBidingView.linearVerticalSeekbars.childCount)
+            mDataBiding.linearVerticalSeekbars.addView(inflater, mDataBiding.linearVerticalSeekbars.childCount)
         }
     }
 
@@ -698,25 +666,64 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
         var bandLevel: Short
         runBlocking {
             bandLevel = mEqualizerActivityViewModel.getBandLevel(
-                mEqualizerActivityViewModel.getCurrentPreset().value,
+                mEqualizerActivityViewModel.currentPreset.value,
                 bandId,
                 mEqualizerPresetBandLevelItemViewModel
             )
         }
-        textTop.text = com.prosabdev.common.utils.FormattersAndParsersUtils.formatBandLevelToString(bandLevel)
+        textTop.text = FormattersAndParsers.formatBandLevelToString(bandLevel)
     }
     private fun updateBandLevelOnVerticalSeekBarChange(bandId: Short, progressLevel: Int) {
-        val level = com.prosabdev.common.utils.FormattersAndParsersUtils.formatPercentToBandFreq(
+        val level = FormattersAndParsers.formatPercentToBandFreq(
             progressLevel,
-            mEqualizerActivityViewModel.getBandLevelRangeMin(),
-            mEqualizerActivityViewModel.getBandLevelRangeMax()
+            mEqualizerActivityViewModel.presetBandsLevels.value?.get(0) ?: 0,
+            mEqualizerActivityViewModel.presetBandsLevels.value?.get(1) ?: 0
         )
         mEqualizerActivityViewModel.setBandLevel(bandId, level)
     }
 
     private fun initViews() {
-        com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
-        com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.constraintContainer)
+        InsetModifiers.updateTopViewInsets(mDataBiding.coordinatorLayout)
+        InsetModifiers.updateBottomViewInsets(mDataBiding.constraintContainer)
+    }
+
+    class SettingsContentObserver(
+        private val mContext: Context,
+        private val mHandler: Handler?,
+        private val mViewModel: EqualizerActivityViewModel
+    ) :
+        ContentObserver(mHandler) {
+        private var previousVolume: Int
+        var maxVolume: Int
+
+        init {
+            val audio = mContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val currentVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
+            maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+            previousVolume = currentVolume
+            mViewModel.volumeProgress.value = currentVolume
+            Log.i(TAG, "AUDIO VOLUME PERCENT SET $currentVolume")
+        }
+
+        override fun onChange(selfChange: Boolean) {
+            super.onChange(selfChange)
+            try {
+                val audio = mContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                val currentVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
+                val delta = previousVolume - currentVolume
+                if (delta > 0) {
+                    previousVolume = currentVolume
+                    mViewModel.volumeProgress.value = currentVolume
+                    Log.i(TAG, "AUDIO VOLUME PERCENT INCREASED $currentVolume")
+                } else if (delta < 0) {
+                    previousVolume = currentVolume
+                    mViewModel.volumeProgress.value = currentVolume
+                    Log.i(TAG, "AUDIO VOLUME PERCENT INCREASED $currentVolume")
+                }
+            }catch (error: Throwable){
+                error.printStackTrace()
+            }
+        }
     }
 
     companion object {

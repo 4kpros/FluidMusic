@@ -20,16 +20,17 @@ import androidx.work.WorkInfo
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
+import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.utils.InsetModifiers
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityMediaScannerSettingsBinding
 import com.prosabdev.fluidmusic.viewmodels.activities.MediaScannerActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @BuildCompat.PrereleaseSdkCheck class MediaScannerSettingsActivity : AppCompatActivity() {
 
-    private lateinit var mDataBidingView : ActivityMediaScannerSettingsBinding
+    private lateinit var mDataBiding : ActivityMediaScannerSettingsBinding
 
     private val mFolderUriTreeViewModel: FolderUriTreeViewModel by viewModels()
     private val mMediaScannerActivityViewModel: MediaScannerActivityViewModel by viewModels()
@@ -37,16 +38,21 @@ import kotlinx.coroutines.launch
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //Apply UI settings and dynamics colors
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        mDataBidingView = DataBindingUtil.setContentView(this, R.layout.activity_media_scanner_settings)
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.setContentView(this, R.layout.activity_media_scanner_settings)
 
-        initViews()
-        MainScope().launch {
-            observeLiveData()
-            checkInteractions()
-            registerOnBackPressedCallback()
+        //Load your UI content
+        if(savedInstanceState == null){
+            runBlocking {
+                initViews()
+                observeLiveData()
+                checkInteractions()
+                registerOnBackPressedCallback()
+            }
         }
     }
 
@@ -67,44 +73,44 @@ import kotlinx.coroutines.launch
     }
 
     private fun checkInteractions() {
-        mDataBidingView.topAppBar.setNavigationOnClickListener {
+        mDataBiding.topAppBar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
-        mDataBidingView.cardViewScanDevice.setOnClickListener{
+        mDataBiding.cardViewScanDevice.setOnClickListener{
             tryToScanDevice()
         }
-        mDataBidingView.cardViewSelectFolders.setOnClickListener{
+        mDataBiding.cardViewSelectFolders.setOnClickListener{
             startActivity(Intent(this, StorageAccessSettingsActivity::class.java).apply {})
         }
-        mDataBidingView.cardViewRescanAll.setOnClickListener{
+        mDataBiding.cardViewRescanAll.setOnClickListener{
             onRescanAllButtonClicked()
         }
-        mDataBidingView.cardViewRestoreDefault.setOnClickListener{
+        mDataBiding.cardViewRestoreDefault.setOnClickListener{
             onRestoreAllButtonClicked()
         }
-        mDataBidingView.switchM3uPlaylists.setOnClickListener{
+        mDataBiding.switchM3uPlaylists.setOnClickListener{
             //
         }
-        mDataBidingView.switchIgnoreVideos.setOnClickListener{
+        mDataBiding.switchIgnoreVideos.setOnClickListener{
             //
         }
-        mDataBidingView.switchAutomaticScanner.setOnClickListener{
+        mDataBiding.switchAutomaticScanner.setOnClickListener{
             //
         }
-        mDataBidingView.seekbarIgnoreShortFiles.addOnChangeListener(object : Slider.OnChangeListener{
+        mDataBiding.seekbarIgnoreShortFiles.addOnChangeListener(object : Slider.OnChangeListener{
             override fun onValueChange(slider: Slider, value: Float, fromUser: Boolean) {
                 //
             }
 
         })
-        mDataBidingView.cardViewScanM3uPlaylists.setOnClickListener{
-            mDataBidingView.switchM3uPlaylists.isChecked = !mDataBidingView.switchM3uPlaylists.isChecked
+        mDataBiding.cardViewScanM3uPlaylists.setOnClickListener{
+            mDataBiding.switchM3uPlaylists.isChecked = !mDataBiding.switchM3uPlaylists.isChecked
         }
-        mDataBidingView.cardViewSkipVideos.setOnClickListener{
-            mDataBidingView.switchIgnoreVideos.isChecked = !mDataBidingView.switchIgnoreVideos.isChecked
+        mDataBiding.cardViewSkipVideos.setOnClickListener{
+            mDataBiding.switchIgnoreVideos.isChecked = !mDataBiding.switchIgnoreVideos.isChecked
         }
-        mDataBidingView.cardViewAutomaticScan.setOnClickListener{
-            mDataBidingView.switchAutomaticScanner.isChecked = !mDataBidingView.switchAutomaticScanner.isChecked
+        mDataBiding.cardViewAutomaticScan.setOnClickListener{
+            mDataBiding.switchAutomaticScanner.isChecked = !mDataBiding.switchAutomaticScanner.isChecked
         }
     }
 
@@ -145,9 +151,9 @@ import kotlinx.coroutines.launch
     }
 
     private fun tryToScanDevice() {
-        if(mMediaScannerActivityViewModel.getIsLoadingInBackground().value == true)
+        if(mMediaScannerActivityViewModel.isLoadingInBackground.value == true)
             return
-        mMediaScannerActivityViewModel.setIsLoadingInBackground(true)
+        mMediaScannerActivityViewModel.isLoadingInBackground.value = true
         mMediaScannerActivityViewModel.scanDevice()
     }
 
@@ -155,22 +161,22 @@ import kotlinx.coroutines.launch
         mFolderUriTreeViewModel.getAll()?.observe(this){
             updateFolderUriTrees(it)
         }
-        mMediaScannerActivityViewModel.getIsLoadingInBackground().observe(this){
+        mMediaScannerActivityViewModel.isLoadingInBackground.observe(this){
             updateLoadingUI(it)
         }
-        mMediaScannerActivityViewModel.getFoldersCounter().observe(this){
+        mMediaScannerActivityViewModel.foldersCounter.observe(this){
             updateFoldersCounterUI(it)
         }
-        mMediaScannerActivityViewModel.getSongsCounter().observe(this){
+        mMediaScannerActivityViewModel.songsCounter.observe(this){
             updateSongsCounterUI(it)
         }
-        mMediaScannerActivityViewModel.getPlaylistsCounter().observe(this){
+        mMediaScannerActivityViewModel.playlistsCounter.observe(this){
             updatePlaylistCounterUI(it)
         }
-        mMediaScannerActivityViewModel.getEmptyFolderUriCounter().observe(this){
+        mMediaScannerActivityViewModel.emptyFolderUriCounter.observe(this){
             updateEmptyFolderUriTreeUI(it)
         }
-        mMediaScannerActivityViewModel.getOutputWorkInfoList().observe(this){
+        mMediaScannerActivityViewModel.outputWorkInfoItems.observe(this){
             checkStatusOfScanningDevice(it)
         }
     }
@@ -183,34 +189,31 @@ import kotlinx.coroutines.launch
 
         mMediaScannerActivityViewModel.updateWorkInfoData(workInfo)
         if(workInfo.state.isFinished){
-            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Device scan finished.")
-            mMediaScannerActivityViewModel.setIsLoadingInBackground(false)
-        }else{
-            Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Working on background ...")
+            mMediaScannerActivityViewModel.isLoadingInBackground.value = false
         }
     }
     private fun mediaScannerWorkInfoObserver(): Observer<List<WorkInfo>> {
         return Observer {
-            if (it.isNullOrEmpty()){
+            if (it.isEmpty()){
                 return@Observer
             }
 
             val workInfo = it[0]
 
             if(workInfo.state.isFinished){
-                Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Device scan finished.")
+                Log.i(MainConst.TAG, "Device scan finished.")
                 mMediaScannerActivityViewModel.updateWorkInfoData(workInfo)
-                mMediaScannerActivityViewModel.setIsLoadingInBackground(false)
+                mMediaScannerActivityViewModel.isLoadingInBackground.value = false
             }else{
-                Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Working on background ...")
+                Log.i(MainConst.TAG, "Working on background ...")
             }
         }
     }
 
     private fun updateEmptyFolderUriTreeUI(it: Int?) {
         if((it ?: 0) > 0){
-            fadeInOut(mDataBidingView.textSelectFoldersSubTitle)
-            fadeInOut(mDataBidingView.textSelectFoldersTitle)
+            fadeInOut(mDataBiding.textSelectFoldersSubTitle)
+            fadeInOut(mDataBiding.textSelectFoldersTitle)
         }
     }
 
@@ -247,27 +250,27 @@ import kotlinx.coroutines.launch
     }
 
     private fun updatePlaylistCounterUI(it: Int?) {
-        mDataBidingView.playlistCounter = it
-        Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Device scan playlists : $it")
+        mDataBiding.playlistCounter = it
+        Log.i(MainConst.TAG, "Device scan playlists : $it")
     }
 
     private fun updateSongsCounterUI(it: Int?) {
-        mDataBidingView.songsCounter = it
-        Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Device scan songs : $it")
+        mDataBiding.songsCounter = it
+        Log.i(MainConst.TAG, "Device scan songs : $it")
     }
 
     private fun updateFoldersCounterUI(it: Int) {
-        mDataBidingView.folderCounter = it
-        Log.i(com.prosabdev.common.utils.ConstantValues.TAG, "Device scan folders : $it")
+        mDataBiding.folderCounter = it
+        Log.i(MainConst.TAG, "Device scan folders : $it")
     }
 
     private fun updateLoadingUI(it: Boolean?) {
-        mDataBidingView.isLoading = it
+        mDataBiding.isLoading = it
     }
 
     private fun initViews() {
-        com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
-        com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.container)
+        InsetModifiers.updateTopViewInsets(mDataBiding.coordinatorLayout)
+        InsetModifiers.updateBottomViewInsets(mDataBiding.container)
     }
 
     companion object {

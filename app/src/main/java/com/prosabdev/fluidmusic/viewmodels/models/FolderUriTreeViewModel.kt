@@ -8,26 +8,26 @@ import com.prosabdev.common.roomdatabase.repositories.FolderUriTreeRepository
 
 class FolderUriTreeViewModel(app: Application) : AndroidViewModel(app) {
 
-    private var repository: FolderUriTreeRepository? = FolderUriTreeRepository(app)
+    private var mRepository: FolderUriTreeRepository? = FolderUriTreeRepository(app)
 
     suspend fun insert(folderUriTree: FolderUriTree?) : Long? {
-        return repository?.insert(folderUriTree)
+        return mRepository?.insert(folderUriTree)
     }
     suspend fun update(folderUriTree: FolderUriTree?) {
-        repository?.update(folderUriTree)
+        mRepository?.update(folderUriTree)
     }
     suspend fun delete(folderUriTree: FolderUriTree?) {
-        repository?.delete(folderUriTree)
+        mRepository?.delete(folderUriTree)
     }
     suspend fun deleteAll() {
-        repository?.deleteAll()
+        mRepository?.deleteAll()
     }
 
     //Getters
     suspend fun getAtId(id: Long) : FolderUriTree? {
-        return repository?.getAtId(id)
+        return mRepository?.getAtId(id)
     }
-    suspend fun getAll(order_by: String = "id") : LiveData<List<FolderUriTree>>? {
-        return repository?.getAll(order_by)
+    suspend fun getAll(orderBy: String = "id") : LiveData<List<FolderUriTree>>? {
+        return mRepository?.getAll(orderBy)
     }
 }

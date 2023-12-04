@@ -22,35 +22,35 @@ class PlaylistSongItemRepository(ctx : Context) {
             mDao?.insertMultiple(playlistSongItems)
         }
     }
-    suspend fun update(playlistSongItem: PlaylistSongItem?) {
-        withContext(Dispatchers.IO){
+    suspend fun update(playlistSongItem: PlaylistSongItem?): Int? {
+        return withContext(Dispatchers.IO){
             mDao?.update(playlistSongItem)
         }
     }
-    suspend fun delete(playlistSongItem: PlaylistSongItem?) {
-        withContext(Dispatchers.IO){
+    suspend fun delete(playlistSongItem: PlaylistSongItem?): Int? {
+        return withContext(Dispatchers.IO){
             mDao?.delete(playlistSongItem)
         }
     }
-    suspend fun deleteAll() {
-        withContext(Dispatchers.IO){
+    suspend fun deleteAll(): Int? {
+        return withContext(Dispatchers.IO){
             mDao?.deleteAll()
         }
     }
-    //Getters
+
     suspend fun getAtId(id: Long) : PlaylistSongItem? {
         return withContext(Dispatchers.IO){
-            return@withContext mDao?.getAtId(id)
+            mDao?.getAtId(id)
         }
     }
     suspend fun getAll(orderBy: String?) : LiveData<List<PlaylistSongItem>?>? {
         return withContext(Dispatchers.IO){
-            return@withContext mDao?.getAll(orderBy)
+            mDao?.getAll(orderBy)
         }
     }
     suspend fun getAllDirectly(orderBy: String?) : List<PlaylistSongItem>? {
         return withContext(Dispatchers.IO){
-            return@withContext mDao?.getAllDirectly(orderBy)
+            mDao?.getAllDirectly(orderBy)
         }
     }
 }

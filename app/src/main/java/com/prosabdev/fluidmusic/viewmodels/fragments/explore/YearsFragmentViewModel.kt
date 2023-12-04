@@ -7,6 +7,6 @@ import com.prosabdev.fluidmusic.viewmodels.models.explore.YearItemViewModel
 
 class YearsFragmentViewModel (app: Application) : GenericListenDataViewModel(app) {
     suspend fun requestDataDirectlyFromDatabase(viewModel: YearItemViewModel){
-        mMutableDataList.value = viewModel.getAllDirectly(getSortBy().value?.ifEmpty { YearItem.DEFAULT_INDEX } ?: YearItem.DEFAULT_INDEX)
+        dataList.value = viewModel.getAllDirectly(sortBy.value?.ifEmpty { YearItem.DEFAULT_INDEX } ?: YearItem.DEFAULT_INDEX)
     }
 }

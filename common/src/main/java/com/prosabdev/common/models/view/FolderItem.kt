@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.room.DatabaseView
 import com.prosabdev.common.R
 import com.prosabdev.common.models.generic.GenericItemListGrid
-import com.prosabdev.common.utils.FormattersAndParsersUtils
+import com.prosabdev.common.utils.FormattersAndParsers
 
 @DatabaseView(
     "SELECT songItem.folder as name, " +
@@ -31,22 +31,22 @@ import com.prosabdev.common.utils.FormattersAndParsersUtils
             "INNER JOIN FolderUriTree as folderUriTree ON songItem.uriTreeId = folderUriTree.id " +
             "GROUP BY SongItem.folder ORDER BY SongItem.folder"
 )
-class FolderItem {
-    var name: String? = ""
-    var deviceName: String? = ""
-    var parentFolder: String? = ""
-    var year: String? = ""
-    var lastUpdateDate: Long = 0
-    var lastAddedDateToLibrary: Long = 0
-    var numberArtists: Int = 0
-    var numberAlbums: Int = 0
-    var numberAlbumArtists: Int = 0
-    var numberComposers: Int = 0
-    var numberTracks: Int = 0
-    var totalDuration: Long = 0
-    var hashedCovertArtSignature: Int = -1
+data class FolderItem (
+    var name: String? = "",
+    var deviceName: String? = "",
+    var parentFolder: String? = "",
+    var year: String? = "",
+    var lastUpdateDate: Long = 0,
+    var lastAddedDateToLibrary: Long = 0,
+    var numberArtists: Int = 0,
+    var numberAlbums: Int = 0,
+    var numberAlbumArtists: Int = 0,
+    var numberComposers: Int = 0,
+    var numberTracks: Int = 0,
+    var totalDuration: Long = 0,
+    var hashedCovertArtSignature: Int = -1,
     var uriImage: String? = ""
-
+){
     companion object {
         const val TAG = "FolderItem"
         const val DEFAULT_INDEX = "name"
@@ -75,7 +75,7 @@ class FolderItem {
                     if(setAllText)
                         ctx.getString(
                             R.string.item_content_explore_text_details,
-                            FormattersAndParsersUtils.formatSongDurationToString(dataItem.totalDuration),
+                            FormattersAndParsers.formatSongDurationToString(dataItem.totalDuration),
                             dataItem.numberTracks.toString()
                         )
                     else

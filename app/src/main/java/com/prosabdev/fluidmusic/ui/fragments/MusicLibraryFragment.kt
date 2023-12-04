@@ -10,24 +10,28 @@ import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.commit
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.prosabdev.common.utils.Animators
+import com.prosabdev.common.utils.InsetModifiers
+import com.prosabdev.common.workers.queuemusic.AddSongsToQueueMusicWorker
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.TabLayoutAdapter
 import com.prosabdev.fluidmusic.databinding.DialogAddToQueueMusicBinding
 import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
 import com.prosabdev.fluidmusic.ui.activities.EditTagsActivity
-import com.prosabdev.fluidmusic.ui.fragments.commonmethods.CommonPlaybackAction
+import com.prosabdev.fluidmusic.ui.fragments.actions.PlaybackActions
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.NowPlayingFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.workers.QueueMusicActionsWorkerViewModel
 import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
 
 @BuildCompat.PrereleaseSdkCheck class MusicLibraryFragment : Fragment() {
-    private var mDataBidingView: FragmentMusicLibraryBinding? = null
+    private var mDataBiding: FragmentMusicLibraryBinding? = null
 
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mNowPlayingFragmentViewModel: NowPlayingFragmentViewModel by activityViewModels()
@@ -37,37 +41,26 @@ import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
 
     private var mTabLayoutAdapter: TabLayoutAdapter? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mDataBidingView = DataBindingUtil.inflate(inflater,R.layout.fragment_music_library,container,false)
-        val view = mDataBidingView?.root
 
-        if(savedInstanceState == null){
-            initViews()
-            setupTabLayoutViewPagerAdapter()
-        }
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.inflate(inflater,R.layout.fragment_music_library, container,false)
+        val view = mDataBiding?.root
+
+        //Load your UI content
+        initViews()
+        setupTabLayoutViewPagerAdapter()
+        checkInteractions()
+        observeLiveData()
+
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        if(savedInstanceState == null){
-            checkInteractions()
-            observeLiveData()
-        }
-    }
-
     private fun setupTabLayoutViewPagerAdapter() {
-        mDataBidingView?.let { dataBidingView ->
+        mDataBiding?.let { dataBidingView ->
             mTabLayoutAdapter =
                 parentFragment?.let { fmt -> TabLayoutAdapter(fmt) }
             dataBidingView.viewPager.adapter = mTabLayoutAdapter
@@ -111,37 +104,37 @@ import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
     }
 
     private fun observeLiveData() {
-        mMainFragmentViewModel.getSelectMode().observe(viewLifecycleOwner) {
+        mMainFragmentViewModel.selectMode.observe(viewLifecycleOwner) {
             updateSelectModeUI(it)
         }
-        mMainFragmentViewModel.getSelectedDataList().observe(viewLifecycleOwner
+        mMainFragmentViewModel.selectedDataList.observe(viewLifecycleOwner
         ) { dataList ->
             updateTotalSelectedItemsUI(dataList.size)
         }
-        mMainFragmentViewModel.getIsFastScrolling().observe(viewLifecycleOwner){
+        mMainFragmentViewModel.isFastScrolling.observe(viewLifecycleOwner){
             tryToUpdateFastScrollStateUI(it)
         }
     }
     private fun tryToUpdateFastScrollStateUI(isFastScrolling: Boolean = true) {
         if(isFastScrolling){
-            if(mMainFragmentViewModel.getSelectMode().value == true){
+            if(mMainFragmentViewModel.selectMode.value == true){
                 hideSideContentSelectionMenu()
             }
-            mDataBidingView?.appBarLayout?.setExpanded(false)
+            mDataBiding?.appBarLayout?.setExpanded(false)
         }else{
-            if(mMainFragmentViewModel.getSelectMode().value == true){
+            if(mMainFragmentViewModel.selectMode.value == true){
                 showSideContentSelectionMenu()
             }
         }
     }
     private fun showSideContentSelectionMenu(animate: Boolean = true) {
-        mDataBidingView?.let { dataBidingView ->
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUp(
+        mDataBiding?.let { dataBidingView ->
+            Animators.crossFadeUp(
                 dataBidingView.includeSideSelectionMenu.relativeContainer as View,
                 animate,
                 50
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeUp(
+            Animators.crossFadeUp(
                 dataBidingView.includeSideSelectionMenu.cardViewContainer as View,
                 animate,
                 200
@@ -149,13 +142,13 @@ import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
         }
     }
     private fun hideSideContentSelectionMenu(animate: Boolean = true) {
-        mDataBidingView?.let { dataBidingView ->
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDown(
+        mDataBiding?.let { dataBidingView ->
+            Animators.crossFadeDown(
                 dataBidingView.includeSideSelectionMenu.relativeContainer as View,
                 animate,
                 25
             )
-            com.prosabdev.common.utils.AnimatorsUtils.crossFadeDown(
+            Animators.crossFadeDown(
                 dataBidingView.includeSideSelectionMenu.cardViewContainer as View,
                 animate,
                 100
@@ -163,7 +156,7 @@ import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
         }
     }
     private  fun updateTotalSelectedItemsUI(totalSelected : Int){
-        mDataBidingView?.let { dataBidingView ->
+        mDataBiding?.let { dataBidingView ->
             if (totalSelected > 0) {
                 enableSideSelectionActions(dataBidingView.includeSideSelectionMenu.buttonPlayAfter)
                 enableSideSelectionActions(dataBidingView.includeSideSelectionMenu.buttonPlaylistAdd)
@@ -180,30 +173,30 @@ import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
         }
     }
     private fun disableSideSelectionActions(view : View) {
-        com.prosabdev.common.utils.AnimatorsUtils.crossFadeDownClickable(
+        Animators.crossFadeDownClickable(
             view,
             true
         )
     }
     private fun enableSideSelectionActions(view : View) {
-        com.prosabdev.common.utils.AnimatorsUtils.crossFadeUpClickable(
+        Animators.crossFadeUpClickable(
             view,
             true
         )
     }
 
     private fun updateSelectModeUI(isSelectMode: Boolean, animate : Boolean = true){
-        mDataBidingView?.let { dataBidingView ->
+        mDataBiding?.let { dataBidingView ->
             if (isSelectMode) {
                 dataBidingView.viewPager.isUserInputEnabled = false
-                com.prosabdev.common.utils.AnimatorsUtils.crossTranslateInFromHorizontal(
+                Animators.crossTranslateInFromHorizontal(
                     dataBidingView.sideSelectionMenuContainer as View,
                     animate,
                     200
                 )
             } else {
                 dataBidingView.viewPager.isUserInputEnabled = true
-                com.prosabdev.common.utils.AnimatorsUtils.crossTranslateOutFromHorizontal(
+                Animators.crossTranslateOutFromHorizontal(
                     dataBidingView.sideSelectionMenuContainer as View,
                     1,
                     animate,
@@ -215,7 +208,7 @@ import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
     }
 
     private fun checkInteractions() {
-        mDataBidingView?.let { dataBidingView ->
+        mDataBiding?.let { dataBidingView ->
             dataBidingView.topAppBar.setNavigationOnClickListener {
                 mMainFragmentViewModel.setShowDrawerMenuCounter()
             }
@@ -229,9 +222,9 @@ import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
                 ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
-                    updateViewModelLibraryPage(position)
-                    mMainFragmentViewModel.setSelectMode(false)
-                    mMainFragmentViewModel.setSelectedDataList(HashMap())
+                    updateViewModelLibraryPage()
+                    mMainFragmentViewModel.selectMode.value = false
+                    mMainFragmentViewModel.selectedDataList.value = HashMap()
                     updateSelectModeUI(false)
                     applyAppBarTitle(position)
                 }
@@ -254,39 +247,38 @@ import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
         }
     }
     private fun openTagEditorFragment() {
-
         startActivity(Intent(context, EditTagsActivity::class.java).apply {})
-//        activity?.let {
-//            it.supportFragmentManager.commit {
-//                setReorderingAllowed(true)
-//                replace(
-//                    R.id.main_activity_fragment_container,
-//                    EditTagsFragment.newInstance(
-//                        null,
-//                        null,
-//                        null
-//                    ),
-//                    EditTagsFragment.TAG
-//                )
-//                addToBackStack(null)
-//            }
-//        }
+        activity?.let {
+            it.supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                replace(
+                    R.id.main_activity_fragment_container,
+                    EditTagsFragment.newInstance(
+                        null,
+                        null,
+                        null
+                    ),
+                    EditTagsFragment.TAG
+                )
+                addToBackStack(null)
+            }
+        }
     }
     private fun openPlaylistAddDialog() {
         //
     }
 
-    private fun updateViewModelLibraryPage(position: Int) {
-        mMainFragmentViewModel.setTotalCount(0)
-        mMainFragmentViewModel.setSelectedDataList(HashMap())
-        mMainFragmentViewModel.setSelectMode(false)
+    private fun updateViewModelLibraryPage() {
+        mMainFragmentViewModel.totalCount.value = 0
+        mMainFragmentViewModel.selectedDataList.value = HashMap()
+        mMainFragmentViewModel.selectMode.value = false
     }
 
     private fun openShareSelectionDialog() {
         context?.let { ctx ->
             val dialogShareSongBinding : DialogShareSongBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_share_song, null, false)
             dialogShareSongBinding.buttonShareScreenshot.isEnabled =
-                (mMainFragmentViewModel.getSelectedDataList().value?.size ?: 0) <= 1
+                (mMainFragmentViewModel.selectedDataList.value?.size ?: 0) <= 1
             dialogShareSongBinding.buttonShareFile.setOnClickListener {
                 shareSelectedFiles()
             }
@@ -327,8 +319,8 @@ import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
             .show()
     }
     private fun deleteSelection() {
-        val modelTypeInfo = CommonPlaybackAction.getModelTypeInfo(mMainFragmentViewModel)
-        val dataList = mMainFragmentViewModel.getSelectedDataList().value ?: return
+        val modelTypeInfo = PlaybackActions.getModelTypeInfo(mMainFragmentViewModel)
+        val dataList = mMainFragmentViewModel.selectedDataList.value ?: return
         mSongActionsWorkerViewModel.deleteSongs(
             modelTypeInfo[0],
             dataList.values,
@@ -359,11 +351,11 @@ import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
     }
 
     private fun addSelectionToBottomOfQueueMusic() {
-        val modelTypeInfo = CommonPlaybackAction.getModelTypeInfo(mMainFragmentViewModel)
-        val dataList = mMainFragmentViewModel.getSelectedDataList().value ?: return
+        val modelTypeInfo = PlaybackActions.getModelTypeInfo(mMainFragmentViewModel)
+        val dataList = mMainFragmentViewModel.selectedDataList.value ?: return
         mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
             modelTypeInfo[0],
-            com.prosabdev.common.workers.queuemusic.AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_BOTTOM,
+            AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_BOTTOM,
             -1,
             dataList.values,
             modelTypeInfo[1],
@@ -372,13 +364,13 @@ import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
     }
 
     private fun addSelectionToPlayNextOfQueueMusic() {
-        val modelTypeInfo = CommonPlaybackAction.getModelTypeInfo(mMainFragmentViewModel)
-        val dataList = mMainFragmentViewModel.getSelectedDataList().value ?: return
-        val currentPlayingPosition = mNowPlayingFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
+        val modelTypeInfo = PlaybackActions.getModelTypeInfo(mMainFragmentViewModel)
+        val dataList = mMainFragmentViewModel.selectedDataList.value ?: return
+        val currentPlayingIndex = mNowPlayingFragmentViewModel.playbackState.value?.position ?: 0
         mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
             modelTypeInfo[0],
-            com.prosabdev.common.workers.queuemusic.AddSongsToQueueMusicWorker.ADD_METHOD_ADD_AT_POSITION,
-            currentPlayingPosition,
+            AddSongsToQueueMusicWorker.ADD_METHOD_ADD_AT_POSITION,
+            currentPlayingIndex,
             dataList.values,
             modelTypeInfo[1],
             modelTypeInfo[2]
@@ -386,11 +378,11 @@ import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
     }
 
     private fun addSelectionToTopOfQueueMusic() {
-        val modelTypeInfo = CommonPlaybackAction.getModelTypeInfo(mMainFragmentViewModel)
-        val dataList = mMainFragmentViewModel.getSelectedDataList().value ?: return
+        val modelTypeInfo = PlaybackActions.getModelTypeInfo(mMainFragmentViewModel)
+        val dataList = mMainFragmentViewModel.selectedDataList.value ?: return
         mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
             modelTypeInfo[0],
-            com.prosabdev.common.workers.queuemusic.AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_TOP,
+            AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_TOP,
             0,
             dataList.values,
             modelTypeInfo[1],
@@ -399,7 +391,7 @@ import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
     }
 
     private fun applyAppBarTitle(position: Int) {
-        mDataBidingView?.let { dataBidingView ->
+        mDataBiding?.let { dataBidingView ->
             when (position) {
                 0->{
                     dataBidingView.topAppBar.title = getString(R.string.songs)
@@ -430,8 +422,8 @@ import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
     }
 
     private fun initViews() {
-        mDataBidingView?.let { dataBidingView ->
-            com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(dataBidingView.coordinatorLayout)
+        mDataBiding?.let { dataBidingView ->
+            InsetModifiers.updateTopViewInsets(dataBidingView.coordinatorLayout)
         }
     }
 

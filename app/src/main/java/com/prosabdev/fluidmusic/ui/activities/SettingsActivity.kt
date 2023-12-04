@@ -9,6 +9,7 @@ import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.color.DynamicColors
+import com.prosabdev.common.utils.InsetModifiers
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivitySettingsBinding
 import com.prosabdev.fluidmusic.ui.activities.settings.InterfaceSettingsActivity
@@ -17,19 +18,24 @@ import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActiv
 
 @BuildCompat.PrereleaseSdkCheck class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var mDataBidingView : ActivitySettingsBinding
+    private lateinit var mDataBiding : ActivitySettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //Apply UI settings and dynamics colors
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        mDataBidingView = DataBindingUtil.setContentView(this, R.layout.activity_settings)
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.setContentView(this, R.layout.activity_settings)
 
-        initViews()
-        checkInteractions()
-        registerOnBackPressedCallback()
+        //Load your UI content
+        if(savedInstanceState == null){
+            initViews()
+            checkInteractions()
+            registerOnBackPressedCallback()
+        }
     }
 
     private fun registerOnBackPressedCallback() {
@@ -49,11 +55,11 @@ import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActiv
     }
 
     private fun checkInteractions() {
-        mDataBidingView.topAppBar.setNavigationOnClickListener {
+        mDataBiding.topAppBar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        mDataBidingView.topAppBar.setOnMenuItemClickListener { menuItem ->
+        mDataBiding.topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.search -> {
                     //
@@ -62,38 +68,38 @@ import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActiv
                 else -> false
             }
         }
-        mDataBidingView.cardViewLanguage.setOnClickListener{
+        mDataBiding.cardViewLanguage.setOnClickListener{
             startActivity(Intent(this, LanguageSettingsActivity::class.java).apply {})
         }
-        mDataBidingView.cardViewInterface.setOnClickListener{
+        mDataBiding.cardViewInterface.setOnClickListener{
             startActivity(Intent(this, InterfaceSettingsActivity::class.java).apply {})
         }
-        mDataBidingView.cardViewCoverArt.setOnClickListener{
+        mDataBiding.cardViewCoverArt.setOnClickListener{
             //
         }
-        mDataBidingView.cardViewNowPlaying.setOnClickListener{
+        mDataBiding.cardViewNowPlaying.setOnClickListener{
             //
         }
-        mDataBidingView.cardViewAudio.setOnClickListener{
+        mDataBiding.cardViewAudio.setOnClickListener{
             //
         }
-        mDataBidingView.cardViewNotifications.setOnClickListener{
+        mDataBiding.cardViewNotifications.setOnClickListener{
             //
         }
-        mDataBidingView.cardViewLibraryScanner.setOnClickListener{
+        mDataBiding.cardViewLibraryScanner.setOnClickListener{
             startActivity(Intent(this, MediaScannerSettingsActivity::class.java).apply {})
         }
-        mDataBidingView.cardViewHeadsetBluetooth.setOnClickListener{
+        mDataBiding.cardViewHeadsetBluetooth.setOnClickListener{
             //
         }
-        mDataBidingView.cardViewAbout.setOnClickListener{
+        mDataBiding.cardViewAbout.setOnClickListener{
             //
         }
     }
 
     private fun initViews() {
-        com.prosabdev.common.utils.InsetModifiersUtils.updateTopViewInsets(mDataBidingView.coordinatorLayout)
-        com.prosabdev.common.utils.InsetModifiersUtils.updateBottomViewInsets(mDataBidingView.container)
+        InsetModifiers.updateTopViewInsets(mDataBiding.coordinatorLayout)
+        InsetModifiers.updateBottomViewInsets(mDataBiding.container)
     }
 
     companion object {

@@ -1,31 +1,30 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.content.Intent
+import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.media.session.PlaybackStateCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.os.BuildCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.slider.Slider
 import com.google.android.material.slider.Slider.OnSliderTouchListener
 import com.prosabdev.common.models.songitem.SongItem
-import com.prosabdev.common.sharedprefs.SharedPreferenceManagerUtils
-import com.prosabdev.common.sharedprefs.models.SleepTimerSP
-import com.prosabdev.common.sharedprefs.models.SortOrganizeItemSP
+import com.prosabdev.common.persistence.PersistentStorage
+import com.prosabdev.common.persistence.models.SleepTimerSP
+import com.prosabdev.common.persistence.models.SortOrganizeItemSP
 import com.prosabdev.common.utils.*
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.adapters.PlayerPageAdapter
+import com.prosabdev.fluidmusic.adapters.PlayingNowPageAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentNowPlayingBinding
 import com.prosabdev.fluidmusic.ui.activities.EqualizerActivity
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
@@ -40,13 +39,13 @@ import com.prosabdev.fluidmusic.viewmodels.fragments.explore.*
 import com.prosabdev.fluidmusic.viewmodels.models.SongItemViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.explore.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
-@BuildCompat.PrereleaseSdkCheck class NowPlayingFragment : Fragment() {
+class NowPlayingFragment : Fragment() {
 
-    private var mDataBidingView: FragmentNowPlayingBinding? = null
+    private var mDataBiding: FragmentNowPlayingBinding? = null
 
     private val mSongItemViewModel: SongItemViewModel by activityViewModels()
 
@@ -68,108 +67,87 @@ import kotlinx.coroutines.withContext
     private var mQueueMusicBottomSheetDialog: QueueMusicBottomSheetDialog = QueueMusicBottomSheetDialog.newInstance()
     private var mPlayerMoreBottomSheetDialog: PlayerMoreFullBottomSheetDialog = PlayerMoreFullBottomSheetDialog.newInstance()
 
-    private var mPlayerPagerAdapter: PlayerPageAdapter? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if(savedInstanceState == null){
-            loadLastPlayerSession()
-        }
-
-        arguments?.let {
-        }
-    }
+    private var mPlayingNowPageAdapter: PlayingNowPageAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mDataBidingView = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_now_playing,
-            container,
-            false
-        )
-        val view = mDataBidingView?.root
 
-        initViews()
-        setupViewPagerAdapter()
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.inflate(inflater,R.layout.fragment_now_playing, container,false)
+        val view = mDataBiding?.root
+
+        //Load your UI content
+        runBlocking {
+            loadLastPlayerSession()
+            initViews()
+            setupViewPagerAdapter()
+            checkInteractions()
+            observeLiveData()
+        }
+
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        checkInteractions()
-        observeLiveData()
-    }
-
     override fun onDestroy() {
-        saveCurrentPlayingSession()
+        lifecycleScope.launch {
+            saveCurrentPlayingSession()
+        }
         super.onDestroy()
     }
 
-    private fun saveCurrentPlayingSession() {
+    private suspend fun saveCurrentPlayingSession() {
         context?.let { ctx ->
-            SharedPreferenceManagerUtils.Player.saveCurrentPlayingSong(
-                ctx,
-                mNowPlayingFragmentViewModel.getCurrentPlayingSong().value
+            PersistentStorage.PlayingNow.saveRecentSong(
+                mNowPlayingFragmentViewModel.mediaDescription.value, 0
             )
-            SharedPreferenceManagerUtils.Player.savePlayingProgressValue(
-                ctx,
+            PersistentStorage.PlayingNow.savePlayingProgressValue(
                 mNowPlayingFragmentViewModel.getPlayingProgressValue().value
             )
-            SharedPreferenceManagerUtils.Player.saveQueueListSource(
-                ctx,
+            PersistentStorage.PlayingNow.saveQueueListSource(
                 mNowPlayingFragmentViewModel.getQueueListSource().value
             )
-            SharedPreferenceManagerUtils.Player.saveQueueListSourceColumnIndex(
-                ctx,
+            PersistentStorage.PlayingNow.saveQueueListSourceColumnIndex(
                 mNowPlayingFragmentViewModel.getQueueListSourceColumnIndex().value
             )
-            SharedPreferenceManagerUtils.Player.saveQueueListSourceColumnValue(
-                ctx,
+            PersistentStorage.PlayingNow.saveQueueListSourceColumnValue(
                 mNowPlayingFragmentViewModel.getQueueListSourceColumnValue().value
             )
-            SharedPreferenceManagerUtils.Player.saveRepeat(
-                ctx,
+            PersistentStorage.PlayingNow.saveRepeat(
                 mNowPlayingFragmentViewModel.getRepeat().value
             )
-            SharedPreferenceManagerUtils.Player.saveShuffle(
-                ctx,
+            PersistentStorage.PlayingNow.saveShuffle(
                 mNowPlayingFragmentViewModel.getShuffle().value
             )
-            SharedPreferenceManagerUtils.Player.saveSleepTimer(
-                ctx,
+            PersistentStorage.PlayingNow.saveSleepTimer(
                 mNowPlayingFragmentViewModel.getSleepTimer().value
             )
             val sortOrganize = SortOrganizeItemSP()
             sortOrganize.sortOrderBy = mNowPlayingFragmentViewModel.getSortBy().value ?: SORT_LIST_GRID_DEFAULT_VALUE
             sortOrganize.isInvertSort = mNowPlayingFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
-            SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.saveSortOrganizeItemsFor(
-                ctx,
-                SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SORT_ORGANIZE_PLAYER_QUEUE_MUSIC,
+            PersistentStorage.SortAnOrganizeForExploreContents.saveSortOrganizeItemsFor(
+                PersistentStorage.SortAnOrganizeForExploreContents.SORT_ORGANIZE_PLAYER_QUEUE_MUSIC,
                 sortOrganize
             )
         }
     }
 
-    private fun loadLastPlayerSession() {
+    private suspend fun loadLastPlayerSession() {
         context?.let { ctx ->
-            val sortOrganize: SortOrganizeItemSP? = SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents
+            val sortOrganize: SortOrganizeItemSP? = PersistentStorage.SortAnOrganizeForExploreContents
                 .loadSortOrganizeItemsFor(
-                    ctx,
-                    SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SORT_ORGANIZE_PLAYER_QUEUE_MUSIC
+                    PersistentStorage.SortAnOrganizeForExploreContents.SORT_ORGANIZE_PLAYER_QUEUE_MUSIC
                 )
-            val queueListSource: String? = SharedPreferenceManagerUtils.Player.loadQueueListSource(ctx, null)
-            val queueListSourceColumnIndex: String? = SharedPreferenceManagerUtils.Player.loadQueueListSourceColumnIndex(ctx)
-            val queueListSourceColumnValue: String? = SharedPreferenceManagerUtils.Player.loadQueueListSourceColumnValue(ctx)
+            val queueListSource: String? = PersistentStorage.PlayingNow.loadQueueListSource(null)
+            val queueListSourceColumnIndex: String? = PersistentStorage.PlayingNow.loadQueueListSourceColumnIndex()
+            val queueListSourceColumnValue: String? = PersistentStorage.PlayingNow.loadQueueListSourceColumnValue()
 
-            mNowPlayingFragmentViewModel.setQueueListSource(queueListSource ?: AllSongsFragment.TAG)
-            mNowPlayingFragmentViewModel.setQueueListSourceColumnIndex(queueListSourceColumnIndex)
-            mNowPlayingFragmentViewModel.setQueueListSourceColumnValue(queueListSourceColumnValue)
-            mNowPlayingFragmentViewModel.setSortBy(sortOrganize?.sortOrderBy ?: SORT_LIST_GRID_DEFAULT_VALUE)
-            mNowPlayingFragmentViewModel.setIsInverted(sortOrganize?.isInvertSort ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE)
+            mNowPlayingFragmentViewModel.queueListSource.value = queueListSource ?: AllSongsFragment.TAG
+            mNowPlayingFragmentViewModel.queueListSourceColumnIndex.value = queueListSourceColumnIndex
+            mNowPlayingFragmentViewModel.queueListSourceColumnValue.value = queueListSourceColumnValue
+            mNowPlayingFragmentViewModel.sortBy.value = sortOrganize?.sortOrderBy ?: SORT_LIST_GRID_DEFAULT_VALUE
+            mNowPlayingFragmentViewModel.isInverted. value = sortOrganize?.isInvertSort ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
 
             loadDirectlyQueueMusicListFromDatabase(
                 sortOrganize?.sortOrderBy ?: SORT_LIST_GRID_DEFAULT_VALUE,
@@ -178,34 +156,28 @@ import kotlinx.coroutines.withContext
                 queueListSourceColumnIndex,
                 queueListSourceColumnValue
             )
-            val songItem: SongItem? = SharedPreferenceManagerUtils.Player.loadCurrentPlayingSong(ctx)
-            val progressValue: Long = SharedPreferenceManagerUtils.Player.loadPlayingProgressValue(ctx)
-            val repeat: Int = SharedPreferenceManagerUtils.Player.loadRepeat(ctx)
-            val shuffle: Int = SharedPreferenceManagerUtils.Player.loadShuffle(ctx)
-            val sleepTimer: SleepTimerSP? = SharedPreferenceManagerUtils.Player.loadSleepTimer(ctx)
+            val songItem: SongItem? = PersistentStorage.PlayingNow.loadRecentSong()
+            val progressValue: Long = PersistentStorage.PlayingNow.loadPlayingProgressValue()
+            val repeat: Int = PersistentStorage.PlayingNow.loadRepeat()
+            val shuffle: Int = PersistentStorage.PlayingNow.loadShuffle()
+            val sleepTimer: SleepTimerSP? = PersistentStorage.PlayingNow.loadSleepTimer()
 
             if(songItem?.uri == null){
-                MainScope().launch {
-                    tryToGetFirstSong()
-                }
+                tryToGetFirstSong()
             }else{
-                MainScope().launch {
-                    val tempSongItem : SongItem? =
-                        mSongItemViewModel.getAtUri(songItem.uri)
-                    if(tempSongItem?.uri == null){
-                        MainScope().launch {
-                            tryToGetFirstSong()
-                        }
-                    }else{
-                        tempSongItem.position = songItem.position
-                        mNowPlayingFragmentViewModel.setCurrentPlayingSong(tempSongItem)
-                        mNowPlayingFragmentViewModel.setPlayingProgressValue(progressValue)
-                        mNowPlayingFragmentViewModel.setIsPlaying(false)
-                        mNowPlayingFragmentViewModel.setRepeat(repeat)
-                        mNowPlayingFragmentViewModel.setShuffle(shuffle)
-                        mNowPlayingFragmentViewModel.setSleepTimer(sleepTimer)
-                        mNowPlayingFragmentViewModel.setSleepTimerStateStarted(false)
-                    }
+                val tempSongItem : SongItem? =
+                    mSongItemViewModel.getAtUri(songItem.uri)
+                if(tempSongItem?.uri == null){
+                    tryToGetFirstSong()
+                }else{
+                    tempSongItem.position = songItem.position
+                    mNowPlayingFragmentViewModel.setCurrentPlayingSong(tempSongItem)
+                    mNowPlayingFragmentViewModel.setPlayingProgressValue(progressValue)
+                    mNowPlayingFragmentViewModel.setIsPlaying(false)
+                    mNowPlayingFragmentViewModel.setRepeatMode(repeat)
+                    mNowPlayingFragmentViewModel.setShuffleMode(shuffle)
+                    mNowPlayingFragmentViewModel.setSleepTimer(sleepTimer)
+                    mNowPlayingFragmentViewModel.setSleepTimerStateStarted(false)
                 }
             }
         }
@@ -214,29 +186,26 @@ import kotlinx.coroutines.withContext
         context?.let { ctx ->
             withContext(Dispatchers.IO) {
                 mSongItemViewModel.getFirstSong().apply {
-                    SharedPreferenceManagerUtils.Player.saveQueueListSource(
-                        ctx,
+                    PersistentStorage.PlayingNow.saveQueueListSource(
                         AllSongsFragment.TAG
                     )
-                    SharedPreferenceManagerUtils.Player.saveQueueListSourceColumnIndex(ctx, null)
-                    SharedPreferenceManagerUtils.Player.saveQueueListSourceColumnValue(ctx, null)
-                    SharedPreferenceManagerUtils.Player.saveRepeat(
-                        ctx,
-                        PlaybackStateCompat.REPEAT_MODE_NONE
+                    PersistentStorage.PlayingNow.saveQueueListSourceColumnIndex(null)
+                    PersistentStorage.PlayingNow.saveQueueListSourceColumnValue(null)
+                    PersistentStorage.PlayingNow.saveRepeat(
+                        PlaybackState.REPEAT_MODE_NONE
                     )
-                    SharedPreferenceManagerUtils.Player.saveShuffle(
-                        ctx,
-                        PlaybackStateCompat.SHUFFLE_MODE_NONE
+                    PersistentStorage.PlayingNow.saveShuffle(
+                        PlaybackState.SHUFFLE_MODE_NONE
                     )
-                    SharedPreferenceManagerUtils.Player.saveSleepTimer(ctx, null)
-                    SharedPreferenceManagerUtils.Player.savePlayingProgressValue(ctx, 0)
+                    PersistentStorage.PlayingNow.saveSleepTimer(ctx, null)
+                    PersistentStorage.PlayingNow.savePlayingProgressValue(ctx, 0)
 
                     if (this@apply?.uri == null) {
                         mNowPlayingFragmentViewModel.setCurrentPlayingSong(null)
-                        SharedPreferenceManagerUtils.Player.saveCurrentPlayingSong(ctx, null)
+                        PersistentStorage.PlayingNow.saveCurrentPlayingSong(null)
                     } else {
                         mNowPlayingFragmentViewModel.setCurrentPlayingSong(this@apply)
-                        SharedPreferenceManagerUtils.Player.saveCurrentPlayingSong(ctx, this@apply)
+                        PersistentStorage.PlayingNow.saveCurrentPlayingSong(this@apply)
                     }
                 }
             }
@@ -251,16 +220,14 @@ import kotlinx.coroutines.withContext
     ) {
         when (queueListSource) {
             AllSongsFragment.TAG -> {
-                MainScope().launch {
-                    val songList = mSongItemViewModel.getAllDirectly(sortOrderBy)
-                    updateEmptyListUI(songList?.size ?: 0)
-                    mPlayerPagerAdapter?.submitList(
-                        if(isInvertSort) songList?.reversed() else songList
-                    )
-                    mQueueMusicBottomSheetDialog.updateQueueMusicList(
-                        if(isInvertSort) songList?.reversed() else songList
-                    )
-                }
+                val songList = mSongItemViewModel.getAllDirectly(sortOrderBy)
+                updateEmptyListUI(songList?.size ?: 0)
+                mPlayingNowPageAdapter?.submitList(
+                    if(isInvertSort) songList?.reversed() else songList
+                )
+                mQueueMusicBottomSheetDialog.updateQueueMusicList(
+                    if(isInvertSort) songList?.reversed() else songList
+                )
             }
             FoldersHierarchyFragment.TAG -> {
                 //
@@ -272,32 +239,28 @@ import kotlinx.coroutines.withContext
                 //
             }
             else -> {
-                MainScope().launch {
-                    val songList = mSongItemViewModel.getAllDirectlyWhereEqual(
-                        queueListSourceColumnIndex,
-                        queueListSourceColumnValue,
-                        sortOrderBy
-                    )
-                    updateEmptyListUI(songList?.size ?: 0)
-                    mPlayerPagerAdapter?.submitList(
-                        if(isInvertSort) songList?.reversed() else songList
-                    )
-                    mQueueMusicBottomSheetDialog.updateQueueMusicList(
-                        if(isInvertSort) songList?.reversed() else songList
-                    )
-                }
+                val songList = mSongItemViewModel.getAllDirectlyWhereEqual(
+                    queueListSourceColumnIndex,
+                    queueListSourceColumnValue,
+                    sortOrderBy
+                )
+                updateEmptyListUI(songList?.size ?: 0)
+                mPlayingNowPageAdapter?.submitList(
+                    if(isInvertSort) songList?.reversed() else songList
+                )
+                mQueueMusicBottomSheetDialog.updateQueueMusicList(
+                    if(isInvertSort) songList?.reversed() else songList
+                )
             }
         }
     }
 
     private fun updateEmptyListUI(size: Int) {
-        mDataBidingView?.let { dataBidingView ->
-            MainScope().launch {
-                if(size > 0){
-                    dataBidingView.linearRescanDeviceContainer.visibility = GONE
-                }else{
-                    dataBidingView.linearRescanDeviceContainer.visibility = VISIBLE
-                }
+        mDataBiding?.let { dataBidingView ->
+            if(size > 0){
+                dataBidingView.linearRescanDeviceContainer.visibility = GONE
+            }else{
+                dataBidingView.linearRescanDeviceContainer.visibility = VISIBLE
             }
         }
     }
@@ -345,21 +308,21 @@ import kotlinx.coroutines.withContext
 
     private fun tryToShuffleSongFromRequest(requestCounter: Int?) {
         if (requestCounter == null || requestCounter <= 0) return
-        if((mPlayerPagerAdapter?.currentList?.size ?: 0) <= 0) return
-        val tempSongPosition = MathComputationsUtils.randomExcluded(mDataBidingView?.viewPagerPlayer?.currentItem ?: -1, mPlayerPagerAdapter?.itemCount ?: 0)
-        if(tempSongPosition >= (mPlayerPagerAdapter?.itemCount ?: 0) || tempSongPosition < 0)return
+        if((mPlayingNowPageAdapter?.currentList?.size ?: 0) <= 0) return
+        val tempSongPosition = MathComputations.randomExcluded(mDataBiding?.viewPagerPlayer?.currentItem ?: -1, mPlayingNowPageAdapter?.itemCount ?: 0)
+        if(tempSongPosition >= (mPlayingNowPageAdapter?.itemCount ?: 0) || tempSongPosition < 0)return
         val tempSongItem : SongItem = getCurrentPlayingSongFromPosition((tempSongPosition))
             ?: return
         mNowPlayingFragmentViewModel.setPlayingProgressValue(0)
-        mNowPlayingFragmentViewModel.setShuffle(PlaybackStateCompat.SHUFFLE_MODE_ALL)
-        mNowPlayingFragmentViewModel.setRepeat(PlaybackStateCompat.REPEAT_MODE_NONE)
+        mNowPlayingFragmentViewModel.setShuffle(PlaybackState.SHUFFLE_MODE_ALL)
+        mNowPlayingFragmentViewModel.setRepeat(PlaybackState.REPEAT_MODE_NONE)
         mNowPlayingFragmentViewModel.setCurrentPlayingSong(tempSongItem)
     }
-    private fun tryToPlaySongAtFromRequest(playSongAtRequest: com.prosabdev.common.models.PlaySongAtRequest?) {
+    private fun tryToPlaySongAtFromRequest(playSongAtRequest: PlaySongAtRequest?) {
         if (playSongAtRequest == null) return
-        if(playSongAtRequest.position < 0 || playSongAtRequest.position > (mPlayerPagerAdapter?.currentList?.size ?: 0)) return
+        if(playSongAtRequest.position < 0 || playSongAtRequest.position > (mPlayingNowPageAdapter?.currentList?.size ?: 0)) return
 
-        val tempCurrentSongRequest = mPlayerPagerAdapter?.currentList?.get(playSongAtRequest.position)
+        val tempCurrentSongRequest = mPlayingNowPageAdapter?.currentList?.get(playSongAtRequest.position)
         if(tempCurrentSongRequest != null){
             tempCurrentSongRequest.position = playSongAtRequest.position
             val tempShuffle : Int = if(playSongAtRequest.shuffle != null && (playSongAtRequest.shuffle ?: -1) >= 0) playSongAtRequest.shuffle ?: -1 else -1
@@ -376,25 +339,23 @@ import kotlinx.coroutines.withContext
     }
 
     private fun updatePlayListData() {
-        MainScope().launch {
-            val queueListSource: String = mNowPlayingFragmentViewModel.getQueueListSource().value ?: AllSongsFragment.TAG
-            val tempIsInverted : Boolean = mNowPlayingFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
-            val songList = getNewSongsForSource(queueListSource)
-            //Update UI
-            updateEmptyListUI(songList.size)
-            mPlayerPagerAdapter?.submitList(
-                if(tempIsInverted)
-                    songList.reversed() as List<SongItem>?
-                else
-                    songList as List<SongItem>?
-            )
-            mQueueMusicBottomSheetDialog.updateQueueMusicList(
-                if(tempIsInverted)
-                    songList.reversed() as List<SongItem>?
-                else
-                    songList as List<SongItem>?
-            )
-        }
+        val queueListSource: String = mNowPlayingFragmentViewModel.getQueueListSource().value ?: AllSongsFragment.TAG
+        val tempIsInverted : Boolean = mNowPlayingFragmentViewModel.getIsInverted().value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
+        val songList = getNewSongsForSource(queueListSource)
+        //Update UI
+        updateEmptyListUI(songList.size)
+        mPlayingNowPageAdapter?.submitList(
+            if(tempIsInverted)
+                songList.reversed() as List<SongItem>?
+            else
+                songList as List<SongItem>?
+        )
+        mQueueMusicBottomSheetDialog.updateQueueMusicList(
+            if(tempIsInverted)
+                songList.reversed() as List<SongItem>?
+            else
+                songList as List<SongItem>?
+        )
     }
 
     private suspend fun getNewSongsForSource(queueListSource: String): List<Any> {
@@ -430,8 +391,8 @@ import kotlinx.coroutines.withContext
                             for (i in dataList.indices){
                                 val tempNewSongs: List<SongItem>? =
                                     mSongItemViewModel.getAllDirectlyWhereEqual(
-                                        com.prosabdev.common.models.view.AlbumArtistItem.INDEX_COLUM_TO_SONG_ITEM,
-                                        (dataList[i] as com.prosabdev.common.models.view.AlbumArtistItem).name,
+                                        view.AlbumArtistItem.INDEX_COLUM_TO_SONG_ITEM,
+                                        (dataList[i] as view.AlbumArtistItem).name,
                                         SongItem.DEFAULT_INDEX
                                     )
                                 tempNewSongs?.let {
@@ -445,8 +406,8 @@ import kotlinx.coroutines.withContext
                             for (i in dataList.indices){
                                 val tempNewSongs: List<SongItem>? =
                                     mSongItemViewModel.getAllDirectlyWhereEqual(
-                                        com.prosabdev.common.models.view.AlbumItem.INDEX_COLUM_TO_SONG_ITEM,
-                                        (dataList[i] as com.prosabdev.common.models.view.AlbumItem).name,
+                                        view.AlbumItem.INDEX_COLUM_TO_SONG_ITEM,
+                                        (dataList[i] as view.AlbumItem).name,
                                         SongItem.DEFAULT_INDEX
                                     )
                                 tempNewSongs?.let {
@@ -460,8 +421,8 @@ import kotlinx.coroutines.withContext
                             for (i in dataList.indices){
                                 val tempNewSongs: List<SongItem>? =
                                     mSongItemViewModel.getAllDirectlyWhereEqual(
-                                        com.prosabdev.common.models.view.ArtistItem.INDEX_COLUM_TO_SONG_ITEM,
-                                        (dataList[i] as com.prosabdev.common.models.view.ArtistItem).name,
+                                        view.ArtistItem.INDEX_COLUM_TO_SONG_ITEM,
+                                        (dataList[i] as view.ArtistItem).name,
                                         SongItem.DEFAULT_INDEX
                                     )
                                 tempNewSongs?.let {
@@ -475,8 +436,8 @@ import kotlinx.coroutines.withContext
                             for (i in dataList.indices){
                                 val tempNewSongs: List<SongItem>? =
                                     mSongItemViewModel.getAllDirectlyWhereEqual(
-                                        com.prosabdev.common.models.view.ComposerItem.INDEX_COLUM_TO_SONG_ITEM,
-                                        (dataList[i] as com.prosabdev.common.models.view.ComposerItem).name,
+                                        view.ComposerItem.INDEX_COLUM_TO_SONG_ITEM,
+                                        (dataList[i] as view.ComposerItem).name,
                                         SongItem.DEFAULT_INDEX
                                     )
                                 tempNewSongs?.let {
@@ -490,8 +451,8 @@ import kotlinx.coroutines.withContext
                             for (i in dataList.indices){
                                 val tempNewSongs: List<SongItem>? =
                                     mSongItemViewModel.getAllDirectlyWhereEqual(
-                                        com.prosabdev.common.models.view.FolderItem.INDEX_COLUM_TO_SONG_ITEM,
-                                        (dataList[i] as com.prosabdev.common.models.view.FolderItem).name,
+                                        view.FolderItem.INDEX_COLUM_TO_SONG_ITEM,
+                                        (dataList[i] as view.FolderItem).name,
                                         SongItem.DEFAULT_INDEX
                                     )
                                 tempNewSongs?.let {
@@ -505,8 +466,8 @@ import kotlinx.coroutines.withContext
                             for (i in dataList.indices){
                                 val tempNewSongs: List<SongItem>? =
                                     mSongItemViewModel.getAllDirectlyWhereEqual(
-                                        com.prosabdev.common.models.view.GenreItem.INDEX_COLUM_TO_SONG_ITEM,
-                                        (dataList[i] as com.prosabdev.common.models.view.GenreItem).name,
+                                        view.GenreItem.INDEX_COLUM_TO_SONG_ITEM,
+                                        (dataList[i] as view.GenreItem).name,
                                         SongItem.DEFAULT_INDEX
                                     )
                                 tempNewSongs?.let {
@@ -520,8 +481,8 @@ import kotlinx.coroutines.withContext
                             for (i in dataList.indices){
                                 val tempNewSongs: List<SongItem>? =
                                     mSongItemViewModel.getAllDirectlyWhereEqual(
-                                        com.prosabdev.common.models.view.YearItem.INDEX_COLUM_TO_SONG_ITEM,
-                                        (dataList[i] as com.prosabdev.common.models.view.YearItem).name,
+                                        view.YearItem.INDEX_COLUM_TO_SONG_ITEM,
+                                        (dataList[i] as view.YearItem).name,
                                         SongItem.DEFAULT_INDEX
                                     )
                                 tempNewSongs?.let {
@@ -545,78 +506,70 @@ import kotlinx.coroutines.withContext
         onNextPageButtonClicked()
     }
     private fun updateRepeatUI(repeat: Int?) {
-        mDataBidingView?.let { dataBidingView ->
-            MainScope().launch {
-                context?.let {
-                    when (repeat) {
-                        PlaybackStateCompat.REPEAT_MODE_ALL -> {
-                            dataBidingView.buttonRepeat.alpha = 1.0f
-                            dataBidingView.buttonRepeat.icon =
-                                ContextCompat.getDrawable(it, R.drawable.repeat)
-                        }
-                        PlaybackStateCompat.REPEAT_MODE_ONE -> {
-                            dataBidingView.buttonRepeat.alpha = 1.0f
-                            dataBidingView.buttonRepeat.icon =
-                                ContextCompat.getDrawable(it, R.drawable.repeat_one)
-                        }
-                        else -> {
-                            dataBidingView.buttonRepeat.alpha = 0.4f
-                            dataBidingView.buttonRepeat.icon =
-                                ContextCompat.getDrawable(it, R.drawable.repeat)
-                        }
+        mDataBiding?.let { dataBidingView ->
+            context?.let {
+                when (repeat) {
+                    PlaybackState.REPEAT_MODE_ALL -> {
+                        dataBidingView.buttonRepeat.alpha = 1.0f
+                        dataBidingView.buttonRepeat.icon =
+                            ContextCompat.getDrawable(it, R.drawable.repeat)
+                    }
+                    PlaybackState.REPEAT_MODE_ONE -> {
+                        dataBidingView.buttonRepeat.alpha = 1.0f
+                        dataBidingView.buttonRepeat.icon =
+                            ContextCompat.getDrawable(it, R.drawable.repeat_one)
+                    }
+                    else -> {
+                        dataBidingView.buttonRepeat.alpha = 0.4f
+                        dataBidingView.buttonRepeat.icon =
+                            ContextCompat.getDrawable(it, R.drawable.repeat)
                     }
                 }
             }
         }
     }
     private fun updateShuffleUI(shuffle: Int?) {
-        mDataBidingView?.let { dataBidingView ->
-            MainScope().launch {
-                context?.let {
-                    when (shuffle) {
-                        PlaybackStateCompat.SHUFFLE_MODE_ALL -> {
-                            dataBidingView.buttonShuffle.alpha = 1.0f
-                            dataBidingView.buttonShuffle.icon =
-                                ContextCompat.getDrawable(it, R.drawable.shuffle)
-                        }
-                        else -> {
-                            dataBidingView.buttonShuffle.alpha = 0.4f
-                            dataBidingView.buttonShuffle.icon =
-                                ContextCompat.getDrawable(it, R.drawable.shuffle)
-                        }
+        mDataBiding?.let { dataBidingView ->
+            context?.let {
+                when (shuffle) {
+                    PlaybackState.SHUFFLE_MODE_ALL -> {
+                        dataBidingView.buttonShuffle.alpha = 1.0f
+                        dataBidingView.buttonShuffle.icon =
+                            ContextCompat.getDrawable(it, R.drawable.shuffle)
+                    }
+                    else -> {
+                        dataBidingView.buttonShuffle.alpha = 0.4f
+                        dataBidingView.buttonShuffle.icon =
+                            ContextCompat.getDrawable(it, R.drawable.shuffle)
                     }
                 }
             }
         }
     }
     private fun updateProgressValueUI(currentDuration: Long) {
-        mDataBidingView?.let { dataBidingView ->
-            MainScope().launch {
-                context?.let {
-                    val totalDuration: Long =
-                        mNowPlayingFragmentViewModel.getCurrentPlayingSong().value?.duration ?: 0
-                    dataBidingView.slider.value =
-                        FormattersAndParsersUtils.formatSongDurationToSliderProgress(
-                            currentDuration,
-                            totalDuration
-                        )
-                    dataBidingView.textDurationCurrent.text =
-                        FormattersAndParsersUtils.formatSongDurationToString(currentDuration)
-                }
+        mDataBiding?.let { dataBidingView ->
+            context?.let {
+                val totalDuration: Long =
+                    mNowPlayingFragmentViewModel.getCurrentPlayingSong().value?.duration ?: 0
+                dataBidingView.slider.value =
+                    FormattersAndParsers.formatSongDurationToSliderProgress(
+                        currentDuration,
+                        totalDuration
+                    )
+                dataBidingView.textDurationCurrent.text =
+                    FormattersAndParsers.formatSongDurationToString(currentDuration)
             }
         }
     }
     private fun updatePlaybackStateUI(isPlaying: Boolean?) {
-        mDataBidingView?.let { dataBidingView ->
-            MainScope().launch {
-                context?.let {
-                    if (isPlaying == true) {
-                        dataBidingView.buttonPlayPause.icon =
-                            ContextCompat.getDrawable(it, R.drawable.pause_circle)
-                    } else {
-                        dataBidingView.buttonPlayPause.icon =
-                            ContextCompat.getDrawable(it, R.drawable.play_circle)
-                    }
+        mDataBiding?.let { dataBidingView ->
+            context?.let {
+                if (isPlaying == true) {
+                    dataBidingView.buttonPlayPause.icon =
+                        ContextCompat.getDrawable(it, R.drawable.pause_circle)
+                } else {
+                    dataBidingView.buttonPlayPause.icon =
+                        ContextCompat.getDrawable(it, R.drawable.play_circle)
                 }
             }
         }
@@ -627,10 +580,10 @@ import kotlinx.coroutines.withContext
         updateBlurredBackgroundUIFromUri(songItem)
     }
     private fun updateViewpagerUI(songItem: SongItem?) {
-        if (songItem == null || (mPlayerPagerAdapter?.currentList?.size ?: 0) <= 0) return
-        mDataBidingView?.let { dataBidingView ->
+        if (songItem == null || (mPlayingNowPageAdapter?.currentList?.size ?: 0) <= 0) return
+        mDataBiding?.let { dataBidingView ->
             val tempOldPosition: Int = dataBidingView.viewPagerPlayer.currentItem
-            val tempOldSongItem = mPlayerPagerAdapter?.currentList?.get(tempOldPosition)
+            val tempOldSongItem = mPlayingNowPageAdapter?.currentList?.get(tempOldPosition)
             if (
                 tempOldPosition != songItem.position &&
                 tempOldSongItem?.uri != songItem.uri &&
@@ -645,38 +598,36 @@ import kotlinx.coroutines.withContext
     }
 
     private fun updateBlurredBackgroundUIFromUri(songItem: SongItem?) {
-        mDataBidingView?.let { dataBidingView ->
+        mDataBiding?.let { dataBidingView ->
             context?.let { ctx ->
                 val tempUri: Uri = Uri.parse(songItem?.uri ?: "")
-                val imageRequestBlurred: ImageLoadersUtils.ImageRequestItem = ImageLoadersUtils.ImageRequestItem.newBlurInstance()
+                val imageRequestBlurred: ImageLoaders.ImageRequestItem = ImageLoaders.ImageRequestItem.newBlurInstance()
                 imageRequestBlurred.uri = tempUri
                 imageRequestBlurred.hashedCovertArtSignature = songItem?.hashedCovertArtSignature ?: -1
                 imageRequestBlurred.imageView = dataBidingView.blurredImageview
-                ImageLoadersUtils.startExploreContentImageLoaderJob(ctx, imageRequestBlurred)
+                ImageLoaders.startExploreContentImageLoaderJob(ctx, imageRequestBlurred)
             }
         }
     }
     private fun updateTextTitleSubtitleDurationUI(songItem: SongItem?) {
-        mDataBidingView?.let { dataBidingView ->
-            MainScope().launch {
-                context?.let { ctx ->
-                    dataBidingView.textTitle.text =
-                        songItem?.title?.ifEmpty { songItem.fileName ?: ctx.getString(R.string.unknown_title) } ?: songItem?.fileName ?: ctx.getString(R.string.unknown_title)
-                    dataBidingView.textArtist.text =
-                        songItem?.artist?.ifEmpty { ctx.getString(R.string.unknown_artist) } ?: ctx.getString(R.string.unknown_artist)
-                    dataBidingView.textDuration.text =
-                        FormattersAndParsersUtils.formatSongDurationToString(
-                            songItem?.duration ?: 0
-                        )
-                }
+        mDataBiding?.let { dataBidingView ->
+            context?.let { ctx ->
+                dataBidingView.textTitle.text =
+                    songItem?.title?.ifEmpty { songItem.fileName ?: ctx.getString(R.string.unknown_title) } ?: songItem?.fileName ?: ctx.getString(R.string.unknown_title)
+                dataBidingView.textArtist.text =
+                    songItem?.artist?.ifEmpty { ctx.getString(R.string.unknown_artist) } ?: ctx.getString(R.string.unknown_artist)
+                dataBidingView.textDuration.text =
+                    FormattersAndParsers.formatSongDurationToString(
+                        songItem?.duration ?: 0
+                    )
             }
         }
     }
 
     private fun setupViewPagerAdapter() {
-        mDataBidingView?.let { dataBidingView ->
+        mDataBiding?.let { dataBidingView ->
             context?.let { ctx ->
-                mPlayerPagerAdapter = PlayerPageAdapter(
+                mPlayingNowPageAdapter = PlayerPageAdapter(
                     ctx,
                     object : PlayerPageAdapter.OnItemClickListener {
                         override fun onButtonLyricsClicked(position: Int) {
@@ -685,19 +636,19 @@ import kotlinx.coroutines.withContext
                         override fun onButtonFullscreenClicked(position: Int) {
                         }
                     })
-                dataBidingView.viewPagerPlayer.adapter = mPlayerPagerAdapter
+                dataBidingView.viewPagerPlayer.adapter = mPlayingNowPageAdapter
                 dataBidingView.viewPagerPlayer.clipToPadding = false
                 dataBidingView.viewPagerPlayer.clipChildren = false
                 dataBidingView.viewPagerPlayer.offscreenPageLimit = 3
                 dataBidingView.viewPagerPlayer.getChildAt(0)?.overScrollMode =
                     View.OVER_SCROLL_NEVER
-                AnimatorsUtils.applyPageTransformer(dataBidingView.viewPagerPlayer)
+                Animators.applyPageTransformer(dataBidingView.viewPagerPlayer)
             }
         }
     }
 
     private fun checkInteractions() {
-        mDataBidingView?.let { dataBidingView ->
+        mDataBiding?.let { dataBidingView ->
             var viewpagerScrollState =  ViewPager2.SCROLL_STATE_IDLE
             dataBidingView.viewPagerPlayer.registerOnPageChangeCallback(object :
                 OnPageChangeCallback() {
@@ -707,7 +658,7 @@ import kotlinx.coroutines.withContext
                     positionOffsetPixels: Int
                 ) {
                     super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                    MathComputationsUtils.fadeWithPageOffset(
+                    MathComputations.fadeWithPageOffset(
                         dataBidingView.blurredImageview,
                         positionOffset
                     )
@@ -769,7 +720,7 @@ import kotlinx.coroutines.withContext
     }
 
     private fun updateViewpagerAfterPageChangedUI() {
-        val currentItem = mDataBidingView?.viewPagerPlayer?.currentItem
+        val currentItem = mDataBiding?.viewPagerPlayer?.currentItem
         val tempCurrentSongItem = mNowPlayingFragmentViewModel.getCurrentPlayingSong().value
         val tempSongItem = getCurrentPlayingSongFromPosition(currentItem)
         if (
@@ -780,13 +731,13 @@ import kotlinx.coroutines.withContext
         ){
             return
         }
-        mDataBidingView?.viewPagerPlayer?.setCurrentItem(tempCurrentSongItem?.position ?: 0, false)
+        mDataBiding?.viewPagerPlayer?.setCurrentItem(tempCurrentSongItem?.position ?: 0, false)
     }
 
     private fun showQueueMusicDialog() {
         if(!mQueueMusicBottomSheetDialog.isVisible) {
             mQueueMusicBottomSheetDialog.updateQueueMusicList(
-                mPlayerPagerAdapter?.currentList
+                mPlayingNowPageAdapter?.currentList
             )
             mQueueMusicBottomSheetDialog.show(
                 childFragmentManager,
@@ -810,28 +761,28 @@ import kotlinx.coroutines.withContext
         }
     }
     private fun onRepeatButtonClicked(){
-        when (mNowPlayingFragmentViewModel.getRepeat().value ?: PlaybackStateCompat.REPEAT_MODE_NONE) {
-            PlaybackStateCompat.REPEAT_MODE_NONE -> {
-                mNowPlayingFragmentViewModel.setRepeat(PlaybackStateCompat.REPEAT_MODE_ALL)
+        when (mNowPlayingFragmentViewModel.getRepeat().value ?: PlaybackState.REPEAT_MODE_NONE) {
+            PlaybackState.REPEAT_MODE_NONE -> {
+                mNowPlayingFragmentViewModel.setRepeat(PlaybackState.REPEAT_MODE_ALL)
             }
-            PlaybackStateCompat.REPEAT_MODE_ALL -> {
-                mNowPlayingFragmentViewModel.setRepeat(PlaybackStateCompat.REPEAT_MODE_ONE)
+            PlaybackState.REPEAT_MODE_ALL -> {
+                mNowPlayingFragmentViewModel.setRepeat(PlaybackState.REPEAT_MODE_ONE)
             }
-            PlaybackStateCompat.REPEAT_MODE_ONE -> {
-                mNowPlayingFragmentViewModel.setRepeat(PlaybackStateCompat.REPEAT_MODE_NONE)
+            PlaybackState.REPEAT_MODE_ONE -> {
+                mNowPlayingFragmentViewModel.setRepeat(PlaybackState.REPEAT_MODE_NONE)
             }
         }
     }
     private fun onShuffleButtonClicked(){
-        val tempShuffleValue: Int = mNowPlayingFragmentViewModel.getShuffle().value ?: PlaybackStateCompat.SHUFFLE_MODE_NONE
-        if(tempShuffleValue == PlaybackStateCompat.SHUFFLE_MODE_NONE){
-            mNowPlayingFragmentViewModel.setShuffle(PlaybackStateCompat.SHUFFLE_MODE_ALL)
-        }else if(tempShuffleValue == PlaybackStateCompat.SHUFFLE_MODE_ALL){
-            mNowPlayingFragmentViewModel.setShuffle(PlaybackStateCompat.SHUFFLE_MODE_NONE)
+        val tempShuffleValue: Int = mNowPlayingFragmentViewModel.getShuffle().value ?: PlaybackState.SHUFFLE_MODE_NONE
+        if(tempShuffleValue == PlaybackState.SHUFFLE_MODE_NONE){
+            mNowPlayingFragmentViewModel.setShuffle(PlaybackState.SHUFFLE_MODE_ALL)
+        }else if(tempShuffleValue == PlaybackState.SHUFFLE_MODE_ALL){
+            mNowPlayingFragmentViewModel.setShuffle(PlaybackState.SHUFFLE_MODE_NONE)
         }
     }
     private fun onPrevPageButtonClicked(){
-        if((mPlayerPagerAdapter?.currentList?.size ?: 0) <= 0) return
+        if((mPlayingNowPageAdapter?.currentList?.size ?: 0) <= 0) return
         val tempPosition : Int = mNowPlayingFragmentViewModel.getCurrentPlayingSong().value?.position ?: return
         val tempSongItem : SongItem = getCurrentPlayingSongFromPosition((tempPosition - 1))
             ?: return
@@ -840,7 +791,7 @@ import kotlinx.coroutines.withContext
         mNowPlayingFragmentViewModel.setCurrentPlayingSong(tempSongItem)
     }
     private fun onNextPageButtonClicked(){
-        if((mPlayerPagerAdapter?.currentList?.size ?: 0) <= 0) return
+        if((mPlayingNowPageAdapter?.currentList?.size ?: 0) <= 0) return
         val tempPosition : Int = mNowPlayingFragmentViewModel.getCurrentPlayingSong().value?.position ?: return
         val tempSongItem : SongItem = getCurrentPlayingSongFromPosition((tempPosition + 1))
             ?: return
@@ -850,8 +801,8 @@ import kotlinx.coroutines.withContext
     }
     private fun getCurrentPlayingSongFromPosition(position: Int?): SongItem? {
         if(position == null) return null
-        if (position < 0 || position >= (mPlayerPagerAdapter?.currentList?.size ?: 0)) return null
-        val tempSongItem: SongItem = mPlayerPagerAdapter?.currentList?.get(position) ?: return null
+        if (position < 0 || position >= (mPlayingNowPageAdapter?.currentList?.size ?: 0)) return null
+        val tempSongItem: SongItem = mPlayingNowPageAdapter?.currentList?.get(position) ?: return null
         tempSongItem.position = position
         return tempSongItem
     }
@@ -859,13 +810,13 @@ import kotlinx.coroutines.withContext
         mNowPlayingFragmentViewModel.toggleIsPlaying()
     }
     private fun updateOnStopTrackingTouch(value: Float) {
-        if((mPlayerPagerAdapter?.currentList?.size ?: 0) <= 0) return
+        if((mPlayingNowPageAdapter?.currentList?.size ?: 0) <= 0) return
         val totalDuration : Long = mNowPlayingFragmentViewModel.getCurrentPlayingSong().value?.duration ?: 0
-        val tempProgress : Long = FormattersAndParsersUtils.formatSliderProgressToLongDuration(value, totalDuration)
+        val tempProgress : Long = FormattersAndParsers.formatSliderProgressToLongDuration(value, totalDuration)
         mNowPlayingFragmentViewModel.setPlayingProgressValue(tempProgress)
     }
     private fun onViewpagerPageChanged(position: Int) {
-        if((mDataBidingView?.viewPagerPlayer?.adapter?.itemCount ?: 0) < 1) return
+        if((mDataBiding?.viewPagerPlayer?.adapter?.itemCount ?: 0) < 1) return
         val tempCurrentSongItem = mNowPlayingFragmentViewModel.getCurrentPlayingSong().value
         val tempSongItem = getCurrentPlayingSongFromPosition(position)
         if (
@@ -882,18 +833,15 @@ import kotlinx.coroutines.withContext
     }
 
     private fun initViews() {
-        mDataBidingView?.let { dataBidingView ->
+        mDataBiding?.let { dataBidingView ->
             dataBidingView.textTitle.isSelected = true
             dataBidingView.textArtist.isSelected = true
 
-            InsetModifiersUtils.updateTopViewInsets(dataBidingView.linearRescanDeviceContainer)
-            InsetModifiersUtils.updateTopViewInsets(dataBidingView.linearViewpager)
+            InsetModifiers.updateTopViewInsets(dataBidingView.linearRescanDeviceContainer)
+            InsetModifiers.updateTopViewInsets(dataBidingView.linearViewpager)
 
-            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.dragHandleViewContainer)
-            InsetModifiersUtils.updateBottomViewInsets(dataBidingView.constraintBottomButtonsContainer)
-//            InsetModifiersUtils.updateRightViewInsets(dataBidingView.dragHandleViewContainer)
-//            InsetModifiersUtils.updateRightViewInsets(dataBidingView.constraintBottomButtonsContainer)
-//            InsetModifiersUtils.updateRightViewInsets(dataBidingView.linearControls)
+            InsetModifiers.updateBottomViewInsets(dataBidingView.dragHandleViewContainer)
+            InsetModifiers.updateBottomViewInsets(dataBidingView.constraintBottomButtonsContainer)
 
             mPlayerMoreBottomSheetDialog.updateData(
                 mNowPlayingFragmentViewModel,
