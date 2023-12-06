@@ -25,7 +25,7 @@ import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 
 class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
-    private var mDataBiding: BottomSheetSortContentExplorerBinding? = null
+    private lateinit var mDataBiding: BottomSheetSortContentExplorerBinding
 
     private var mGenericListenDataViewModel: GenericListenDataViewModel? = null
 
@@ -36,11 +36,11 @@ class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment()
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         //Set content with data biding util
         mDataBiding = DataBindingUtil.inflate(inflater, R.layout._bottom_sheet_sort_content_explorer, container, false)
-        val view = mDataBiding?.root
+        val view = mDataBiding.root
 
         //Load your UI content
         initViews()
@@ -50,13 +50,13 @@ class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment()
     }
 
     private fun checkInteractions() {
-        mDataBiding?.let { viewBiding ->
-            viewBiding.radioGroupSort.setOnCheckedChangeListener { _, checkedId ->
+        mDataBiding.let {
+            it.radioGroupSort.setOnCheckedChangeListener { _, checkedId ->
                 onRadioGroupStateChanged(
                     checkedId
                 )
             }
-            viewBiding.checkboxInvertItems.setOnCheckedChangeListener { _, isChecked ->
+            it.checkboxInvertItems.setOnCheckedChangeListener { _, isChecked ->
                 onInvertSortChanged(
                     isChecked
                 )
@@ -70,45 +70,45 @@ class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment()
     }
 
     private fun onRadioGroupStateChanged(checkedId: Int) {
-        mDataBiding?.let { viewBiding ->
+        mDataBiding.let {
             when (checkedId) {
-                viewBiding.radioName.id -> {
+                it.radioName.id -> {
                     mGenericListenDataViewModel?.sortBy?.value = "name"
                 }
-                viewBiding.radioArtist.id -> {
+                it.radioArtist.id -> {
                     mGenericListenDataViewModel?.sortBy?.value = "artist"
                 }
-                viewBiding.radioAlbum.id -> {
+                it.radioAlbum.id -> {
                     mGenericListenDataViewModel?.sortBy?.value = "album"
                 }
-                viewBiding.radioAlbumArtist.id -> {
+                it.radioAlbumArtist.id -> {
                     mGenericListenDataViewModel?.sortBy?.value = "albumArtist"
                 }
-                viewBiding.radioYear.id -> {
+                it.radioYear.id -> {
                     mGenericListenDataViewModel?.sortBy?.value = "year"
                 }
-                viewBiding.radioLastAddedDateToLibrary.id -> {
+                it.radioLastAddedDateToLibrary.id -> {
                     mGenericListenDataViewModel?.sortBy?.value = "lastAddedDateToLibrary"
                 }
-                viewBiding.radioLastUpdateDate.id -> {
+                it.radioLastUpdateDate.id -> {
                     mGenericListenDataViewModel?.sortBy?.value = "lastUpdateDate"
                 }
-                viewBiding.radioTotalDuration.id -> {
+                it.radioTotalDuration.id -> {
                     mGenericListenDataViewModel?.sortBy?.value = "totalDuration"
                 }
-                viewBiding.radioNumberTracks.id -> {
+                it.radioNumberTracks.id -> {
                     mGenericListenDataViewModel?.sortBy?.value = "numberTracks"
                 }
-                viewBiding.radioNumberArtists.id -> {
+                it.radioNumberArtists.id -> {
                     mGenericListenDataViewModel?.sortBy?.value = "numberArtists"
                 }
-                viewBiding.radioNumberAlbums.id -> {
+                it.radioNumberAlbums.id -> {
                     mGenericListenDataViewModel?.sortBy?.value = "numberAlbums"
                 }
-                viewBiding.radioNumberAlbumArtists.id -> {
+                it.radioNumberAlbumArtists.id -> {
                     mGenericListenDataViewModel?.sortBy?.value = "numberAlbumArtists"
                 }
-                viewBiding.radioNumberComposers.id -> {
+                it.radioNumberComposers.id -> {
                     mGenericListenDataViewModel?.sortBy?.value = "numberComposers"
                 }
                 else -> {
@@ -127,61 +127,61 @@ class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment()
     private fun updateTitleUI() {
         when (mFromSource) {
             AlbumsFragment.TAG -> {
-                mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                mDataBiding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.albums) ?: ""
                 ) ?: ""
             }
             AlbumArtistsFragment.TAG -> {
-                mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                mDataBiding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.album_artists) ?: ""
                 ) ?: ""
             }
             ArtistsFragment.TAG -> {
-                mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                mDataBiding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.artists) ?: ""
                 ) ?: ""
             }
             ComposersFragment.TAG -> {
-                mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                mDataBiding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.composers) ?: ""
                 ) ?: ""
             }
             FoldersFragment.TAG -> {
-                mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                mDataBiding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.folders) ?: ""
                 ) ?: ""
             }
             GenresFragment.TAG -> {
-                mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                mDataBiding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.genres) ?: ""
                 ) ?: ""
             }
             YearsFragment.TAG -> {
-                mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                mDataBiding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.years) ?: ""
                 ) ?: ""
             }
             PlaylistsFragment.TAG -> {
-                mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                mDataBiding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.playlists) ?: ""
                 ) ?: ""
             }
 //            FavoritesFragment.TAG -> {
-//                mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+//                mDataBiding.textSortDetails.text = context?.resources?.getString(
 //                    R.string._sort_for,
 //                    context?.resources?.getString(R.string.favorites) ?: ""
 //                ) ?: ""
 //            }
             StreamsFragment.TAG -> {
-                mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                mDataBiding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.streams) ?: ""
                 ) ?: ""
@@ -195,131 +195,131 @@ class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment()
     }
     private fun updateRadioButtonsForSortGenericItems() {
         //Update generic first radio button text title
-        mDataBiding?.let { viewBiding ->
+        mDataBiding.let {
             when (mFromSource) {
                 AllSongsFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        viewBiding.radioName.tooltipText = context?.getString(R.string.album_name)
+                        it.radioName.tooltipText = context?.getString(R.string.album_name)
                     }
-                    viewBiding.radioName.text = context?.getString(R.string.album_name)
+                    it.radioName.text = context?.getString(R.string.album_name)
                     //Now hide non necessary radio buttons
-                    viewBiding.radioArtist.visibility = GONE
-                    viewBiding.radioAlbum.visibility = GONE
-                    viewBiding.radioAlbumArtist.visibility = GONE
+                    it.radioArtist.visibility = GONE
+                    it.radioAlbum.visibility = GONE
+                    it.radioAlbumArtist.visibility = GONE
                 }
                 AlbumArtistsFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        viewBiding.radioName.tooltipText = context?.getString(R.string.album_artist)
+                        it.radioName.tooltipText = context?.getString(R.string.album_artist)
                     }
-                    viewBiding.radioName.text = context?.getString(R.string.album_artist)
+                    it.radioName.text = context?.getString(R.string.album_artist)
                     //Now hide non necessary radio buttons
-                    viewBiding.radioArtist.visibility = GONE
-                    viewBiding.radioAlbum.visibility = GONE
-                    viewBiding.radioAlbumArtist.visibility = GONE
+                    it.radioArtist.visibility = GONE
+                    it.radioAlbum.visibility = GONE
+                    it.radioAlbumArtist.visibility = GONE
                 }
                 ArtistsFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        viewBiding.radioName.tooltipText = context?.getString(R.string.artist_name)
+                        it.radioName.tooltipText = context?.getString(R.string.artist_name)
                     }
-                    viewBiding.radioName.text = context?.getString(R.string.artist_name)
+                    it.radioName.text = context?.getString(R.string.artist_name)
                     //Now hide non necessary radio buttons
-                    viewBiding.radioArtist.visibility = GONE
+                    it.radioArtist.visibility = GONE
                 }
                 ComposersFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        viewBiding.radioName.tooltipText = context?.getString(R.string.composer_name)
+                        it.radioName.tooltipText = context?.getString(R.string.composer_name)
                     }
-                    viewBiding.radioName.text = context?.getString(R.string.composer_name)
+                    it.radioName.text = context?.getString(R.string.composer_name)
                     //Now hide non necessary radio buttons
-                    viewBiding.radioNumberComposers.visibility = GONE
+                    it.radioNumberComposers.visibility = GONE
                 }
                 FoldersFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        viewBiding.radioName.tooltipText = context?.getString(R.string.folder_name)
+                        it.radioName.tooltipText = context?.getString(R.string.folder_name)
                     }
-                    viewBiding.radioName.text = context?.getString(R.string.folder_name)
+                    it.radioName.text = context?.getString(R.string.folder_name)
                 }
                 GenresFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        viewBiding.radioName.tooltipText = context?.getString(R.string.genre)
+                        it.radioName.tooltipText = context?.getString(R.string.genre)
                     }
-                    viewBiding.radioName.text = context?.getString(R.string.genre)
+                    it.radioName.text = context?.getString(R.string.genre)
                 }
                 YearsFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        viewBiding.radioName.tooltipText = context?.getString(R.string.year)
+                        it.radioName.tooltipText = context?.getString(R.string.year)
                     }
-                    viewBiding.radioName.text = context?.getString(R.string.year)
+                    it.radioName.text = context?.getString(R.string.year)
                     //Now hide non necessary radio buttons
-                    viewBiding.radioYear.visibility = GONE
+                    it.radioYear.visibility = GONE
                 }
             }
         }
     }
     private fun showAllRadioButtonsVisibility() {
-        mDataBiding?.let { viewBiding ->
-            viewBiding.radioName.visibility = VISIBLE
-            viewBiding.radioArtist.visibility = VISIBLE
-            viewBiding.radioAlbum.visibility = VISIBLE
-            viewBiding.radioAlbumArtist.visibility = VISIBLE
-            viewBiding.radioYear.visibility = VISIBLE
-            viewBiding.radioLastAddedDateToLibrary.visibility = VISIBLE
-            viewBiding.radioLastUpdateDate.visibility = VISIBLE
-            viewBiding.radioTotalDuration.visibility = VISIBLE
-            viewBiding.radioNumberTracks.visibility = VISIBLE
-            viewBiding.radioNumberArtists.visibility = VISIBLE
-            viewBiding.radioNumberAlbums.visibility = VISIBLE
-            viewBiding.radioNumberAlbumArtists.visibility = VISIBLE
-            viewBiding.radioNumberComposers.visibility = VISIBLE
+        mDataBiding.let {
+            it.radioName.visibility = VISIBLE
+            it.radioArtist.visibility = VISIBLE
+            it.radioAlbum.visibility = VISIBLE
+            it.radioAlbumArtist.visibility = VISIBLE
+            it.radioYear.visibility = VISIBLE
+            it.radioLastAddedDateToLibrary.visibility = VISIBLE
+            it.radioLastUpdateDate.visibility = VISIBLE
+            it.radioTotalDuration.visibility = VISIBLE
+            it.radioNumberTracks.visibility = VISIBLE
+            it.radioNumberArtists.visibility = VISIBLE
+            it.radioNumberAlbums.visibility = VISIBLE
+            it.radioNumberAlbumArtists.visibility = VISIBLE
+            it.radioNumberComposers.visibility = VISIBLE
         }
     }
 
     private fun updateDefaultCheckboxInvertButtonUI() {
-        mDataBiding?.checkboxInvertItems?.isChecked = mGenericListenDataViewModel?.isInverted?.value ?: false
+        mDataBiding.checkboxInvertItems.isChecked = mGenericListenDataViewModel?.isInverted?.value ?: false
     }
     private fun updateDefaultCheckedRadioButtonUI() {
         if(mGenericListenDataViewModel == null) return
-        mDataBiding?.let { viewBiding ->
+        mDataBiding.let {
             val tempFilter = mGenericListenDataViewModel?.sortBy?.value ?: return
             when (tempFilter) {
                 "name" -> {
-                    viewBiding.radioGroupSort.check(viewBiding.radioName.id)
+                    it.radioGroupSort.check(it.radioName.id)
                 }
                 "artist" -> {
-                    viewBiding.radioGroupSort.check(viewBiding.radioArtist.id)
+                    it.radioGroupSort.check(it.radioArtist.id)
                 }
                 "album" -> {
-                    viewBiding.radioGroupSort.check(viewBiding.radioAlbum.id)
+                    it.radioGroupSort.check(it.radioAlbum.id)
                 }
                 "albumArtist" -> {
-                    viewBiding.radioGroupSort.check(viewBiding.radioAlbumArtist.id)
+                    it.radioGroupSort.check(it.radioAlbumArtist.id)
                 }
                 "year" -> {
-                    viewBiding.radioGroupSort.check(viewBiding.radioYear.id)
+                    it.radioGroupSort.check(it.radioYear.id)
                 }
                 "lastAddedDateToLibrary" -> {
-                    viewBiding.radioGroupSort.check(viewBiding.radioLastAddedDateToLibrary.id)
+                    it.radioGroupSort.check(it.radioLastAddedDateToLibrary.id)
                 }
                 "lastUpdateDate" -> {
-                    viewBiding.radioGroupSort.check(viewBiding.radioLastUpdateDate.id)
+                    it.radioGroupSort.check(it.radioLastUpdateDate.id)
                 }
                 "totalDuration" -> {
-                    viewBiding.radioGroupSort.check(viewBiding.radioTotalDuration.id)
+                    it.radioGroupSort.check(it.radioTotalDuration.id)
                 }
                 "numberTracks" -> {
-                    viewBiding.radioGroupSort.check(viewBiding.radioNumberTracks.id)
+                    it.radioGroupSort.check(it.radioNumberTracks.id)
                 }
                 "numberArtists" -> {
-                    viewBiding.radioGroupSort.check(viewBiding.radioNumberArtists.id)
+                    it.radioGroupSort.check(it.radioNumberArtists.id)
                 }
                 "numberAlbums" -> {
-                    viewBiding.radioGroupSort.check(viewBiding.radioNumberAlbums.id)
+                    it.radioGroupSort.check(it.radioNumberAlbums.id)
                 }
                 "numberAlbumArtists" -> {
-                    viewBiding.radioGroupSort.check(viewBiding.radioNumberAlbumArtists.id)
+                    it.radioGroupSort.check(it.radioNumberAlbumArtists.id)
                 }
                 "numberComposers" -> {
-                    viewBiding.radioGroupSort.check(viewBiding.radioNumberComposers.id)
+                    it.radioGroupSort.check(it.radioNumberComposers.id)
                 }
             }
         }

@@ -1,6 +1,5 @@
 package com.prosabdev.fluidmusic.viewmodels
 
-import android.content.Context
 import com.prosabdev.common.persistence.PersistentStorage
 import com.prosabdev.common.persistence.models.SortOrganizeItemSP
 import com.prosabdev.common.constants.MainConst

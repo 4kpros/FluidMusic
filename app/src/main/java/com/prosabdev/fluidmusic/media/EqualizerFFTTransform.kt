@@ -13,8 +13,12 @@ import androidx.media3.exoplayer.audio.MediaCodecAudioRenderer
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import com.prosabdev.fluidmusic.ui.custom.visualizer.FFTAudioProcessor
 
-object EqualizerBuilder {
-    @OptIn(UnstableApi::class) fun initFFTransform(ctx: Context, fftAudioProcessor: FFTAudioProcessor): DefaultRenderersFactory {
+object EqualizerFFTTransform {
+    @OptIn(UnstableApi::class)
+    fun initFFTransform(
+        ctx: Context,
+        fftAudioProcessor: FFTAudioProcessor
+    ): DefaultRenderersFactory {
         val renderersFactory: DefaultRenderersFactory?
         renderersFactory = object : DefaultRenderersFactory(ctx) {
             override fun buildAudioRenderers(

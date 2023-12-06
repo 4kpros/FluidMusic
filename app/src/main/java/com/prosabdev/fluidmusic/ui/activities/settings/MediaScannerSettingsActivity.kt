@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -28,7 +29,7 @@ import com.prosabdev.fluidmusic.viewmodels.activities.MediaScannerActivityViewMo
 import com.prosabdev.fluidmusic.viewmodels.models.FolderUriTreeViewModel
 import kotlinx.coroutines.runBlocking
 
-@BuildCompat.PrereleaseSdkCheck class MediaScannerSettingsActivity : AppCompatActivity() {
+class MediaScannerSettingsActivity : AppCompatActivity() {
 
     private lateinit var mDataBiding : ActivityMediaScannerSettingsBinding
 
@@ -57,7 +58,7 @@ import kotlinx.coroutines.runBlocking
     }
 
     private fun registerOnBackPressedCallback() {
-        if (BuildCompat.isAtLeastT()) {
+        if (Build.VERSION.SDK_INT >= 33) {
             onBackInvokedDispatcher.registerOnBackInvokedCallback(
                 OnBackInvokedDispatcher.PRIORITY_DEFAULT
             ) {

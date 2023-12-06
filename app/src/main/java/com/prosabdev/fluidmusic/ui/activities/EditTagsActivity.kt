@@ -1,5 +1,6 @@
 package com.prosabdev.fluidmusic.ui.activities
 
+import android.os.Build
 import android.os.Bundle
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
@@ -12,7 +13,7 @@ import com.prosabdev.common.utils.InsetModifiers
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityEditTagsBinding
 
-@BuildCompat.PrereleaseSdkCheck class EditTagsActivity : AppCompatActivity() {
+class EditTagsActivity : AppCompatActivity() {
 
     private lateinit var mDataBiding : ActivityEditTagsBinding
 
@@ -35,7 +36,7 @@ import com.prosabdev.fluidmusic.databinding.ActivityEditTagsBinding
     }
 
     private fun registerOnBackPressedCallback() {
-        if (BuildCompat.isAtLeastT()) {
+        if (Build.VERSION.SDK_INT >= 33) {
             onBackInvokedDispatcher.registerOnBackInvokedCallback(
                 OnBackInvokedDispatcher.PRIORITY_DEFAULT
             ) {

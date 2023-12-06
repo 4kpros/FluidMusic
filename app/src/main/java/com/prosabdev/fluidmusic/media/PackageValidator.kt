@@ -123,23 +123,26 @@ class PackageValidator(context: Context, @XmlRes xmlResId: Int) {
             )
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                packageManager.getPackageInfo(callingPackage, PackageManager.GET_SIGNING_CERTIFICATES)
+                packageManager.getPackageInfo(
+                    callingPackage,
+                    PackageManager.GET_SIGNING_CERTIFICATES
+                )
             } else {
                 packageManager.getPackageInfo(callingPackage, PackageManager.GET_SIGNATURES)
             }
         }
 
 
-    private fun getSignature(packageInfo: PackageInfo): String?{
+    private fun getSignature(packageInfo: PackageInfo): String? {
         val certificate: ByteArray? =
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 Log.i(TAG, "PACKAGE INFOS : ${packageInfo.signingInfo}")
                 if (packageInfo.signingInfo == null || packageInfo.signingInfo.signingCertificateHistory == null || packageInfo.signingInfo.signingCertificateHistory.size != 1) {
                     return null
                 } else {
                     packageInfo.signingInfo.signingCertificateHistory[0].toByteArray()
                 }
-            }else{
+            } else {
                 if (packageInfo.signatures == null || packageInfo.signatures.size != 1) {
                     return null
                 } else {

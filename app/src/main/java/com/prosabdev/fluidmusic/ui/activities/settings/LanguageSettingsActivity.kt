@@ -1,5 +1,6 @@
 package com.prosabdev.fluidmusic.ui.activities.settings
 
+import android.os.Build
 import android.os.Bundle
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
@@ -12,7 +13,7 @@ import com.prosabdev.common.utils.InsetModifiers
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityLanguageSettingsBinding
 
-@BuildCompat.PrereleaseSdkCheck class LanguageSettingsActivity : AppCompatActivity() {
+class LanguageSettingsActivity : AppCompatActivity() {
 
     private lateinit var mDataBiding : ActivityLanguageSettingsBinding
 
@@ -35,7 +36,7 @@ import com.prosabdev.fluidmusic.databinding.ActivityLanguageSettingsBinding
     }
 
     private fun registerOnBackPressedCallback() {
-        if (BuildCompat.isAtLeastT()) {
+        if (Build.VERSION.SDK_INT >= 33) {
             onBackInvokedDispatcher.registerOnBackInvokedCallback(
                 OnBackInvokedDispatcher.PRIORITY_DEFAULT
             ) {

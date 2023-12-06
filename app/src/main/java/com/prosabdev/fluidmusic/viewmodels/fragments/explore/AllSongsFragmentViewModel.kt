@@ -2,7 +2,6 @@ package com.prosabdev.fluidmusic.viewmodels.fragments.explore
 
 import android.app.Application
 import com.prosabdev.common.models.songitem.SongItem
-import com.prosabdev.common.models.view.GenreItem
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.SongItemViewModel
 

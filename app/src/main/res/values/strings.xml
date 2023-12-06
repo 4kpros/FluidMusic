@@ -2,7 +2,7 @@
     <string name="app_name">Fluid Music</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="preference_file_key">com.prosabdev.fluidmusic.preferenceskey31230123123123</string>
+    <string name="preference_file_key">com.prosabdev.fluidmusic.preferenceskey.31230123123123</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_storage_access">Storage access</string>
     <string name="title_activity_equalizer">Equalizer</string>
@@ -253,5 +253,8 @@
     <string name="equ">Equ.</string>
     <string name="invalid_name">Invalid Name</string>
     <string name="name_already_exist">Name Already Exist</string>
+    <string name="notification_content_title">Notification Content Title</string>
+    <string name="notification_content_text">Notification Content Text</string>
+    <string name="notification_channel_name">Notification Channel Name</string>
 
 </resources>

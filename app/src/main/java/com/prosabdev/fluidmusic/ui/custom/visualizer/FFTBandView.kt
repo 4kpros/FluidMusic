@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
+import androidx.media3.common.util.UnstableApi
 import java.lang.System.arraycopy
 import kotlin.math.cos
 import kotlin.math.floor
@@ -18,7 +19,7 @@ import kotlin.math.pow
  * https://github.com/paramsen/noise/blob/master/sample/src/main/java/com/paramsen/noise/sample/view/FFTBandView.kt
  *
  */
-class FFTBandView @JvmOverloads constructor(
+@UnstableApi class FFTBandView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 

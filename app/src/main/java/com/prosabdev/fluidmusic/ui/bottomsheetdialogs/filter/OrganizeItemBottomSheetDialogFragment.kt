@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import com.google.android.exoplayer2.util.Log
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.prosabdev.common.constants.MainConst
 import com.prosabdev.fluidmusic.R
@@ -28,7 +27,7 @@ import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 
 class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnShowListener {
 
-    private var mDataBiding: BottomSheetOrganizeItemsBinding? = null
+    private lateinit var mDataBiding: BottomSheetOrganizeItemsBinding
 
     private var mGenericListenDataViewModel: GenericListenDataViewModel? = null
 
@@ -39,11 +38,16 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         //Set content with data biding util
-        mDataBiding = DataBindingUtil.inflate(inflater, R.layout._bottom_sheet_organize_items, container, false)
-        val view = mDataBiding?.root
+        mDataBiding = DataBindingUtil.inflate(
+            inflater,
+            R.layout._bottom_sheet_organize_items,
+            container,
+            false
+        )
+        val view = mDataBiding.root
 
         //Load your UI content
         initViews()
@@ -53,50 +57,76 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
     }
 
     private fun checkInteractions() {
-        mDataBiding?.radioGroupOrganize?.setOnCheckedChangeListener { _, checkedId ->
+        mDataBiding.radioGroupOrganize.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.radio_list_extra_small -> {
-                    mGenericListenDataViewModel?.organizeListGrid?.value = MainConst.ORGANIZE_LIST_EXTRA_SMALL
+                    mGenericListenDataViewModel?.organizeListGrid?.value =
+                        MainConst.ORGANIZE_LIST_EXTRA_SMALL
                 }
+
                 R.id.radio_list_small -> {
-                    mGenericListenDataViewModel?.organizeListGrid?.value = MainConst.ORGANIZE_LIST_SMALL
+                    mGenericListenDataViewModel?.organizeListGrid?.value =
+                        MainConst.ORGANIZE_LIST_SMALL
                 }
+
                 R.id.radio_list_medium -> {
-                    mGenericListenDataViewModel?.organizeListGrid?.value = MainConst.ORGANIZE_LIST_MEDIUM
+                    mGenericListenDataViewModel?.organizeListGrid?.value =
+                        MainConst.ORGANIZE_LIST_MEDIUM
                 }
+
                 R.id.radio_list_large -> {
-                    mGenericListenDataViewModel?.organizeListGrid?.value = MainConst.ORGANIZE_LIST_LARGE
+                    mGenericListenDataViewModel?.organizeListGrid?.value =
+                        MainConst.ORGANIZE_LIST_LARGE
                 }
+
                 R.id.radio_list_small_no_image -> {
-                    mGenericListenDataViewModel?.organizeListGrid?.value = MainConst.ORGANIZE_LIST_SMALL_NO_IMAGE
+                    mGenericListenDataViewModel?.organizeListGrid?.value =
+                        MainConst.ORGANIZE_LIST_SMALL_NO_IMAGE
                 }
+
                 R.id.radio_list_medium_no_image -> {
-                    mGenericListenDataViewModel?.organizeListGrid?.value = MainConst.ORGANIZE_LIST_MEDIUM_NO_IMAGE
+                    mGenericListenDataViewModel?.organizeListGrid?.value =
+                        MainConst.ORGANIZE_LIST_MEDIUM_NO_IMAGE
                 }
+
                 R.id.radio_list_large_no_image -> {
-                    mGenericListenDataViewModel?.organizeListGrid?.value = MainConst.ORGANIZE_LIST_LARGE_NO_IMAGE
+                    mGenericListenDataViewModel?.organizeListGrid?.value =
+                        MainConst.ORGANIZE_LIST_LARGE_NO_IMAGE
                 }
 
                 R.id.radio_grid_extra_small -> {
-                    mGenericListenDataViewModel?.organizeListGrid?.value = MainConst.ORGANIZE_GRID_EXTRA_SMALL
+                    mGenericListenDataViewModel?.organizeListGrid?.value =
+                        MainConst.ORGANIZE_GRID_EXTRA_SMALL
                 }
+
                 R.id.radio_grid_small -> {
-                    mGenericListenDataViewModel?.organizeListGrid?.value = MainConst.ORGANIZE_GRID_SMALL
+                    mGenericListenDataViewModel?.organizeListGrid?.value =
+                        MainConst.ORGANIZE_GRID_SMALL
                 }
+
                 R.id.radio_grid_medium -> {
-                    mGenericListenDataViewModel?.organizeListGrid?.value = MainConst.ORGANIZE_GRID_MEDIUM
+                    mGenericListenDataViewModel?.organizeListGrid?.value =
+                        MainConst.ORGANIZE_GRID_MEDIUM
                 }
+
                 R.id.radio_grid_large -> {
-                    mGenericListenDataViewModel?.organizeListGrid?.value = MainConst.ORGANIZE_GRID_LARGE
+                    mGenericListenDataViewModel?.organizeListGrid?.value =
+                        MainConst.ORGANIZE_GRID_LARGE
                 }
+
                 R.id.radio_grid_extra_large -> {
-                    mGenericListenDataViewModel?.organizeListGrid?.value = MainConst.ORGANIZE_GRID_EXTRA_LARGE
+                    mGenericListenDataViewModel?.organizeListGrid?.value =
+                        MainConst.ORGANIZE_GRID_EXTRA_LARGE
                 }
+
                 R.id.radio_grid_small_no_image -> {
-                    mGenericListenDataViewModel?.organizeListGrid?.value = MainConst.ORGANIZE_GRID_SMALL_NO_IMAGE
+                    mGenericListenDataViewModel?.organizeListGrid?.value =
+                        MainConst.ORGANIZE_GRID_SMALL_NO_IMAGE
                 }
+
                 R.id.radio_grid_medium_no_image -> {
-                    mGenericListenDataViewModel?.organizeListGrid?.value = MainConst.ORGANIZE_GRID_MEDIUM_NO_IMAGE
+                    mGenericListenDataViewModel?.organizeListGrid?.value =
+                        MainConst.ORGANIZE_GRID_MEDIUM_NO_IMAGE
                 }
             }
         }
@@ -110,55 +140,63 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
     private fun updateTitleUI() {
         when (mFromSource) {
             AllSongsFragment.TAG -> {
-                mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                     R.string._organize_for,
                     context?.resources?.getString(R.string.all_songs) ?: ""
                 ) ?: ""
             }
+
             AlbumsFragment.TAG -> {
-                mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                     R.string._organize_for,
                     context?.resources?.getString(R.string.songs_for_album) ?: ""
                 ) ?: ""
             }
+
             AlbumArtistsFragment.TAG -> {
-                mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                     R.string._organize_for,
                     context?.resources?.getString(R.string.songs_for_album_artist) ?: ""
                 ) ?: ""
             }
+
             ArtistsFragment.TAG -> {
-                mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                     R.string._organize_for,
                     context?.resources?.getString(R.string.songs_for_artist) ?: ""
                 ) ?: ""
             }
+
             ComposersFragment.TAG -> {
-                mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                     R.string._organize_for,
                     context?.resources?.getString(R.string.songs_for_composer) ?: ""
                 ) ?: ""
             }
+
             FoldersFragment.TAG -> {
-                mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                     R.string._organize_for,
                     context?.resources?.getString(R.string.songs_for_folder) ?: ""
                 ) ?: ""
             }
+
             GenresFragment.TAG -> {
-                mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                     R.string._organize_for,
                     context?.resources?.getString(R.string.songs_for_genre) ?: ""
                 ) ?: ""
             }
+
             YearsFragment.TAG -> {
-                mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                     R.string._organize_for,
                     context?.resources?.getString(R.string.songs_for_year) ?: ""
                 ) ?: ""
             }
+
             PlaylistsFragment.TAG -> {
-                mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                     R.string._organize_for,
                     context?.resources?.getString(R.string.songs_for_playlist) ?: ""
                 ) ?: ""
@@ -170,57 +208,65 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
 //                        ) ?: ""
 //                    }
             StreamsFragment.TAG -> {
-                mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                     R.string._organize_for,
                     context?.resources?.getString(R.string.songs_for_stream) ?: ""
                 ) ?: ""
             }
+
             ExploreContentsForFragment.TAG -> {
                 when (mFromSourceValue) {
                     AlbumsFragment.TAG -> {
-                        mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                        mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                             R.string._organize_for,
                             context?.resources?.getString(R.string.songs_for_album) ?: ""
                         ) ?: ""
                     }
+
                     AlbumArtistsFragment.TAG -> {
-                        mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                        mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                             R.string._organize_for,
                             context?.resources?.getString(R.string.songs_for_album_artist) ?: ""
                         ) ?: ""
                     }
+
                     ArtistsFragment.TAG -> {
-                        mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                        mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                             R.string._organize_for,
                             context?.resources?.getString(R.string.songs_for_artist) ?: ""
                         ) ?: ""
                     }
+
                     ComposersFragment.TAG -> {
-                        mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                        mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                             R.string._organize_for,
                             context?.resources?.getString(R.string.songs_for_composer) ?: ""
                         ) ?: ""
                     }
+
                     FoldersFragment.TAG -> {
-                        mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                        mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                             R.string._organize_for,
                             context?.resources?.getString(R.string.songs_for_folder) ?: ""
                         ) ?: ""
                     }
+
                     GenresFragment.TAG -> {
-                        mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                        mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                             R.string._organize_for,
                             context?.resources?.getString(R.string.songs_for_genre) ?: ""
                         ) ?: ""
                     }
+
                     YearsFragment.TAG -> {
-                        mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                        mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                             R.string._organize_for,
                             context?.resources?.getString(R.string.songs_for_year) ?: ""
                         ) ?: ""
                     }
+
                     PlaylistsFragment.TAG -> {
-                        mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                        mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                             R.string._organize_for,
                             context?.resources?.getString(R.string.songs_for_playlist) ?: ""
                         ) ?: ""
@@ -232,7 +278,7 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
 //                        ) ?: ""
 //                    }
                     StreamsFragment.TAG -> {
-                        mDataBiding?.textOrganizeDetails?.text = context?.resources?.getString(
+                        mDataBiding.textOrganizeDetails.text = context?.resources?.getString(
                             R.string._organize_for,
                             context?.resources?.getString(R.string.songs_for_stream) ?: ""
                         ) ?: ""
@@ -243,55 +289,68 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
     }
 
     private fun updateCheckedOrganizeButtonUI() {
-        if(mGenericListenDataViewModel == null) return
-        val tempOrganize : Int = mGenericListenDataViewModel?.organizeListGrid?.value ?: return
-        mDataBiding?.let { bottomSheetOrganizeItemsBinding ->
+        if (mGenericListenDataViewModel == null) return
+        val tempOrganize: Int = mGenericListenDataViewModel?.organizeListGrid?.value ?: return
+        mDataBiding.let {
             when (tempOrganize) {
                 MainConst.ORGANIZE_LIST_EXTRA_SMALL -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListExtraSmall.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioListExtraSmall.id)
                 }
+
                 MainConst.ORGANIZE_LIST_SMALL -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListSmall.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioListSmall.id)
                 }
+
                 MainConst.ORGANIZE_LIST_MEDIUM -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListMedium.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioListMedium.id)
                 }
+
                 MainConst.ORGANIZE_LIST_LARGE -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListLarge.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioListLarge.id)
                 }
+
                 MainConst.ORGANIZE_LIST_SMALL_NO_IMAGE -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListSmallNoImage.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioListSmallNoImage.id)
                 }
+
                 MainConst.ORGANIZE_LIST_MEDIUM_NO_IMAGE -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListMediumNoImage.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioListMediumNoImage.id)
                 }
+
                 MainConst.ORGANIZE_LIST_LARGE_NO_IMAGE -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListLargeNoImage.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioListLargeNoImage.id)
                 }
 
                 MainConst.ORGANIZE_GRID_EXTRA_SMALL -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridExtraSmall.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioGridExtraSmall.id)
                 }
+
                 MainConst.ORGANIZE_GRID_SMALL -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridSmall.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioGridSmall.id)
                 }
+
                 MainConst.ORGANIZE_GRID_MEDIUM -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridMedium.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioGridMedium.id)
                 }
+
                 MainConst.ORGANIZE_GRID_LARGE -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridLarge.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioGridLarge.id)
                 }
+
                 MainConst.ORGANIZE_GRID_EXTRA_LARGE -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridExtraLarge.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioGridExtraLarge.id)
                 }
+
                 MainConst.ORGANIZE_GRID_SMALL_NO_IMAGE -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridSmallNoImage.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioGridSmallNoImage.id)
                 }
+
                 MainConst.ORGANIZE_GRID_MEDIUM_NO_IMAGE -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioGridMediumNoImage.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioGridMediumNoImage.id)
                 }
+
                 else -> {
-                    mDataBiding?.radioGroupOrganize?.check(bottomSheetOrganizeItemsBinding.radioListSmall.id)
+                    mDataBiding.radioGroupOrganize.check(it.radioListSmall.id)
                 }
             }
         }
@@ -301,7 +360,7 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
         genericListenDataViewModel: GenericListenDataViewModel?,
         fromSource: String?,
         fromSourceValue: String?
-    ){
+    ) {
         mGenericListenDataViewModel = genericListenDataViewModel
         mFromSource = fromSource
         mFromSourceValue = fromSourceValue
@@ -316,29 +375,37 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
                 MainConst.ORGANIZE_GRID_SMALL_NO_IMAGE -> {
                     return ctx.resources.getInteger(R.integer.organize_grid_no_image_span_count)
                 }
+
                 MainConst.ORGANIZE_GRID_MEDIUM_NO_IMAGE -> {
                     return ctx.resources.getInteger(R.integer.organize_grid_no_image_span_count)
                 }
+
                 MainConst.ORGANIZE_GRID_EXTRA_SMALL -> {
                     return ctx.resources.getInteger(R.integer.organize_grid_extra_small_span_count)
                 }
+
                 MainConst.ORGANIZE_GRID_SMALL -> {
                     return ctx.resources.getInteger(R.integer.organize_grid_small_span_count)
                 }
+
                 MainConst.ORGANIZE_GRID_MEDIUM -> {
                     return ctx.resources.getInteger(R.integer.organize_grid_medium_span_count)
                 }
+
                 MainConst.ORGANIZE_GRID_LARGE -> {
                     return ctx.resources.getInteger(R.integer.organize_grid_large_span_count)
                 }
+
                 MainConst.ORGANIZE_GRID_EXTRA_LARGE -> {
                     return ctx.resources.getInteger(R.integer.organize_grid_extra_large_span_count)
                 }
+
                 else -> {
                     return 1
                 }
             }
         }
+
         @JvmStatic
         fun newInstance() =
             OrganizeItemBottomSheetDialogFragment().apply {
@@ -346,6 +413,6 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
     }
 
     override fun onShow(dialog: DialogInterface?) {
-        Log.i(MainConst.TAG, "onshow dddddddddddddddddddddddd")
+        //Nothing
     }
 }

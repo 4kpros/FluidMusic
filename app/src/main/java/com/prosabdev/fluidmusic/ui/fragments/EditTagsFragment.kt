@@ -7,12 +7,13 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.google.android.material.transition.platform.MaterialSharedAxis
+import com.prosabdev.common.utils.InsetModifiers
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.FragmentEditTagsBinding
 
 class EditTagsFragment : Fragment() {
 
-    private var mDataBiding: FragmentEditTagsBinding? = null
+    private lateinit var mDataBinding: FragmentEditTagsBinding
 
     private var mDataList: List<String>? = null
     private var mModelType: String? = null
@@ -28,11 +29,12 @@ class EditTagsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         //Set content with data biding util
-        mDataBiding = DataBindingUtil.inflate(inflater,R.layout.fragment_edit_tags, container,false)
-        val view = mDataBiding?.root
+        mDataBinding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_edit_tags, container, false)
+        val view = mDataBinding.root
 
         //Load your UI content
         initViews()
@@ -53,10 +55,8 @@ class EditTagsFragment : Fragment() {
     }
 
     private fun initViews() {
-        mDataBiding?.let { dataBidingView ->
-            com.prosabdev.common.utils.InsetModifiers.updateTopViewInsets(dataBidingView.coordinatorLayout)
-            com.prosabdev.common.utils.InsetModifiers.updateBottomViewInsets(dataBidingView.constraintNestedScrollView)
-        }
+        InsetModifiers.updateTopViewInsets(mDataBinding.coordinatorLayout)
+        InsetModifiers.updateBottomViewInsets(mDataBinding.constraintNestedScrollView)
     }
 
     companion object {

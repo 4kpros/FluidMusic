@@ -11,16 +11,17 @@ import com.prosabdev.fluidmusic.databinding.FragmentFoldersHierarchyBinding
 
 class FoldersHierarchyFragment : Fragment() {
 
-    private var mDataBiding: FragmentFoldersHierarchyBinding? = null
+    private lateinit var mDataBinding: FragmentFoldersHierarchyBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         //Set content with data biding util
-        mDataBiding = DataBindingUtil.inflate(inflater,R.layout.fragment_folders_hierarchy, container,false)
-        val view = mDataBiding?.root
+        mDataBinding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_folders_hierarchy, container, false)
+        val view = mDataBinding.root
 
         //Load your UI content
         initViews()

@@ -1,31 +1,26 @@
 package com.prosabdev.fluidmusic.viewmodels.activities
 
+import android.annotation.SuppressLint
 import android.app.Application
-import android.content.Context
 import android.media.audiofx.Equalizer
-import android.os.Handler
 import android.util.Log
-import androidx.annotation.OptIn
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.DefaultRenderersFactory
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.Renderer
-import androidx.media3.exoplayer.audio.AudioRendererEventListener
-import androidx.media3.exoplayer.audio.AudioSink
-import androidx.media3.exoplayer.audio.DefaultAudioSink
-import androidx.media3.exoplayer.audio.MediaCodecAudioRenderer
-import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
-import androidx.media3.exoplayer.source.MediaSource
 import com.prosabdev.common.models.equalizer.EqualizerPresetItem
-import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.media.MediaEventsListener
 import com.prosabdev.fluidmusic.ui.custom.visualizer.ExoVisualizer
 import com.prosabdev.fluidmusic.ui.custom.visualizer.FFTAudioProcessor
 import com.prosabdev.fluidmusic.viewmodels.models.equalizer.EqualizerPresetBandLevelItemViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.equalizer.EqualizerPresetItemViewModel
-import kotlinx.coroutines.launch
 
-@UnstableApi class EqualizerActivityViewModel(app: Application) : AndroidViewModel(app)  {
+@SuppressLint("LongLogTag")
+class EqualizerActivityViewModel(app: Application) : AndroidViewModel(app)  {
+
     //Equalizer bands
     val equalizerState = MutableLiveData<Boolean>(null)
     val currentPreset = MutableLiveData<CharSequence?>(null)
@@ -33,11 +28,14 @@ import kotlinx.coroutines.launch
     val customPresets = MutableLiveData<List<EqualizerPresetItem>?>(null)
     //Tone
     val toneState = MutableLiveData<Boolean>(null)
-    val bassBoostProgress = MutableLiveData<Int>(null)
-    val visualizerProgress = MutableLiveData<Int>(null)
-    val volumeProgress = MutableLiveData<Int>(null)
+    val bassBoost = MutableLiveData<Int>(null)
+    val visualizer = MutableLiveData<Int>(null)
+    val volume = MutableLiveData<Int>(null)
 
     private var mEqualizer: Equalizer? = null
+    var mediaEventsListener: MediaEventsListener = object : MediaEventsListener() {
+
+    }
 
     fun initSilentEqualizer(visualizerView: ExoVisualizer) {
         try {
@@ -51,46 +49,43 @@ import kotlinx.coroutines.launch
         return null
     }
 
+    suspend fun loadPresets(owner: LifecycleOwner, viewModel: EqualizerPresetItemViewModel){
+        viewModel.getAll()?.observe(owner) {
+            customPresets.value = it
+        }
+    }
+
     fun stopEqualizer() {
         //
     }
 
-    fun setEqualizerState(value: Boolean){
-        viewModelScope.launch {
-            mEqualizer?.enabled = value
-            equalizerState.value = value
-        }
-    }
+    suspend fun setCurrentPreset(preset: CharSequence?, viewModel: EqualizerPresetBandLevelItemViewModel?){
+        currentPreset.value = preset
+        if(preset.isNullOrEmpty()) return
 
-    fun setCurrentPreset(preset: CharSequence?, viewModel: EqualizerPresetBandLevelItemViewModel?){
-        viewModelScope.launch {
-            currentPreset.value = preset
-            if(preset.isNullOrEmpty()) return@launch
-
-            if(viewModel == null) return@launch
-            val presetId = getPresetIdFromName(preset)
-            val presetsCount = mEqualizer?.numberOfPresets ?: 0
-            if(presetId < presetsCount){
-                mEqualizer?.let { equ ->
-                    equ.usePreset(presetId)
-                    val tempPresetsLevels = Array<Short>(equ.numberOfBands.toInt()){0}
-                    for(i in 0 until equ.numberOfBands){
-                        tempPresetsLevels[i] = equ.getBandLevel(i.toShort())
-                    }
-                    presetBandsLevels.value = tempPresetsLevels
+        if(viewModel == null) return
+        val presetId = getPresetIdFromName(preset)
+        val presetsCount = mEqualizer?.numberOfPresets ?: 0
+        if(presetId < presetsCount){
+            mEqualizer?.let { equ ->
+                equ.usePreset(presetId)
+                val tempPresetsLevels = Array<Short>(equ.numberOfBands.toInt()){0}
+                for(i in 0 until equ.numberOfBands){
+                    tempPresetsLevels[i] = equ.getBandLevel(i.toShort())
                 }
-            }else{
-                val tempCustomPresets = customPresets.value
-                tempCustomPresets?.let { cP ->
-                    for(element in cP){
-                        if(preset == element.presetName){
-                            val tempCustomPresetBandsLevels = viewModel.getAllAtPresetName(preset as String?)
-                            val tempPresetsLevels = Array<Short>(tempCustomPresetBandsLevels?.size ?: return@let){0}
-                            for (i in tempCustomPresetBandsLevels.indices){
-                                tempPresetsLevels[tempCustomPresetBandsLevels[i].bandId.toInt()] = tempCustomPresetBandsLevels[i].bandLevel
-                            }
-                            presetBandsLevels.value = tempPresetsLevels
+                presetBandsLevels.value = tempPresetsLevels
+            }
+        }else{
+            val tempCustomPresets = customPresets.value
+            tempCustomPresets?.let { cP ->
+                for(element in cP){
+                    if(preset == element.presetName){
+                        val tempCustomPresetBandsLevels = viewModel.getAllAtPresetName(preset as String?)
+                        val tempPresetsLevels = Array<Short>(tempCustomPresetBandsLevels?.size ?: return@let){0}
+                        for (i in tempCustomPresetBandsLevels.indices){
+                            tempPresetsLevels[tempCustomPresetBandsLevels[i].bandId.toInt()] = tempCustomPresetBandsLevels[i].bandLevel
                         }
+                        presetBandsLevels.value = tempPresetsLevels
                     }
                 }
             }
@@ -120,9 +115,24 @@ import kotlinx.coroutines.launch
         tempPresetBandsLevels?.let {
             it[bandId.toInt()] = level
         }
-        viewModelScope.launch {
-            presetBandsLevels.value = tempPresetBandsLevels
-        }
+        presetBandsLevels.value = tempPresetBandsLevels
+    }
+
+    fun getBandLevelRangeMin(): Short {
+        return mEqualizer?.let {
+            it.bandLevelRange[0]
+        } ?: 0
+    }
+    fun getBandLevelRangeMax(): Short {
+        return mEqualizer?.let {
+            it.bandLevelRange[1]
+        } ?: 0
+    }
+    fun getBandsCount(): Short {
+        return mEqualizer?.numberOfBands ?: 0
+    }
+    fun getPresetName(presetId: Short): CharSequence? {
+        return mEqualizer?.getPresetName(presetId)
     }
     fun getPresets(): Array<CharSequence>? {
         mEqualizer?.let { equ ->
@@ -134,6 +144,9 @@ import kotlinx.coroutines.launch
             return tempPresets
         }
         return null
+    }
+    fun getCenterFrequency(bandId: Short): Int {
+        return (mEqualizer?.getCenterFreq(bandId) ?: 0)
     }
     fun getPresetIdFromName(presetName: CharSequence?): Short {
         if(presetName.isNullOrEmpty()) return -1
@@ -164,7 +177,6 @@ import kotlinx.coroutines.launch
                 return true
             }
         }
-        Log.i("TAG", "CHECK ON CUSTOM PRESETS")
         //Check on custom presets
         val customPresetsCount: Int = customPresets.value?.size ?: return false
         for (i in 0 until customPresetsCount){
@@ -174,5 +186,17 @@ import kotlinx.coroutines.launch
             }
         }
         return false
+    }
+
+    class Factory(
+        private val app: Application,
+    ) : ViewModelProvider.NewInstanceFactory() {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return EqualizerActivityViewModel(app) as T
+        }
+    }
+
+    companion object {
+        const val TAG = "EqualizerActivityViewModel"
     }
 }
