@@ -23,7 +23,7 @@ import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 
 class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
-    private var mDataBiding: BottomSheetSortSongsBinding? = null
+    private lateinit var mDataBiding: BottomSheetSortSongsBinding
 
     private var mGenericListenDataViewModel: GenericListenDataViewModel? = null
 
@@ -34,11 +34,11 @@ class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         //Set content with data biding util
         mDataBiding = DataBindingUtil.inflate(inflater, R.layout._bottom_sheet_sort_songs, container, false)
-        val view = mDataBiding?.root
+        val view = mDataBiding.root
 
         //Load your UI content
         initViews()
@@ -48,13 +48,13 @@ class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun checkInteractions() {
-        mDataBiding?.let { bottomSheetSortSongsBinding ->
-            bottomSheetSortSongsBinding.radioGroupSort.setOnCheckedChangeListener { _, checkedId ->
+        mDataBiding.let {
+            it.radioGroupSort.setOnCheckedChangeListener { _, checkedId ->
                 onRadioGroupStateChanged(
                     checkedId
                 )
             }
-            bottomSheetSortSongsBinding.checkboxInvertItems.setOnCheckedChangeListener { _, isChecked ->
+            it.checkboxInvertItems.setOnCheckedChangeListener { _, isChecked ->
                 onInvertSortChanged(
                     isChecked
                 )
@@ -154,7 +154,7 @@ class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private fun updateTitleUI() {
         when (mFromSource) {
             AllSongsFragment.TAG -> {
-                mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                mDataBiding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.all_songs) ?: ""
                 ) ?: ""
@@ -162,61 +162,61 @@ class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
             ExploreContentsForFragment.TAG -> {
                 when (mFromSourceValue) {
                     AlbumsFragment.TAG -> {
-                        mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                        mDataBiding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_album) ?: ""
                         ) ?: ""
                     }
                     AlbumArtistsFragment.TAG -> {
-                        mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                        mDataBiding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_album_artist) ?: ""
                         ) ?: ""
                     }
                     ArtistsFragment.TAG -> {
-                        mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                        mDataBiding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_artist) ?: ""
                         ) ?: ""
                     }
                     ComposersFragment.TAG -> {
-                        mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                        mDataBiding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_composer) ?: ""
                         ) ?: ""
                     }
                     FoldersFragment.TAG -> {
-                        mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                        mDataBiding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_folder) ?: ""
                         ) ?: ""
                     }
                     GenresFragment.TAG -> {
-                        mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                        mDataBiding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_genre) ?: ""
                         ) ?: ""
                     }
                     YearsFragment.TAG -> {
-                        mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                        mDataBiding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_year) ?: ""
                         ) ?: ""
                     }
                     PlaylistsFragment.TAG -> {
-                        mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                        mDataBiding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_playlist) ?: ""
                         ) ?: ""
                     }
 //                    FavoritesFragment.TAG -> {
-//                        mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+//                        mDataBiding.textSortDetails.text = context?.resources?.getString(
 //                            R.string._sort_for,
 //                            context?.resources?.getString(R.string.songs_for_favorites) ?: ""
 //                        ) ?: ""
 //                    }
                     StreamsFragment.TAG -> {
-                        mDataBiding?.textSortDetails?.text = context?.resources?.getString(
+                        mDataBiding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_stream) ?: ""
                         ) ?: ""
@@ -227,92 +227,92 @@ class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun updateDefaultCheckboxInvertButtonUI() {
-        mDataBiding?.checkboxInvertItems?.isChecked =
+        mDataBiding.checkboxInvertItems.isChecked =
             mGenericListenDataViewModel?.isInverted?.value ?: false
     }
 
     private fun updateDefaultCheckedRadioButtonUI() {
         if (mGenericListenDataViewModel == null) return
-        mDataBiding?.let { bottomSheetSortSongsBinding ->
+        mDataBiding.let {
             val tempFilter = mGenericListenDataViewModel?.sortBy?.value ?: return
             when (tempFilter) {
                 "title" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_title)
+                    it.radioGroupSort.check(R.id.radio_title)
                 }
                 "fileName" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_file_name)
+                    it.radioGroupSort.check(R.id.radio_file_name)
                 }
                 "cdTrackNumber" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_artist)
+                    it.radioGroupSort.check(R.id.radio_artist)
                 }
                 "diskNumber" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_disc_number)
+                    it.radioGroupSort.check(R.id.radio_disc_number)
                 }
                 "artist" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_artist)
+                    it.radioGroupSort.check(R.id.radio_artist)
                 }
                 "album" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_album)
+                    it.radioGroupSort.check(R.id.radio_album)
                 }
                 "albumArtist" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_album_artist)
+                    it.radioGroupSort.check(R.id.radio_album_artist)
                 }
                 "composer" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_composer)
+                    it.radioGroupSort.check(R.id.radio_composer)
                 }
                 "year" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_year)
+                    it.radioGroupSort.check(R.id.radio_year)
                 }
                 "duration" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_duration)
+                    it.radioGroupSort.check(R.id.radio_duration)
                 }
                 "lastAddedDateToLibrary" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_last_added_date_to_library)
+                    it.radioGroupSort.check(R.id.radio_last_added_date_to_library)
                 }
                 "lastUpdateDate" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_last_update_date)
+                    it.radioGroupSort.check(R.id.radio_last_update_date)
                 }
                 "path" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_path)
+                    it.radioGroupSort.check(R.id.radio_path)
                 }
                 "pathCaseSensitive" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_path_case_sensitive)
+                    it.radioGroupSort.check(R.id.radio_path_case_sensitive)
                 }
                 "genre" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_genre)
+                    it.radioGroupSort.check(R.id.radio_genre)
                 }
                 "size" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_size)
+                    it.radioGroupSort.check(R.id.radio_size)
                 }
                 "typeMime" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_type_mime)
+                    it.radioGroupSort.check(R.id.radio_type_mime)
                 }
                 "rating" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_rating)
+                    it.radioGroupSort.check(R.id.radio_rating)
                 }
                 "playCount" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_play_count)
+                    it.radioGroupSort.check(R.id.radio_play_count)
                 }
                 "lastPlayed" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_last_played)
+                    it.radioGroupSort.check(R.id.radio_last_played)
                 }
                 "author" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_author)
+                    it.radioGroupSort.check(R.id.radio_author)
                 }
                 "writer" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_writer)
+                    it.radioGroupSort.check(R.id.radio_writer)
                 }
                 "language" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_language)
+                    it.radioGroupSort.check(R.id.radio_language)
                 }
                 "sampleRate" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_sample_rate)
+                    it.radioGroupSort.check(R.id.radio_sample_rate)
                 }
                 "bitrate" -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(R.id.radio_bitrate)
+                    it.radioGroupSort.check(R.id.radio_bitrate)
                 }
                 else -> {
-                    bottomSheetSortSongsBinding.radioGroupSort.check(bottomSheetSortSongsBinding.radioTitle.id)
+                    it.radioGroupSort.check(it.radioTitle.id)
                 }
             }
         }

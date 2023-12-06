@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.ui.activities
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
@@ -16,7 +17,7 @@ import com.prosabdev.fluidmusic.ui.activities.settings.InterfaceSettingsActivity
 import com.prosabdev.fluidmusic.ui.activities.settings.LanguageSettingsActivity
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
 
-@BuildCompat.PrereleaseSdkCheck class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : AppCompatActivity() {
 
     private lateinit var mDataBiding : ActivitySettingsBinding
 
@@ -39,7 +40,7 @@ import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActiv
     }
 
     private fun registerOnBackPressedCallback() {
-        if (BuildCompat.isAtLeastT()) {
+        if (Build.VERSION.SDK_INT >= 33) {
             onBackInvokedDispatcher.registerOnBackInvokedCallback(
                 OnBackInvokedDispatcher.PRIORITY_DEFAULT
             ) {

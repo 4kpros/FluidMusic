@@ -44,7 +44,7 @@ import kotlinx.coroutines.*
 
 class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
 
-    private var mDataBidingView: BottomSheetPlayerMoreBinding? = null
+    private var mDataBiding: BottomSheetPlayerMoreBinding? = null
 
     private val mPlaylistItemViewModel: PlaylistItemViewModel by viewModels()
 
@@ -68,11 +68,15 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mDataBidingView = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_player_more, container, false)
-        val view = mDataBidingView?.root
 
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_player_more, container, false)
+        val view = mDataBiding.root
+
+        //Load your UI content
         initViews()
         observeLiveData()
+
         return view
     }
 
@@ -98,7 +102,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         if(songItem == null)
             return
         context?.let { ctx ->
-            mDataBidingView?.let { dataBidingView ->
+            mDataBiding?.let { dataBidingView ->
                 dataBidingView.textTitle.text = songItem.title?.ifEmpty { songItem.fileName } ?: songItem.fileName
                 dataBidingView.textArtist.text = songItem.artist?.ifEmpty { ctx.getString(R.string.unknown_artist) } ?: ctx.getString(R.string.unknown_artist)
 
@@ -120,7 +124,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun checkInteractions() {
-        mDataBidingView?.let { dataBidingView ->
+        mDataBiding?.let { dataBidingView ->
             dataBidingView.buttonInfo.setOnClickListener {
                 showSongInfoDialog()
             }
@@ -526,8 +530,8 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         dismiss()
     }
     private fun initViews() {
-        mDataBidingView?.textTitle?.isSelected = true
-        mDataBidingView?.textDescription?.isSelected = true
+        mDataBiding?.textTitle?.isSelected = true
+        mDataBiding?.textDescription?.isSelected = true
     }
 
     fun updateData(nowPlayingFragmentViewModel : NowPlayingFragmentViewModel, mainFragmentViewModel : MainFragmentViewModel, screenShootPlayerView : View){

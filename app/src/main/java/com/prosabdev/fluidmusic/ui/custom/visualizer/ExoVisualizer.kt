@@ -13,12 +13,12 @@ class ExoVisualizer @JvmOverloads constructor(
 
     var processor: FFTAudioProcessor? = null
 
-    private var currentWaveform: FloatArray? = null
+    private var mCurrentWaveform: FloatArray? = null
 
-    private val bandView = FFTBandView(context, attrs)
+    private val mBandView = FFTBandView(context, attrs)
 
     init {
-        addView(bandView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        addView(mBandView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
     }
 
     private fun updateProcessorListenerState(enable: Boolean) {
@@ -26,7 +26,7 @@ class ExoVisualizer @JvmOverloads constructor(
             processor?.listener = this
         } else {
             processor?.listener = null
-            currentWaveform = null
+            mCurrentWaveform = null
         }
     }
 
@@ -41,8 +41,8 @@ class ExoVisualizer @JvmOverloads constructor(
     }
 
     override fun onFFTReady(sampleRateHz: Int, channelCount: Int, fft: FloatArray) {
-        currentWaveform = fft
-        bandView.onFFT(fft)
+        mCurrentWaveform = fft
+        mBandView.onFFT(fft)
     }
 
 }

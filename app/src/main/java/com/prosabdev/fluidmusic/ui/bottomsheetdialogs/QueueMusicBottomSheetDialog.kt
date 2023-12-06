@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 
 class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
 
-    private var mBottomSheetQueueMusicBinding: BottomSheetQueueMusicBinding? = null
+    private lateinit var mDataBiding: BottomSheetQueueMusicBinding
 
     private var mNowPlayingFragmentViewModel: NowPlayingFragmentViewModel? = null
 
@@ -33,12 +33,16 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        mBottomSheetQueueMusicBinding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_queue_music, container, false)
-        val view = mBottomSheetQueueMusicBinding?.root
+    ): View {
 
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_queue_music, container, false)
+        val view = mDataBiding.root
+
+        //Load your UI content
         initViews()
         setupRecyclerView()
+
         return view
     }
 
@@ -71,7 +75,7 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
     }
 
     private fun checkInteractions() {
-        mBottomSheetQueueMusicBinding?.let { bottomSheetQueueMusicBinding ->
+        mDataBiding?.let { bottomSheetQueueMusicBinding ->
             bottomSheetQueueMusicBinding.buttonClearQueueMusic.setOnClickListener{
                 clearQueueMusicList()
             }
@@ -93,7 +97,7 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
 
     private fun setupRecyclerView() {
         context?.let { ctx ->
-            mBottomSheetQueueMusicBinding?.let { bottomSheetQueueMusicBinding ->
+            mDataBiding?.let { bottomSheetQueueMusicBinding ->
                 mQueueMusicItemAdapter = QueueMusicItemListAdapter(
                     ctx,
                     object : QueueMusicItemListAdapter.OnItemClickListener {

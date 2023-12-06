@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.database.ContentObserver
 import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -17,16 +18,13 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.media3.common.util.UnstableApi
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textview.MaterialTextView
 import com.lukelorusso.verticalseekbar.VerticalSeekBar
-import com.prosabdev.common.persistence.PersistentStorage
 import com.prosabdev.common.utils.Animators
 import com.prosabdev.common.utils.FormattersAndParsers
 import com.prosabdev.common.utils.InsetModifiers
@@ -35,20 +33,29 @@ import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityEqualizerBinding
 import com.prosabdev.fluidmusic.databinding.ComponentDialogEditTextBinding
 import com.prosabdev.fluidmusic.databinding.ComponentDialogTitleBinding
+import com.prosabdev.fluidmusic.media.MediaEventsListener
+import com.prosabdev.fluidmusic.utils.InjectorUtils
 import com.prosabdev.fluidmusic.viewmodels.activities.EqualizerActivityViewModel
+import com.prosabdev.fluidmusic.viewmodels.activities.MainActivityViewModel
+import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaControllerViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.equalizer.EqualizerPresetBandLevelItemViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.equalizer.EqualizerPresetItemViewModel
 import kotlinx.coroutines.*
 import me.tankery.lib.circularseekbar.CircularSeekBar
 
-@UnstableApi @BuildCompat.PrereleaseSdkCheck class EqualizerActivity : AppCompatActivity() {
+@UnstableApi class EqualizerActivity : AppCompatActivity() {
 
     private lateinit var mDataBiding : ActivityEqualizerBinding
 
+    private val mEqualizerActivityViewModel by viewModels<EqualizerActivityViewModel> {
+        InjectorUtils.provideEqualizerActivityViewModel(application)
+    }
+    private val mMediaControllerViewModel by viewModels<MediaControllerViewModel> {
+        InjectorUtils.provideMediaControllerViewModel(mEqualizerActivityViewModel.mediaEventsListener)
+    }
+
     private val mEqualizerPresetItemViewModel: EqualizerPresetItemViewModel by viewModels()
     private val mEqualizerPresetBandLevelItemViewModel: EqualizerPresetBandLevelItemViewModel by viewModels()
-
-    private val mEqualizerActivityViewModel: EqualizerActivityViewModel by viewModels()
 
     private var mSettingsContentObserver: SettingsContentObserver? = null
 
@@ -63,25 +70,29 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
         mDataBiding = DataBindingUtil.setContentView(this, R.layout.activity_equalizer)
 
         //Load your UI content
-        if(savedInstanceState == null){
-            initViews()
-            loadSettingsAndInitEqualizer()
-            checkInteractions()
-            observeLiveData()
-            registerOnBackPressedCallback()
+        if(savedInstanceState == null) {
+            runBlocking {
+                initViews()
+                loadSharedPrefsAnInitEqualizer()
+                checkInteractions()
+                observeLiveData()
+                registerOnBackPressedCallback()
+            }
         }
     }
-    override fun onStop() {
-        mEqualizerActivityViewModel.stopEqualizer()
-        unregisterEventListeners()
-        super.onStop()
-    }
+
     override fun onStart() {
         super.onStart()
-        registerEventListeners()
+        registerVolumeEventListener()
     }
 
-    private fun registerEventListeners() {
+    override fun onStop() {
+        mEqualizerActivityViewModel.stopEqualizer()
+        unregisterVolumeEventListener()
+        super.onStop()
+    }
+
+    private fun registerVolumeEventListener() {
         if(mSettingsContentObserver != null) return
 
         mSettingsContentObserver = SettingsContentObserver(this, Handler(Looper.getMainLooper()), mEqualizerActivityViewModel)
@@ -93,57 +104,50 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
             )
         }
     }
-    private fun unregisterEventListeners() {
+    private fun unregisterVolumeEventListener() {
         mSettingsContentObserver?.let { observer ->
             applicationContext.contentResolver.unregisterContentObserver(observer)
         }
         mSettingsContentObserver = null
     }
 
-    private fun observeLiveData() {
-        mEqualizerActivityViewModel.customPresets.observe(this@EqualizerActivity) {
-            //
-        }
+    private suspend fun observeLiveData() {
+        mEqualizerActivityViewModel.loadPresets(this@EqualizerActivity, mEqualizerPresetItemViewModel)
         mEqualizerActivityViewModel.equalizerState.observe(this) {
-            if(it != null) {
-                updateEnableEquUI(it)
-            }
+            onEqualizerStateChanged(it)
         }
         mEqualizerActivityViewModel.toneState.observe(this) {
-            if(it != null) {
-                updateEnableToneUI(it)
-            }
+            onTonalStateChange(it)
         }
         mEqualizerActivityViewModel.currentPreset.observe(this) {
-            if(it != null) {
-                updateEqualizerBands(it)
-            }
+            onCurrentPresetChange(it)
         }
         mEqualizerActivityViewModel.presetBandsLevels.observe(this) {
-            if(it != null) {
-                updateEqualizerBands(mEqualizerActivityViewModel.getCurrentPreset().value)
-            }
+            onPresetBandsLevelsChange()
         }
-        mEqualizerActivityViewModel.volumeProgress.observe(this) {
-            if(it != null) {
-                onVolumeChanged(it)
-            }
+        mEqualizerActivityViewModel.volume.observe(this) {
+            onVolumeChanged(it)
         }
-        mEqualizerActivityViewModel.bassBoostProgress.observe(this) {
-            if(it != null) {
-                updateBassBoostUI(it)
-            }
+        mEqualizerActivityViewModel.bassBoost.observe(this) {
+            onBassBoostChanged(it)
         }
-        mEqualizerActivityViewModel.visualizerProgress.observe(this) {
-            if(it != null) {
-                updateVisualizerUI(it)
-            }
+        mEqualizerActivityViewModel.visualizer.observe(this) {
+            onVisualizerChanged(it)
         }
     }
 
+    private fun onVisualizerChanged(it: Int?) {
+        if(it == null) return
+        updateVisualizerUI(it)
+    }
     private fun updateVisualizerUI(it: Int) {
         mDataBiding.seekbarVisualizer.progress = it.toFloat()
         mDataBiding.textViewVisualizerProgress.text = "${it}%"
+    }
+
+    private fun onBassBoostChanged(it: Int?) {
+        if(it == null) return
+        updateBassBoostUI(it)
     }
     @SuppressLint("SetTextI18n")
     private fun updateBassBoostUI(it: Int) {
@@ -155,7 +159,6 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
         if(it == null) return
         val tempMaxVolume: Int = mSettingsContentObserver?.maxVolume ?: 0
         val tempPercentVolume: Float = (it.toFloat() / tempMaxVolume.toFloat()) * 100.0f
-        Log.i(TAG, "ON VOLUME PERCENTAGE CHANGED : $tempPercentVolume")
         updateMediaPlayerVolume(it)
         updateVolumeUI(tempPercentVolume)
     }
@@ -179,12 +182,20 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
         mDataBiding.textViewVolumeProgress.text = "${it.toInt()}%"
     }
 
+    private fun onPresetBandsLevelsChange() {
+        updateEqualizerBands(mEqualizerActivityViewModel.currentPreset.value)
+    }
+
     private fun onTonalStateChange(it: Boolean?) {
         val animate = it != null
         updateEnableToneUI(
             it ?: false,
             animate
         )
+    }
+
+    private fun onCurrentPresetChange(it: CharSequence?) {
+        updateEqualizerBands(it)
     }
 
     private fun onEqualizerStateChanged(it: Boolean?) {
@@ -196,7 +207,7 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
     }
 
     private fun registerOnBackPressedCallback() {
-        if (BuildCompat.isAtLeastT()) {
+        if (Build.VERSION.SDK_INT >= 33) {
             onBackInvokedDispatcher.registerOnBackInvokedCallback(
                 OnBackInvokedDispatcher.PRIORITY_DEFAULT
             ) {
@@ -211,15 +222,17 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
         }
     }
 
-    fun checkInteractions() {
+    private fun checkInteractions() {
         mDataBiding.switchEqualizer.setOnCheckedChangeListener { _, isChecked ->
-            mEqualizerActivityViewModel.setEqualizerState(isChecked)
-            if(mEqualizerActivityViewModel.getCurrentPreset().value == null){
-                val defaultActivatedPreset = mEqualizerActivityViewModel.getPresetName(0)
-                mEqualizerActivityViewModel.setCurrentPreset(
-                    defaultActivatedPreset,
-                    mEqualizerPresetBandLevelItemViewModel
-                )
+            mEqualizerActivityViewModel.equalizerState.value = isChecked
+            if(mEqualizerActivityViewModel.currentPreset.value == null){
+                runBlocking {
+                    val defaultActivatedPreset = mEqualizerActivityViewModel.getPresetName(0)
+                    mEqualizerActivityViewModel.setCurrentPreset(
+                        defaultActivatedPreset,
+                        mEqualizerPresetBandLevelItemViewModel
+                    )
+                }
             }
         }
         mDataBiding.switchTone.setOnCheckedChangeListener { _, isChecked ->
@@ -235,7 +248,7 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
             if(fromUser){
                 val maxVolume = mSettingsContentObserver?.maxVolume ?: 0
                 val newVolume = value / 100f * maxVolume
-                mEqualizerActivityViewModel.volumeProgress.value = newVolume.toInt()
+                mEqualizerActivityViewModel.volume.value = newVolume.toInt()
             }
         }
         mDataBiding.seekbarBassBoost.setOnSeekBarChangeListener(object : CircularSeekBar.OnCircularSeekBarChangeListener{
@@ -245,7 +258,7 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
                 fromUser: Boolean
             ) {
                 if(fromUser){
-                    mEqualizerActivityViewModel.bassBoostProgress.value = progress.toInt()
+                    mEqualizerActivityViewModel.bassBoost.value = progress.toInt()
                 }
             }
             override fun onStartTrackingTouch(seekBar: CircularSeekBar?) {
@@ -260,7 +273,7 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
                 fromUser: Boolean
             ) {
                 if(fromUser){
-                    mEqualizerActivityViewModel.visualizerProgress.value = progress.toInt()
+                    mEqualizerActivityViewModel.visualizer.value = progress.toInt()
                 }
             }
             override fun onStartTrackingTouch(seekBar: CircularSeekBar?) {
@@ -354,12 +367,10 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
     private fun updateSavePresetDialogUI(dialogDataBidingView: ComponentDialogEditTextBinding, haveErrors: Boolean) {
         if(haveErrors){
             val inputTextLength = dialogDataBidingView.textInputEditText.text?.length ?: 0
-            MainScope().launch {
-                if(inputTextLength <= 0){
-                    dialogDataBidingView.textInputLayout.error = baseContext.resources.getString(R.string.invalid_name)
-                }else{
-                    dialogDataBidingView.textInputLayout.error = baseContext.resources.getString(R.string.name_already_exist)
-                }
+            if(inputTextLength <= 0){
+                dialogDataBidingView.textInputLayout.error = baseContext.resources.getString(R.string.invalid_name)
+            }else{
+                dialogDataBidingView.textInputLayout.error = baseContext.resources.getString(R.string.name_already_exist)
             }
             Animators.crossFadeDownClickable(
                 dialogDataBidingView.buttonSave
@@ -375,7 +386,7 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
     }
 
     private fun openPresetSelectorDialog() {
-        val tempCurrentPresetName = mEqualizerActivityViewModel.getCurrentPreset().value
+        val tempCurrentPresetName = mEqualizerActivityViewModel.currentPreset.value
         val dialogTitleDataBidingView : ComponentDialogTitleBinding = DataBindingUtil.inflate(layoutInflater, R.layout._component_dialog_title, null, false)
         MaterialAlertDialogBuilder(this)
             .setCustomTitle(dialogTitleDataBidingView.root)
@@ -419,13 +430,13 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
             textTop.text = FormattersAndParsers.formatBandLevelToString(bandLevel)
             verticalSeekBar.progress = FormattersAndParsers.formatBandToPercent(
                 bandLevel,
-                mEqualizerActivityViewModel.presetBandsLevels.value?.get(0) ?: 0,
-                mEqualizerActivityViewModel.presetBandsLevels.value?.get(1) ?: 0
+                mEqualizerActivityViewModel.getBandLevelRangeMin(),
+                mEqualizerActivityViewModel.getBandLevelRangeMax()
             )
         }
     }
 
-    private fun updateEnableEquUI(isChecked: Boolean, animate: Boolean = true) {
+    private fun updateEnableEquUI(isChecked: Boolean, animate: Boolean) {
         if(isChecked){
             Animators.crossFadeUpClickable(
                 mDataBiding.buttonChoosePreset,
@@ -520,7 +531,7 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
             }
         }
     }
-    private fun updateEnableToneUI(isChecked: Boolean, animate: Boolean = true) {
+    private fun updateEnableToneUI(isChecked: Boolean, animate: Boolean) {
         if(isChecked){
             Animators.crossFadeUpClickable(
                 mDataBiding.seekbarBassBoost,
@@ -594,12 +605,12 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
         }
     }
 
-    private fun loadSettingsAndInitEqualizer() {
-        val equEnable = PersistentStorage.AudioEffects.loadEqualizerState()
-        val toneEnable = PersistentStorage.AudioEffects.loadToneState()
-        mEqualizerActivityViewModel.initSilentEqualizer(mDataBiding.exoVisualizerBands)
-        initEqualizerUI(equEnable)
-        initToneUI(toneEnable)
+    private fun loadSharedPrefsAnInitEqualizer() {
+//        val equEnable = SharedPreferenceManager.AudioEffects.loadEqualizerState(baseContext)
+//        val toneEnable = SharedPreferenceManager.AudioEffects.loadToneState(baseContext)
+//        mEqualizerActivityViewModel.initSilentEqualizer(baseContext)
+//        initEqualizerUI(equEnable)
+//        initToneUI(toneEnable)
     }
     private fun initToneUI(toneEnable: Boolean) {
         mDataBiding.switchTone.isChecked = toneEnable
@@ -613,7 +624,7 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
         setupEqualizerBandsUI()
     }
     private fun setupEqualizerBandsUI() {
-        val bandsCount: Short = mEqualizerActivityViewModel.presetBandsLevels.value?.size ?: 0
+        val bandsCount: Short = mEqualizerActivityViewModel.getBandsCount()
         for(i in 0 until bandsCount){
             val inflater = LayoutInflater.from(this@EqualizerActivity).inflate(R.layout._component_vertical_seek_bar, null)
             val textTop = inflater.findViewById<MaterialTextView>(R.id.text_view_top)
@@ -635,8 +646,8 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
             textBottom.text = FormattersAndParsers.formatCenterFreqToString(centerFreq)
             verticalSeekBar.progress = FormattersAndParsers.formatBandToPercent(
                 bandLevel,
-                mEqualizerActivityViewModel.presetBandsLevels.value?.get(0) ?: 0,
-                mEqualizerActivityViewModel.presetBandsLevels.value?.get(1) ?: 0
+                mEqualizerActivityViewModel.getBandLevelRangeMin(),
+                mEqualizerActivityViewModel.getBandLevelRangeMax()
             )
             var havePressed = false
             verticalSeekBar.setOnPressListener {
@@ -658,7 +669,7 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
         }
     }
 
-    private fun updateCurrentPresetName() {
+    private suspend fun updateCurrentPresetName() {
         mEqualizerActivityViewModel.setCurrentPreset(null, null)
     }
 
@@ -676,8 +687,8 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
     private fun updateBandLevelOnVerticalSeekBarChange(bandId: Short, progressLevel: Int) {
         val level = FormattersAndParsers.formatPercentToBandFreq(
             progressLevel,
-            mEqualizerActivityViewModel.presetBandsLevels.value?.get(0) ?: 0,
-            mEqualizerActivityViewModel.presetBandsLevels.value?.get(1) ?: 0
+            mEqualizerActivityViewModel.getBandLevelRangeMin(),
+            mEqualizerActivityViewModel.getBandLevelRangeMax()
         )
         mEqualizerActivityViewModel.setBandLevel(bandId, level)
     }
@@ -693,7 +704,7 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
         private val mViewModel: EqualizerActivityViewModel
     ) :
         ContentObserver(mHandler) {
-        private var previousVolume: Int
+        var previousVolume: Int
         var maxVolume: Int
 
         init {
@@ -701,7 +712,7 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
             val currentVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
             maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
             previousVolume = currentVolume
-            mViewModel.volumeProgress.value = currentVolume
+            mViewModel.volume.value = currentVolume
             Log.i(TAG, "AUDIO VOLUME PERCENT SET $currentVolume")
         }
 
@@ -713,12 +724,10 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
                 val delta = previousVolume - currentVolume
                 if (delta > 0) {
                     previousVolume = currentVolume
-                    mViewModel.volumeProgress.value = currentVolume
-                    Log.i(TAG, "AUDIO VOLUME PERCENT INCREASED $currentVolume")
+                    mViewModel.volume.value = currentVolume
                 } else if (delta < 0) {
                     previousVolume = currentVolume
-                    mViewModel.volumeProgress.value = currentVolume
-                    Log.i(TAG, "AUDIO VOLUME PERCENT INCREASED $currentVolume")
+                    mViewModel.volume.value = currentVolume
                 }
             }catch (error: Throwable){
                 error.printStackTrace()

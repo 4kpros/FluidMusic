@@ -11,16 +11,16 @@ import com.prosabdev.fluidmusic.databinding.FragmentStreamsBinding
 
 class StreamsFragment : Fragment() {
 
-    private var mDataBiding: FragmentStreamsBinding? = null
+    private lateinit var mDataBinding: FragmentStreamsBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         //Set content with data biding util
-        mDataBiding = DataBindingUtil.inflate(inflater,R.layout.fragment_streams, container,false)
-        val view = mDataBiding?.root
+        mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_streams, container, false)
+        val view = mDataBinding.root
 
         //Load your UI content
         initViews()

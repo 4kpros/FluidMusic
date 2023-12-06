@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:backgroundTint="?android:colorBackground"
         android:background="?android:colorBackground"
-        tools:context=".ui.fragments.NowPlayingFragment">
+        tools:context=".ui.fragments.PlayingNowFragment">
 
 
         <ImageView

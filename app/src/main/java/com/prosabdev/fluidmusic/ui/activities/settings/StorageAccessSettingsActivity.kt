@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.ui.activities.settings
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -37,7 +38,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
-@BuildCompat.PrereleaseSdkCheck class StorageAccessSettingsActivity : AppCompatActivity() {
+class StorageAccessSettingsActivity : AppCompatActivity() {
 
     private lateinit var mDataBiding: ActivityStorageAccessSettingsBinding
 
@@ -71,7 +72,7 @@ import kotlinx.coroutines.withContext
     }
 
     private fun registerOnBackPressedCallback() {
-        if (BuildCompat.isAtLeastT()) {
+        if (Build.VERSION.SDK_INT >= 33) {
             onBackInvokedDispatcher.registerOnBackInvokedCallback(
                 OnBackInvokedDispatcher.PRIORITY_DEFAULT
             ) {

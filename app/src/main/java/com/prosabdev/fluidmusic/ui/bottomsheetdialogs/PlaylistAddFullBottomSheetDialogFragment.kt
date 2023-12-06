@@ -22,7 +22,7 @@ import kotlinx.coroutines.*
 
 class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFragment() {
 
-    private lateinit var mBottomSheetAddToPlaylistBinding: BottomSheetAddToPlaylistBinding
+    private lateinit var mDataBiding: BottomSheetAddToPlaylistBinding
 
     private var mPlaylistItemViewModel: PlaylistItemViewModel? = null
 
@@ -38,9 +38,12 @@ class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFra
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mBottomSheetAddToPlaylistBinding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_add_to_playlist, container, false)
-        val view = mBottomSheetAddToPlaylistBinding.root
 
+        //Set content with data biding util
+        mDataBiding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_add_to_playlist, container, false)
+        val view = mDataBiding.root
+
+        //Load your UI content
         initViews()
         setupRecyclerView()
 
@@ -70,16 +73,16 @@ class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFra
 
             })
             mPlaylistItemAdapter?.submitList(mPlaylists)
-            mBottomSheetAddToPlaylistBinding.recyclerView.scrollToPosition(0)
+            mDataBiding.recyclerView.scrollToPosition(0)
 
             mLayoutManager = GridLayoutManager(ctx, 1, GridLayoutManager.VERTICAL, false)
-            mBottomSheetAddToPlaylistBinding.recyclerView.adapter = mPlaylistItemAdapter
-            mBottomSheetAddToPlaylistBinding.recyclerView.layoutManager = mLayoutManager
+            mDataBiding.recyclerView.adapter = mPlaylistItemAdapter
+            mDataBiding.recyclerView.layoutManager = mLayoutManager
         }
     }
 
     private fun checkInteractions() {
-        mBottomSheetAddToPlaylistBinding.buttonNewPlaylist.setOnClickListener{
+        mDataBiding.buttonNewPlaylist.setOnClickListener{
             MainScope().launch {
                 showAddNewPlaylistDialog()
             }
@@ -149,7 +152,7 @@ class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFra
         return withContext(Dispatchers.Default){
             val pI = com.prosabdev.common.models.playlist.PlaylistItem()
             pI.name = playlistName
-            pI.lastAddedDateToLibrary = com.prosabdev.common.utils.SystemSettings.getCurrentDateInMilli()
+            pI.lastAddedDateToLibrary = com.prosabdev.common.utils.SystemSettings.getCurrentDateInMillis()
             val insertedPlaylistResult : Long = mPlaylistItemViewModel?.insert(pI) ?: -1
             if(insertedPlaylistResult > 0){
                 insertMultiplesSongsToPlaylist(ctx, insertedPlaylistResult, playlistName)

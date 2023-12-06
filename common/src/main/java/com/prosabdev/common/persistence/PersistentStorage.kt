@@ -2,10 +2,7 @@ package com.prosabdev.common.persistence
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.media.MediaDescription
-import android.media.browse.MediaBrowser
-import android.net.Uri
-import android.os.Bundle
+import androidx.media3.common.Player
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.prosabdev.common.constants.MainConst
@@ -39,7 +36,7 @@ class PersistentStorage private constructor(private val ctx: Context) {
         fun loadBooleanValue(sharedPrefKey: String, defaultValue: Boolean = false): Boolean {
             return INSTANCE?.preferences?.getBoolean(sharedPrefKey, defaultValue) ?: defaultValue
         }
-        fun saveBooleanValue(value: Boolean, sharedPrefKey: String) {
+        fun saveBooleanValue(sharedPrefKey: String, value: Boolean) {
             val editor: SharedPreferences.Editor = INSTANCE?.preferences?.edit() ?: return
             editor.putBoolean(sharedPrefKey, value)
             editor.apply()
@@ -48,7 +45,7 @@ class PersistentStorage private constructor(private val ctx: Context) {
         fun loadIntValue(sharedPrefKey: String, defaultValue: Int = 0): Int {
             return INSTANCE?.preferences?.getInt(sharedPrefKey, defaultValue) ?: defaultValue
         }
-        fun saveIntValue(value: Int, sharedPrefKey: String) {
+        fun saveIntValue(sharedPrefKey: String, value: Int) {
             val editor: SharedPreferences.Editor = INSTANCE?.preferences?.edit() ?: return
             editor.putInt(sharedPrefKey, value)
             editor.apply()
@@ -57,16 +54,16 @@ class PersistentStorage private constructor(private val ctx: Context) {
         fun loadLongValue(sharedPrefKey: String, defaultValue: Long = 0): Long {
             return INSTANCE?.preferences?.getLong(sharedPrefKey, defaultValue) ?: defaultValue
         }
-        fun saveLongValue(value: Long, sharedPrefKey: String) {
+        fun saveLongValue(sharedPrefKey: String, value: Long?) {
             val editor: SharedPreferences.Editor = INSTANCE?.preferences?.edit() ?: return
-            editor.putLong(sharedPrefKey, value)
+            editor.putLong(sharedPrefKey, value ?: 0)
             editor.apply()
         }
         //OPERATE TO FLOAT
         fun loadFloatValue(sharedPrefKey: String, defaultValue: Float = 0f): Float {
             return INSTANCE?.preferences?.getFloat(sharedPrefKey, defaultValue) ?: defaultValue
         }
-        fun saveFloatValue(value: Float, sharedPrefKey: String) {
+        fun saveFloatValue(sharedPrefKey: String, value: Float) {
             val editor: SharedPreferences.Editor = INSTANCE?.preferences?.edit() ?: return
             editor.putFloat(sharedPrefKey, value)
             editor.apply()
@@ -75,115 +72,103 @@ class PersistentStorage private constructor(private val ctx: Context) {
         fun loadStringValue(sharedPrefKey: String, defaultValue: String? = null): String? {
             return INSTANCE?.preferences?.getString(sharedPrefKey, defaultValue) ?: defaultValue
         }
-        fun saveStringValue(value: String?, sharedPrefKey: String) {
+        fun saveStringValue(sharedPrefKey: String, value: String?) {
             val editor: SharedPreferences.Editor = INSTANCE?.preferences?.edit() ?: return
             editor.putString(sharedPrefKey, value)
             editor.apply()
         }
+
+        fun loadCustomObjectValue(sharedPrefKey: String): Any? {
+            val tempGson = Gson()
+            val tempItem: String? = INSTANCE?.preferences?.getString(
+                sharedPrefKey, null)
+            val tempItemType = object : TypeToken<Any?>() {}.type
+            return tempGson.fromJson<Any?>(tempItem, tempItemType)
+        }
+        fun saveCustomObjectValue(sharedPrefKey: String, value: Any?) {
+            val tempEditor: SharedPreferences.Editor = INSTANCE?.preferences?.edit() ?: return
+            val tempGson = Gson()
+            val tempJson: String = tempGson.toJson(value)
+            tempEditor.putString(sharedPrefKey, tempJson)
+            tempEditor.apply()
+        }
     }
 
-    class PlayingNow {
+    class Playback {
         companion object {
-            private const val RECENT_SONG_MEDIA_ID_KEY = "RECENT_SONG_MEDIA_ID_KEY"
-            private const val RECENT_SONG_TITLE_KEY = "RECENT_SONG_TITLE_KEY"
-            private const val RECENT_SONG_SUBTITLE_KEY = "RECENT_SONG_SUBTITLE_KEY"
-            private const val RECENT_SONG_POSITION_KEY = "RECENT_SONG_POSITION_KEY"
-            private const val RECENT_SONG_ICON_URI_KEY = "RECENT_SONG_ICON_URI_KEY"
+            private const val CURRENT_MEDIA_ITEM_ID_KEY = "CURRENT_MEDIA_ITEM_ID_KEY"
 
-            private const val PLAYER_REPEAT = "PLAYER_REPEAT"
-            private const val PLAYER_SHUFFLE = "PLAYER_SHUFFLE"
+            private const val CURRENT_POSITION_MS = "CURRENT_POSITION_MS"
 
-            private const val PLAYER_SLEEP_TIMER = "PLAYER_SLEEP_TIMER"
-            private const val PLAYER_PLAYING_PROGRESS_VALUE= "PLAYER_PLAYING_PROGRESS_VALUE"
+            private const val REPEAT_MODE = "REPEAT_MODE"
+            private const val SHUFFLE_MODE_ENABLED = "SHUFFLE_MODE_ENABLED"
+
+            private const val PLAYBACK_SPEED = "PLAYBACK_SPEED"
+            private const val PLAYBACK_PITCH = "PLAYBACK_PITCH"
+
+            private const val SLEEP_TIMER = "SLEEP_TIMER"
+
             private const val PLAYER_QUEUE_LIST_SOURCE = "PLAYER_QUEUE_LIST_SOURCE"
             private const val PLAYER_QUEUE_LIST_SOURCE_COLUMN_INDEX = "PLAYER_QUEUE_LIST_SOURCE_COLUMN_INDEX"
             private const val PLAYER_QUEUE_LIST_SOURCE_COLUMN_VALUE = "PLAYER_QUEUE_LIST_SOURCE_COLUMN_VALUE"
 
-            suspend fun saveRecentSong(description: MediaDescription?, position: Long) {
-                withContext(Dispatchers.IO) {
-                    val editor: SharedPreferences.Editor = INSTANCE?.preferences?.edit() ?: return@withContext
-                    editor.putString(RECENT_SONG_MEDIA_ID_KEY, description?.mediaId)
-                    editor.putString(RECENT_SONG_TITLE_KEY, description?.title?.toString())
-                    editor.putString(RECENT_SONG_SUBTITLE_KEY, description?.subtitle?.toString())
-                    editor.putString(RECENT_SONG_ICON_URI_KEY, description?.iconUri?.toString())
-                    editor.putLong(RECENT_SONG_POSITION_KEY, position)
-                    editor.apply()
-                }
-            }
-            fun loadRecentSong(): MediaBrowser.MediaItem? {
-                val mediaId = INSTANCE?.preferences?.getString(RECENT_SONG_MEDIA_ID_KEY, null) ?: return null
+            var currentMediaId: String?
+                get() = loadStringValue(CURRENT_MEDIA_ITEM_ID_KEY, null)
+                set(value) = saveStringValue(CURRENT_MEDIA_ITEM_ID_KEY, value)
 
-                val extras = Bundle().also {
-                    val position = INSTANCE?.preferences?.getLong(RECENT_SONG_POSITION_KEY, 0L) ?: 0L
-                }
-                return MediaBrowser.MediaItem(
-                    MediaDescription.Builder()
-                        .setMediaId(mediaId)
-                        .setTitle(INSTANCE?.preferences?.getString(RECENT_SONG_TITLE_KEY, "") ?: "")
-                        .setSubtitle(INSTANCE?.preferences?.getString(RECENT_SONG_SUBTITLE_KEY, "") ?: "")
-                        .setIconUri(Uri.parse(INSTANCE?.preferences?.getString(RECENT_SONG_ICON_URI_KEY, "") ?: "") ?: Uri.EMPTY)
-                        .setExtras(extras)
-                        .build(), MediaBrowser.MediaItem.FLAG_PLAYABLE
-                )
-            }
+            var currentPositionMs: Long?
+                get() = loadLongValue(CURRENT_POSITION_MS, 0)
+                set(value) = saveLongValue(CURRENT_POSITION_MS, value)
 
-            //Sleep timer
-            fun loadSleepTimer(): SleepTimerSP? {
-                val tempGson = Gson()
-                val tempItem: String? = INSTANCE?.preferences?.getString(PLAYER_SLEEP_TIMER, null)
-                val tempItemType = object : TypeToken<SleepTimerSP>() {}.type
-                return tempGson.fromJson<SleepTimerSP>(tempItem, tempItemType)
-            }
-            fun saveSleepTimer(value: SleepTimerSP?) {
-                val tempEditor: SharedPreferences.Editor = INSTANCE?.preferences?.edit() ?: return
-                val tempGson = Gson()
-                val tempJson: String = tempGson.toJson(value)
-                tempEditor.putString(PLAYER_SLEEP_TIMER, tempJson)
-                tempEditor.apply()
-            }
+            var repeatMode: Int?
+                get() = loadIntValue(REPEAT_MODE, Player.REPEAT_MODE_OFF)
+                set(value) = saveIntValue(REPEAT_MODE, value ?: Player.REPEAT_MODE_OFF)
 
-            //Repeat
-            fun loadRepeat(): Int {
-                return loadIntValue(PLAYER_REPEAT, 0)
-            }
-            fun saveRepeat(value: Int?) {
-                saveIntValue(value ?: 0, PLAYER_REPEAT)
-            }
-            //Shuffle
-            fun loadShuffle(): Int {
-                return loadIntValue(PLAYER_SHUFFLE, 0)
-            }
-            fun saveShuffle(value: Int?) {
-                saveIntValue(value ?: 0, PLAYER_SHUFFLE)
-            }
-            //Queue list source
-            fun loadQueueListSource(defaultValue: String?): String? {
-                return loadStringValue(PLAYER_QUEUE_LIST_SOURCE, defaultValue)
-            }
-            fun saveQueueListSource(value: String?) {
-                saveStringValue(value, PLAYER_QUEUE_LIST_SOURCE)
-            }
-            //Queue list size
-            fun loadPlayingProgressValue(): Long {
-                return loadLongValue(PLAYER_PLAYING_PROGRESS_VALUE, 0)
-            }
-            fun savePlayingProgressValue(value: Long?) {
-                saveLongValue(value ?: 0, PLAYER_PLAYING_PROGRESS_VALUE)
-            }
-            //Queue list source value
-            fun loadQueueListSourceColumnIndex(): String? {
-                return loadStringValue(PLAYER_QUEUE_LIST_SOURCE_COLUMN_INDEX)
-            }
-            fun saveQueueListSourceColumnIndex(value: String?) {
-                saveStringValue(value, PLAYER_QUEUE_LIST_SOURCE_COLUMN_INDEX)
-            }
-            //Queue list source value
-            fun loadQueueListSourceColumnValue(): String? {
-                return loadStringValue(PLAYER_QUEUE_LIST_SOURCE_COLUMN_VALUE)
-            }
-            fun saveQueueListSourceColumnValue(value: String?) {
-                saveStringValue(value, PLAYER_QUEUE_LIST_SOURCE_COLUMN_VALUE)
-            }
+            var shuffleModeEnabled: Boolean?
+                get() = loadBooleanValue(SHUFFLE_MODE_ENABLED, false)
+                set(value) = saveBooleanValue(SHUFFLE_MODE_ENABLED, value ?: false)
+
+            var playbackSpeed: Float?
+                get() = loadFloatValue(PLAYBACK_SPEED, 0f)
+                set(value) = saveFloatValue(PLAYBACK_SPEED, value ?: 0f)
+
+            var playbackPitch: Float?
+                get() = loadFloatValue(PLAYBACK_PITCH, 0f)
+                set(value) = saveFloatValue(PLAYBACK_PITCH, value ?: 0f)
+
+            var sleepTimer: Float?
+                get() = loadFloatValue(SLEEP_TIMER, 0f)
+                set(value) = saveFloatValue(SLEEP_TIMER, value ?: 0f)
+
+            var queueListSource: String?
+                get() = loadStringValue(PLAYER_QUEUE_LIST_SOURCE, null)
+                set(value) = saveStringValue(PLAYER_QUEUE_LIST_SOURCE, value)
+
+            var queueListSourceColumnIndex: String?
+                get() = loadStringValue(PLAYER_QUEUE_LIST_SOURCE_COLUMN_INDEX, null)
+                set(value) = saveStringValue(PLAYER_QUEUE_LIST_SOURCE_COLUMN_INDEX, value)
+
+            var queueListSourceColumnValue: String?
+                get() = loadStringValue(PLAYER_QUEUE_LIST_SOURCE_COLUMN_VALUE, null)
+                set(value) = saveStringValue(PLAYER_QUEUE_LIST_SOURCE, value)
+
+        }
+    }
+
+    class QueueList {
+        companion object {
+            private const val PLAYER_QUEUE_LIST_SOURCE = "PLAYER_QUEUE_LIST_SOURCE"
+            private const val PLAYER_QUEUE_LIST_SOURCE_COLUMN_INDEX = "PLAYER_QUEUE_LIST_SOURCE_COLUMN_INDEX"
+            private const val PLAYER_QUEUE_LIST_SOURCE_COLUMN_VALUE = "PLAYER_QUEUE_LIST_SOURCE_COLUMN_VALUE"
+
+            var queueListSourceColumnIndex: String?
+                get() = loadStringValue(PLAYER_QUEUE_LIST_SOURCE_COLUMN_INDEX, null)
+                set(value) = saveStringValue(PLAYER_QUEUE_LIST_SOURCE_COLUMN_INDEX, value)
+
+            var queueListSourceColumnValue: String?
+                get() = loadStringValue(PLAYER_QUEUE_LIST_SOURCE_COLUMN_VALUE, null)
+                set(value) = saveStringValue(PLAYER_QUEUE_LIST_SOURCE, value)
+
         }
     }
 
@@ -201,108 +186,59 @@ class PersistentStorage private constructor(private val ctx: Context) {
             private const val AUDIO_EFFECTS_BASS_PROGRESS = "AUDIO_EFFECTS_BASS_PROGRESS"
             private const val AUDIO_EFFECTS_VISUALIZER_PROGRESS = "AUDIO_EFFECTS_VISUALIZER_PROGRESS"
             private const val AUDIO_EFFECTS_BALANCE_PROGRESS = "AUDIO_EFFECTS_BALANCE_PROGRESS"
-            private const val AUDIO_EFFECTS__REVERB_PROGRESS = "AUDIO_EFFECTS__REVERB_PROGRESS"
+            private const val AUDIO_EFFECTS_REVERB_PROGRESS = "AUDIO_EFFECTS_REVERB_PROGRESS"
             private const val AUDIO_EFFECTS_LOUDNESS_ENHANCER_PROGRESS = "AUDIO_EFFECTS_LOUDNESS_ENHANCER_PROGRESS"
 
-            /**
-             * Progress
-             **/
-            //EQUALIZER PRESET NAME
-            fun loadEqualizerPresetName(): String? {
-                return loadStringValue(AUDIO_EFFECTS_DEFAULT_EQUALIZER_PRESET_NAME)
-            }
-            fun saveEqualizerPresetName(value: String?) {
-                saveStringValue(value, AUDIO_EFFECTS_DEFAULT_EQUALIZER_PRESET_NAME)
-            }
-            //EQUALIZER CUSTOM PRESET VALUE
-            fun loadEqualizerCustomPresetValue(): ArrayList<EqualizerPresetBandLevelItem>? {
-                val tempGson = Gson()
-                val tempItem: String? = INSTANCE?.preferences?.getString(
-                    AUDIO_EFFECTS_CUSTOM_EQUALIZER_BANDS_LEVELS, null)
-                val tempItemType = object : TypeToken<ArrayList<EqualizerPresetBandLevelItem>?>() {}.type
-                return tempGson.fromJson<ArrayList<EqualizerPresetBandLevelItem>?>(tempItem, tempItemType)
-            }
-            fun saveEqualizerCustomPresetValue(value: ArrayList<EqualizerPresetBandLevelItem>?) {
-                val tempEditor: SharedPreferences.Editor = INSTANCE?.preferences?.edit() ?: return
-                val tempGson = Gson()
-                val tempJson: String = tempGson.toJson(value)
-                tempEditor.putString(AUDIO_EFFECTS_CUSTOM_EQUALIZER_BANDS_LEVELS, tempJson)
-                tempEditor.apply()
-            }
-            //BASS BOOST PROGRESS
-            fun loadBassBoostProgress(): Int {
-                return loadIntValue(AUDIO_EFFECTS_BASS_PROGRESS, 0)
-            }
-            fun saveBassBoostProgress(value: Int) {
-                saveIntValue(value, AUDIO_EFFECTS_BASS_PROGRESS)
-            }
-            //VISUALIZER PROGRESS
-            fun loadVisualizerProgress(): Int {
-                return loadIntValue(AUDIO_EFFECTS_VISUALIZER_PROGRESS, 0)
-            }
-            fun saveVisualizerProgress(value: Int) {
-                saveIntValue(value, AUDIO_EFFECTS_VISUALIZER_PROGRESS)
-            }
-            //BALANCE PROGRESS
-            fun loadBalanceProgress(): Int {
-                return loadIntValue(AUDIO_EFFECTS_BALANCE_PROGRESS, 0)
-            }
-            fun saveBalanceProgress(value: Int) {
-                saveIntValue(value, AUDIO_EFFECTS_BALANCE_PROGRESS)
-            }
-            //REVERB PROGRESS
-            fun loadReverbProgress(): Int {
-                return loadIntValue(AUDIO_EFFECTS__REVERB_PROGRESS, 0)
-            }
-            fun saveReverbProgress(value: Int) {
-                saveIntValue(value, AUDIO_EFFECTS__REVERB_PROGRESS)
-            }
-            //LOUDNESS ENHANCER PROGRESS
-            fun loadLoudnessEnhancerProgress(): Int {
-                return loadIntValue(AUDIO_EFFECTS_LOUDNESS_ENHANCER_PROGRESS, 0)
-            }
-            fun saveLoudnessEnhancerProgress(value: Int) {
-                saveIntValue(value, AUDIO_EFFECTS_LOUDNESS_ENHANCER_PROGRESS)
-            }
+            var equalizerPresetName: String?
+                get() = loadStringValue(AUDIO_EFFECTS_DEFAULT_EQUALIZER_PRESET_NAME)
+                set(value) = saveStringValue(AUDIO_EFFECTS_DEFAULT_EQUALIZER_PRESET_NAME, value)
+
+            var equalizerCustomPresetValue: Any?
+                get() = loadCustomObjectValue(AUDIO_EFFECTS_CUSTOM_EQUALIZER_BANDS_LEVELS)
+                set(value) = saveCustomObjectValue(AUDIO_EFFECTS_CUSTOM_EQUALIZER_BANDS_LEVELS, value)
+
+            var bassBoostProgress: Int?
+                get() = loadIntValue(AUDIO_EFFECTS_BASS_PROGRESS)
+                set(value) = saveIntValue(AUDIO_EFFECTS_BASS_PROGRESS, value ?: 0)
+
+            var visualizerProgress: Int?
+                get() = loadIntValue(AUDIO_EFFECTS_VISUALIZER_PROGRESS)
+                set(value) = saveIntValue(AUDIO_EFFECTS_VISUALIZER_PROGRESS, value ?: 0)
+
+            var balanceProgress: Int?
+                get() = loadIntValue(AUDIO_EFFECTS_BALANCE_PROGRESS)
+                set(value) = saveIntValue(AUDIO_EFFECTS_BALANCE_PROGRESS, value ?: 0)
+
+            var reverbProgress: Int?
+                get() = loadIntValue(AUDIO_EFFECTS_REVERB_PROGRESS)
+                set(value) = saveIntValue(AUDIO_EFFECTS_REVERB_PROGRESS, value ?: 0)
+
+            var loudnessEnhancerProgress: Int?
+                get() = loadIntValue(AUDIO_EFFECTS_LOUDNESS_ENHANCER_PROGRESS)
+                set(value) = saveIntValue(AUDIO_EFFECTS_LOUDNESS_ENHANCER_PROGRESS, value ?: 0)
 
             /**
              * States
              **/
-            //EQUALIZER STATE SETTING
-            fun loadEqualizerState(): Boolean {
-                return loadBooleanValue(AUDIO_EFFECTS_ENABLE_EQUALIZER, false)
-            }
-            fun saveEqualizerState(value: Boolean) {
-                saveBooleanValue(value, AUDIO_EFFECTS_ENABLE_EQUALIZER)
-            }
-            //TONE STATE SETTING
-            fun loadToneState(): Boolean {
-                return loadBooleanValue(AUDIO_EFFECTS_ENABLE_TONE, false)
-            }
-            fun saveToneState(value: Boolean) {
-                saveBooleanValue(value, AUDIO_EFFECTS_ENABLE_TONE)
-            }
-            //BALANCE STATE SETTING
-            fun loadBalanceState(): Boolean {
-                return loadBooleanValue(AUDIO_EFFECTS_ENABLE_BALANCE, false)
-            }
-            fun saveBalanceState(value: Boolean) {
-                saveBooleanValue(value, AUDIO_EFFECTS_ENABLE_BALANCE)
-            }
-            //REVERB STATE SETTING
-            fun loadReverbState(): Boolean {
-                return loadBooleanValue(AUDIO_EFFECTS_ENABLE_REVERB, false)
-            }
-            fun saveReverbState(value: Boolean) {
-                saveBooleanValue(value, AUDIO_EFFECTS_ENABLE_REVERB)
-            }
-            //LOUDNESS ENHANCER STATE SETTING
-            fun loadLoudnessEnhancerState(): Boolean {
-                return loadBooleanValue(AUDIO_EFFECTS_ENABLE_LOUDNESS_ENHANCER, false)
-            }
-            fun saveLoudnessEnhancerState(value: Boolean) {
-                saveBooleanValue(value, AUDIO_EFFECTS_ENABLE_LOUDNESS_ENHANCER)
-            }
+            var equalizerState: Boolean?
+                get() = loadBooleanValue(AUDIO_EFFECTS_ENABLE_EQUALIZER)
+                set(value) = saveBooleanValue(AUDIO_EFFECTS_ENABLE_EQUALIZER, value ?: false)
+
+            var toneState: Boolean?
+                get() = loadBooleanValue(AUDIO_EFFECTS_ENABLE_TONE)
+                set(value) = saveBooleanValue(AUDIO_EFFECTS_ENABLE_TONE, value ?: false)
+
+            var balanceState: Boolean?
+                get() = loadBooleanValue(AUDIO_EFFECTS_ENABLE_BALANCE)
+                set(value) = saveBooleanValue(AUDIO_EFFECTS_ENABLE_BALANCE, value ?: false)
+
+            var reverbState: Boolean?
+                get() = loadBooleanValue(AUDIO_EFFECTS_ENABLE_REVERB)
+                set(value) = saveBooleanValue(AUDIO_EFFECTS_ENABLE_REVERB, value ?: false)
+
+            var loudnessEnhancerState: Boolean?
+                get() = loadBooleanValue(AUDIO_EFFECTS_ENABLE_LOUDNESS_ENHANCER)
+                set(value) = saveBooleanValue(AUDIO_EFFECTS_ENABLE_LOUDNESS_ENHANCER, value ?: false)
         }
     }
 
@@ -310,12 +246,9 @@ class PersistentStorage private constructor(private val ctx: Context) {
         companion object {
             private const val SETTINGS_FIRST_TIME_LOADING = "SETTINGS_FIRST_TIME_LOADING"
 
-            fun loadIsFirstTimeOpenApp(): Boolean {
-                return loadBooleanValue(SETTINGS_FIRST_TIME_LOADING, true)
-            }
-            fun saveIsFirstTimeOpenApp(value: Boolean) {
-                saveBooleanValue(value, SETTINGS_FIRST_TIME_LOADING)
-            }
+            var firstTimeOpened: Boolean?
+                get() = loadBooleanValue(SETTINGS_FIRST_TIME_LOADING)
+                set(value) = saveBooleanValue(SETTINGS_FIRST_TIME_LOADING, value ?: false)
         }
     }
 

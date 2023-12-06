@@ -3,7 +3,6 @@ package com.prosabdev.fluidmusic.viewmodels.fragments
 import android.app.Application
 import androidx.lifecycle.*
 import com.sothree.slidinguppanel.PanelState
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class MainFragmentViewModel(
