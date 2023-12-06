@@ -344,7 +344,7 @@ class PlayingNowFragment : Fragment() {
     }
 
     private fun updateViewpagerAfterPageChangedUI() {
-        val currentItem = mDataBinding.viewPagerPlayer?.currentItem
+        val currentItem = mDataBinding.viewPagerPlayer.currentItem
         val tempCurrentSongItem = mNowPlayingFragmentViewModel.getCurrentPlayingSong().value
         val tempSongItem = getCurrentPlayingSongFromPosition(currentItem)
         if (
