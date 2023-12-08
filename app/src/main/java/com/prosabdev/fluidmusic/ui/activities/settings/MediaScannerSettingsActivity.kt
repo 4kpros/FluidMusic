@@ -31,8 +31,10 @@ import kotlinx.coroutines.runBlocking
 
 class MediaScannerSettingsActivity : AppCompatActivity() {
 
+    //Data binding
     private lateinit var mDataBiding : ActivityMediaScannerSettingsBinding
 
+    //View models
     private val mFolderUriTreeViewModel: FolderUriTreeViewModel by viewModels()
     private val mMediaScannerActivityViewModel: MediaScannerActivityViewModel by viewModels()
 
@@ -43,7 +45,7 @@ class MediaScannerSettingsActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        //Set content with data biding util
+        //Set binding layout and return binding object
         mDataBiding = DataBindingUtil.setContentView(this, R.layout.activity_media_scanner_settings)
 
         //Load your UI content

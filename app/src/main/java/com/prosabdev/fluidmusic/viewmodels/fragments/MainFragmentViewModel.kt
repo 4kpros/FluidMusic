@@ -5,21 +5,24 @@ import androidx.lifecycle.*
 import com.sothree.slidinguppanel.PanelState
 import kotlinx.coroutines.launch
 
-class MainFragmentViewModel(
-    app: Application
-) : AndroidViewModel(app) {
+class MainFragmentViewModel(app: Application) : AndroidViewModel(app) {
+
+    //Mutable live data
     val currentSelectablePage = MutableLiveData<String>(null)
     val selectMode = MutableLiveData<Boolean>(false)
+    val selectedItems = MutableLiveData<HashMap<Int, String>>(HashMap())
     val requestToggleSelectRange = MutableLiveData<Int>(0)
     val requestToggleSelectAll = MutableLiveData<Int>(0)
     val totalCount = MutableLiveData<Int>(0)
-    val showDrawerMenuCounter = MutableLiveData<Int>()
+
     val slidingUpPanelState = MutableLiveData<PanelState>(PanelState.COLLAPSED)
+
     val isFastScrolling = MutableLiveData<Boolean>(false)
     val scrollingState = MutableLiveData<Int>(-2)
+
+    val showDrawerMenuCounter = MutableLiveData<Int>()
     val showSlidingUpPanelCounter = MutableLiveData<Int>(0)
     val hideSlidingUpPanelCounter = MutableLiveData<Int>(0)
-    val selectedDataList = MutableLiveData<HashMap<Int, String>>(HashMap())
 
     fun setShowSlidingPanelCounter() {
         viewModelScope.launch {

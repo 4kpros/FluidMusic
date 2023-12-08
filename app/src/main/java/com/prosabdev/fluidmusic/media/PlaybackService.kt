@@ -54,7 +54,7 @@ open class PlaybackService : MediaLibraryService() {
     private fun initializeSessionAndPlayer() {
         try {
             mRenderersFactory =
-                EqualizerFFTTransform.initFFTransform(this@PlaybackService, mFftAudioProcessor)
+                EqualizerFFTransform.initFFTransform(this@PlaybackService, mFftAudioProcessor)
             mRenderersFactory?.let { renderersFactory ->
                 mPlayer = ExoPlayer.Builder(this@PlaybackService, renderersFactory)
                     .setAudioAttributes(AudioAttributes.DEFAULT, /* handleAudioFocus= */ true)

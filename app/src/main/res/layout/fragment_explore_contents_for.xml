@@ -11,7 +11,7 @@
         android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.fragments.ExploreContentsForFragment"
+        tools:context=".ui.fragments.ExploreContentForFragment"
         android:clickable="true"
         android:background="?android:colorBackground"
         android:backgroundTint="?android:colorBackground"
@@ -124,7 +124,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".ui.fragments.ExploreContentsForFragment"
+            tools:context=".ui.fragments.ExploreContentForFragment"
             android:fillViewport="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             >

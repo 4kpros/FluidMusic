@@ -12,7 +12,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.prosabdev.common.constants.MainConst
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetOrganizeItemsBinding
-import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
+import com.prosabdev.fluidmusic.ui.fragments.ExploreContentForFragment
 import com.prosabdev.fluidmusic.ui.fragments.PlaylistsFragment
 import com.prosabdev.fluidmusic.ui.fragments.StreamsFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.AlbumArtistsFragment
@@ -214,7 +214,7 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
                 ) ?: ""
             }
 
-            ExploreContentsForFragment.TAG -> {
+            ExploreContentForFragment.TAG -> {
                 when (mFromSourceValue) {
                     AlbumsFragment.TAG -> {
                         mDataBiding.textOrganizeDetails.text = context?.resources?.getString(

@@ -7,6 +7,9 @@ import android.text.style.UnderlineSpan
 import androidx.documentfile.provider.DocumentFile
 import com.prosabdev.common.R
 import com.prosabdev.common.constants.MainConst
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.floor
 
 object FormattersAndParsers {
@@ -78,61 +81,67 @@ object FormattersAndParsers {
         return if(tempProgress > totalDuration) totalDuration else tempProgress
     }
     fun formatSongDurationToString(durationTemp: Long): String {
-        var totalOut = ""
-        var totalSec: Int
-        var totalMin: Int
-        var totalHours: Int
-        var totalDays: Int
-        val seconds = durationTemp.toDouble() / 1000
-        val minutes = seconds / 60
-        val hours = minutes / 60
-        val days = hours / 24
-        totalSec = seconds.toInt()
-        totalMin = minutes.toInt()
-        totalHours = hours.toInt()
-        totalDays = days.toInt()
-        totalSec = getMaxTime(totalSec, 59)
-        totalMin = getMaxTime(totalMin, 59)
-        totalHours = getMaxTime(totalHours, 59)
-        totalDays = getMaxTime(totalDays, 23)
-        if (totalDays > 0) {
-            if (totalDays < 10) {
+        return withContext(Dispatchers.Default){
+            var totalOut = ""
+            var totalSec: Int
+            var totalMin: Int
+            var totalHours: Int
+            var totalDays: Int
+            val seconds = durationTemp.toDouble() / 1000
+            val minutes = seconds / 60
+            val hours = minutes / 60
+            val days = hours / 24
+            totalSec = seconds.toInt()
+            totalMin = minutes.toInt()
+            totalHours = hours.toInt()
+            totalDays = days.toInt()
+            totalSec = getMaxTime(totalSec, 59)
+            totalMin = getMaxTime(totalMin, 59)
+            totalHours = getMaxTime(totalHours, 59)
+            totalDays = getMaxTime(totalDays, 23)
+            if (totalDays > 0) {
+                if (totalDays < 10) {
+                    totalOut += "0"
+                }
+                totalOut += totalDays.toString() + "day "
+            }
+            if (totalHours > 0) {
+                if (totalHours < 10) {
+                    totalOut += "0"
+                }
+                totalOut += "$totalHours:"
+            }
+            if (totalMin < 10) {
                 totalOut += "0"
             }
-            totalOut += totalDays.toString() + "day "
-        }
-        if (totalHours > 0) {
-            if (totalHours < 10) {
+            totalOut += "$totalMin:"
+            if (totalSec < 10) {
                 totalOut += "0"
             }
-            totalOut += "$totalHours:"
+            totalOut += totalSec.toString() + ""
+
+            totalOut
         }
-        if (totalMin < 10) {
-            totalOut += "0"
-        }
-        totalOut += "$totalMin:"
-        if (totalSec < 10) {
-            totalOut += "0"
-        }
-        totalOut += totalSec.toString() + ""
-        return totalOut
     }
 
-    fun formatAndReturnFolderUriSAF(context: Context, uri: Uri): com.prosabdev.common.models.FolderUriTree {
-        val documentFile = DocumentFile.fromTreeUri(context, uri)
+    suspend fun formatAndReturnFolderUriSAF(context: Context, uri: Uri): com.prosabdev.common.models.FolderUriTree {
+        return withContext(Dispatchers.Default){
+            val documentFile = DocumentFile.fromTreeUri(context, uri)
 
-        val tempFolderUriTree = com.prosabdev.common.models.FolderUriTree()
-        tempFolderUriTree.uriTree = documentFile?.uri.toString()
-        tempFolderUriTree.lastPathSegment = uri.lastPathSegment ?: ""
-        tempFolderUriTree.pathTree = uri.path.toString().trim()
-        tempFolderUriTree.normalizeScheme = uri.normalizeScheme().toString()
-        tempFolderUriTree.path = "/${(uri.lastPathSegment ?: "").substringAfter(":")}"
-        tempFolderUriTree.deviceName =
-            if ((uri.lastPathSegment ?: "").substringBefore(":") == DeviceInfo.STORAGE_ID_PRIMARY)
-                DeviceInfo.getDeviceName()
-            else
-                DeviceInfo.getDeviceName()
-        return tempFolderUriTree
+            val tempFolderUriTree = com.prosabdev.common.models.FolderUriTree()
+            tempFolderUriTree.uriTree = documentFile?.uri.toString()
+            tempFolderUriTree.lastPathSegment = uri.lastPathSegment ?: ""
+            tempFolderUriTree.pathTree = uri.path.toString().trim()
+            tempFolderUriTree.normalizeScheme = uri.normalizeScheme().toString()
+            tempFolderUriTree.path = "/${(uri.lastPathSegment ?: "").substringAfter(":")}"
+            tempFolderUriTree.deviceName =
+                if ((uri.lastPathSegment ?: "").substringBefore(":") == DeviceInfo.STORAGE_ID_PRIMARY)
+                    DeviceInfo.getDeviceName()
+                else
+                    DeviceInfo.getDeviceName()
+
+            tempFolderUriTree
+        }
     }
 
     private fun getMaxTime(value: Int, max: Int): Int {

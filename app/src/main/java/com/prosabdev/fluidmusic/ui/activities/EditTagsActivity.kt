@@ -15,6 +15,7 @@ import com.prosabdev.fluidmusic.databinding.ActivityEditTagsBinding
 
 class EditTagsActivity : AppCompatActivity() {
 
+    //Data binding
     private lateinit var mDataBiding : ActivityEditTagsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,7 +25,7 @@ class EditTagsActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        //Set content with data biding util
+        //Set binding layout and return binding object
         mDataBiding = DataBindingUtil.setContentView(this, R.layout.activity_edit_tags)
 
         //Load your UI content

@@ -29,7 +29,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/MaterialAlertDialog.Material3.Body.Text"
-                    android:text="Add to top or bottom of queue music. Play next add after current playing."
+                    android:text="@string/add_queue_music_dialog_title"
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>
             <com.google.android.material.button.MaterialButton

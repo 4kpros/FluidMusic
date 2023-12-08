@@ -23,22 +23,27 @@ import com.prosabdev.fluidmusic.databinding.DialogAddToQueueMusicBinding
 import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.databinding.FragmentMusicLibraryBinding
 import com.prosabdev.fluidmusic.ui.activities.EditTagsActivity
-import com.prosabdev.fluidmusic.ui.fragments.actions.PlaybackActions
+import com.prosabdev.fluidmusic.ui.fragments.communication.FragmentsCommunication
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.fragments.NowPlayingFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.PlayingNowFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaPlayerDataViewModel
 import com.prosabdev.fluidmusic.viewmodels.workers.QueueMusicActionsWorkerViewModel
 import com.prosabdev.fluidmusic.viewmodels.workers.SongActionsWorkerViewModel
 
 class MusicLibraryFragment : Fragment() {
 
+    //Data binding
     private lateinit var mDataBinding: FragmentMusicLibraryBinding
 
+    //View models
+    private val mMediaPlayerDataViewModel: MediaPlayerDataViewModel by activityViewModels()
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
-    private val mNowPlayingFragmentViewModel: NowPlayingFragmentViewModel by activityViewModels()
-
+    private val mPlayingNowFragmentViewModel: PlayingNowFragmentViewModel by activityViewModels()
+    //View models for work manager
     private val mQueueMusicActionsWorkerViewModel: QueueMusicActionsWorkerViewModel by activityViewModels()
     private val mSongActionsWorkerViewModel: SongActionsWorkerViewModel by activityViewModels()
 
+    //Tab layout adapter
     private var mTabLayoutAdapter: TabLayoutAdapter? = null
 
     override fun onCreateView(
@@ -46,162 +51,86 @@ class MusicLibraryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        //Set content with data biding util
+        //Inflate binding layout and return binding object
         mDataBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_music_library, container, false)
         val view = mDataBinding.root
 
         //Load your UI content
-        initViews()
-        setupTabLayoutViewPagerAdapter()
-        checkInteractions()
-        observeLiveData()
+        if (savedInstanceState == null){
+            initViews()
+            setupTabLayoutAdapter()
+            checkInteractions()
+            observeLiveData()
+        }
 
         return view
     }
 
-    private fun setupTabLayoutViewPagerAdapter() {
-        mDataBinding.let { dataBidingView ->
-            mTabLayoutAdapter =
-                parentFragment?.let { fmt -> TabLayoutAdapter(fmt) }
-            dataBidingView.viewPager.adapter = mTabLayoutAdapter
-            dataBidingView.viewPager.offscreenPageLimit = 8
-            TabLayoutMediator(
-                dataBidingView.tabLayout,
-                dataBidingView.viewPager
-            ) { tab, position ->
-                applyToolBarTitle(position, tab)
-            }.attach()
-            dataBidingView.viewPager.currentItem = 0
-        }
-    }
-
-    private fun applyToolBarTitle(position: Int, tab: TabLayout.Tab) {
-        when (position) {
-            0 -> {
-                tab.text = getString(R.string.songs)
-            }
-
-            1 -> {
-                tab.text = getString(R.string.albums)
-            }
-
-            2 -> {
-                tab.text = getString(R.string.artists)
-            }
-
-            3 -> {
-                tab.text = getString(R.string.folders)
-            }
-
-            4 -> {
-                tab.text = getString(R.string.genre)
-            }
-
-            5 -> {
-                tab.text = getString(R.string.album_artists)
-            }
-
-            6 -> {
-                tab.text = getString(R.string.composers)
-            }
-
-            7 -> {
-                tab.text = getString(R.string.years)
-            }
-        }
-    }
-
     private fun observeLiveData() {
         mMainFragmentViewModel.selectMode.observe(viewLifecycleOwner) {
-            updateSelectModeUI(it)
+            updateUISelectMode(it)
         }
-        mMainFragmentViewModel.selectedDataList.observe(
+        mMainFragmentViewModel.selectedItems.observe(
             viewLifecycleOwner
         ) { dataList ->
-            updateTotalSelectedItemsUI(dataList.size)
+            updateUITotalSelectedItems(dataList.size)
         }
         mMainFragmentViewModel.isFastScrolling.observe(viewLifecycleOwner) {
-            tryToUpdateFastScrollStateUI(it)
+            updateUIFastScroller(it)
         }
     }
 
-    private fun tryToUpdateFastScrollStateUI(isFastScrolling: Boolean = true) {
+    private fun updateUIFastScroller(isFastScrolling: Boolean = true) {
         if (isFastScrolling) {
             if (mMainFragmentViewModel.selectMode.value == true) {
-                hideSideContentSelectionMenu()
+                Animators.crossFadeDown(
+                    mDataBinding.includeSideSelectionMenu.relativeContainer,
+                    true,
+                    25
+                )
+                Animators.crossFadeDown(
+                    mDataBinding.includeSideSelectionMenu.cardViewContainer,
+                    true,
+                    100
+                )
             }
-            mDataBinding.appBarLayout?.setExpanded(false)
+            mDataBinding.appBarLayout.setExpanded(false)
         } else {
             if (mMainFragmentViewModel.selectMode.value == true) {
-                showSideContentSelectionMenu()
+                Animators.crossFadeUp(
+                    mDataBinding.includeSideSelectionMenu.relativeContainer,
+                    true,
+                    50
+                )
+                Animators.crossFadeUp(
+                    mDataBinding.includeSideSelectionMenu.cardViewContainer,
+                    true,
+                    200
+                )
             }
         }
     }
 
-    private fun showSideContentSelectionMenu(animate: Boolean = true) {
-        mDataBinding.let { dataBidingView ->
-            Animators.crossFadeUp(
-                dataBidingView.includeSideSelectionMenu.relativeContainer as View,
-                animate,
-                50
-            )
-            Animators.crossFadeUp(
-                dataBidingView.includeSideSelectionMenu.cardViewContainer as View,
-                animate,
-                200
-            )
+    private fun updateUITotalSelectedItems(totalSelected: Int) {
+        if (totalSelected > 0) {
+            enableActionButton(mDataBinding.includeSideSelectionMenu.buttonAddToQueueMusic)
+            enableActionButton(mDataBinding.includeSideSelectionMenu.buttonAddToPlaylist)
+            enableActionButton(mDataBinding.includeSideSelectionMenu.buttonEditTags)
+            enableActionButton(mDataBinding.includeSideSelectionMenu.buttonShare)
+            enableActionButton(mDataBinding.includeSideSelectionMenu.buttonDelete)
+        } else {
+            disableActionButton(mDataBinding.includeSideSelectionMenu.buttonAddToQueueMusic)
+            disableActionButton(mDataBinding.includeSideSelectionMenu.buttonAddToPlaylist)
+            disableActionButton(mDataBinding.includeSideSelectionMenu.buttonEditTags)
+            disableActionButton(mDataBinding.includeSideSelectionMenu.buttonShare)
+            disableActionButton(mDataBinding.includeSideSelectionMenu.buttonDelete)
         }
     }
+    private fun disableActionButton(v: View) { Animators.crossFadeDownClickable(v, true) }
+    private fun enableActionButton(v: View) { Animators.crossFadeUpClickable(v, true) }
 
-    private fun hideSideContentSelectionMenu(animate: Boolean = true) {
-        mDataBinding.let { dataBidingView ->
-            Animators.crossFadeDown(
-                dataBidingView.includeSideSelectionMenu.relativeContainer as View,
-                animate,
-                25
-            )
-            Animators.crossFadeDown(
-                dataBidingView.includeSideSelectionMenu.cardViewContainer as View,
-                animate,
-                100
-            )
-        }
-    }
-
-    private fun updateTotalSelectedItemsUI(totalSelected: Int) {
-        mDataBinding.let { dataBidingView ->
-            if (totalSelected > 0) {
-                enableSideSelectionActions(dataBidingView.includeSideSelectionMenu.buttonPlayAfter)
-                enableSideSelectionActions(dataBidingView.includeSideSelectionMenu.buttonPlaylistAdd)
-                enableSideSelectionActions(dataBidingView.includeSideSelectionMenu.buttonEditTags)
-                enableSideSelectionActions(dataBidingView.includeSideSelectionMenu.buttonShare)
-                enableSideSelectionActions(dataBidingView.includeSideSelectionMenu.buttonDelete)
-            } else {
-                disableSideSelectionActions(dataBidingView.includeSideSelectionMenu.buttonPlayAfter)
-                disableSideSelectionActions(dataBidingView.includeSideSelectionMenu.buttonPlaylistAdd)
-                disableSideSelectionActions(dataBidingView.includeSideSelectionMenu.buttonEditTags)
-                disableSideSelectionActions(dataBidingView.includeSideSelectionMenu.buttonShare)
-                disableSideSelectionActions(dataBidingView.includeSideSelectionMenu.buttonDelete)
-            }
-        }
-    }
-
-    private fun disableSideSelectionActions(view: View) {
-        Animators.crossFadeDownClickable(
-            view,
-            true
-        )
-    }
-
-    private fun enableSideSelectionActions(view: View) {
-        Animators.crossFadeUpClickable(
-            view,
-            true
-        )
-    }
-
-    private fun updateSelectModeUI(isSelectMode: Boolean, animate: Boolean = true) {
+    private fun updateUISelectMode(isSelectMode: Boolean, animate: Boolean = true) {
         mDataBinding.let { dataBidingView ->
             if (isSelectMode) {
                 dataBidingView.viewPager.isUserInputEnabled = false
@@ -224,48 +153,89 @@ class MusicLibraryFragment : Fragment() {
     }
 
     private fun checkInteractions() {
-        mDataBinding.let { dataBidingView ->
-            dataBidingView.topAppBar.setNavigationOnClickListener {
-                mMainFragmentViewModel.setShowDrawerMenuCounter()
+        mDataBinding.topAppBar.setNavigationOnClickListener {
+            mMainFragmentViewModel.setShowDrawerMenuCounter()
+        }
+        mDataBinding.topAppBar.setOnMenuItemClickListener {
+            if (it?.itemId == R.id.search) {
+                onSearchButtonClicked()
             }
-            dataBidingView.topAppBar.setOnMenuItemClickListener {
-                if (it?.itemId == R.id.search) {
-                    Log.i(ExploreContentsForFragment.TAG, "ON CLICK TO SEARCH PAGE")
-                }
-                true
+            true
+        }
+        mDataBinding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                onPageChanged(position)
             }
-            dataBidingView.viewPager.registerOnPageChangeCallback(object :
-                ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                    super.onPageSelected(position)
-                    updateViewModelLibraryPage()
-                    mMainFragmentViewModel.selectMode.value = false
-                    mMainFragmentViewModel.selectedDataList.value = HashMap()
-                    updateSelectModeUI(false)
-                    applyAppBarTitle(position)
-                }
-            })
-            dataBidingView.includeSideSelectionMenu.buttonPlayAfter.setOnClickListener {
-                addToQueueMusic()
-            }
-            dataBidingView.includeSideSelectionMenu.buttonPlaylistAdd.setOnClickListener {
-                openPlaylistAddDialog()
-            }
-            dataBidingView.includeSideSelectionMenu.buttonEditTags.setOnClickListener {
-                openTagEditorFragment()
-            }
-            dataBidingView.includeSideSelectionMenu.buttonShare.setOnClickListener {
-                openShareSelectionDialog()
-            }
-            dataBidingView.includeSideSelectionMenu.buttonDelete.setOnClickListener {
-                openDeleteSelectionDialog()
-            }
+        })
+        mDataBinding.includeSideSelectionMenu.buttonAddToQueueMusic.setOnClickListener {
+            onAddToQueueMusicButtonClicked()
+        }
+        mDataBinding.includeSideSelectionMenu.buttonAddToPlaylist.setOnClickListener {
+            onAddToPlaylistButtonClicked()
+        }
+        mDataBinding.includeSideSelectionMenu.buttonEditTags.setOnClickListener {
+            onEditTagsButtonClicked()
+        }
+        mDataBinding.includeSideSelectionMenu.buttonShare.setOnClickListener {
+            onShareButtonClicked()
+        }
+        mDataBinding.includeSideSelectionMenu.buttonDelete.setOnClickListener {
+            onDeleteButtonClicked()
         }
     }
 
-    private fun openTagEditorFragment() {
+    private fun onDeleteButtonClicked(){
+        MaterialAlertDialogBuilder(this.requireContext())
+            .setTitle(resources.getString(R.string.dialog_delete_selection_title))
+            .setIcon(R.drawable.delete)
+            .setMessage(resources.getString(R.string.dialog_delete_selection_description))
+            .setNegativeButton(resources.getString(R.string.decline)) { dialog, which ->
+                dialog.dismiss()
+            }
+            .setPositiveButton(resources.getString(R.string.delete_files)) { dialog, which ->
+                deleteSelection()
+            }
+            .show()
+    }
+    private fun deleteSelection() {
+        val modelTypeInfo = FragmentsCommunication.getModelTypeInfo(mMainFragmentViewModel)
+        val dataList = mMainFragmentViewModel.selectedItems.value ?: return
+        mSongActionsWorkerViewModel.deleteSongs(
+            modelTypeInfo[0],
+            dataList.values,
+            modelTypeInfo[1],
+            modelTypeInfo[2]
+        )
+    }
+
+    private fun onShareButtonClicked(){
+        context?.also { ctx ->
+            val dialogShareSongBinding: DialogShareSongBinding =
+                DataBindingUtil.inflate(layoutInflater, R.layout.dialog_share_song, null, false)
+            dialogShareSongBinding.buttonShareScreenshot.isEnabled =
+                (mMainFragmentViewModel.selectedItems.value?.size ?: 0) <= 1
+            dialogShareSongBinding.buttonShareFile.setOnClickListener {
+                shareSelectedFiles()
+            }
+            dialogShareSongBinding.buttonShareScreenshot.setOnClickListener {
+                shareScreenShootForSelectedUniqueItem()
+            }
+            MaterialAlertDialogBuilder(ctx)
+                .setTitle(ctx.getString(R.string.share))
+                .setIcon(R.drawable.share)
+                .setView(dialogShareSongBinding.root)
+                .setNegativeButton(ctx.getString(R.string.close)) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show().apply {
+                }
+        }
+    }
+
+    private fun onEditTagsButtonClicked(){
         startActivity(Intent(context, EditTagsActivity::class.java).apply {})
-        activity?.let {
+        activity?.also {
             it.supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 replace(
@@ -282,74 +252,10 @@ class MusicLibraryFragment : Fragment() {
         }
     }
 
-    private fun openPlaylistAddDialog() {
-        //
+    private fun onAddToPlaylistButtonClicked(){
     }
 
-    private fun updateViewModelLibraryPage() {
-        mMainFragmentViewModel.totalCount.value = 0
-        mMainFragmentViewModel.selectedDataList.value = HashMap()
-        mMainFragmentViewModel.selectMode.value = false
-    }
-
-    private fun openShareSelectionDialog() {
-        context?.let { ctx ->
-            val dialogShareSongBinding: DialogShareSongBinding =
-                DataBindingUtil.inflate(layoutInflater, R.layout.dialog_share_song, null, false)
-            dialogShareSongBinding.buttonShareScreenshot.isEnabled =
-                (mMainFragmentViewModel.selectedDataList.value?.size ?: 0) <= 1
-            dialogShareSongBinding.buttonShareFile.setOnClickListener {
-                shareSelectedFiles()
-            }
-            dialogShareSongBinding.buttonShareScreenshot.setOnClickListener {
-                shareScreenShootForSelectedUniqueItem()
-            }
-            MaterialAlertDialogBuilder(this.requireContext())
-                .setTitle(ctx.getString(R.string.share))
-                .setIcon(R.drawable.share)
-                .setView(dialogShareSongBinding.root)
-                .setNegativeButton(ctx.getString(R.string.close)) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show().apply {
-                }
-        }
-    }
-
-    private fun shareSelectedFiles() {
-        //
-    }
-
-    private fun shareScreenShootForSelectedUniqueItem() {
-        //
-    }
-
-    private fun openDeleteSelectionDialog() {
-        MaterialAlertDialogBuilder(this.requireContext())
-            .setTitle(resources.getString(R.string.dialog_delete_selection_title))
-            .setIcon(R.drawable.delete)
-            .setMessage(resources.getString(R.string.dialog_delete_selection_description))
-            .setNegativeButton(resources.getString(R.string.decline)) { dialog, which ->
-                dialog.dismiss()
-            }
-            .setPositiveButton(resources.getString(R.string.delete_files)) { dialog, which ->
-                deleteSelection()
-            }
-            .show()
-    }
-
-    private fun deleteSelection() {
-        val modelTypeInfo = PlaybackActions.getModelTypeInfo(mMainFragmentViewModel)
-        val dataList = mMainFragmentViewModel.selectedDataList.value ?: return
-        mSongActionsWorkerViewModel.deleteSongs(
-            modelTypeInfo[0],
-            dataList.values,
-            modelTypeInfo[1],
-            modelTypeInfo[2]
-        )
-    }
-
-    private fun addToQueueMusic() {
+    private fun onAddToQueueMusicButtonClicked() {
         val dataBidingView: DialogAddToQueueMusicBinding =
             DataBindingUtil.inflate(layoutInflater, R.layout.dialog_add_to_queue_music, null, false)
         dataBidingView.buttonAddToTop.setOnClickListener {
@@ -370,10 +276,9 @@ class MusicLibraryFragment : Fragment() {
             }
             .show()
     }
-
     private fun addSelectionToBottomOfQueueMusic() {
-        val modelTypeInfo = PlaybackActions.getModelTypeInfo(mMainFragmentViewModel)
-        val dataList = mMainFragmentViewModel.selectedDataList.value ?: return
+        val modelTypeInfo = FragmentsCommunication.getModelTypeInfo(mMainFragmentViewModel)
+        val dataList = mMainFragmentViewModel.selectedItems.value ?: return
         mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
             modelTypeInfo[0],
             AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_BOTTOM,
@@ -383,11 +288,10 @@ class MusicLibraryFragment : Fragment() {
             modelTypeInfo[2]
         )
     }
-
     private fun addSelectionToPlayNextOfQueueMusic() {
-        val modelTypeInfo = PlaybackActions.getModelTypeInfo(mMainFragmentViewModel)
-        val dataList = mMainFragmentViewModel.selectedDataList.value ?: return
-        val currentPlayingIndex = mNowPlayingFragmentViewModel.playbackState.value.?: 0
+        val modelTypeInfo = FragmentsCommunication.getModelTypeInfo(mMainFragmentViewModel)
+        val dataList = mMainFragmentViewModel.selectedItems.value ?: return
+        val currentPlayingIndex = mMediaPlayerDataViewModel.currentMediaItemIndex.value ?: 0
         mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
             modelTypeInfo[0],
             AddSongsToQueueMusicWorker.ADD_METHOD_ADD_AT_POSITION,
@@ -397,10 +301,9 @@ class MusicLibraryFragment : Fragment() {
             modelTypeInfo[2]
         )
     }
-
     private fun addSelectionToTopOfQueueMusic() {
-        val modelTypeInfo = PlaybackActions.getModelTypeInfo(mMainFragmentViewModel)
-        val dataList = mMainFragmentViewModel.selectedDataList.value ?: return
+        val modelTypeInfo = FragmentsCommunication.getModelTypeInfo(mMainFragmentViewModel)
+        val dataList = mMainFragmentViewModel.selectedItems.value ?: return
         mQueueMusicActionsWorkerViewModel.addSongsToQueueMusic(
             modelTypeInfo[0],
             AddSongsToQueueMusicWorker.ADD_METHOD_ADD_TO_TOP,
@@ -411,48 +314,63 @@ class MusicLibraryFragment : Fragment() {
         )
     }
 
-    private fun applyAppBarTitle(position: Int) {
-        mDataBinding.let { dataBidingView ->
-            when (position) {
-                0 -> {
-                    dataBidingView.topAppBar.title = getString(R.string.songs)
-                }
+    private fun onPageChanged(position: Int) {
+        mMainFragmentViewModel.totalCount.value = 0
+        mMainFragmentViewModel.selectedItems.value = HashMap()
+        mMainFragmentViewModel.selectMode.value = false
+        updateUISelectMode(false)
+        updateUIAppbarTitle(position)
+    }
 
-                1 -> {
-                    dataBidingView.topAppBar.title = getString(R.string.albums)
-                }
+    private fun onSearchButtonClicked() {
+        //
+    }
 
-                2 -> {
-                    dataBidingView.topAppBar.title = getString(R.string.artists)
-                }
+    private fun shareSelectedFiles() {
+        //
+    }
 
-                3 -> {
-                    dataBidingView.topAppBar.title = getString(R.string.folders)
-                }
+    private fun shareScreenShootForSelectedUniqueItem() {
+        //
+    }
 
-                4 -> {
-                    dataBidingView.topAppBar.title = getString(R.string.genre)
-                }
+    private fun updateUIAppbarTitle(position: Int) {
+        when (position) {
+            0 -> mDataBinding.topAppBar.title = getString(R.string.songs)
+            1 -> mDataBinding.topAppBar.title = getString(R.string.albums)
+            2 -> mDataBinding.topAppBar.title = getString(R.string.artists)
+            3 -> mDataBinding.topAppBar.title = getString(R.string.folders)
+            4 -> mDataBinding.topAppBar.title = getString(R.string.genre)
+            5 -> mDataBinding.topAppBar.title = getString(R.string.album_artists)
+            6 -> mDataBinding.topAppBar.title = getString(R.string.composers)
+            7 -> mDataBinding.topAppBar.title = getString(R.string.years)
+        }
+    }
 
-                5 -> {
-                    dataBidingView.topAppBar.title = getString(R.string.album_artists)
-                }
-
-                6 -> {
-                    dataBidingView.topAppBar.title = getString(R.string.composers)
-                }
-
-                7 -> {
-                    dataBidingView.topAppBar.title = getString(R.string.years)
-                }
-            }
+    private fun setupTabLayoutAdapter() {
+        mTabLayoutAdapter = TabLayoutAdapter(this)
+        mDataBinding.viewPager.adapter = mTabLayoutAdapter
+        mDataBinding.viewPager.offscreenPageLimit = 8
+        TabLayoutMediator(mDataBinding.tabLayout, mDataBinding.viewPager) { tab, position ->
+            updateUIToolbarTitle(position, tab)
+        }.attach()
+        mDataBinding.viewPager.currentItem = 0
+    }
+    private fun updateUIToolbarTitle(position: Int, tab: TabLayout.Tab) {
+        when (position) {
+            0 -> tab.text = getString(R.string.songs)
+            1 -> tab.text = getString(R.string.albums)
+            2 -> tab.text = getString(R.string.artists)
+            3 -> tab.text = getString(R.string.folders)
+            4 -> tab.text = getString(R.string.genre)
+            5 -> tab.text = getString(R.string.album_artists)
+            6 -> tab.text = getString(R.string.composers)
+            7 -> tab.text = getString(R.string.years)
         }
     }
 
     private fun initViews() {
-        mDataBinding.let { dataBidingView ->
-            InsetModifiers.updateTopViewInsets(dataBidingView.coordinatorLayout)
-        }
+        InsetModifiers.updateTopViewInsets(mDataBinding.coordinatorLayout)
     }
 
     companion object {
@@ -461,8 +379,7 @@ class MusicLibraryFragment : Fragment() {
         @JvmStatic
         fun newInstance() =
             MusicLibraryFragment().apply {
-                arguments = Bundle().apply {
-                }
+                arguments = Bundle().apply {}
             }
     }
 }

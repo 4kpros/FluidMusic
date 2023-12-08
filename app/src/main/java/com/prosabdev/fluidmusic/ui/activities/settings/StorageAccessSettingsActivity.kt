@@ -40,11 +40,14 @@ import kotlinx.coroutines.withContext
 
 class StorageAccessSettingsActivity : AppCompatActivity() {
 
+    //Data binding
     private lateinit var mDataBiding: ActivityStorageAccessSettingsBinding
 
+    //View models
     private val mFolderUriTreeViewModel: FolderUriTreeViewModel by viewModels()
     private val mStorageAccessActivityViewModel: StorageAccessActivityViewModel by viewModels()
 
+    //Adapters
     private var mEmptyBottomAdapter: EmptyBottomAdapter? = null
     private var mFolderUriTreeAdapter: FolderUriTreeAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
@@ -56,7 +59,7 @@ class StorageAccessSettingsActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        //Set content with data biding util
+        //Set binding layout and return binding object
         mDataBiding = DataBindingUtil.setContentView(this, R.layout.activity_storage_access_settings)
 
         //Load your UI content

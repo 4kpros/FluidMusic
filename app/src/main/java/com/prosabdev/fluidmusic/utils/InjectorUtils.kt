@@ -2,11 +2,10 @@ package com.prosabdev.fluidmusic.utils
 
 import android.app.Application
 import android.content.Context
-import androidx.media3.common.util.UnstableApi
 import com.prosabdev.fluidmusic.media.MediaEventsListener
 import com.prosabdev.fluidmusic.viewmodels.activities.EqualizerActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.activities.MainActivityViewModel
-import com.prosabdev.fluidmusic.viewmodels.fragments.NowPlayingFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.PlayingNowFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaControllerViewModel
 
 
@@ -27,9 +26,9 @@ object InjectorUtils {
         return EqualizerActivityViewModel.Factory(app)
     }
 
-    fun provideNowPlayingFragmentViewModel(ctx: Context): NowPlayingFragmentViewModel.Factory {
+    fun provideNowPlayingFragmentViewModel(ctx: Context): PlayingNowFragmentViewModel.Factory {
         val applicationContext = ctx.applicationContext
-        return NowPlayingFragmentViewModel.Factory(
+        return PlayingNowFragmentViewModel.Factory(
             applicationContext as Application
         )
     }

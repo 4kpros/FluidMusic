@@ -82,6 +82,7 @@
     <string name="unknown_folder">Unknown folder</string>
     <string name="unknown_folder_parent">Unknown folder parent</string>
     <string name="unknown_year">Unknown year</string>
+    <string name="unknown_content">Unknown content</string>
     //
     <string name="songs_for_album">Songs for album</string>
     <string name="songs_for_album_artist">Songs for album artist</string>
@@ -219,7 +220,7 @@
     <string name="save">Save</string>
     <string name="playlist_name">Playlist name</string>
     <string name="edit_tags">Edit tags</string>
-    <string name="play_after">Play after</string>
+    <string name="add_to_queue_music">Add to queue music</string>
 
     //List grid organize
     <string name="list">List</string>
@@ -256,5 +257,6 @@
     <string name="notification_content_title">Notification Content Title</string>
     <string name="notification_content_text">Notification Content Text</string>
     <string name="notification_channel_name">Notification Channel Name</string>
+    <string name="add_queue_music_dialog_title">Add to top, bottom or play next of queue music.</string>
 
 </resources>
