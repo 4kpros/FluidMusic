@@ -73,6 +73,7 @@ data class SongItem (
     companion object {
         const val TAG = "SongItem"
         const val DEFAULT_INDEX = "title"
+        const val IMAGE_SIGNATURE = "IMAGE_SIGNATURE"
 
         fun getStringIndexForSelection(dataItem: Any?): String {
             if(dataItem != null && dataItem is SongItem) {
@@ -86,7 +87,7 @@ data class SongItem (
             }
             return "#"
         }
-        fun castDataItemToGeneric(ctx: Context, dataItem: Any?): GenericItemListGrid? {
+         fun castDataItemToGeneric(ctx: Context, dataItem: Any?): GenericItemListGrid? {
             var tempResult : GenericItemListGrid? = null
             if(dataItem is SongItem) {
                 tempResult = GenericItemListGrid()

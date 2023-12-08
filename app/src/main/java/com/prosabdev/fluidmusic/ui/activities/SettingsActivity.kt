@@ -19,6 +19,7 @@ import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActiv
 
 class SettingsActivity : AppCompatActivity() {
 
+    //Data binding
     private lateinit var mDataBiding : ActivitySettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,7 +29,7 @@ class SettingsActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this.application)
 
-        //Set content with data biding util
+        //Set binding layout and return binding object
         mDataBiding = DataBindingUtil.setContentView(this, R.layout.activity_settings)
 
         //Load your UI content

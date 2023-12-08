@@ -11,6 +11,7 @@ import com.prosabdev.fluidmusic.databinding.FragmentPlaylistsBinding
 
 class PlaylistsFragment : Fragment() {
 
+    //Data binding
     private lateinit var mDataBinding: FragmentPlaylistsBinding
 
     override fun onCreateView(
@@ -18,16 +19,18 @@ class PlaylistsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        //Set content with data biding util
+        //Inflate binding layout and return binding object
         mDataBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_playlists, container, false)
         val view = mDataBinding.root
 
         //Load your UI content
-        initViews()
-        setupRecyclerViewAdapter()
-        observeLiveData()
-        checkInteractions()
+        if (savedInstanceState == null){
+            initViews()
+            setupRecyclerViewAdapter()
+            observeLiveData()
+            checkInteractions()
+        }
 
         return view
     }

@@ -7,10 +7,12 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.prosabdev.fluidmusic.R
+import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
 import com.prosabdev.fluidmusic.databinding.FragmentStreamsBinding
 
 class StreamsFragment : Fragment() {
 
+    //Data binding
     private lateinit var mDataBinding: FragmentStreamsBinding
 
     override fun onCreateView(
@@ -18,15 +20,17 @@ class StreamsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        //Set content with data biding util
+        //Inflate binding layout and return binding object
         mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_streams, container, false)
         val view = mDataBinding.root
 
         //Load your UI content
-        initViews()
-        setupRecyclerViewAdapter()
-        observeLiveData()
-        checkInteractions()
+        if (savedInstanceState == null){
+            initViews()
+            setupRecyclerViewAdapter()
+            observeLiveData()
+            checkInteractions()
+        }
 
         return view
     }

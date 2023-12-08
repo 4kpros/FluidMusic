@@ -14,18 +14,20 @@ import com.prosabdev.fluidmusic.ui.fragments.MainFragment
 import com.prosabdev.fluidmusic.utils.InjectorUtils
 import com.prosabdev.fluidmusic.viewmodels.activities.MainActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaControllerViewModel
-import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaPlayerStateViewModel
+import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaPlayerDataViewModel
 
 @UnstableApi class MainActivity : AppCompatActivity(){
 
+    //Data binding
     private lateinit var mDataBinding: ActivityMainBinding
 
+    //View models
     private val mMainActivityViewModel by viewModels<MainActivityViewModel> {
         InjectorUtils.provideMainActivityViewModel(application)
     }
-    private val mMediaPlayerStateViewModel by viewModels<MediaPlayerStateViewModel>()
+    private val mMediaPlayerDataViewModel by viewModels<MediaPlayerDataViewModel>()
     private val mMediaControllerViewModel by viewModels<MediaControllerViewModel> {
-        InjectorUtils.provideMediaControllerViewModel(mMediaPlayerStateViewModel.mediaEventsListener)
+        InjectorUtils.provideMediaControllerViewModel(mMediaPlayerDataViewModel.mediaEventsListener)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +37,7 @@ import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaPlayerStateViewM
         WindowCompat.setDecorFitsSystemWindows(window, false)
         DynamicColors.applyToActivitiesIfAvailable(this@MainActivity.application)
 
-        //Set content view with data binding util
+        //Set binding layout and return binding object
         mDataBinding = DataBindingUtil.setContentView(this@MainActivity, R.layout.activity_main)
 
         //Load your UI content
@@ -76,7 +78,6 @@ import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaPlayerStateViewM
     }
     public override fun onStop() {
         super.onStop()
-        mMediaControllerViewModel.releaseController()
         ImageLoaders.stopAllJobs(applicationContext)
     }
 

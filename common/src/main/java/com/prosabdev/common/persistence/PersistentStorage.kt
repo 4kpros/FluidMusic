@@ -252,7 +252,7 @@ class PersistentStorage private constructor(private val ctx: Context) {
         }
     }
 
-    class SortAnOrganizeForExploreContents {
+    class SortAnOrganize {
         companion object {
             const val SORT_ORGANIZE_PLAYER_QUEUE_MUSIC = "SORT_ORGANIZE_PLAYER_QUEUE_MUSIC"
 
@@ -280,13 +280,13 @@ class PersistentStorage private constructor(private val ctx: Context) {
             const val SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_GENRE = "SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_GENRE"
             const val SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_YEAR = "SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_YEAR"
 
-            fun loadSortOrganizeItemsFor(sharedPrefsKey: String): SortOrganizeItemSP? {
+            fun load(sharedPrefsKey: String): SortOrganizeItemSP? {
                 val tempGson = Gson()
                 val tempItem: String? = INSTANCE?.preferences?.getString(sharedPrefsKey, null)
                 val tempItemType = object : TypeToken<SortOrganizeItemSP>() {}.type
                 return tempGson.fromJson<SortOrganizeItemSP>(tempItem, tempItemType)
             }
-            fun saveSortOrganizeItemsFor(sharedPrefsKey: String, sortOrganizeItemSP: SortOrganizeItemSP?) {
+            fun save(sharedPrefsKey: String, sortOrganizeItemSP: SortOrganizeItemSP?) {
                 val tempEditor: SharedPreferences.Editor = INSTANCE?.preferences?.edit() ?: return
                 val tempGson = Gson()
                 val tempJson: String = tempGson.toJson(sortOrganizeItemSP)

@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetSortSongsBinding
-import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
+import com.prosabdev.fluidmusic.ui.fragments.ExploreContentForFragment
 import com.prosabdev.fluidmusic.ui.fragments.PlaylistsFragment
 import com.prosabdev.fluidmusic.ui.fragments.StreamsFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.AlbumArtistsFragment
@@ -159,7 +159,7 @@ class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
                     context?.resources?.getString(R.string.all_songs) ?: ""
                 ) ?: ""
             }
-            ExploreContentsForFragment.TAG -> {
+            ExploreContentForFragment.TAG -> {
                 when (mFromSourceValue) {
                     AlbumsFragment.TAG -> {
                         mDataBiding.textSortDetails.text = context?.resources?.getString(

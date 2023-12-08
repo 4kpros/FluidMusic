@@ -22,9 +22,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:clickable="true"
+            android:focusable="true"
             >
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_play_after"
+                android:id="@+id/button_add_to_queue_music"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Widget.Material3.Button.IconButton"
@@ -32,33 +33,32 @@
                 android:layout_centerHorizontal="true"
                 app:icon="@drawable/fast_forward"
                 android:layout_gravity="center"
-                android:contentDescription="@string/play_after"
-                android:tooltipText="@string/play_after"
+                android:contentDescription="@string/add_to_queue_music"
                 />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_playlist_add"
+                android:id="@+id/button_add_to_playlist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Widget.Material3.Button.IconButton"
-                android:layout_below="@+id/button_play_after"
+                android:layout_below="@+id/button_add_to_queue_music"
                 android:layout_centerHorizontal="true"
                 app:icon="@drawable/playlist_add"
                 android:layout_gravity="center"
                 android:contentDescription="@string/add_to_playlist"
-                android:tooltipText="@string/add_to_playlist" />
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_edit_tags"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Widget.Material3.Button.IconButton"
-                android:layout_below="@+id/button_playlist_add"
+                android:layout_below="@+id/button_add_to_playlist"
                 android:layout_centerHorizontal="true"
                 app:icon="@drawable/edit"
                 android:layout_gravity="center"
                 android:contentDescription="@string/edit_tags"
-                android:tooltipText="@string/edit_tags" />
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_share"
@@ -67,10 +67,10 @@
                 style="@style/Widget.Material3.Button.IconButton"
                 android:layout_below="@+id/button_edit_tags"
                 android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
                 app:icon="@drawable/share"
                 android:contentDescription="@string/share"
-                android:tooltipText="@string/share"
-                android:layout_gravity="center" />
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_delete"
@@ -82,7 +82,7 @@
                 app:icon="@drawable/delete"
                 android:layout_gravity="center"
                 android:contentDescription="@string/delete"
-                android:tooltipText="@string/delete" />
+                />
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

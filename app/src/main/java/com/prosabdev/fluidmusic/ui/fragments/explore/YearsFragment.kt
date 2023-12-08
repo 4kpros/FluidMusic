@@ -35,13 +35,12 @@ import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomS
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortContentExplorerBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
 import com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
-import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
+import com.prosabdev.fluidmusic.ui.fragments.ExploreContentForFragment
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.fragments.NowPlayingFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.PlayingNowFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.explore.YearsFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.explore.YearItemViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -51,7 +50,7 @@ class YearsFragment : Fragment() {
 
     private val mYearsFragmentViewModel: YearsFragmentViewModel by activityViewModels()
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
-    private val mNowPlayingFragmentViewModel: NowPlayingFragmentViewModel by activityViewModels()
+    private val mPlayingNowFragmentViewModel: PlayingNowFragmentViewModel by activityViewModels()
 
     private val mYearItemViewModel: YearItemViewModel by activityViewModels()
 
@@ -75,7 +74,7 @@ class YearsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        //Set content with data biding util
+        //Inflate binding layout and return binding object
         mDataBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_years, container, false)
         val view = mDataBinding.root
@@ -149,10 +148,10 @@ class YearsFragment : Fragment() {
         }
 
         //Listen to player changes
-        mNowPlayingFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner) {
+        mPlayingNowFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner) {
             updatePlayingSongUI(it)
         }
-        mNowPlayingFragmentViewModel.getIsPlaying().observe(viewLifecycleOwner) {
+        mPlayingNowFragmentViewModel.getIsPlaying().observe(viewLifecycleOwner) {
             updatePlaybackStateUI(it)
         }
 
@@ -190,17 +189,17 @@ class YearsFragment : Fragment() {
             mGenericListGridItemAdapter?.submitList(mYearsFragmentViewModel.dataList.value)
         }
         if (
-            mNowPlayingFragmentViewModel.queueListSource.value == TAG &&
-            mNowPlayingFragmentViewModel.queueListSourceColumnIndex.value == null &&
-            mNowPlayingFragmentViewModel.queueListSourceColumnValue.value == null &&
-            mNowPlayingFragmentViewModel.sortBy.value == mYearsFragmentViewModel.sortBy.value &&
-            mNowPlayingFragmentViewModel.isInverted.value == mYearsFragmentViewModel.isInverted.value
+            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
+            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == null &&
+            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == null &&
+            mPlayingNowFragmentViewModel.sortBy.value == mYearsFragmentViewModel.sortBy.value &&
+            mPlayingNowFragmentViewModel.isInverted.value == mYearsFragmentViewModel.isInverted.value
         ) {
             mGenericListGridItemAdapter?.setPlayingPosition(
-                mNowPlayingFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
+                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
             )
             mGenericListGridItemAdapter?.setIsPlaying(
-                mNowPlayingFragmentViewModel.getIsPlaying().value ?: false
+                mPlayingNowFragmentViewModel.getIsPlaying().value ?: false
             )
         } else {
             mGenericListGridItemAdapter?.setPlayingPosition(-1)
@@ -227,17 +226,17 @@ class YearsFragment : Fragment() {
             mMainFragmentViewModel.totalCount.value = dataList?.size ?: 0
         }
         if (
-            mNowPlayingFragmentViewModel.queueListSource.value == TAG &&
-            mNowPlayingFragmentViewModel.queueListSourceColumnIndex.value == null &&
-            mNowPlayingFragmentViewModel.queueListSourceColumnValue.value == null &&
-            mNowPlayingFragmentViewModel.sortBy.value == mYearsFragmentViewModel.sortBy.value &&
-            mNowPlayingFragmentViewModel.isInverted.value == mYearsFragmentViewModel.isInverted.value
+            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
+            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == null &&
+            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == null &&
+            mPlayingNowFragmentViewModel.sortBy.value == mYearsFragmentViewModel.sortBy.value &&
+            mPlayingNowFragmentViewModel.isInverted.value == mYearsFragmentViewModel.isInverted.value
         ) {
             mGenericListGridItemAdapter?.setPlayingPosition(
-                mNowPlayingFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
+                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
             )
             mGenericListGridItemAdapter?.setIsPlaying(
-                mNowPlayingFragmentViewModel.getIsPlaying().value ?: false
+                mPlayingNowFragmentViewModel.getIsPlaying().value ?: false
             )
         } else {
             mGenericListGridItemAdapter?.setPlayingPosition(-1)
@@ -287,15 +286,15 @@ class YearsFragment : Fragment() {
         val songPosition: Int = songItem?.position ?: -1
 
         if (
-            mNowPlayingFragmentViewModel.queueListSource.value == TAG &&
-            mNowPlayingFragmentViewModel.queueListSourceColumnIndex.value == null &&
-            mNowPlayingFragmentViewModel.queueListSourceColumnValue.value == null &&
-            mNowPlayingFragmentViewModel.sortBy.value == mYearsFragmentViewModel.sortBy.value &&
-            mNowPlayingFragmentViewModel.isInverted.value == mYearsFragmentViewModel.isInverted.value
+            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
+            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == null &&
+            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == null &&
+            mPlayingNowFragmentViewModel.sortBy.value == mYearsFragmentViewModel.sortBy.value &&
+            mPlayingNowFragmentViewModel.isInverted.value == mYearsFragmentViewModel.isInverted.value
         ) {
             mGenericListGridItemAdapter?.setPlayingPosition(songPosition)
             mGenericListGridItemAdapter?.setIsPlaying(
-                mNowPlayingFragmentViewModel.playbackState.value?.state ?: false
+                mPlayingNowFragmentViewModel.playbackState.value?.state ?: false
             )
             tryToScrollOnCurrentItem(songPosition)
         } else {
@@ -307,9 +306,9 @@ class YearsFragment : Fragment() {
     private fun tryToScrollOnCurrentItem(position: Int) {
         if (position >= 0) {
             val tempCanScrollToPlayingSong: Boolean =
-                mNowPlayingFragmentViewModel.getCanScrollCurrentPlayingSong().value ?: false
+                mPlayingNowFragmentViewModel.getCanScrollCurrentPlayingSong().value ?: false
             if (!tempCanScrollToPlayingSong) return
-            mNowPlayingFragmentViewModel.setCanScrollCurrentPlayingSong(false)
+            mPlayingNowFragmentViewModel.setCanScrollCurrentPlayingSong(false)
             val tempFV: Int = (mLayoutManager?.findFirstVisibleItemPosition() ?: 0) - 1
             val tempLV: Int = mLayoutManager?.findLastVisibleItemPosition() ?: +1
             val tempVisibility: Boolean = position in tempFV..tempLV
@@ -333,18 +332,18 @@ class YearsFragment : Fragment() {
 
     private fun updatePlaybackStateUI(isPlaying: Boolean) {
         if (
-            mNowPlayingFragmentViewModel.queueListSource.value == TAG &&
-            mNowPlayingFragmentViewModel.queueListSourceColumnIndex.value == null &&
-            mNowPlayingFragmentViewModel.queueListSourceColumnValue.value == null &&
-            mNowPlayingFragmentViewModel.sortBy.value == mYearsFragmentViewModel.sortBy.value &&
-            mNowPlayingFragmentViewModel.isInverted.value == mYearsFragmentViewModel.isInverted.value
+            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
+            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == null &&
+            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == null &&
+            mPlayingNowFragmentViewModel.sortBy.value == mYearsFragmentViewModel.sortBy.value &&
+            mPlayingNowFragmentViewModel.isInverted.value == mYearsFragmentViewModel.isInverted.value
         ) {
             mGenericListGridItemAdapter?.setPlayingPosition(
-                (mNowPlayingFragmentViewModel.playbackState.value?.position ?: 0).toInt()
+                (mPlayingNowFragmentViewModel.playbackState.value?.position ?: 0).toInt()
             )
             mGenericListGridItemAdapter?.setIsPlaying(isPlaying)
             tryToScrollOnCurrentItem(
-                (mNowPlayingFragmentViewModel.playbackState.value?.position ?: 0).toInt()
+                (mPlayingNowFragmentViewModel.playbackState.value?.position ?: 0).toInt()
             )
         } else {
             if (mGenericListGridItemAdapter?.getIsPlaying() == true) {
@@ -596,7 +595,7 @@ class YearsFragment : Fragment() {
                 setReorderingAllowed(false)
                 add(
                     R.id.main_fragment_container,
-                    ExploreContentsForFragment.newInstance(
+                    ExploreContentForFragment.newInstance(
                         PersistentStorage
                             .SortAnOrganizeForExploreContents
                             .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_YEAR,

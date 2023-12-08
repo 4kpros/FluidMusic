@@ -2,12 +2,9 @@ package com.prosabdev.fluidmusic.viewmodels.mediacontroller
 
 import android.content.ComponentName
 import android.content.Context
-import android.net.Uri
-import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
@@ -36,6 +33,25 @@ class MediaControllerViewModel(private val mMediaEventsListener: MediaEventsList
             },
             MoreExecutors.directExecutor()
         )
+    }
+
+    fun toggleRepeatMode(value: Int = Player.REPEAT_MODE_OFF){
+        when(value){
+            Player.REPEAT_MODE_OFF -> mediaController?.repeatMode = Player.REPEAT_MODE_ALL
+            Player.REPEAT_MODE_ALL -> mediaController?.repeatMode = Player.REPEAT_MODE_ONE
+            Player.REPEAT_MODE_ONE -> mediaController?.repeatMode = Player.REPEAT_MODE_OFF
+        }
+    }
+
+    fun toggleShuffleModeEnabled(value: Boolean = false){
+        mediaController?.shuffleModeEnabled = !(value ?: false)
+    }
+
+    fun togglePlayPause(isPlaying: Boolean = false){
+        when(isPlaying){
+            true -> mediaController?.pause()
+            else -> mediaController?.play()
+        }
     }
 
     private fun listenMediaEvents() {
@@ -99,13 +115,13 @@ class MediaControllerViewModel(private val mMediaEventsListener: MediaEventsList
         )
     }
 
+    fun releaseController() {
+        MediaController.releaseFuture(mediaControllerFuture.value!!)
+    }
+
     override fun onCleared() {
         super.onCleared()
         releaseController()
-    }
-
-    fun releaseController() {
-        MediaController.releaseFuture(mediaControllerFuture.value!!)
     }
 
     class Factory(

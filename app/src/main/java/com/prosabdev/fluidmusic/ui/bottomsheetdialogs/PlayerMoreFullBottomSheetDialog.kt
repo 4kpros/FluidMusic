@@ -35,10 +35,10 @@ import com.prosabdev.fluidmusic.databinding.BottomSheetPlayerMoreBinding
 import com.prosabdev.fluidmusic.databinding.DialogGotoSongBinding
 import com.prosabdev.fluidmusic.databinding.DialogSetSleepTimerBinding
 import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
-import com.prosabdev.fluidmusic.ui.fragments.ExploreContentsForFragment
+import com.prosabdev.fluidmusic.ui.fragments.ExploreContentForFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.fragments.NowPlayingFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.PlayingNowFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistItemViewModel
 import kotlinx.coroutines.*
 
@@ -48,7 +48,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
 
     private val mPlaylistItemViewModel: PlaylistItemViewModel by viewModels()
 
-    private var mNowPlayingFragmentViewModel: NowPlayingFragmentViewModel? = null
+    private var mPlayingNowFragmentViewModel: PlayingNowFragmentViewModel? = null
     private var mMainFragmentViewModel: MainFragmentViewModel? = null
     private var mScreenShotPlayerView : View? = null
 
@@ -83,7 +83,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        updateCurrentPlayingSongUI(mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value)
+        updateCurrentPlayingSongUI(mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value)
         checkInteractions()
     }
 
@@ -154,7 +154,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
 
     private fun showDeleteSelectionDialog() {
         val tempSongItem: SongItem =
-            mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+            mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
         context?.let { ctx ->
             MaterialAlertDialogBuilder(this.requireContext())
                 .setTitle(ctx.getString(R.string.dialog_delete_selection_title))
@@ -175,7 +175,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun setSongAsRingtone() {
-        val tempSongItem : SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val tempSongItem : SongItem = mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
         context?.let { ctx ->
             if(PermissionsManager.haveWriteSystemSettingsPermission(ctx)){
                 val tempUri : Uri = Uri.parse(tempSongItem.uri ?: "") ?: return
@@ -203,7 +203,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun showGoToSongDialog() {
-        val tempSongItem : SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val tempSongItem : SongItem = mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
 
         val mDialogGotoSongBinding : DialogGotoSongBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_goto_song, null, false)
         val tempFragmentManager = activity?.supportFragmentManager ?: return
@@ -224,7 +224,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                             setReorderingAllowed(true)
                             add(
                                 R.id.main_fragment_container,
-                                ExploreContentsForFragment.newInstance(
+                                ExploreContentForFragment.newInstance(
                                     PersistentStorage
                                         .SortAnOrganizeForExploreContents
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ALBUM,
@@ -249,7 +249,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                             setReorderingAllowed(true)
                             add(
                                 R.id.main_fragment_container,
-                                ExploreContentsForFragment.newInstance(
+                                ExploreContentForFragment.newInstance(
                                     PersistentStorage
                                         .SortAnOrganizeForExploreContents
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ALBUM_ARTIST,
@@ -274,7 +274,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                             setReorderingAllowed(true)
                             add(
                                 R.id.main_fragment_container,
-                                ExploreContentsForFragment.newInstance(
+                                ExploreContentForFragment.newInstance(
                                     PersistentStorage
                                         .SortAnOrganizeForExploreContents
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ARTIST,
@@ -299,7 +299,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                             setReorderingAllowed(true)
                             add(
                                 R.id.main_fragment_container,
-                                ExploreContentsForFragment.newInstance(
+                                ExploreContentForFragment.newInstance(
                                     PersistentStorage
                                         .SortAnOrganizeForExploreContents
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_COMPOSER,
@@ -324,7 +324,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                             setReorderingAllowed(true)
                             add(
                                 R.id.main_fragment_container,
-                                ExploreContentsForFragment.newInstance(
+                                ExploreContentForFragment.newInstance(
                                     PersistentStorage
                                         .SortAnOrganizeForExploreContents
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_FOLDER,
@@ -349,7 +349,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                             setReorderingAllowed(true)
                             add(
                                 R.id.main_fragment_container,
-                                ExploreContentsForFragment.newInstance(
+                                ExploreContentForFragment.newInstance(
                                     PersistentStorage
                                         .SortAnOrganizeForExploreContents
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_GENRE,
@@ -374,7 +374,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
 //                            setReorderingAllowed(true)
 //                            add(
 //                                R.id.main_fragment_container,
-//                                ExploreContentsForFragment.newInstance(
+//                                ExploreContentForFragment.newInstance(
 //                                    SharedPreferenceManagerUtils
 //                                        .SortAnOrganizeForExploreContents
 //                                        .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_YEAR,
@@ -414,8 +414,8 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     )
                 }
                 .show().apply {
-                    val tempSleepTimer: Float = mNowPlayingFragmentViewModel?.sleepTimer?.value?.sliderValue ?: 0.0f
-                    val tempPlayLastSong: Boolean = mNowPlayingFragmentViewModel?.sleepTimer?.value?.playLastSong ?: false
+                    val tempSleepTimer: Float = mPlayingNowFragmentViewModel?.sleepTimer?.value?.sliderValue ?: 0.0f
+                    val tempPlayLastSong: Boolean = mPlayingNowFragmentViewModel?.sleepTimer?.value?.playLastSong ?: false
                     mDialogSetSleepTimerBinding.slider.value = tempSleepTimer
                     mDialogSetSleepTimerBinding.textRangeValue.text =
                         if(tempSleepTimer <= 0)
@@ -441,11 +441,11 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         val tempSleepTimerSP = SleepTimerSP()
         tempSleepTimerSP.sliderValue = value
         tempSleepTimerSP.playLastSong = playLastSong
-        mNowPlayingFragmentViewModel?.sleepTimer?.value = tempSleepTimerSP
+        mPlayingNowFragmentViewModel?.sleepTimer?.value = tempSleepTimerSP
     }
 
     private fun shareSong() {
-        val tempSongItem : SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val tempSongItem : SongItem = mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
         context?.let { ctx ->
             val dialogShareSongBinding : DialogShareSongBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_share_song, null, false)
             MaterialAlertDialogBuilder(this.requireContext())
@@ -497,11 +497,11 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun fetchLyrics() {
-        val tempSongItem : SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val tempSongItem : SongItem = mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
     }
 
     private fun showAddToPlaylistDialog() {
-        val tempSongItem : SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val tempSongItem : SongItem = mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
 
         val songsToAddOnPlaylist : ArrayList<PlaylistSongItem> = ArrayList()
         val psI = PlaylistSongItem()
@@ -524,7 +524,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun showSongInfoDialog() {
-        val tempSongItem : SongItem = mNowPlayingFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val tempSongItem : SongItem = mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
         val songInfoBottomSheetDialog = SongInfoFullBottomSheetDialogFragment.newInstance(tempSongItem)
         activity ?.supportFragmentManager?.let { songInfoBottomSheetDialog.show(it, SongInfoFullBottomSheetDialogFragment.TAG) }
         dismiss()
@@ -534,8 +534,8 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         mDataBiding?.textDescription?.isSelected = true
     }
 
-    fun updateData(nowPlayingFragmentViewModel : NowPlayingFragmentViewModel, mainFragmentViewModel : MainFragmentViewModel, screenShootPlayerView : View){
-        mNowPlayingFragmentViewModel = nowPlayingFragmentViewModel
+    fun updateData(playingNowFragmentViewModel : PlayingNowFragmentViewModel, mainFragmentViewModel : MainFragmentViewModel, screenShootPlayerView : View){
+        mPlayingNowFragmentViewModel = playingNowFragmentViewModel
         mMainFragmentViewModel = mainFragmentViewModel
         mScreenShotPlayerView = screenShootPlayerView
     }

@@ -1,5 +1,6 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -12,6 +13,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
+import androidx.lifecycle.lifecycleScope
 import com.prosabdev.common.constants.MainConst
 import com.prosabdev.common.utils.Animators
 import com.prosabdev.common.utils.ImageLoaders
@@ -26,10 +28,13 @@ import kotlinx.coroutines.launch
 
 class MainFragment : Fragment() {
 
+    //Data binding
     private lateinit var mDataBinding: FragmentMainBinding
 
+    //View models
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
 
+    //Fragments
     private val mMusicLibraryFragment = MusicLibraryFragment.newInstance()
     private val mFoldersHierarchyFragment = FoldersHierarchyFragment.newInstance()
     private val mPlaylistsFragment = PlaylistsFragment.newInstance()
@@ -40,15 +45,17 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        //Set content with data biding util
+        //Inflate binding layout and return binding object
         mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false)
         val view = mDataBinding.root
 
         //Load your UI content
-        initViews()
-        setupFragments()
-        checkInteractions()
-        observeLiveData()
+        if (savedInstanceState == null){
+            initViews()
+            setupFragments()
+            checkInteractions()
+            observeLiveData()
+        }
 
         return view
     }
@@ -86,7 +93,7 @@ class MainFragment : Fragment() {
         mMainFragmentViewModel.selectMode.observe(viewLifecycleOwner) {
             updateSelectModeUI(it)
         }
-        mMainFragmentViewModel.selectedDataList.observe(viewLifecycleOwner) {
+        mMainFragmentViewModel.selectedItems.observe(viewLifecycleOwner) {
             updateTotalSelectedTracksUI(it.size)
         }
         mMainFragmentViewModel.scrollingState.observe(viewLifecycleOwner) {
@@ -196,6 +203,7 @@ class MainFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateTotalSelectedTracksUI(totalSelected: Int, animate: Boolean = true) {
         mDataBinding.let { dataBidingView ->
             MainScope().launch {
@@ -287,43 +295,32 @@ class MainFragment : Fragment() {
             hideSlidingUpPanel(counter)
         }
     }
-
     private fun hideSlidingUpPanel(counter: Int?) {
-        mDataBinding.let { dataBidingView ->
-            if (counter == null || counter <= 0)
-                return
-            MainScope().launch {
-                if (dataBidingView.slidingUpPanel.panelState != PanelState.COLLAPSED)
-                    dataBidingView.slidingUpPanel.panelState = PanelState.COLLAPSED
-            }
+        if (counter == null || counter <= 0)
+            return
+        lifecycleScope.launch {
+            if (mDataBinding.slidingUpPanel.panelState != PanelState.COLLAPSED)
+                mDataBinding.slidingUpPanel.panelState = PanelState.COLLAPSED
         }
     }
-
     private fun showSlidingUpPanel(counter: Int?) {
-        mDataBinding.let { dataBidingView ->
-            if (counter == null || counter <= 0)
-                return
-            MainScope().launch {
-                if (dataBidingView.slidingUpPanel.panelState != PanelState.EXPANDED)
-                    dataBidingView.slidingUpPanel.panelState = PanelState.EXPANDED
-            }
+        if (counter == null || counter <= 0)
+            return
+        lifecycleScope.launch {
+            if (mDataBinding.slidingUpPanel.panelState != PanelState.EXPANDED)
+                mDataBinding.slidingUpPanel.panelState = PanelState.EXPANDED
         }
     }
 
     private fun updateMiniPlayerPlayPauseStateUI(isPlaying: Boolean?) {
-        mDataBinding.let { dataBidingView ->
-            MainScope().launch {
-                context?.let {
-                    if (isPlaying == true) {
-                        tryToUpdateMiniPlayerScrollStateUI(-2)
-                        dataBidingView.constraintMiniPlayerInclude.buttonPlayPause.icon =
-                            AppCompatResources.getDrawable(it, R.drawable.pause)
-                    } else {
-                        dataBidingView.constraintMiniPlayerInclude.buttonPlayPause.icon =
-                            AppCompatResources.getDrawable(it, R.drawable.play_arrow)
-                    }
-                }
-
+        context?.let {
+            if (isPlaying == true) {
+                tryToUpdateMiniPlayerScrollStateUI(-2)
+                mDataBinding.constraintMiniPlayerInclude.buttonPlayPause.icon =
+                    AppCompatResources.getDrawable(it, R.drawable.pause)
+            } else {
+                mDataBinding.constraintMiniPlayerInclude.buttonPlayPause.icon =
+                    AppCompatResources.getDrawable(it, R.drawable.play_arrow)
             }
         }
     }
@@ -466,7 +463,7 @@ class MainFragment : Fragment() {
     }
 
     private fun onClickButtonCloseSelectionMenu() {
-        mMainFragmentViewModel.selectedDataList.value = HashMap()
+        mMainFragmentViewModel.selectedItems.value = HashMap()
         mMainFragmentViewModel.totalCount.value = 0
         mMainFragmentViewModel.selectMode.value = false
     }

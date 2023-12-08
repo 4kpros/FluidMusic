@@ -13,6 +13,7 @@ import com.prosabdev.fluidmusic.databinding.FragmentEditTagsBinding
 
 class EditTagsFragment : Fragment() {
 
+    //Data binding
     private lateinit var mDataBinding: FragmentEditTagsBinding
 
     private var mDataList: List<String>? = null
@@ -31,16 +32,18 @@ class EditTagsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        //Set content with data biding util
+        //Inflate binding layout and return binding object
         mDataBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_edit_tags, container, false)
         val view = mDataBinding.root
 
         //Load your UI content
-        initViews()
-        setupSongInfoData()
-        observeLiveData()
-        checkInteractions()
+        if (savedInstanceState == null){
+            initViews()
+            setupSongInfoData()
+            observeLiveData()
+            checkInteractions()
+        }
 
         return view
     }
