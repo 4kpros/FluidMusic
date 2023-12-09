@@ -11,13 +11,13 @@ class PlaylistItemViewModel(app: Application) : AndroidViewModel(app) {
     private var mRepository: PlaylistItemRepository? = PlaylistItemRepository(app)
 
     suspend fun insert(playlistItem: PlaylistItem?) : Long? {
-        return mRepository?.insert(playlistItem)
+        return mRepository?.insert(playlistItem ?: return null)
     }
     suspend fun update(playlistItem: PlaylistItem?) {
-        mRepository?.update(playlistItem)
+        mRepository?.update(playlistItem ?: return)
     }
     suspend fun delete(playlistItem: PlaylistItem?) {
-        mRepository?.delete(playlistItem)
+        mRepository?.delete(playlistItem ?: return)
     }
     suspend fun deleteAll() {
         mRepository?.deleteAll()

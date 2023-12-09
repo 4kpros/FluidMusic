@@ -14,22 +14,22 @@ class PlaylistSongItemRepository(ctx : Context) {
 
     suspend fun insert(playlistSongItem: PlaylistSongItem?) : Long? {
         return withContext(Dispatchers.IO){
-            mDao?.insert(playlistSongItem)
+            mDao?.insert(playlistSongItem ?: return@withContext null)
         }
     }
     suspend fun insertMultiple(playlistSongItems: ArrayList<PlaylistSongItem>?) : List<Long>? {
         return withContext(Dispatchers.IO){
-            mDao?.insertMultiple(playlistSongItems)
+            mDao?.insertMultiple(playlistSongItems ?: return@withContext null)
         }
     }
     suspend fun update(playlistSongItem: PlaylistSongItem?): Int? {
         return withContext(Dispatchers.IO){
-            mDao?.update(playlistSongItem)
+            mDao?.update(playlistSongItem ?: return@withContext null)
         }
     }
     suspend fun delete(playlistSongItem: PlaylistSongItem?): Int? {
         return withContext(Dispatchers.IO){
-            mDao?.delete(playlistSongItem)
+            mDao?.delete(playlistSongItem ?: return@withContext null)
         }
     }
     suspend fun deleteAll(): Int? {
@@ -45,12 +45,12 @@ class PlaylistSongItemRepository(ctx : Context) {
     }
     suspend fun getAll(orderBy: String?) : LiveData<List<PlaylistSongItem>?>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAll(orderBy)
+            mDao?.getAll(orderBy ?: return@withContext null)
         }
     }
     suspend fun getAllDirectly(orderBy: String?) : List<PlaylistSongItem>? {
         return withContext(Dispatchers.IO){
-            mDao?.getAllDirectly(orderBy)
+            mDao?.getAllDirectly(orderBy ?: return@withContext null)
         }
     }
 }

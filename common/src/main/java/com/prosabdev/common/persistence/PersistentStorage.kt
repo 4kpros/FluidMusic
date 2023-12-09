@@ -252,7 +252,7 @@ class PersistentStorage private constructor(private val ctx: Context) {
         }
     }
 
-    class SortAnOrganize {
+    class SortAndOrganize {
         companion object {
             const val SORT_ORGANIZE_PLAYER_QUEUE_MUSIC = "SORT_ORGANIZE_PLAYER_QUEUE_MUSIC"
 

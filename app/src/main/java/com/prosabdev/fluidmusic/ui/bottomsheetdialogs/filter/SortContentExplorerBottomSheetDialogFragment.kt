@@ -11,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetSortContentExplorerBinding
+import com.prosabdev.fluidmusic.databinding.FragmentYearsBinding
 import com.prosabdev.fluidmusic.ui.fragments.PlaylistsFragment
 import com.prosabdev.fluidmusic.ui.fragments.StreamsFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.AlbumArtistsFragment
@@ -25,8 +26,10 @@ import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 
 class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
-    private lateinit var mDataBiding: BottomSheetSortContentExplorerBinding
+    //Data binding
+    private lateinit var mDataBinding: BottomSheetSortContentExplorerBinding
 
+    //View models
     private var mGenericListenDataViewModel: GenericListenDataViewModel? = null
 
     private var mFromSource: String? = null
@@ -38,9 +41,9 @@ class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment()
         savedInstanceState: Bundle?
     ): View {
 
-        //Set content with data biding util
-        mDataBiding = DataBindingUtil.inflate(inflater, R.layout._bottom_sheet_sort_content_explorer, container, false)
-        val view = mDataBiding.root
+        //Inflate binding layout and return binding object
+        mDataBinding = DataBindingUtil.inflate(inflater, R.layout._bottom_sheet_sort_content_explorer, container, false)
+        val view = mDataBinding.root
 
         //Load your UI content
         initViews()
@@ -50,13 +53,13 @@ class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment()
     }
 
     private fun checkInteractions() {
-        mDataBiding.let {
-            it.radioGroupSort.setOnCheckedChangeListener { _, checkedId ->
+        mDataBinding.run {
+            radioGroupSort.setOnCheckedChangeListener { _, checkedId ->
                 onRadioGroupStateChanged(
                     checkedId
                 )
             }
-            it.checkboxInvertItems.setOnCheckedChangeListener { _, isChecked ->
+            checkboxInvertItems.setOnCheckedChangeListener { _, isChecked ->
                 onInvertSortChanged(
                     isChecked
                 )
@@ -70,50 +73,22 @@ class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment()
     }
 
     private fun onRadioGroupStateChanged(checkedId: Int) {
-        mDataBiding.let {
+        mDataBinding.run {
             when (checkedId) {
-                it.radioName.id -> {
-                    mGenericListenDataViewModel?.sortBy?.value = "name"
-                }
-                it.radioArtist.id -> {
-                    mGenericListenDataViewModel?.sortBy?.value = "artist"
-                }
-                it.radioAlbum.id -> {
-                    mGenericListenDataViewModel?.sortBy?.value = "album"
-                }
-                it.radioAlbumArtist.id -> {
-                    mGenericListenDataViewModel?.sortBy?.value = "albumArtist"
-                }
-                it.radioYear.id -> {
-                    mGenericListenDataViewModel?.sortBy?.value = "year"
-                }
-                it.radioLastAddedDateToLibrary.id -> {
-                    mGenericListenDataViewModel?.sortBy?.value = "lastAddedDateToLibrary"
-                }
-                it.radioLastUpdateDate.id -> {
-                    mGenericListenDataViewModel?.sortBy?.value = "lastUpdateDate"
-                }
-                it.radioTotalDuration.id -> {
-                    mGenericListenDataViewModel?.sortBy?.value = "totalDuration"
-                }
-                it.radioNumberTracks.id -> {
-                    mGenericListenDataViewModel?.sortBy?.value = "numberTracks"
-                }
-                it.radioNumberArtists.id -> {
-                    mGenericListenDataViewModel?.sortBy?.value = "numberArtists"
-                }
-                it.radioNumberAlbums.id -> {
-                    mGenericListenDataViewModel?.sortBy?.value = "numberAlbums"
-                }
-                it.radioNumberAlbumArtists.id -> {
-                    mGenericListenDataViewModel?.sortBy?.value = "numberAlbumArtists"
-                }
-                it.radioNumberComposers.id -> {
-                    mGenericListenDataViewModel?.sortBy?.value = "numberComposers"
-                }
-                else -> {
-                    mGenericListenDataViewModel?.sortBy?.value = "name"
-                }
+                radioName.id -> mGenericListenDataViewModel?.sortBy?.value = "name"
+                radioArtist.id -> mGenericListenDataViewModel?.sortBy?.value = "artist"
+                radioAlbum.id -> mGenericListenDataViewModel?.sortBy?.value = "album"
+                radioAlbumArtist.id -> mGenericListenDataViewModel?.sortBy?.value = "albumArtist"
+                radioYear.id -> mGenericListenDataViewModel?.sortBy?.value = "year"
+                radioLastAddedDateToLibrary.id -> mGenericListenDataViewModel?.sortBy?.value = "lastAddedDateToLibrary"
+                radioLastUpdateDate.id -> mGenericListenDataViewModel?.sortBy?.value = "lastUpdateDate"
+                radioTotalDuration.id -> mGenericListenDataViewModel?.sortBy?.value = "totalDuration"
+                radioNumberTracks.id -> mGenericListenDataViewModel?.sortBy?.value = "numberTracks"
+                radioNumberArtists.id -> mGenericListenDataViewModel?.sortBy?.value = "numberArtists"
+                radioNumberAlbums.id -> mGenericListenDataViewModel?.sortBy?.value = "numberAlbums"
+                radioNumberAlbumArtists.id -> mGenericListenDataViewModel?.sortBy?.value = "numberAlbumArtists"
+                radioNumberComposers.id -> mGenericListenDataViewModel?.sortBy?.value = "numberComposers"
+                else -> mGenericListenDataViewModel?.sortBy?.value = "name"
             }
         }
     }
@@ -127,61 +102,61 @@ class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment()
     private fun updateTitleUI() {
         when (mFromSource) {
             AlbumsFragment.TAG -> {
-                mDataBiding.textSortDetails.text = context?.resources?.getString(
+                mDataBinding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.albums) ?: ""
                 ) ?: ""
             }
             AlbumArtistsFragment.TAG -> {
-                mDataBiding.textSortDetails.text = context?.resources?.getString(
+                mDataBinding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.album_artists) ?: ""
                 ) ?: ""
             }
             ArtistsFragment.TAG -> {
-                mDataBiding.textSortDetails.text = context?.resources?.getString(
+                mDataBinding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.artists) ?: ""
                 ) ?: ""
             }
             ComposersFragment.TAG -> {
-                mDataBiding.textSortDetails.text = context?.resources?.getString(
+                mDataBinding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.composers) ?: ""
                 ) ?: ""
             }
             FoldersFragment.TAG -> {
-                mDataBiding.textSortDetails.text = context?.resources?.getString(
+                mDataBinding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.folders) ?: ""
                 ) ?: ""
             }
             GenresFragment.TAG -> {
-                mDataBiding.textSortDetails.text = context?.resources?.getString(
+                mDataBinding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.genres) ?: ""
                 ) ?: ""
             }
             YearsFragment.TAG -> {
-                mDataBiding.textSortDetails.text = context?.resources?.getString(
+                mDataBinding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.years) ?: ""
                 ) ?: ""
             }
             PlaylistsFragment.TAG -> {
-                mDataBiding.textSortDetails.text = context?.resources?.getString(
+                mDataBinding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.playlists) ?: ""
                 ) ?: ""
             }
 //            FavoritesFragment.TAG -> {
-//                mDataBiding.textSortDetails.text = context?.resources?.getString(
+//                mDataBinding.textSortDetails.text = context?.resources?.getString(
 //                    R.string._sort_for,
 //                    context?.resources?.getString(R.string.favorites) ?: ""
 //                ) ?: ""
 //            }
             StreamsFragment.TAG -> {
-                mDataBiding.textSortDetails.text = context?.resources?.getString(
+                mDataBinding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.streams) ?: ""
                 ) ?: ""
@@ -195,132 +170,101 @@ class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment()
     }
     private fun updateRadioButtonsForSortGenericItems() {
         //Update generic first radio button text title
-        mDataBiding.let {
+        mDataBinding.run {
             when (mFromSource) {
                 AllSongsFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        it.radioName.tooltipText = context?.getString(R.string.album_name)
+                        radioName.tooltipText = context?.getString(R.string.album_name)
                     }
-                    it.radioName.text = context?.getString(R.string.album_name)
-                    //Now hide non necessary radio buttons
-                    it.radioArtist.visibility = GONE
-                    it.radioAlbum.visibility = GONE
-                    it.radioAlbumArtist.visibility = GONE
+                    radioName.text = context?.getString(R.string.album_name)
+                    radioArtist.visibility = GONE
+                    radioAlbum.visibility = GONE
+                    radioAlbumArtist.visibility = GONE
                 }
                 AlbumArtistsFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        it.radioName.tooltipText = context?.getString(R.string.album_artist)
+                        radioName.tooltipText = context?.getString(R.string.album_artist)
                     }
-                    it.radioName.text = context?.getString(R.string.album_artist)
-                    //Now hide non necessary radio buttons
-                    it.radioArtist.visibility = GONE
-                    it.radioAlbum.visibility = GONE
-                    it.radioAlbumArtist.visibility = GONE
+                    radioName.text = context?.getString(R.string.album_artist)
+                    radioArtist.visibility = GONE
+                    radioAlbum.visibility = GONE
+                    radioAlbumArtist.visibility = GONE
                 }
                 ArtistsFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        it.radioName.tooltipText = context?.getString(R.string.artist_name)
+                        radioName.tooltipText = context?.getString(R.string.artist_name)
                     }
-                    it.radioName.text = context?.getString(R.string.artist_name)
-                    //Now hide non necessary radio buttons
-                    it.radioArtist.visibility = GONE
+                    radioName.text = context?.getString(R.string.artist_name)
+                    radioArtist.visibility = GONE
                 }
                 ComposersFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        it.radioName.tooltipText = context?.getString(R.string.composer_name)
+                        radioName.tooltipText = context?.getString(R.string.composer_name)
                     }
-                    it.radioName.text = context?.getString(R.string.composer_name)
-                    //Now hide non necessary radio buttons
-                    it.radioNumberComposers.visibility = GONE
+                    radioName.text = context?.getString(R.string.composer_name)
+                    radioNumberComposers.visibility = GONE
                 }
                 FoldersFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        it.radioName.tooltipText = context?.getString(R.string.folder_name)
+                        radioName.tooltipText = context?.getString(R.string.folder_name)
                     }
-                    it.radioName.text = context?.getString(R.string.folder_name)
+                    radioName.text = context?.getString(R.string.folder_name)
                 }
                 GenresFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        it.radioName.tooltipText = context?.getString(R.string.genre)
+                        radioName.tooltipText = context?.getString(R.string.genre)
                     }
-                    it.radioName.text = context?.getString(R.string.genre)
+                    radioName.text = context?.getString(R.string.genre)
                 }
                 YearsFragment.TAG -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        it.radioName.tooltipText = context?.getString(R.string.year)
+                        radioName.tooltipText = context?.getString(R.string.year)
                     }
-                    it.radioName.text = context?.getString(R.string.year)
-                    //Now hide non necessary radio buttons
-                    it.radioYear.visibility = GONE
+                    radioName.text = context?.getString(R.string.year)
+                    radioYear.visibility = GONE
                 }
             }
         }
     }
     private fun showAllRadioButtonsVisibility() {
-        mDataBiding.let {
-            it.radioName.visibility = VISIBLE
-            it.radioArtist.visibility = VISIBLE
-            it.radioAlbum.visibility = VISIBLE
-            it.radioAlbumArtist.visibility = VISIBLE
-            it.radioYear.visibility = VISIBLE
-            it.radioLastAddedDateToLibrary.visibility = VISIBLE
-            it.radioLastUpdateDate.visibility = VISIBLE
-            it.radioTotalDuration.visibility = VISIBLE
-            it.radioNumberTracks.visibility = VISIBLE
-            it.radioNumberArtists.visibility = VISIBLE
-            it.radioNumberAlbums.visibility = VISIBLE
-            it.radioNumberAlbumArtists.visibility = VISIBLE
-            it.radioNumberComposers.visibility = VISIBLE
+        mDataBinding.run {
+            radioName.visibility = VISIBLE
+            radioArtist.visibility = VISIBLE
+            radioAlbum.visibility = VISIBLE
+            radioAlbumArtist.visibility = VISIBLE
+            radioYear.visibility = VISIBLE
+            radioLastAddedDateToLibrary.visibility = VISIBLE
+            radioLastUpdateDate.visibility = VISIBLE
+            radioTotalDuration.visibility = VISIBLE
+            radioNumberTracks.visibility = VISIBLE
+            radioNumberArtists.visibility = VISIBLE
+            radioNumberAlbums.visibility = VISIBLE
+            radioNumberAlbumArtists.visibility = VISIBLE
+            radioNumberComposers.visibility = VISIBLE
         }
     }
 
     private fun updateDefaultCheckboxInvertButtonUI() {
-        mDataBiding.checkboxInvertItems.isChecked = mGenericListenDataViewModel?.isInverted?.value ?: false
+        mDataBinding.checkboxInvertItems.isChecked = mGenericListenDataViewModel?.isInverted?.value ?: false
     }
     private fun updateDefaultCheckedRadioButtonUI() {
         if(mGenericListenDataViewModel == null) return
-        mDataBiding.let {
+        mDataBinding.run {
             val tempFilter = mGenericListenDataViewModel?.sortBy?.value ?: return
             when (tempFilter) {
-                "name" -> {
-                    it.radioGroupSort.check(it.radioName.id)
-                }
-                "artist" -> {
-                    it.radioGroupSort.check(it.radioArtist.id)
-                }
-                "album" -> {
-                    it.radioGroupSort.check(it.radioAlbum.id)
-                }
-                "albumArtist" -> {
-                    it.radioGroupSort.check(it.radioAlbumArtist.id)
-                }
-                "year" -> {
-                    it.radioGroupSort.check(it.radioYear.id)
-                }
-                "lastAddedDateToLibrary" -> {
-                    it.radioGroupSort.check(it.radioLastAddedDateToLibrary.id)
-                }
-                "lastUpdateDate" -> {
-                    it.radioGroupSort.check(it.radioLastUpdateDate.id)
-                }
-                "totalDuration" -> {
-                    it.radioGroupSort.check(it.radioTotalDuration.id)
-                }
-                "numberTracks" -> {
-                    it.radioGroupSort.check(it.radioNumberTracks.id)
-                }
-                "numberArtists" -> {
-                    it.radioGroupSort.check(it.radioNumberArtists.id)
-                }
-                "numberAlbums" -> {
-                    it.radioGroupSort.check(it.radioNumberAlbums.id)
-                }
-                "numberAlbumArtists" -> {
-                    it.radioGroupSort.check(it.radioNumberAlbumArtists.id)
-                }
-                "numberComposers" -> {
-                    it.radioGroupSort.check(it.radioNumberComposers.id)
-                }
+                "name" -> radioGroupSort.check(radioName.id)
+                "artist" -> radioGroupSort.check(radioArtist.id)
+                "album" -> radioGroupSort.check(radioAlbum.id)
+                "albumArtist" -> radioGroupSort.check(radioAlbumArtist.id)
+                "year" -> radioGroupSort.check(radioYear.id)
+                "lastAddedDateToLibrary" -> radioGroupSort.check(radioLastAddedDateToLibrary.id)
+                "lastUpdateDate" -> radioGroupSort.check(radioLastUpdateDate.id)
+                "totalDuration" -> radioGroupSort.check(radioTotalDuration.id)
+                "numberTracks" -> radioGroupSort.check(radioNumberTracks.id)
+                "numberArtists" -> radioGroupSort.check(radioNumberArtists.id)
+                "numberAlbums" -> radioGroupSort.check(radioNumberAlbums.id)
+                "numberAlbumArtists" -> radioGroupSort.check(radioNumberAlbumArtists.id)
+                "numberComposers" -> radioGroupSort.check(radioNumberComposers.id)
             }
         }
     }

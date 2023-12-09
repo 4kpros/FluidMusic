@@ -7,19 +7,19 @@ import com.prosabdev.common.models.songitem.SongItemUri
 @Dao
 interface SongItemDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(songItem: SongItem?) : Long
+    fun insert(songItem: SongItem) : Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(songItem: SongItem?) : Int
+    fun update(songItem: SongItem) : Int
 
     @Delete
-    fun delete(songItem: SongItem?) : Int
+    fun delete(songItem: SongItem) : Int
 
     @Query("DELETE FROM SongItem WHERE uri = :uri")
-    fun deleteAtUri(uri: String?) : Int
+    fun deleteAtUri(uri: String) : Int
 
     @Delete
-    fun deleteMultiple(songItem: List<SongItem>?) : Int
+    fun deleteMultiple(songItem: List<SongItem>) : Int
 
     @Query("DELETE FROM SongItem")
     fun deleteAll() : Int
@@ -28,20 +28,20 @@ interface SongItemDao {
             "isValid = :isValid " +
             "WHERE uri = :uri"
     )
-    fun updateValidityAtUri(uri: String?, isValid: Boolean): Int
+    fun updateValidityAtUri(uri: String, isValid: Boolean): Int
 
     @Query("UPDATE SongItem SET " +
             "lastAddedDateToLibrary = :lastAddedDateToLibrary " +
             "WHERE uri = :uri"
     )
-    fun updateLastAddedToLibraryAtUri(uri: String?, lastAddedDateToLibrary: Long): Int
+    fun updateLastAddedToLibraryAtUri(uri: String, lastAddedDateToLibrary: Long): Int
 
     @Query("UPDATE SongItem SET " +
             "playCount = :playCount," +
             "lastPlayed = :lastPlayed " +
             "WHERE uri = :uri"
     )
-    fun updatePlayCountAtUri(uri: String?, playCount: Int, lastPlayed: Long): Int
+    fun updatePlayCountAtUri(uri: String, playCount: Int, lastPlayed: Long): Int
 
     @Query("UPDATE SongItem SET " +
             "uriTreeId = :uriTreeId," +
@@ -79,36 +79,36 @@ interface SongItemDao {
             "WHERE uri = :uri"
     )
     fun updateAtUri(
-        uri: String?,
+        uri: String,
         uriTreeId: Long,
-        fileName: String?,
-        title: String?,
-        artist: String?,
-        albumArtist: String?,
-        composer: String?,
-        album: String?,
-        genre: String?,
-        uriPath: String?,
-        folder: String?,
-        folderParent: String?,
-        folderUri: String?,
-        year: String?,
+        fileName: String,
+        title: String,
+        artist: String,
+        albumArtist: String,
+        composer: String,
+        album: String,
+        genre: String,
+        uriPath: String,
+        folder: String,
+        folderParent: String,
+        folderUri: String,
+        year: String,
         duration: Long,
-        language: String?,
-        typeMime: String?,
+        language: String,
+        typeMime: String,
         sampleRate: Int,
         bitrate: Double,
         size: Long,
         channelCount: Int,
-        fileExtension: String?,
-        bitPerSample: String?,
+        fileExtension: String,
+        bitPerSample: String,
         lastUpdateDate: Long,
-        author: String?,
-        diskNumber: String?,
-        writer: String?,
-        cdTrackNumber: String?,
-        numberTracks: String?,
-        comments: String?,
+        author: String,
+        diskNumber: String,
+        writer: String,
+        cdTrackNumber: String,
+        numberTracks: String,
+        comments: String,
         rating: Int,
         hashedCovertArtSignature: Int,
         isValid: Boolean
@@ -121,7 +121,7 @@ interface SongItemDao {
     fun getAtId(id: Long): SongItem?
 
     @Query("SELECT * FROM SongItem WHERE uri = :uri LIMIT 1")
-    fun getAtUri(uri: String?): SongItem?
+    fun getAtUri(uri: String): SongItem?
 
     @Query("SELECT * FROM SongItem " +
             "ORDER BY " +
@@ -152,7 +152,7 @@ interface SongItemDao {
             "CASE :orderBy WHEN 'id' THEN SongItem.id END ASC," +
             "COALESCE(NULLIF(SongItem.title,''), SongItem.fileName) ASC LIMIT :limit"
     )
-    fun getAllDirectlyLimit(orderBy: String?, limit: Int = 50): List<SongItem>?
+    fun getAllDirectlyLimit(orderBy: String, limit: Int = 50): List<SongItem>?
 
     @Query("SELECT * FROM SongItem " +
             "ORDER BY " +
@@ -183,7 +183,7 @@ interface SongItemDao {
             "CASE :orderBy WHEN 'id' THEN SongItem.id END ASC," +
             "COALESCE(NULLIF(SongItem.title,''), SongItem.fileName) ASC"
     )
-    fun getAllDirectly(orderBy: String?): List<SongItem>?
+    fun getAllDirectly(orderBy: String): List<SongItem>?
 
     @Query("SELECT * FROM " +
             "(" +
@@ -226,7 +226,7 @@ interface SongItemDao {
             "WHEN 'year' THEN tempAllSong.year = :columnValue " +
             "END "
     )
-    fun getAllDirectlyWhereEqual(whereColumn: String?, columnValue: String?, orderBy: String?): List<SongItem>?
+    fun getAllDirectlyWhereEqual(whereColumn: String, columnValue: String, orderBy: String): List<SongItem>?
 
     @Query("SELECT * FROM " +
             "(" +
@@ -269,7 +269,7 @@ interface SongItemDao {
                 "WHEN 'year' THEN tempAllSong.year GLOB '*' || :columnValue || '*' " +
             "END"
     )
-    fun getAllDirectlyWhereLike(whereColumn: String?, columnValue: String?, orderBy: String?): List<SongItem>?
+    fun getAllDirectlyWhereLike(whereColumn: String, columnValue: String, orderBy: String): List<SongItem>?
 
     @Query(
         "SELECT songItem.id as id, " +
@@ -287,7 +287,7 @@ interface SongItemDao {
                 "END " +
                 "COLLATE NOCASE ORDER BY COALESCE(NULLIF(SongItem.title,''), SongItem.fileName) ASC"
     )
-    fun getAllOnlyUriDirectlyWhereEqual(whereColumn: String?, columnValue: String?): List<SongItemUri>?
+    fun getAllOnlyUriDirectlyWhereEqual(whereColumn: String, columnValue: String): List<SongItemUri>?
 
     @Query(
         "SELECT songItem.id as id, " +
@@ -305,5 +305,5 @@ interface SongItemDao {
                 "END " +
                 "COLLATE NOCASE ORDER BY COALESCE(NULLIF(SongItem.title,''), SongItem.fileName) ASC"
     )
-    fun getAllOnlyUriDirectlyWhereLike(whereColumn: String?, columnValue: String?): List<SongItemUri>?
+    fun getAllOnlyUriDirectlyWhereLike(whereColumn: String, columnValue: String): List<SongItemUri>?
 }

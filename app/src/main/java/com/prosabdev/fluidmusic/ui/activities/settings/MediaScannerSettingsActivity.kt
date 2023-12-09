@@ -80,7 +80,7 @@ class MediaScannerSettingsActivity : AppCompatActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
         mDataBiding.cardViewScanDevice.setOnClickListener{
-            tryToScanDevice()
+            scanDevice()
         }
         mDataBiding.cardViewSelectFolders.setOnClickListener{
             startActivity(Intent(this, StorageAccessSettingsActivity::class.java).apply {})
@@ -153,7 +153,7 @@ class MediaScannerSettingsActivity : AppCompatActivity() {
         dialog.dismiss()
     }
 
-    private fun tryToScanDevice() {
+    private fun scanDevice() {
         if(mMediaScannerActivityViewModel.isLoadingInBackground.value == true)
             return
         mMediaScannerActivityViewModel.isLoadingInBackground.value = true

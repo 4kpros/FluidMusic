@@ -43,7 +43,7 @@ data class PlaylistItemView (
         const val TAG = "PlaylistItemView"
         const val DEFAULT_INDEX = "name"
 
-        fun getStringIndexRequestFastScroller(ctx: Context, dataItem: Any): String {
+        fun getStringIndexRequestFastScroller(dataItem: Any): String {
             if(dataItem is PlaylistItemView) {
                 return dataItem.name ?: "#"
             }

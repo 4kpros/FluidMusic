@@ -14,19 +14,19 @@ abstract class SortOrganizePrefsLoaderAndSetupViewModels {
             var defaultOrderBy: String = "id"
             var defaultOrganizeListGrid: Int = 1
             if(
-                sharedPrefsKey == PersistentStorage.SortAnOrganizeForExploreContents.SORT_ORGANIZE_ALL_SONGS ||
+                sharedPrefsKey == PersistentStorage.SortAndOrganize.SORT_ORGANIZE_ALL_SONGS ||
 
-                sharedPrefsKey == PersistentStorage.SortAnOrganizeForExploreContents.SORT_ORGANIZE_FOLDER_HIERARCHY_MUSIC_CONTENT ||
-                sharedPrefsKey == PersistentStorage.SortAnOrganizeForExploreContents.SORT_ORGANIZE_PLAYLIST_MUSIC_CONTENT ||
-                sharedPrefsKey == PersistentStorage.SortAnOrganizeForExploreContents.SORT_ORGANIZE_STREAM_MUSIC_CONTENT ||
+                sharedPrefsKey == PersistentStorage.SortAndOrganize.SORT_ORGANIZE_FOLDER_HIERARCHY_MUSIC_CONTENT ||
+                sharedPrefsKey == PersistentStorage.SortAndOrganize.SORT_ORGANIZE_PLAYLIST_MUSIC_CONTENT ||
+                sharedPrefsKey == PersistentStorage.SortAndOrganize.SORT_ORGANIZE_STREAM_MUSIC_CONTENT ||
 
-                sharedPrefsKey == PersistentStorage.SortAnOrganizeForExploreContents.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ALBUM_ARTIST ||
-                sharedPrefsKey == PersistentStorage.SortAnOrganizeForExploreContents.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ALBUM ||
-                sharedPrefsKey == PersistentStorage.SortAnOrganizeForExploreContents.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ARTIST ||
-                sharedPrefsKey == PersistentStorage.SortAnOrganizeForExploreContents.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_COMPOSER ||
-                sharedPrefsKey == PersistentStorage.SortAnOrganizeForExploreContents.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_FOLDER ||
-                sharedPrefsKey == PersistentStorage.SortAnOrganizeForExploreContents.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_GENRE ||
-                sharedPrefsKey == PersistentStorage.SortAnOrganizeForExploreContents.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_YEAR
+                sharedPrefsKey == PersistentStorage.SortAndOrganize.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ALBUM_ARTIST ||
+                sharedPrefsKey == PersistentStorage.SortAndOrganize.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ALBUM ||
+                sharedPrefsKey == PersistentStorage.SortAndOrganize.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ARTIST ||
+                sharedPrefsKey == PersistentStorage.SortAndOrganize.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_COMPOSER ||
+                sharedPrefsKey == PersistentStorage.SortAndOrganize.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_FOLDER ||
+                sharedPrefsKey == PersistentStorage.SortAndOrganize.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_GENRE ||
+                sharedPrefsKey == PersistentStorage.SortAndOrganize.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_YEAR
             ){
                 defaultOrderBy = "title"
                 defaultOrganizeListGrid = MainConst.ORGANIZE_LIST_SMALL
@@ -51,7 +51,7 @@ abstract class SortOrganizePrefsLoaderAndSetupViewModels {
             defaultIsInverted: Boolean
         ) {
             val sortOrganize: SortOrganizeItemSP? =
-                PersistentStorage.SortAnOrganizeForExploreContents.loadSortOrganizeItemsFor(
+                PersistentStorage.SortAndOrganize.load(
                     sharedPrefsKey
                 )
             genericListenDataViewModel.sortBy.value = sortOrganize?.sortOrderBy ?: defaultOrderBy

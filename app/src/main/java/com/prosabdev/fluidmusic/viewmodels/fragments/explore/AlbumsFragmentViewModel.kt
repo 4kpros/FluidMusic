@@ -7,7 +7,7 @@ import com.prosabdev.fluidmusic.viewmodels.models.explore.AlbumItemViewModel
 
 class AlbumsFragmentViewModel(app: Application) : GenericListenDataViewModel(app) {
     suspend fun requestDataDirectlyFromDatabase(viewModel: AlbumItemViewModel){
-        dataList.value = viewModel.getAllDirectly(
+        itemsList.value = viewModel.getAllDirectly(
             sortBy.value?.ifEmpty {
                 AlbumItem.DEFAULT_INDEX
             } ?: AlbumItem.DEFAULT_INDEX)

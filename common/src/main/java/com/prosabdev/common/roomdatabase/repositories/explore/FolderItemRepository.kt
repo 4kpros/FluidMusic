@@ -12,17 +12,17 @@ class FolderItemRepository(ctx : Context) {
 
     private var mDao: FolderItemDao? = AppDatabase.getDatabase(ctx).folderItemDao()
 
-    suspend fun getAtName(name : String?) : FolderItem? {
+    suspend fun getAtName(name : String) : FolderItem? {
         return withContext(Dispatchers.IO){
             mDao?.getAtName(name)
         }
     }
-    suspend fun getAll(orderBy: String?) : LiveData<List<FolderItem>>? {
+    suspend fun getAll(orderBy: String) : LiveData<List<FolderItem>>? {
         return withContext(Dispatchers.IO){
             mDao?.getAll(orderBy)
         }
     }
-    suspend fun getAllDirectly(orderBy: String?) : List<FolderItem>? {
+    suspend fun getAllDirectly(orderBy: String) : List<FolderItem>? {
         return withContext(Dispatchers.IO){
             mDao?.getAllDirectly(orderBy)
         }

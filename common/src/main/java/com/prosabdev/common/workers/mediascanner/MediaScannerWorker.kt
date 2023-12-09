@@ -161,41 +161,46 @@ class MediaScannerWorker(
      */
     private fun saveSongToDatabase(songItem: SongItem): Long {
         if(songItem.uri?.isEmpty() ?: return 0) return 0
-        val updateCount = AppDatabase.getDatabase(applicationContext).songItemDao().updateAtUri(
-            songItem.uri,
-            songItem.uriTreeId,
-            songItem.fileName,
-            songItem.title,
-            songItem.artist,
-            songItem.albumArtist,
-            songItem.composer,
-            songItem.album,
-            songItem.genre,
-            songItem.uriPath,
-            songItem.folder,
-            songItem.folderParent,
-            songItem.folderUri,
-            songItem.year,
-            songItem.duration,
-            songItem.language,
-            songItem.typeMime,
-            songItem.sampleRate,
-            songItem.bitrate,
-            songItem.size,
-            songItem.channelCount,
-            songItem.fileExtension,
-            songItem.bitPerSample,
-            songItem.lastUpdateDate,
-            songItem.author,
-            songItem.diskNumber,
-            songItem.writer,
-            songItem.cdTrackNumber,
-            songItem.numberTracks,
-            songItem.comments,
-            songItem.rating,
-            songItem.hashedCovertArtSignature,
-            songItem.isValid
-        )
+        var updateCount = -1
+        try {
+            updateCount = AppDatabase.getDatabase(applicationContext).songItemDao().updateAtUri(
+                songItem.uri!!,
+                songItem.uriTreeId,
+                songItem.fileName!!,
+                songItem.title!!,
+                songItem.artist!!,
+                songItem.albumArtist!!,
+                songItem.composer!!,
+                songItem.album!!,
+                songItem.genre!!,
+                songItem.uriPath!!,
+                songItem.folder!!,
+                songItem.folderParent!!,
+                songItem.folderUri!!,
+                songItem.year!!,
+                songItem.duration,
+                songItem.language!!,
+                songItem.typeMime!!,
+                songItem.sampleRate,
+                songItem.bitrate,
+                songItem.size,
+                songItem.channelCount,
+                songItem.fileExtension!!,
+                songItem.bitPerSample!!,
+                songItem.lastUpdateDate,
+                songItem.author!!,
+                songItem.diskNumber!!,
+                songItem.writer!!,
+                songItem.cdTrackNumber!!,
+                songItem.numberTracks!!,
+                songItem.comments!!,
+                songItem.rating,
+                songItem.hashedCovertArtSignature,
+                songItem.isValid
+            )
+        }catch (error: Throwable){
+            error.printStackTrace()
+        }
         return if(updateCount <= 0) AppDatabase.getDatabase(applicationContext).songItemDao().insert(songItem)
         else updateCount.toLong()
     }
@@ -204,13 +209,20 @@ class MediaScannerWorker(
      * Save playlist to database
      */
     private fun savePlaylistToDatabase(playlistItem: PlaylistItem) {
-//        val updateResult = AppDatabase.getDatabase(applicationContext).playlistItemDao().updateAtUri(
-//
-//        )
-//        Log.i(TAG, "UPDATE PLAYLIST WITH URI ${playlistItem.uri} RESULT $updateResult")
-//        if(updateResult <= 0){
-//            AppDatabase.getDatabase(applicationContext).playlistItemDao().insert(playlistItem)
-//        }
+        var updateResult = -1
+        try {
+            updateResult = AppDatabase.getDatabase(applicationContext).playlistItemDao().updateAtUri(
+                playlistItem.uri!!,
+                playlistItem.name!!,
+                playlistItem.isRealFile
+            )
+        }catch (error: Throwable) {
+            error.printStackTrace()
+        }
+        Log.i(TAG, "UPDATE PLAYLIST WITH URI ${playlistItem.uri} RESULT $updateResult")
+        if(updateResult <= 0){
+            AppDatabase.getDatabase(applicationContext).playlistItemDao().insert(playlistItem)
+        }
     }
 
     companion object {

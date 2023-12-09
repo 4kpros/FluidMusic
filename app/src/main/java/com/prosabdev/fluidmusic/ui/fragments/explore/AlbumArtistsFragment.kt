@@ -11,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -18,6 +19,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
 import com.l4digital.fastscroll.FastScroller
 import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.models.view.AlbumArtistItem
+import com.prosabdev.common.persistence.PersistentStorage
+import com.prosabdev.common.persistence.models.SortOrganizeItemSP
+import com.prosabdev.common.utils.InsetModifiers
+import com.prosabdev.common.utils.MathComputations
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.GridSpacingItemDecoration
@@ -30,139 +36,117 @@ import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortContentExplorer
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
 import com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentForFragment
+import com.prosabdev.fluidmusic.utils.InjectorUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayingNowFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.explore.AlbumArtistsFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaControllerViewModel
+import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaPlayerDataViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.explore.AlbumArtistItemViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 class AlbumArtistsFragment : Fragment() {
 
-    private var mDataBinding: FragmentAlbumArtistsBinding? = null
+    //Data binding
+    private lateinit var mDataBinding: FragmentAlbumArtistsBinding
 
+    //View models
     private val mAlbumArtistsFragmentViewModel: AlbumArtistsFragmentViewModel by activityViewModels()
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayingNowFragmentViewModel: PlayingNowFragmentViewModel by activityViewModels()
 
+    private val mMediaPlayerDataViewModel: MediaPlayerDataViewModel by activityViewModels()
+    private val mMediaControllerViewModel by activityViewModels<MediaControllerViewModel> {
+        InjectorUtils.provideMediaControllerViewModel(mMediaPlayerDataViewModel.mediaEventsListener)
+    }
+
     private val mAlbumArtistItemViewModel: AlbumArtistItemViewModel by activityViewModels()
 
+    //Dialogs
     private var mOrganizeDialog: OrganizeItemBottomSheetDialogFragment =
         OrganizeItemBottomSheetDialogFragment.newInstance()
     private val mSortAlbumArtistsDialog: SortContentExplorerBottomSheetDialogFragment =
         SortContentExplorerBottomSheetDialogFragment.newInstance()
 
+    //Adapters
     private var mConcatAdapter: ConcatAdapter? = null
     private var mEmptyBottomAdapter: EmptyBottomAdapter? = null
     private var mHeadlineTopPlayShuffleAdapter: HeadlinePlayShuffleAdapter? = null
     private var mGenericListGridItemAdapter: GenericListGridItemAdapter? = null
+
     private var mLayoutManager: GridLayoutManager? = null
     private var mItemDecoration: GridSpacingItemDecoration? = null
 
     private var mIsDraggingToScroll: Boolean = false
 
+    private val isMatchingQueueMusicContent: Boolean
+        get() {
+            return mMediaPlayerDataViewModel.queueListSource.value == TAG &&
+                    mMediaPlayerDataViewModel.queueListSourceColumnIndex.value == null &&
+                    mMediaPlayerDataViewModel.queueListSourceColumnValue.value == null &&
+                    mMediaPlayerDataViewModel.queueListIsInverted.value == mAlbumArtistsFragmentViewModel.isInverted.value
+        }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
-        //Set content with data biding util
+        //Inflate binding layout and return binding object
         mDataBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_album_artists, container, false)
-        val view = mDataBinding?.root
+        val view = mDataBinding.root
 
         //Load your UI content
-        loadPrefsAndInitViewModel()
-        initViews()
-        setupRecyclerViewAdapter()
-        checkInteractions()
-        observeLiveData()
+        if (savedInstanceState == null) {
+            runBlocking {
+                loadPreferences()
+                initViews()
+                setupRecyclerViewAdapter()
+                checkInteractions()
+                observeLiveData()
+            }
+        }
 
         return view
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        saveAllDataToPref()
-    }
-
-    private fun saveAllDataToPref() {
-        context?.let { ctx ->
-            val tempSortOrganize = com.prosabdev.common.persistence.models.SortOrganizeItemSP()
-            tempSortOrganize.sortOrderBy =
-                mAlbumArtistsFragmentViewModel.getSortBy().value ?: SORT_LIST_GRID_DEFAULT_VALUE
-            tempSortOrganize.organizeListGrid =
-                mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value
-                    ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
-            tempSortOrganize.isInvertSort = mAlbumArtistsFragmentViewModel.getIsInverted().value
-                ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
-            com.prosabdev.common.persistence.SharedPreferenceManagerUtils
-                .SortAnOrganizeForExploreContents
-                .saveSortOrganizeItemsFor(
-                    ctx,
-                    com.prosabdev.common.persistence.SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SORT_ORGANIZE_ALBUM_ARTISTS,
-                    tempSortOrganize
-                )
-        }
-    }
-
-    private fun loadPrefsAndInitViewModel() {
-        context?.let { ctx ->
-            val tempSortOrganize: com.prosabdev.common.persistence.models.SortOrganizeItemSP =
-                com.prosabdev.common.persistence.SharedPreferenceManagerUtils
-                    .SortAnOrganizeForExploreContents
-                    .loadSortOrganizeItemsFor(
-                        ctx,
-                        com.prosabdev.common.persistence.SharedPreferenceManagerUtils.SortAnOrganizeForExploreContents.SORT_ORGANIZE_ALBUM_ARTISTS
-                    )
-            tempSortOrganize?.let { sortOrganize ->
-                mAlbumArtistsFragmentViewModel.setSortBy(sortOrganize.sortOrderBy)
-                mAlbumArtistsFragmentViewModel.setOrganizeListGrid(sortOrganize.organizeListGrid)
-                mAlbumArtistsFragmentViewModel.setIsInverted(sortOrganize.isInvertSort)
-            }
-            if (tempSortOrganize == null) {
-                mAlbumArtistsFragmentViewModel.setSortBy(SORT_LIST_GRID_DEFAULT_VALUE)
-                mAlbumArtistsFragmentViewModel.setOrganizeListGrid(ORGANIZE_LIST_GRID_DEFAULT_VALUE)
-                mAlbumArtistsFragmentViewModel.setIsInverted(IS_INVERTED_LIST_GRID_DEFAULT_VALUE)
-            }
-        }
-    }
-
     private fun observeLiveData() {
-        mAlbumArtistsFragmentViewModel.getAll().observe(viewLifecycleOwner) {
+        mAlbumArtistsFragmentViewModel.itemsList.observe(viewLifecycleOwner) {
             addDataToGenericAdapter(it)
         }
-        mAlbumArtistsFragmentViewModel.getSortBy().observe(viewLifecycleOwner) {
+        mAlbumArtistsFragmentViewModel.sortBy.observe(viewLifecycleOwner) {
             requestNewDataFromDatabase()
         }
-        mAlbumArtistsFragmentViewModel.getIsInverted().observe(viewLifecycleOwner) {
+        mAlbumArtistsFragmentViewModel.isInverted.observe(viewLifecycleOwner) {
             invertSongListAndUpdateAdapter(it)
         }
-        mAlbumArtistsFragmentViewModel.getOrganizeListGrid().observe(viewLifecycleOwner) {
+        mAlbumArtistsFragmentViewModel.organizeListGrid.observe(viewLifecycleOwner) {
             updateOrganizeListGrid(it)
         }
 
         //Listen to player changes
-        mPlayingNowFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner) {
-            updatePlayingSongUI(it)
+        mMediaPlayerDataViewModel.currentMediaItemIndex.observe(viewLifecycleOwner) {
+            updateUICurrentMediaItemIndex(it)
         }
-        mPlayingNowFragmentViewModel.getIsPlaying().observe(viewLifecycleOwner) {
-            updatePlaybackStateUI(it)
+        mMediaPlayerDataViewModel.isPlaying.observe(viewLifecycleOwner) {
+            updateUIIsPlaying(it)
         }
 
         //Listen for main fragment changes
-        mMainFragmentViewModel.getSelectMode().observe(viewLifecycleOwner) {
+        mMainFragmentViewModel.selectMode.observe(viewLifecycleOwner) {
             onSelectionModeChanged(it)
         }
-        mMainFragmentViewModel.getReQuestToggleSelectAll().observe(viewLifecycleOwner) {
+        mMainFragmentViewModel.requestToggleSelectAll.observe(viewLifecycleOwner) {
             onReQuestToggleSelectAll(it)
         }
-        mMainFragmentViewModel.getReQuestToggleSelectRange().observe(viewLifecycleOwner) {
+        mMainFragmentViewModel.requestToggleSelectRange.observe(viewLifecycleOwner) {
             onReQuestToggleSelectRange(it)
         }
-        mMainFragmentViewModel.getScrollingState().observe(viewLifecycleOwner) {
+        mMainFragmentViewModel.scrollingState.observe(viewLifecycleOwner) {
             updateOnScrollingStateUI(it)
         }
     }
@@ -172,8 +156,7 @@ class AlbumArtistsFragment : Fragment() {
             val tempSpanCount: Int =
                 OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, organizeValue)
             mGenericListGridItemAdapter?.setOrganizeListGrid(
-                mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value
-                    ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
+                mAlbumArtistsFragmentViewModel.organizeListGrid.value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
             )
             mLayoutManager?.spanCount = tempSpanCount
         }
@@ -182,22 +165,16 @@ class AlbumArtistsFragment : Fragment() {
     private fun invertSongListAndUpdateAdapter(isInverted: Boolean?) {
         val tempNewIsInverted: Boolean = isInverted ?: false
         if (tempNewIsInverted) {
-            mGenericListGridItemAdapter?.submitList(mAlbumArtistsFragmentViewModel.getAll().value?.reversed())
+            mGenericListGridItemAdapter?.submitList(mAlbumArtistsFragmentViewModel.itemsList.value?.reversed())
         } else {
-            mGenericListGridItemAdapter?.submitList(mAlbumArtistsFragmentViewModel.getAll().value)
+            mGenericListGridItemAdapter?.submitList(mAlbumArtistsFragmentViewModel.itemsList.value)
         }
-        if (
-            mPlayingNowFragmentViewModel.getQueueListSource().value == TAG &&
-            mPlayingNowFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
-            mPlayingNowFragmentViewModel.getQueueListSourceColumnValue().value == null &&
-            mPlayingNowFragmentViewModel.getSortBy().value == mAlbumArtistsFragmentViewModel.getSortBy().value &&
-            mPlayingNowFragmentViewModel.getIsInverted().value == mAlbumArtistsFragmentViewModel.getIsInverted().value
-        ) {
+        if (isMatchingQueueMusicContent) {
             mGenericListGridItemAdapter?.setPlayingPosition(
-                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
+                mMediaPlayerDataViewModel.currentMediaItemIndex.value ?: -1
             )
             mGenericListGridItemAdapter?.setIsPlaying(
-                mPlayingNowFragmentViewModel.getIsPlaying().value ?: false
+                mMediaPlayerDataViewModel.isPlaying.value ?: false
             )
         } else {
             mGenericListGridItemAdapter?.setPlayingPosition(-1)
@@ -206,35 +183,29 @@ class AlbumArtistsFragment : Fragment() {
     }
 
     private fun requestNewDataFromDatabase() {
-        if (mAlbumArtistsFragmentViewModel.getSortBy().value?.isEmpty() == true) return
-        MainScope().launch {
+        if (mAlbumArtistsFragmentViewModel.sortBy.value?.isEmpty() == true) return
+        lifecycleScope.launch {
             mAlbumArtistsFragmentViewModel.requestDataDirectlyFromDatabase(
                 mAlbumArtistItemViewModel
             )
         }
     }
 
-    private fun addDataToGenericAdapter(dataList: List<Any>?) {
-        if (mAlbumArtistsFragmentViewModel.getIsInverted().value == true) {
-            mGenericListGridItemAdapter?.submitList(dataList?.reversed())
+    private fun addDataToGenericAdapter(itemsList: List<Any>?) {
+        if (mAlbumArtistsFragmentViewModel.isInverted.value == true) {
+            mGenericListGridItemAdapter?.submitList(itemsList?.reversed())
         } else {
-            mGenericListGridItemAdapter?.submitList(dataList)
+            mGenericListGridItemAdapter?.submitList(itemsList)
         }
-        if (mMainFragmentViewModel.getCurrentSelectablePage().value == TAG) {
-            mMainFragmentViewModel.setTotalCount(dataList?.size ?: 0)
+        if (mMainFragmentViewModel.currentSelectablePage.value == TAG) {
+            mMainFragmentViewModel.totalCount.value = itemsList?.size ?: 0
         }
-        if (
-            mPlayingNowFragmentViewModel.getQueueListSource().value == TAG &&
-            mPlayingNowFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
-            mPlayingNowFragmentViewModel.getQueueListSourceColumnValue().value == null &&
-            mPlayingNowFragmentViewModel.getSortBy().value == mAlbumArtistsFragmentViewModel.getSortBy().value &&
-            mPlayingNowFragmentViewModel.getIsInverted().value == mAlbumArtistsFragmentViewModel.getIsInverted().value
-        ) {
+        if (isMatchingQueueMusicContent) {
             mGenericListGridItemAdapter?.setPlayingPosition(
-                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
+                mMediaPlayerDataViewModel.currentMediaItemIndex.value ?: -1
             )
             mGenericListGridItemAdapter?.setIsPlaying(
-                mPlayingNowFragmentViewModel.getIsPlaying().value ?: false
+                mMediaPlayerDataViewModel.isPlaying.value ?: false
             )
         } else {
             mGenericListGridItemAdapter?.setPlayingPosition(-1)
@@ -243,7 +214,7 @@ class AlbumArtistsFragment : Fragment() {
     }
 
     private fun updateOnScrollingStateUI(i: Int) {
-        if (mMainFragmentViewModel.getCurrentSelectablePage().value == TAG) {
+        if (mMainFragmentViewModel.currentSelectablePage.value == TAG) {
             if (i == 2)
                 mEmptyBottomAdapter?.onSetScrollState(2)
         }
@@ -251,14 +222,14 @@ class AlbumArtistsFragment : Fragment() {
 
     private fun onReQuestToggleSelectRange(requestCount: Int?) {
         if (requestCount == null || requestCount <= 0) return
-        if (mMainFragmentViewModel.getCurrentSelectablePage().value == TAG) {
+        if (mMainFragmentViewModel.currentSelectablePage.value == TAG) {
             mGenericListGridItemAdapter?.selectableSelectRange(mLayoutManager)
         }
     }
 
     private fun onReQuestToggleSelectAll(requestCount: Int?) {
         if (requestCount == null || requestCount <= 0) return
-        if (mMainFragmentViewModel.getCurrentSelectablePage().value == TAG) {
+        if (mMainFragmentViewModel.currentSelectablePage.value == TAG) {
             val totalItemCount = mGenericListGridItemAdapter?.itemCount ?: 0
             val selectedItemCount =
                 mGenericListGridItemAdapter?.selectableGetSelectedItemCount() ?: 0
@@ -271,8 +242,8 @@ class AlbumArtistsFragment : Fragment() {
     }
 
     private fun onSelectionModeChanged(it: Boolean?) {
-        if (mMainFragmentViewModel.getCurrentSelectablePage().value == TAG) {
-            mMainFragmentViewModel.setTotalCount(mGenericListGridItemAdapter?.itemCount ?: 0)
+        if (mMainFragmentViewModel.currentSelectablePage.value == TAG) {
+            mMainFragmentViewModel.totalCount.value = mGenericListGridItemAdapter?.itemCount ?: 0
             mLayoutManager?.let { it1 ->
                 mGenericListGridItemAdapter?.selectableSetSelectionMode(it ?: false, it1)
             }
@@ -280,33 +251,41 @@ class AlbumArtistsFragment : Fragment() {
         }
     }
 
-    private fun updatePlayingSongUI(songItem: com.prosabdev.common.models.songitem.SongItem?) {
-        val songPosition: Int = songItem?.position ?: -1
-
-        if (
-            mPlayingNowFragmentViewModel.getQueueListSource().value == TAG &&
-            mPlayingNowFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
-            mPlayingNowFragmentViewModel.getQueueListSourceColumnValue().value == null &&
-            mPlayingNowFragmentViewModel.getSortBy().value == mAlbumArtistsFragmentViewModel.getSortBy().value &&
-            mPlayingNowFragmentViewModel.getIsInverted().value == mAlbumArtistsFragmentViewModel.getIsInverted().value
-        ) {
-            mGenericListGridItemAdapter?.setPlayingPosition(songPosition)
-            mGenericListGridItemAdapter?.setIsPlaying(
-                mPlayingNowFragmentViewModel.getIsPlaying().value ?: false
+    private fun updateUIIsPlaying(isPlaying: Boolean) {
+        if (isMatchingQueueMusicContent) {
+            mGenericListGridItemAdapter?.setPlayingPosition(
+                mMediaPlayerDataViewModel.currentMediaItemIndex.value ?: -1
             )
-            tryToScrollOnCurrentItem(songPosition)
+            mGenericListGridItemAdapter?.setIsPlaying(isPlaying)
+            tryToScrollToCurrentItem(
+                mMediaPlayerDataViewModel.currentMediaItemIndex.value ?: -1
+            )
+        } else {
+            if (mGenericListGridItemAdapter?.getIsPlaying() == true) {
+                mGenericListGridItemAdapter?.setIsPlaying(false)
+                mGenericListGridItemAdapter?.setPlayingPosition(-1)
+            }
+        }
+    }
+
+    private fun updateUICurrentMediaItemIndex(index: Int) {
+        if (isMatchingQueueMusicContent) {
+            mGenericListGridItemAdapter?.setPlayingPosition(index)
+            mGenericListGridItemAdapter?.setIsPlaying(
+                mMediaPlayerDataViewModel.isPlaying.value ?: false
+            )
+            tryToScrollToCurrentItem(index)
         } else {
             if ((mGenericListGridItemAdapter?.getPlayingPosition() ?: -1) >= 0)
                 mGenericListGridItemAdapter?.setPlayingPosition(-1)
         }
     }
-
-    private fun tryToScrollOnCurrentItem(position: Int) {
+    private fun tryToScrollToCurrentItem(position: Int) {
         if (position >= 0) {
             val tempCanScrollToPlayingSong: Boolean =
-                mPlayingNowFragmentViewModel.getCanScrollCurrentPlayingSong().value ?: false
+                mPlayingNowFragmentViewModel.canSmoothScrollViewpager.value ?: false
             if (!tempCanScrollToPlayingSong) return
-            mPlayingNowFragmentViewModel.setCanScrollCurrentPlayingSong(false)
+            mPlayingNowFragmentViewModel.canSmoothScrollViewpager.value = false
             val tempFV: Int = (mLayoutManager?.findFirstVisibleItemPosition() ?: 0) - 1
             val tempLV: Int = mLayoutManager?.findLastVisibleItemPosition() ?: +1
             val tempVisibility: Boolean = position in tempFV..tempLV
@@ -315,7 +294,7 @@ class AlbumArtistsFragment : Fragment() {
                 val tempListSize: Int = mGenericListGridItemAdapter?.currentList?.size ?: 0
                 val tempTargetPosition =
                     if (position + 2 <= tempListSize) position + 2 else tempListSize
-                MainScope().launch {
+                lifecycleScope.launch {
                     mLayoutManager?.let {
                         it.startSmoothScroll(
                             CenterSmoothScroller(ctx).apply {
@@ -328,56 +307,34 @@ class AlbumArtistsFragment : Fragment() {
         }
     }
 
-    private fun updatePlaybackStateUI(isPlaying: Boolean) {
-        if (
-            mPlayingNowFragmentViewModel.getQueueListSource().value == TAG &&
-            mPlayingNowFragmentViewModel.getQueueListSourceColumnIndex().value == null &&
-            mPlayingNowFragmentViewModel.getQueueListSourceColumnValue().value == null &&
-            mPlayingNowFragmentViewModel.getSortBy().value == mAlbumArtistsFragmentViewModel.getSortBy().value &&
-            mPlayingNowFragmentViewModel.getIsInverted().value == mAlbumArtistsFragmentViewModel.getIsInverted().value
-        ) {
-            mGenericListGridItemAdapter?.setPlayingPosition(
-                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
-            )
-            mGenericListGridItemAdapter?.setIsPlaying(isPlaying)
-            tryToScrollOnCurrentItem(
-                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
-            )
-        } else {
-            if (mGenericListGridItemAdapter?.getIsPlaying() == true) {
-                mGenericListGridItemAdapter?.setIsPlaying(false)
-                mGenericListGridItemAdapter?.setPlayingPosition(-1)
-            }
-        }
-    }
-
     private fun checkInteractions() {
-        mDataBinding?.recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        mDataBinding.recyclerView.addOnScrollListener(object :
+            RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (mIsDraggingToScroll) {
                     if (dy < 0) {
                         Log.i(TAG, "Scrolling --> TOP")
-                        mMainFragmentViewModel.setScrollingState(-1)
+                        mMainFragmentViewModel.scrollingState.value = ExploreContentForFragment.SCROLLING_TOP
                     } else if (dy > 0) {
                         Log.i(TAG, "Scrolling --> BOTTOM")
-                        mMainFragmentViewModel.setScrollingState(1)
+                        mMainFragmentViewModel.scrollingState.value = ExploreContentForFragment.SCROLLING_BOTTOM
                     }
                     if (!recyclerView.canScrollVertically(1) && dy > 0) {
                         Log.i(TAG, "Scrolled to BOTTOM")
-                        mMainFragmentViewModel.setScrollingState(2)
+                        mMainFragmentViewModel.scrollingState.value = ExploreContentForFragment.SCROLLED_BOTTOM
                     } else if (!recyclerView.canScrollVertically(-1) && dy < 0) {
                         Log.i(TAG, "Scrolled to TOP")
-                        mMainFragmentViewModel.setScrollingState(-2)
+                        mMainFragmentViewModel.scrollingState.value = ExploreContentForFragment.SCROLLED_TOP
                     }
                 } else {
                     if (!recyclerView.canScrollVertically(1) && dy > 0) {
                         Log.i(TAG, "Scrolled to BOTTOM")
-                        if (mMainFragmentViewModel.getScrollingState().value != 2)
-                            mMainFragmentViewModel.setScrollingState(2)
+                        if (mMainFragmentViewModel.scrollingState.value != ExploreContentForFragment.SCROLLED_BOTTOM)
+                            mMainFragmentViewModel.scrollingState.value = ExploreContentForFragment.SCROLLED_BOTTOM
                     } else if (!recyclerView.canScrollVertically(-1) && dy < 0) {
                         Log.i(TAG, "Scrolled to TOP")
-                        if (mMainFragmentViewModel.getScrollingState().value != -2)
-                            mMainFragmentViewModel.setScrollingState(-2)
+                        if (mMainFragmentViewModel.scrollingState.value != ExploreContentForFragment.SCROLLED_TOP)
+                            mMainFragmentViewModel.scrollingState.value = ExploreContentForFragment.SCROLLED_TOP
                     }
                 }
             }
@@ -403,181 +360,176 @@ class AlbumArtistsFragment : Fragment() {
         })
     }
 
-    private fun setupRecyclerViewAdapter() {
-        val ctx: Context = context ?: return
-        //Setup headline adapter
-        val listHeadlines: ArrayList<Int> = ArrayList()
-        listHeadlines.add(0)
-        mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(
-            listHeadlines,
-            object : HeadlinePlayShuffleAdapter.OnItemClickListener {
-                override fun onPlayButtonClicked() {
-                    playFirstSong()
-                }
+    private suspend fun setupRecyclerViewAdapter() {
+        withContext(Dispatchers.Default) {
+            val ctx: Context = context ?: return@withContext
+            //Setup headline adapter
+            val listHeadlines: ArrayList<Int> = ArrayList()
+            listHeadlines.add(0)
+            mHeadlineTopPlayShuffleAdapter = HeadlinePlayShuffleAdapter(
+                listHeadlines,
+                object : HeadlinePlayShuffleAdapter.OnItemClickListener {
+                    override fun onPlayButtonClicked() {
+                        playFirstSong()
+                    }
 
-                override fun onShuffleButtonClicked() {
-                    playSongOnShuffle()
-                }
+                    override fun onShuffleButtonClicked() {
+                        playSongOnShuffle()
+                    }
 
-                override fun onSortButtonClicked() {
-                    showSortDialog()
-                }
+                    override fun onSortButtonClicked() {
+                        showSortDialog()
+                    }
 
-                override fun onOrganizeButtonClicked() {
-                    showOrganizeDialog()
-                }
-            })
+                    override fun onOrganizeButtonClicked() {
+                        showOrganizeDialog()
+                    }
+                })
 
-        //Setup generic item adapter
-        mGenericListGridItemAdapter = GenericListGridItemAdapter(
-            ctx,
-            object : GenericListGridItemAdapter.OnItemRequestDataInfo {
-                override fun onRequestDataInfo(
-                    dataItem: Any,
-                    position: Int
-                ): com.prosabdev.common.models.generic.GenericItemListGrid? {
-                    return com.prosabdev.common.models.view.AlbumArtistItem.castDataItemToGeneric(
-                        ctx,
-                        dataItem,
-                        true
-                    )
-                }
+            //Setup generic item adapter
+            mGenericListGridItemAdapter = GenericListGridItemAdapter(
+                ctx,
+                object : GenericListGridItemAdapter.OnItemRequestDataInfo {
+                    override fun onRequestDataInfo(
+                        dataItem: Any,
+                        position: Int
+                    ): com.prosabdev.common.models.generic.GenericItemListGrid? {
+                        return AlbumArtistItem.castDataItemToGeneric(ctx, dataItem)
+                    }
 
-                override fun onRequestTextIndexForFastScroller(
-                    dataItem: Any,
-                    position: Int
-                ): String {
-                    return com.prosabdev.common.models.view.AlbumArtistItem.getStringIndexForFastScroller(
-                        dataItem
-                    )
-                }
-            },
-            object : GenericListGridItemAdapter.OnItemClickListener {
-                override fun onItemClicked(
-                    position: Int,
-                    imageviewCoverArt: CustomShapeableImageViewImageViewRatio11,
-                    textTitle: MaterialTextView,
-                    textSubtitle: MaterialTextView,
-                    textDetails: MaterialTextView
-                ) {
-                    if (mMainFragmentViewModel.selectMode.value == true) {
+                    override fun onRequestTextIndexForFastScroller(
+                        dataItem: Any,
+                        position: Int
+                    ): String {
+                        return AlbumArtistItem.getStringIndexForFastScroller(dataItem)
+                    }
+                },
+                object : GenericListGridItemAdapter.OnItemClickListener {
+                    override fun onItemClicked(
+                        position: Int,
+                        imageviewCoverArt: CustomShapeableImageViewImageViewRatio11,
+                        textTitle: MaterialTextView,
+                        textSubtitle: MaterialTextView,
+                        textDetails: MaterialTextView
+                    ) {
+                        if (mMainFragmentViewModel.selectMode.value == true) {
+                            mGenericListGridItemAdapter?.selectableSelectFromPosition(
+                                position,
+                                mLayoutManager
+                            )
+                        } else {
+                            openExploreContentFragment(position)
+                        }
+                    }
+
+                    override fun onItemLongPressed(position: Int) {
                         mGenericListGridItemAdapter?.selectableSelectFromPosition(
                             position,
                             mLayoutManager
                         )
-                    } else {
-                        openExploreContentFragment(position)
                     }
-                }
-
-                override fun onItemLongPressed(position: Int) {
-                    mGenericListGridItemAdapter?.selectableSelectFromPosition(
-                        position,
-                        mLayoutManager
-                    )
-                }
-            },
-            object : SelectableItemListAdapter.OnSelectSelectableItemListener {
-                override fun onSelectModeChange(selectMode: Boolean) {
-                    if (selectMode) {
-                        mMainFragmentViewModel.currentSelectablePage.value = TAG
+                },
+                object : SelectableItemListAdapter.OnSelectSelectableItemListener {
+                    override fun onSelectModeChange(selectMode: Boolean) {
+                        if (selectMode) {
+                            mMainFragmentViewModel.currentSelectablePage.value = TAG
+                        }
+                        mMainFragmentViewModel.selectMode.value = selectMode
                     }
-                    mMainFragmentViewModel.selectMode.value = selectMode
-                }
 
-                override fun onRequestGetStringIndex(position: Int): String {
-                    return com.prosabdev.common.models.view.AlbumArtistItem.getStringIndexForSelection(
-                        mGenericListGridItemAdapter?.currentList?.get(position)
+                    override fun onRequestGetStringIndex(position: Int): String {
+                        return AlbumArtistItem.getStringIndexForSelection(
+                            mGenericListGridItemAdapter?.currentList?.get(position)
+                        )
+                    }
+
+                    override fun onSelectedListChange(selectedList: HashMap<Int, String>) {
+                        mMainFragmentViewModel.selectedItems.value = selectedList
+                    }
+                },
+                AlbumArtistItem.diffCallback as DiffUtil.ItemCallback<Any>,
+                mAlbumArtistsFragmentViewModel.organizeListGrid.value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE,
+                mIsSelectable = true,
+                mHavePlaybackState = false,
+                mIsImageFullCircle = false,
+            )
+
+            //Setup empty bottom space adapter
+            val listEmptyBottomSpace: ArrayList<String> = ArrayList()
+            listEmptyBottomSpace.add("")
+            mEmptyBottomAdapter = EmptyBottomAdapter(listEmptyBottomSpace)
+
+            //Setup concat adapter
+            mConcatAdapter = ConcatAdapter()
+            mHeadlineTopPlayShuffleAdapter?.let {
+                mConcatAdapter?.addAdapter(it)
+            }
+            mGenericListGridItemAdapter?.let {
+                mConcatAdapter?.addAdapter(it)
+            }
+            mEmptyBottomAdapter?.let {
+                mConcatAdapter?.addAdapter(it)
+            }
+
+            //Add Layout manager
+            val initialSpanCount: Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(
+                ctx,
+                mAlbumArtistsFragmentViewModel.organizeListGrid.value
+            )
+            mLayoutManager =
+                GridLayoutManager(ctx, initialSpanCount, GridLayoutManager.VERTICAL, false)
+            mLayoutManager?.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    val newSpanCount: Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(
+                        ctx,
+                        mAlbumArtistsFragmentViewModel.organizeListGrid.value
                     )
-                }
-
-                override fun onSelectedListChange(selectedList: HashMap<Int, String>) {
-                    mMainFragmentViewModel.selectedDataList.value = selectedList
-                }
-            },
-            com.prosabdev.common.models.view.AlbumArtistItem.diffCallback as DiffUtil.ItemCallback<Any>,
-            mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value
-                ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE,
-            mIsSelectable = true,
-            mHavePlaybackState = false,
-            mIsImageFullCircle = IS_IMAGE_CIRCLE,
-        )
-
-        //Setup empty bottom space adapter
-        val listEmptyBottomSpace: ArrayList<String> = ArrayList()
-        listEmptyBottomSpace.add("")
-        mEmptyBottomAdapter = EmptyBottomAdapter(listEmptyBottomSpace)
-
-        //Setup concat adapter
-        mConcatAdapter = ConcatAdapter()
-        mHeadlineTopPlayShuffleAdapter?.let {
-            mConcatAdapter?.addAdapter(it)
-        }
-        mGenericListGridItemAdapter?.let {
-            mConcatAdapter?.addAdapter(it)
-        }
-        mEmptyBottomAdapter?.let {
-            mConcatAdapter?.addAdapter(it)
-        }
-
-        //Add Layout manager
-        val initialSpanCount: Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(
-            ctx,
-            mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value
-        )
-        mLayoutManager = GridLayoutManager(ctx, initialSpanCount, GridLayoutManager.VERTICAL, false)
-        mLayoutManager?.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                val newSpanCount: Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(
-                    ctx,
-                    mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value
-                )
-                val updatedSpan: Int =
-                    if (mLayoutManager?.spanCount == newSpanCount) newSpanCount else mLayoutManager?.spanCount
-                        ?: 1
-                return when (position) {
-                    0 -> updatedSpan
-                    ((mLayoutManager?.itemCount ?: 0) - 1) -> updatedSpan
-                    else -> 1
+                    val updatedSpan: Int =
+                        if (mLayoutManager?.spanCount == newSpanCount) newSpanCount else mLayoutManager?.spanCount
+                            ?: 1
+                    return when (position) {
+                        0 -> updatedSpan
+                        ((mLayoutManager?.itemCount ?: 0) - 1) -> updatedSpan
+                        else -> 1
+                    }
                 }
             }
-        }
-        mDataBinding?.let { dataBidingView ->
-            MainScope().launch {
-                dataBidingView.recyclerView.adapter = mConcatAdapter
-                dataBidingView.recyclerView.layoutManager = mLayoutManager
+
+            lifecycleScope.launch {
+                mDataBinding.recyclerView.adapter = mConcatAdapter
+                mDataBinding.recyclerView.layoutManager = mLayoutManager
             }
             val newSpanCount: Int = OrganizeItemBottomSheetDialogFragment.getSpanCount(
                 ctx,
-                mAlbumArtistsFragmentViewModel.getOrganizeListGrid().value
+                mAlbumArtistsFragmentViewModel.organizeListGrid.value
             )
             val updatedSpan: Int =
                 if (mLayoutManager?.spanCount == newSpanCount) newSpanCount else mLayoutManager?.spanCount
                     ?: 1
             mItemDecoration = GridSpacingItemDecoration(updatedSpan)
             mItemDecoration?.let {
-                MainScope().launch {
-                    dataBidingView.recyclerView.addItemDecoration(it)
+                lifecycleScope.launch {
+                    mDataBinding.recyclerView.addItemDecoration(it)
                 }
             }
 
-            MainScope().launch {
-                dataBidingView.fastScroller.setSectionIndexer(mGenericListGridItemAdapter)
-                dataBidingView.fastScroller.attachRecyclerView(dataBidingView.recyclerView)
-                dataBidingView.fastScroller.setFastScrollListener(object :
+            lifecycleScope.launch {
+                mDataBinding.fastScroller.setSectionIndexer(mGenericListGridItemAdapter)
+                mDataBinding.fastScroller.attachRecyclerView(mDataBinding.recyclerView)
+                mDataBinding.fastScroller.setFastScrollListener(object :
                     FastScroller.FastScrollListener {
                     override fun onFastScrollStart(fastScroller: FastScroller) {
-                        mMainFragmentViewModel.setIsFastScrolling(true)
+                        mMainFragmentViewModel.isFastScrolling.value = true
                     }
 
                     override fun onFastScrollStop(fastScroller: FastScroller) {
-                        mMainFragmentViewModel.setIsFastScrolling(false)
-                        if (mDataBinding?.recyclerView?.canScrollVertically(-1) == false) {
+                        mMainFragmentViewModel.isFastScrolling.value = false
+                        if (!mDataBinding.recyclerView.canScrollVertically(-1)) {
                             //On scrolled to top
-                            mMainFragmentViewModel.setScrollingState(-2)
-                        } else if (mDataBinding?.recyclerView?.canScrollVertically(1) == false) {
+                            mMainFragmentViewModel.scrollingState.value = -2
+                        } else if (!mDataBinding.recyclerView.canScrollVertically(1)) {
                             //On scrolled to bottom
-                            mMainFragmentViewModel.setScrollingState(2)
+                            mMainFragmentViewModel.scrollingState.value = 2
                         }
                     }
                 })
@@ -588,25 +540,21 @@ class AlbumArtistsFragment : Fragment() {
     private fun openExploreContentFragment(position: Int) {
         val tempFragmentManager = activity?.supportFragmentManager ?: return
         val tempItem = mGenericListGridItemAdapter?.currentList?.get(position) ?: return
+
         context?.let { ctx ->
-            val tempGeneric =
-                com.prosabdev.common.models.view.AlbumArtistItem.castDataItemToGeneric(
-                    ctx,
-                    tempItem,
-                    true
-                ) ?: return
+            val tempGeneric = AlbumArtistItem.castDataItemToGeneric(ctx, tempItem, true) ?: return
             val tempStringUri =
                 if (tempGeneric.imageUri == Uri.EMPTY) "" else tempGeneric.imageUri.toString()
             tempFragmentManager.commit {
-                setReorderingAllowed(true)
+                setReorderingAllowed(false)
                 add(
                     R.id.main_fragment_container,
                     ExploreContentForFragment.newInstance(
-                        com.prosabdev.common.persistence.SharedPreferenceManagerUtils
-                            .SortAnOrganizeForExploreContents
+                        PersistentStorage
+                            .SortAndOrganize
                             .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ALBUM_ARTIST,
                         TAG,
-                        com.prosabdev.common.models.view.AlbumArtistItem.INDEX_COLUM_TO_SONG_ITEM,
+                        AlbumArtistItem.INDEX_COLUM_TO_SONG_ITEM,
                         tempGeneric.name,
                         tempStringUri,
                         tempGeneric.imageHashedSignature,
@@ -645,50 +593,81 @@ class AlbumArtistsFragment : Fragment() {
         mOrganizeDialog.show(childFragmentManager, OrganizeItemBottomSheetDialogFragment.TAG)
     }
 
-    private fun playSongOnShuffle() {
-        if ((mGenericListGridItemAdapter?.currentList?.size ?: 0) <= 0) return
-        MainScope().launch {
-            withContext(Dispatchers.Default) {
-                val randomExcludedNumber: Int =
-                    com.prosabdev.common.utils.MathComputations.randomExcluded(
-                        mGenericListGridItemAdapter?.getPlayingPosition() ?: -1,
-                        (mGenericListGridItemAdapter?.currentList?.size ?: 0) - 1
-                    )
-
-                //Load song and play
-                updateRecyclerViewScrollingSate()
-            }
-        }
-    }
-
     private fun playFirstSong() {
         //
     }
 
+    private fun playSongOnShuffle() {
+        if ((mGenericListGridItemAdapter?.currentList?.size ?: 0) <= 0) return
+
+        //Load song and play
+        mMediaControllerViewModel.mediaController?.shuffleModeEnabled = true
+        mMediaControllerViewModel.mediaController?.play()
+        updateRecyclerViewScrollingSate()
+    }
+
     private fun updateRecyclerViewScrollingSate() {
-        if (mDataBinding?.recyclerView?.scrollState == RecyclerView.SCROLL_STATE_SETTLING) {
+        if (mDataBinding.recyclerView.scrollState == RecyclerView.SCROLL_STATE_SETTLING) {
             mIsDraggingToScroll = false
         }
-        mMainFragmentViewModel.setScrollingState(-1)
+        mMainFragmentViewModel.scrollingState.value = ExploreContentForFragment.SCROLLING_TOP
     }
 
 
     private fun initViews() {
-        mDataBinding?.recyclerView?.setHasFixedSize(true)
-        mDataBinding?.constraintFastScrollerContainer?.let {
-            com.prosabdev.common.utils.InsetModifiers.updateBottomViewInsets(
+        mDataBinding.recyclerView.setHasFixedSize(true)
+        mDataBinding.constraintFastScrollerContainer.let {
+            InsetModifiers.updateBottomViewInsets(
                 it
             )
         }
     }
 
+    private fun savePreferences() {
+        val tempSortOrganize = SortOrganizeItemSP()
+        tempSortOrganize.sortOrderBy =
+            mAlbumArtistsFragmentViewModel.sortBy.value ?: SORT_LIST_GRID_DEFAULT_VALUE
+        tempSortOrganize.organizeListGrid =
+            mAlbumArtistsFragmentViewModel.organizeListGrid.value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
+        tempSortOrganize.isInvertSort =
+            mAlbumArtistsFragmentViewModel.isInverted.value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
+        PersistentStorage
+            .SortAndOrganize
+            .save(
+                PersistentStorage.SortAndOrganize.SORT_ORGANIZE_ALBUM_ARTISTS,
+                tempSortOrganize
+            )
+    }
+
+    private fun loadPreferences() {
+        val tempSortOrganize: SortOrganizeItemSP? =
+            PersistentStorage
+                .SortAndOrganize
+                .load(
+                    PersistentStorage.SortAndOrganize.SORT_ORGANIZE_ALBUM_ARTISTS
+                )
+        tempSortOrganize?.let {
+            mAlbumArtistsFragmentViewModel.sortBy.value = it.sortOrderBy
+            mAlbumArtistsFragmentViewModel.organizeListGrid.value = it.organizeListGrid
+            mAlbumArtistsFragmentViewModel.isInverted.value = it.isInvertSort
+        }
+        if (tempSortOrganize == null) {
+            mAlbumArtistsFragmentViewModel.sortBy.value = SORT_LIST_GRID_DEFAULT_VALUE
+            mAlbumArtistsFragmentViewModel.organizeListGrid.value = ORGANIZE_LIST_GRID_DEFAULT_VALUE
+            mAlbumArtistsFragmentViewModel.isInverted.value = IS_INVERTED_LIST_GRID_DEFAULT_VALUE
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        savePreferences()
+    }
+
     companion object {
         const val TAG = "AlbumArtistsFragment"
-        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = MainConst.ORGANIZE_GRID_LARGE
-        private const val SORT_LIST_GRID_DEFAULT_VALUE: String =
-            com.prosabdev.common.models.view.AlbumArtistItem.DEFAULT_INDEX
+        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = MainConst.ORGANIZE_GRID_MEDIUM
+        private const val SORT_LIST_GRID_DEFAULT_VALUE: String = AlbumArtistItem.DEFAULT_INDEX
         private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
-        private const val IS_IMAGE_CIRCLE: Boolean = false
 
         @JvmStatic
         fun newInstance() =

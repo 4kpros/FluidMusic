@@ -12,17 +12,17 @@ class YearItemRepository(ctx : Context) {
 
     private var mDao: YearItemDao? = AppDatabase.getDatabase(ctx).yearItemDao()
 
-    suspend fun getAtName(name : String?) : YearItem? {
+    suspend fun getAtName(name : String) : YearItem? {
         return withContext(Dispatchers.IO){
             mDao?.getAtName(name)
         }
     }
-    suspend fun getAll(orderBy: String?) : LiveData<List<YearItem>>? {
+    suspend fun getAll(orderBy: String) : LiveData<List<YearItem>>? {
         return withContext(Dispatchers.IO){
             mDao?.getAll(orderBy)
         }
     }
-    suspend fun getAllDirectly(orderBy: String?) : List<YearItem>? {
+    suspend fun getAllDirectly(orderBy: String) : List<YearItem>? {
         return withContext(Dispatchers.IO){
             mDao?.getAllDirectly(orderBy)
         }

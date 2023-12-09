@@ -7,13 +7,13 @@ import com.prosabdev.common.models.queuemusic.QueueMusicItem
 @Dao
 interface QueueMusicItemDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(queueMusicItem: QueueMusicItem?) : Long
+    fun insert(queueMusicItem: QueueMusicItem) : Long
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertMultiple(queueMusicItems: List<QueueMusicItem>?) : List<Long>
+    fun insertMultiple(queueMusicItems: List<QueueMusicItem>) : List<Long>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(queueMusicItem: QueueMusicItem?) : Int
+    fun update(queueMusicItem: QueueMusicItem) : Int
 
     @Query("UPDATE QueueMusicItem SET " +
             "playOrder = :newPlayOrder " +
@@ -22,10 +22,10 @@ interface QueueMusicItemDao {
     fun updatePlayOrder(oldPlayOrder: Int, newPlayOrder: Int) : Int
 
     @Delete
-    fun delete(queueMusicItem: QueueMusicItem?) : Int
+    fun delete(queueMusicItem: QueueMusicItem) : Int
 
     @Delete
-    fun deleteMultiple(queueMusicItem: List<QueueMusicItem>?) : Int
+    fun deleteMultiple(queueMusicItem: List<QueueMusicItem>) : Int
 
     @Query("DELETE FROM QueueMusicItem")
     fun deleteAll() : Int
@@ -34,7 +34,7 @@ interface QueueMusicItemDao {
     fun deleteAtId(id: Long) : Int
 
     @Query("DELETE FROM QueueMusicItem WHERE songUri = :uri")
-    fun deleteAtSongUri(uri: String?) : Int
+    fun deleteAtSongUri(uri: String) : Int
 
     @Query("SELECT * FROM QueueMusicItem WHERE id = :id LIMIT 1")
     fun getAtId(id: Long): QueueMusicItem?

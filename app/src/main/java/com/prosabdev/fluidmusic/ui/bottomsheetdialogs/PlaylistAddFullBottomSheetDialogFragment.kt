@@ -16,16 +16,20 @@ import com.prosabdev.fluidmusic.adapters.playlist.PlaylistItemAdapter
 import com.prosabdev.fluidmusic.databinding.BottomSheetAddToPlaylistBinding
 import com.prosabdev.fluidmusic.databinding.ComponentDialogEditTextBinding
 import com.prosabdev.fluidmusic.databinding.ComponentDialogTitleBinding
+import com.prosabdev.fluidmusic.databinding.FragmentYearsBinding
 import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistItemViewModel
 import kotlinx.coroutines.*
 
 
 class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFragment() {
 
-    private lateinit var mDataBiding: BottomSheetAddToPlaylistBinding
+    //Data binding
+    private lateinit var mDataBinding: BottomSheetAddToPlaylistBinding
 
+    //View models
     private var mPlaylistItemViewModel: PlaylistItemViewModel? = null
 
+    //Variables
     private var mPlaylistItemAdapter: PlaylistItemAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
 
@@ -39,9 +43,9 @@ class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFra
         savedInstanceState: Bundle?
     ): View {
 
-        //Set content with data biding util
-        mDataBiding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_add_to_playlist, container, false)
-        val view = mDataBiding.root
+        //Inflate binding layout and return binding object
+        mDataBinding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_add_to_playlist, container, false)
+        val view = mDataBinding.root
 
         //Load your UI content
         initViews()
@@ -73,16 +77,16 @@ class PlaylistAddFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFra
 
             })
             mPlaylistItemAdapter?.submitList(mPlaylists)
-            mDataBiding.recyclerView.scrollToPosition(0)
+            mDataBinding.recyclerView.scrollToPosition(0)
 
             mLayoutManager = GridLayoutManager(ctx, 1, GridLayoutManager.VERTICAL, false)
-            mDataBiding.recyclerView.adapter = mPlaylistItemAdapter
-            mDataBiding.recyclerView.layoutManager = mLayoutManager
+            mDataBinding.recyclerView.adapter = mPlaylistItemAdapter
+            mDataBinding.recyclerView.layoutManager = mLayoutManager
         }
     }
 
     private fun checkInteractions() {
-        mDataBiding.buttonNewPlaylist.setOnClickListener{
+        mDataBinding.buttonNewPlaylist.setOnClickListener{
             MainScope().launch {
                 showAddNewPlaylistDialog()
             }

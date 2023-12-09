@@ -42,8 +42,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
     //Room database
     implementation("androidx.room:room-runtime:2.6.1")
-    annotationProcessor("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
     //Document file
     implementation("androidx.documentfile:documentfile:1.0.1")
     //Work manager
@@ -64,10 +64,10 @@ dependencies {
     //Google gson
     implementation("com.google.code.gson:gson:2.10")
     //Dagger hilt
-    implementation ("com.google.dagger:dagger:2.44.2")
-    implementation("com.google.dagger:hilt-android:2.44")
-    ksp("com.google.dagger:dagger-compiler:2.44.2")
-    ksp("com.google.dagger:hilt-android-compiler:2.38.1")
+//    implementation ("com.google.dagger:dagger:2.44.2")
+//    implementation("com.google.dagger:hilt-android:2.44")
+//    ksp("com.google.dagger:dagger-compiler:2.44.2")
+//    ksp("com.google.dagger:hilt-android-compiler:2.38.1")
 
     //Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")

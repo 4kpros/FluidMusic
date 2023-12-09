@@ -9,6 +9,7 @@ import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.common.Tracks
+import com.prosabdev.common.persistence.models.SleepTimerSP
 import com.prosabdev.fluidmusic.media.MediaEventsListener
 
 class MediaPlayerDataViewModel: ViewModel() {
@@ -32,7 +33,14 @@ class MediaPlayerDataViewModel: ViewModel() {
     val audioAttributes = MutableLiveData<AudioAttributes?>(null)
     val seekForwardIncrement = MutableLiveData<Long>(0)
     val seekBackIncrement = MutableLiveData<Long>(0)
+    val sleepTimer = MutableLiveData<SleepTimerSP?>(null)
     val currentTimeline = MutableLiveData<Timeline?>(null)
+
+    val queueListSource = MutableLiveData<String>(null)
+    val queueListSourceColumnIndex = MutableLiveData<String>(null)
+    val queueListSourceColumnValue = MutableLiveData<String>(null)
+    val queueListSortBy = MutableLiveData<String>(null)
+    val queueListIsInverted = MutableLiveData<Boolean>(false)
 
     //Public variables
     var mediaEventsListener: MediaEventsListener = object : MediaEventsListener() {

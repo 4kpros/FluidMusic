@@ -9,7 +9,6 @@ import com.prosabdev.common.R
 import com.prosabdev.common.constants.MainConst
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.CoroutineContext
 import kotlin.math.floor
 
 object FormattersAndParsers {
@@ -63,7 +62,7 @@ object FormattersAndParsers {
             }
         }
     }
-    fun getUnderLinedWord(word: String?): CharSequence {
+    fun getUnderLinedWord(word: CharSequence?): CharSequence {
         val uWord = SpannableString(word ?: "")
         uWord.setSpan(UnderlineSpan(), 0, uWord.length, 0)
         return uWord
@@ -81,47 +80,45 @@ object FormattersAndParsers {
         return if(tempProgress > totalDuration) totalDuration else tempProgress
     }
     fun formatSongDurationToString(durationTemp: Long): String {
-        return withContext(Dispatchers.Default){
-            var totalOut = ""
-            var totalSec: Int
-            var totalMin: Int
-            var totalHours: Int
-            var totalDays: Int
-            val seconds = durationTemp.toDouble() / 1000
-            val minutes = seconds / 60
-            val hours = minutes / 60
-            val days = hours / 24
-            totalSec = seconds.toInt()
-            totalMin = minutes.toInt()
-            totalHours = hours.toInt()
-            totalDays = days.toInt()
-            totalSec = getMaxTime(totalSec, 59)
-            totalMin = getMaxTime(totalMin, 59)
-            totalHours = getMaxTime(totalHours, 59)
-            totalDays = getMaxTime(totalDays, 23)
-            if (totalDays > 0) {
-                if (totalDays < 10) {
-                    totalOut += "0"
-                }
-                totalOut += totalDays.toString() + "day "
-            }
-            if (totalHours > 0) {
-                if (totalHours < 10) {
-                    totalOut += "0"
-                }
-                totalOut += "$totalHours:"
-            }
-            if (totalMin < 10) {
+        var totalOut = ""
+        var totalSec: Int
+        var totalMin: Int
+        var totalHours: Int
+        var totalDays: Int
+        val seconds = durationTemp.toDouble() / 1000
+        val minutes = seconds / 60
+        val hours = minutes / 60
+        val days = hours / 24
+        totalSec = seconds.toInt()
+        totalMin = minutes.toInt()
+        totalHours = hours.toInt()
+        totalDays = days.toInt()
+        totalSec = getMaxTime(totalSec, 59)
+        totalMin = getMaxTime(totalMin, 59)
+        totalHours = getMaxTime(totalHours, 59)
+        totalDays = getMaxTime(totalDays, 23)
+        if (totalDays > 0) {
+            if (totalDays < 10) {
                 totalOut += "0"
             }
-            totalOut += "$totalMin:"
-            if (totalSec < 10) {
-                totalOut += "0"
-            }
-            totalOut += totalSec.toString() + ""
-
-            totalOut
+            totalOut += totalDays.toString() + "day "
         }
+        if (totalHours > 0) {
+            if (totalHours < 10) {
+                totalOut += "0"
+            }
+            totalOut += "$totalHours:"
+        }
+        if (totalMin < 10) {
+            totalOut += "0"
+        }
+        totalOut += "$totalMin:"
+        if (totalSec < 10) {
+            totalOut += "0"
+        }
+        totalOut += totalSec.toString() + ""
+
+        return totalOut
     }
 
     suspend fun formatAndReturnFolderUriSAF(context: Context, uri: Uri): com.prosabdev.common.models.FolderUriTree {

@@ -224,29 +224,29 @@ class ExploreContentForFragment : Fragment() {
     }
 
     private fun invertSongListAndUpdateAdapter(isInverted: Boolean?) {
-        val tempNewIsInverted: Boolean = isInverted ?: false
-        if (tempNewIsInverted) {
-            mGenericListGridItemAdapter?.submitList(mExploreContentsForFragmentViewModel.itemsList.value?.reversed())
-        } else {
-            mGenericListGridItemAdapter?.submitList(mExploreContentsForFragmentViewModel.itemsList.value)
-        }
-        if (
-            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
-            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
-            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
-            mPlayingNowFragmentViewModel.sort.value == mExploreContentsForFragmentViewModel.sortBy.value &&
-            mPlayingNowFragmentViewModel.isInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
-        ) {
-            mGenericListGridItemAdapter?.setPlayingPosition(
-                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
-            )
-            mGenericListGridItemAdapter?.setIsPlaying(
-                mPlayingNowFragmentViewModel.getIsPlaying().value ?: false
-            )
-        } else {
-            mGenericListGridItemAdapter?.setPlayingPosition(-1)
-            mGenericListGridItemAdapter?.setIsPlaying(false)
-        }
+//        val tempNewIsInverted: Boolean = isInverted ?: false
+//        if (tempNewIsInverted) {
+//            mGenericListGridItemAdapter?.submitList(mExploreContentsForFragmentViewModel.itemsList.value?.reversed())
+//        } else {
+//            mGenericListGridItemAdapter?.submitList(mExploreContentsForFragmentViewModel.itemsList.value)
+//        }
+//        if (
+//            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
+//            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
+//            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
+//            mPlayingNowFragmentViewModel.sort.value == mExploreContentsForFragmentViewModel.sortBy.value &&
+//            mPlayingNowFragmentViewModel.isInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
+//        ) {
+//            mGenericListGridItemAdapter?.setPlayingPosition(
+//                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
+//            )
+//            mGenericListGridItemAdapter?.setIsPlaying(
+//                mPlayingNowFragmentViewModel.getIsPlaying().value ?: false
+//            )
+//        } else {
+//            mGenericListGridItemAdapter?.setPlayingPosition(-1)
+//            mGenericListGridItemAdapter?.setIsPlaying(false)
+//        }
     }
 
     private suspend fun requestNewDataFromDatabase() {
@@ -260,31 +260,31 @@ class ExploreContentForFragment : Fragment() {
     }
 
     private fun addDataToGenericAdapter(dataList: List<Any>?) {
-        if (mExploreContentsForFragmentViewModel.isInverted.value == true) {
-            mGenericListGridItemAdapter?.submitList(dataList?.reversed())
-        } else {
-            mGenericListGridItemAdapter?.submitList(dataList)
-        }
-        if (mMainFragmentViewModel.currentSelectablePage.value == TAG) {
-            mMainFragmentViewModel.totalCount.value = dataList?.size ?: 0)
-        }
-        if (
-            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
-            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
-            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
-            mPlayingNowFragmentViewModel.sortBy.value == mExploreContentsForFragmentViewModel.sortBy.value &&
-            mPlayingNowFragmentViewModel.isInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
-        ) {
-            mGenericListGridItemAdapter?.setPlayingPosition(
-                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
-            )
-            mGenericListGridItemAdapter?.setIsPlaying(
-                mPlayingNowFragmentViewModel.getIsPlaying().value ?: false
-            )
-        } else {
-            mGenericListGridItemAdapter?.setPlayingPosition(-1)
-            mGenericListGridItemAdapter?.setIsPlaying(false)
-        }
+//        if (mExploreContentsForFragmentViewModel.isInverted.value == true) {
+//            mGenericListGridItemAdapter?.submitList(dataList?.reversed())
+//        } else {
+//            mGenericListGridItemAdapter?.submitList(dataList)
+//        }
+//        if (mMainFragmentViewModel.currentSelectablePage.value == TAG) {
+//            mMainFragmentViewModel.totalCount.value = dataList?.size ?: 0
+//        }
+//        if (
+//            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
+//            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
+//            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
+//            mPlayingNowFragmentViewModel.sortBy.value == mExploreContentsForFragmentViewModel.sortBy.value &&
+//            mPlayingNowFragmentViewModel.isInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
+//        ) {
+//            mGenericListGridItemAdapter?.setPlayingPosition(
+//                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
+//            )
+//            mGenericListGridItemAdapter?.setIsPlaying(
+//                mPlayingNowFragmentViewModel.getIsPlaying().value ?: false
+//            )
+//        } else {
+//            mGenericListGridItemAdapter?.setPlayingPosition(-1)
+//            mGenericListGridItemAdapter?.setIsPlaying(false)
+//        }
     }
 
     private fun updateOnScrollingStateUI(i: Int) {
@@ -326,24 +326,24 @@ class ExploreContentForFragment : Fragment() {
     }
 
     private fun updatePlayingSongUI(songItem: SongItem?) {
-        val songPosition: Int = songItem?.position ?: -1
-
-        if (
-            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
-            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
-            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
-            mPlayingNowFragmentViewModel.sortBy.value == mExploreContentsForFragmentViewModel.sortBy.value &&
-            mPlayingNowFragmentViewModel.isInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
-        ) {
-            mGenericListGridItemAdapter?.setPlayingPosition(songPosition)
-            mGenericListGridItemAdapter?.setIsPlaying(
-                mPlayingNowFragmentViewModel.getIsPlaying().value ?: false
-            )
-            tryToScrollOnCurrentItem(songPosition)
-        } else {
-            if ((mGenericListGridItemAdapter?.getPlayingPosition() ?: -1) >= 0)
-                mGenericListGridItemAdapter?.setPlayingPosition(-1)
-        }
+//        val songPosition: Int = songItem?.position ?: -1
+//
+//        if (
+//            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
+//            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
+//            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
+//            mPlayingNowFragmentViewModel.sortBy.value == mExploreContentsForFragmentViewModel.sortBy.value &&
+//            mPlayingNowFragmentViewModel.isInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
+//        ) {
+//            mGenericListGridItemAdapter?.setPlayingPosition(songPosition)
+//            mGenericListGridItemAdapter?.setIsPlaying(
+//                mPlayingNowFragmentViewModel.getIsPlaying().value ?: false
+//            )
+//            tryToScrollOnCurrentItem(songPosition)
+//        } else {
+//            if ((mGenericListGridItemAdapter?.getPlayingPosition() ?: -1) >= 0)
+//                mGenericListGridItemAdapter?.setPlayingPosition(-1)
+//        }
     }
 
     private fun tryToScrollOnCurrentItem(position: Int) {
@@ -374,26 +374,26 @@ class ExploreContentForFragment : Fragment() {
     }
 
     private fun updatePlaybackStateUI(isPlaying: Boolean) {
-        if (
-            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
-            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
-            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
-            mPlayingNowFragmentViewModel.sortBy.value == mExploreContentsForFragmentViewModel.sortBy.value &&
-            mPlayingNowFragmentViewModel.isInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
-        ) {
-            mGenericListGridItemAdapter?.setPlayingPosition(
-                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
-            )
-            mGenericListGridItemAdapter?.setIsPlaying(isPlaying)
-            tryToScrollOnCurrentItem(
-                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
-            )
-        } else {
-            if (mGenericListGridItemAdapter?.getIsPlaying() == true) {
-                mGenericListGridItemAdapter?.setIsPlaying(false)
-                mGenericListGridItemAdapter?.setPlayingPosition(-1)
-            }
-        }
+//        if (
+//            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
+//            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
+//            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
+//            mPlayingNowFragmentViewModel.sortBy.value == mExploreContentsForFragmentViewModel.sortBy.value &&
+//            mPlayingNowFragmentViewModel.isInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
+//        ) {
+//            mGenericListGridItemAdapter?.setPlayingPosition(
+//                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
+//            )
+//            mGenericListGridItemAdapter?.setIsPlaying(isPlaying)
+//            tryToScrollOnCurrentItem(
+//                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
+//            )
+//        } else {
+//            if (mGenericListGridItemAdapter?.getIsPlaying() == true) {
+//                mGenericListGridItemAdapter?.setIsPlaying(false)
+//                mGenericListGridItemAdapter?.setPlayingPosition(-1)
+//            }
+//        }
     }
 
     private fun checkInteractions() {
@@ -402,7 +402,7 @@ class ExploreContentForFragment : Fragment() {
         }
         mDataBinding.topAppBar.setOnMenuItemClickListener {
             if (it?.itemId == R.id.search) {
-                onSearchButtonClicked()
+                //onSearchButtonClicked()
             }
             true
         }
@@ -786,13 +786,13 @@ class ExploreContentForFragment : Fragment() {
                 ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
         tempSortOrganize.isInvertSort = mExploreContentsForFragmentViewModel.isInverted.value
             ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
-        PersistentStorage.SortAnOrganize.save(
+        PersistentStorage.SortAndOrganize.save(
             mPreferencesKey ?: return,
             tempSortOrganize
         )
     }
     private fun loadPreferences() {
-        val tempSortOrganize: SortOrganizeItemSP? = PersistentStorage.SortAnOrganize.load(
+        val tempSortOrganize: SortOrganizeItemSP? = PersistentStorage.SortAndOrganize.load(
             mPreferencesKey ?: return
         )
         mExploreContentsForFragmentViewModel.sortBy.value =
@@ -815,10 +815,10 @@ class ExploreContentForFragment : Fragment() {
         private const val SORT_LIST_GRID_DEFAULT_VALUE: String = SongItem.DEFAULT_INDEX
         private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 
-        private const val SCROLLING_TOP: Int = -1
-        private const val SCROLLING_BOTTOM: Int = 1
-        private const val SCROLLED_TOP: Int = -2
-        private const val SCROLLED_BOTTOM: Int = 2
+        const val SCROLLING_TOP: Int = -1
+        const val SCROLLING_BOTTOM: Int = 1
+        const val SCROLLED_TOP: Int = -2
+        const val SCROLLED_BOTTOM: Int = 2
         @JvmStatic
         fun newInstance(
             preferencesKey: String,

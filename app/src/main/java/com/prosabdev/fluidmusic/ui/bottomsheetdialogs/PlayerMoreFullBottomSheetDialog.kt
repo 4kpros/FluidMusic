@@ -8,13 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
 import com.prosabdev.common.models.playlist.PlaylistItem
-import com.prosabdev.common.models.playlist.PlaylistSongItem
 import com.prosabdev.common.models.songitem.SongItem
 import com.prosabdev.common.models.view.AlbumArtistItem
 import com.prosabdev.common.models.view.AlbumItem
@@ -37,21 +38,29 @@ import com.prosabdev.fluidmusic.databinding.DialogSetSleepTimerBinding
 import com.prosabdev.fluidmusic.databinding.DialogShareSongBinding
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentForFragment
 import com.prosabdev.fluidmusic.ui.fragments.explore.*
+import com.prosabdev.fluidmusic.utils.InjectorUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayingNowFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaControllerViewModel
+import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaPlayerDataViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.playlist.PlaylistItemViewModel
 import kotlinx.coroutines.*
 
 class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
 
-    private var mDataBiding: BottomSheetPlayerMoreBinding? = null
+    //Data binding
+    private lateinit var mDataBinding: BottomSheetPlayerMoreBinding
 
+    //View models
+    private val mMediaPlayerDataViewModel: MediaPlayerDataViewModel by activityViewModels()
+    private val mMediaControllerViewModel by activityViewModels<MediaControllerViewModel> {
+        InjectorUtils.provideMediaControllerViewModel(mMediaPlayerDataViewModel.mediaEventsListener)
+    }
     private val mPlaylistItemViewModel: PlaylistItemViewModel by viewModels()
-
-    private var mPlayingNowFragmentViewModel: PlayingNowFragmentViewModel? = null
     private var mMainFragmentViewModel: MainFragmentViewModel? = null
     private var mScreenShotPlayerView : View? = null
 
+    //Variables
     private var mPlaylists: ArrayList<PlaylistItem> = ArrayList()
     private var mDefaultPlaylistCount: Long = 0
 
@@ -67,11 +76,11 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
-        //Set content with data biding util
-        mDataBiding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_player_more, container, false)
-        val view = mDataBiding.root
+        //Inflate binding layout and return binding object
+        mDataBinding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_player_more, container, false)
+        val view = mDataBinding.root
 
         //Load your UI content
         initViews()
@@ -83,7 +92,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        updateCurrentPlayingSongUI(mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value)
+        updateCurrentPlayingSongUI(null)
         checkInteractions()
     }
 
@@ -99,14 +108,14 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun updateCurrentPlayingSongUI(songItem: SongItem?) {
-        if(songItem == null)
-            return
-        context?.let { ctx ->
-            mDataBiding?.let { dataBidingView ->
-                dataBidingView.textTitle.text = songItem.title?.ifEmpty { songItem.fileName } ?: songItem.fileName
-                dataBidingView.textArtist.text = songItem.artist?.ifEmpty { ctx.getString(R.string.unknown_artist) } ?: ctx.getString(R.string.unknown_artist)
+        if(songItem == null) return
 
-                dataBidingView.textDescription.text =
+        context?.let { ctx ->
+            mDataBinding.run {
+                textTitle.text = songItem.title?.ifEmpty { songItem.fileName } ?: songItem.fileName
+                textArtist.text = songItem.artist?.ifEmpty { ctx.getString(R.string.unknown_artist) } ?: ctx.getString(R.string.unknown_artist)
+
+                textDescription.text =
                     ctx.getString(
                         R.string.item_song_card_text_details,
                         FormattersAndParsers.formatSongDurationToString(songItem.duration ),
@@ -116,7 +125,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                 val tempUri: Uri? = Uri.parse(songItem.uri)
                 val imageRequest: ImageLoaders.ImageRequestItem = ImageLoaders.ImageRequestItem.newOriginalCardInstance()
                 imageRequest.uri = tempUri
-                imageRequest.imageView = dataBidingView.covertArt
+                imageRequest.imageView = covertArt
                 imageRequest.hashedCovertArtSignature = songItem.hashedCovertArtSignature
                 ImageLoaders.startExploreContentImageLoaderJob(ctx, imageRequest)
             }
@@ -124,37 +133,36 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun checkInteractions() {
-        mDataBiding?.let { dataBidingView ->
-            dataBidingView.buttonInfo.setOnClickListener {
+        mDataBinding.run {
+            buttonInfo.setOnClickListener {
                 showSongInfoDialog()
             }
-            dataBidingView.buttonPlaylistAdd.setOnClickListener {
+            buttonPlaylistAdd.setOnClickListener {
                 showAddToPlaylistDialog()
             }
-            dataBidingView.buttonLyrics.setOnClickListener {
+            buttonLyrics.setOnClickListener {
                 fetchLyrics()
             }
-            dataBidingView.buttonShare.setOnClickListener {
+            buttonShare.setOnClickListener {
                 shareSong()
             }
-            dataBidingView.buttonTimer.setOnClickListener {
+            buttonTimer.setOnClickListener {
                 showSleepTimerDialog()
             }
-            dataBidingView.buttonGoto.setOnClickListener {
+            buttonGoto.setOnClickListener {
                 showGoToSongDialog()
             }
-            dataBidingView.buttonSetAs.setOnClickListener {
+            buttonSetAs.setOnClickListener {
                 setSongAsRingtone()
             }
-            dataBidingView.buttonDelete.setOnClickListener {
+            buttonDelete.setOnClickListener {
                 showDeleteSelectionDialog()
             }
         }
     }
 
     private fun showDeleteSelectionDialog() {
-        val tempSongItem: SongItem =
-            mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val songItem: SongItem? = null
         context?.let { ctx ->
             MaterialAlertDialogBuilder(this.requireContext())
                 .setTitle(ctx.getString(R.string.dialog_delete_selection_title))
@@ -164,22 +172,22 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     dialog.dismiss()
                 }
                 .setPositiveButton(ctx.getString(R.string.delete_file)) { _, _ ->
-                    deleteSelectedSongs(tempSongItem)
+                    deleteSelectedSongs(songItem)
                 }
                 .show()
         }
         dismiss()
     }
-    private fun deleteSelectedSongs(songItem: SongItem) {
+    private fun deleteSelectedSongs(songItem: SongItem?) {
         //
     }
 
     private fun setSongAsRingtone() {
-        val tempSongItem : SongItem = mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val songItem : SongItem? = null
         context?.let { ctx ->
             if(PermissionsManager.haveWriteSystemSettingsPermission(ctx)){
-                val tempUri : Uri = Uri.parse(tempSongItem.uri ?: "") ?: return
-                SystemSettings.setRingtone(ctx, tempUri, tempSongItem.fileName, true)
+                val tempUri : Uri = Uri.parse(songItem?.uri ?: "") ?: return
+                SystemSettings.setRingtone(ctx, tempUri, songItem?.fileName, true)
             }else{
                 MaterialAlertDialogBuilder(this.requireContext())
                     .setTitle(ctx.getString(R.string.set_as_ringtone))
@@ -203,7 +211,7 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun showGoToSongDialog() {
-        val tempSongItem : SongItem = mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
+        val songItem : SongItem? = null
 
         val mDialogGotoSongBinding : DialogGotoSongBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_goto_song, null, false)
         val tempFragmentManager = activity?.supportFragmentManager ?: return
@@ -226,11 +234,11 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                                 R.id.main_fragment_container,
                                 ExploreContentForFragment.newInstance(
                                     PersistentStorage
-                                        .SortAnOrganizeForExploreContents
+                                        .SortAndOrganize
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ALBUM,
                                     AlbumsFragment.TAG,
                                     AlbumItem.INDEX_COLUM_TO_SONG_ITEM,
-                                    tempSongItem.album,
+                                    songItem?.album,
                                     mAlbumItem?.uriImage,
                                     mAlbumItem?.hashedCovertArtSignature ?: -1,
                                     temGenericItem?.title,
@@ -251,11 +259,11 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                                 R.id.main_fragment_container,
                                 ExploreContentForFragment.newInstance(
                                     PersistentStorage
-                                        .SortAnOrganizeForExploreContents
+                                        .SortAndOrganize
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ALBUM_ARTIST,
                                     AlbumArtistsFragment.TAG,
                                     AlbumArtistItem.INDEX_COLUM_TO_SONG_ITEM,
-                                    tempSongItem.albumArtist,
+                                    songItem?.albumArtist,
                                     mAlbumArtistItem?.uriImage,
                                     mAlbumArtistItem?.hashedCovertArtSignature ?: -1,
                                     temGenericItem?.title,
@@ -276,11 +284,11 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                                 R.id.main_fragment_container,
                                 ExploreContentForFragment.newInstance(
                                     PersistentStorage
-                                        .SortAnOrganizeForExploreContents
+                                        .SortAndOrganize
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_ARTIST,
                                     ArtistsFragment.TAG,
                                     ArtistItem.INDEX_COLUM_TO_SONG_ITEM,
-                                    tempSongItem.artist,
+                                    songItem?.artist,
                                     mArtistItem?.uriImage,
                                     mArtistItem?.hashedCovertArtSignature ?: -1,
                                     temGenericItem?.title,
@@ -301,11 +309,11 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                                 R.id.main_fragment_container,
                                 ExploreContentForFragment.newInstance(
                                     PersistentStorage
-                                        .SortAnOrganizeForExploreContents
+                                        .SortAndOrganize
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_COMPOSER,
                                     ComposersFragment.TAG,
                                     ComposerItem.INDEX_COLUM_TO_SONG_ITEM,
-                                    tempSongItem.composer,
+                                    songItem?.composer,
                                     mComposerItem?.uriImage,
                                     mComposerItem?.hashedCovertArtSignature ?: -1,
                                     temGenericItem?.title,
@@ -326,11 +334,11 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                                 R.id.main_fragment_container,
                                 ExploreContentForFragment.newInstance(
                                     PersistentStorage
-                                        .SortAnOrganizeForExploreContents
+                                        .SortAndOrganize
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_FOLDER,
                                     FoldersFragment.TAG,
                                     FolderItem.INDEX_COLUM_TO_SONG_ITEM,
-                                    tempSongItem.folder,
+                                    songItem?.folder,
                                     mFolderItem?.uriImage,
                                     mFolderItem?.hashedCovertArtSignature ?: -1,
                                     temGenericItem?.title,
@@ -351,11 +359,11 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                                 R.id.main_fragment_container,
                                 ExploreContentForFragment.newInstance(
                                     PersistentStorage
-                                        .SortAnOrganizeForExploreContents
+                                        .SortAndOrganize
                                         .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_GENRE,
                                     GenresFragment.TAG,
                                     GenreItem.INDEX_COLUM_TO_SONG_ITEM,
-                                    tempSongItem.genre,
+                                    songItem?.genre,
                                     mGenreItem?.uriImage,
                                     mGenreItem?.hashedCovertArtSignature ?: -1,
                                     temGenericItem?.title,
@@ -376,11 +384,11 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
 //                                R.id.main_fragment_container,
 //                                ExploreContentForFragment.newInstance(
 //                                    SharedPreferenceManagerUtils
-//                                        .SortAnOrganizeForExploreContents
+//                                        .SortAndOrganize
 //                                        .SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_YEAR,
 //                                    YearsFragment.TAG,
 //                                    YearItem.INDEX_COLUM_TO_SONG_ITEM,
-//                                    tempSongItem.genre,
+//                                    songItem?.genre,
 //                                    mYearItem?.uriImage,
 //                                    mYearItem?.hashedCovertArtSignature ?: -1,
 //                                    temGenericItem?.title,
@@ -414,8 +422,8 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                     )
                 }
                 .show().apply {
-                    val tempSleepTimer: Float = mPlayingNowFragmentViewModel?.sleepTimer?.value?.sliderValue ?: 0.0f
-                    val tempPlayLastSong: Boolean = mPlayingNowFragmentViewModel?.sleepTimer?.value?.playLastSong ?: false
+                    val tempSleepTimer: Float = mMediaPlayerDataViewModel?.sleepTimer?.value?.sliderValue ?: 0.0f
+                    val tempPlayLastSong: Boolean = mMediaPlayerDataViewModel?.sleepTimer?.value?.playLastSong ?: false
                     mDialogSetSleepTimerBinding.slider.value = tempSleepTimer
                     mDialogSetSleepTimerBinding.textRangeValue.text =
                         if(tempSleepTimer <= 0)
@@ -441,11 +449,10 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
         val tempSleepTimerSP = SleepTimerSP()
         tempSleepTimerSP.sliderValue = value
         tempSleepTimerSP.playLastSong = playLastSong
-        mPlayingNowFragmentViewModel?.sleepTimer?.value = tempSleepTimerSP
+        mMediaPlayerDataViewModel.sleepTimer.value = tempSleepTimerSP
     }
 
     private fun shareSong() {
-        val tempSongItem : SongItem = mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
         context?.let { ctx ->
             val dialogShareSongBinding : DialogShareSongBinding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_share_song, null, false)
             MaterialAlertDialogBuilder(this.requireContext())
@@ -455,18 +462,17 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
                 .setNegativeButton(ctx.getString(R.string.close)) { dialog, _ ->
                     dialog.dismiss()
                 }
-                .show().apply {
+                .show()
+                .apply {
                     dialogShareSongBinding.buttonShareFile.setOnClickListener{
-                        MainScope().launch {
-                            withContext(Dispatchers.IO){
-                                val tempUri = Uri.parse(tempSongItem.uri ?: "") ?: return@withContext
-                                val tempDesc =
-                                    if(tempSongItem.title != null)
-                                        ctx.getString(R.string._music_content_by, tempSongItem.title, tempSongItem.artist ?: "")
-                                    else
-                                        "${tempSongItem.fileName}"
-                                IntentActionsManager.shareSongFile(ctx, tempUri, tempDesc)
-                            }
+                        lifecycleScope.launch(Dispatchers.IO){
+//                            val tempUri = Uri.parse(tempSongItem.uri ?: "") ?: return@withContext
+//                            val tempDesc =
+//                                if(tempSongItem.title != null)
+//                                    ctx.getString(R.string._music_content_by, tempSongItem.title, tempSongItem.artist ?: "")
+//                                else
+//                                    "${tempSongItem.fileName}"
+//                            IntentActionsManager.shareSongFile(ctx, tempUri, tempDesc)
                         }
                         this@apply.dismiss()
                     }
@@ -497,47 +503,43 @@ class PlayerMoreFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun fetchLyrics() {
-        val tempSongItem : SongItem = mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
     }
 
     private fun showAddToPlaylistDialog() {
-        val tempSongItem : SongItem = mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
-
-        val songsToAddOnPlaylist : ArrayList<PlaylistSongItem> = ArrayList()
-        val psI = PlaylistSongItem()
-        psI.songUri = tempSongItem.uri
-        psI.lastAddedDateToLibrary = SystemSettings.getCurrentDateInMillis()
-        songsToAddOnPlaylist.add(psI)
-
-        val playlistAddBottomSheetDialog = PlaylistAddFullBottomSheetDialogFragment.newInstance(
-            songsToAddOnPlaylist,
-            mPlaylists,
-            mDefaultPlaylistCount
-        )
-        activity ?.supportFragmentManager?.let {
-            playlistAddBottomSheetDialog.show(
-                it,
-                PlaylistAddFullBottomSheetDialogFragment.TAG
-            )
-        }
-        dismiss()
+//        val songsToAddOnPlaylist : ArrayList<PlaylistSongItem> = ArrayList()
+//        val psI = PlaylistSongItem()
+//        psI.songUri = tempSongItem.uri
+//        psI.lastAddedDateToLibrary = SystemSettings.getCurrentDateInMillis()
+//        songsToAddOnPlaylist.add(psI)
+//
+//        val playlistAddBottomSheetDialog = PlaylistAddFullBottomSheetDialogFragment.newInstance(
+//            songsToAddOnPlaylist,
+//            mPlaylists,
+//            mDefaultPlaylistCount
+//        )
+//        activity ?.supportFragmentManager?.let {
+//            playlistAddBottomSheetDialog.show(
+//                it,
+//                PlaylistAddFullBottomSheetDialogFragment.TAG
+//            )
+//        }
+//        dismiss()
     }
 
     private fun showSongInfoDialog() {
-        val tempSongItem : SongItem = mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value ?: return
-        val songInfoBottomSheetDialog = SongInfoFullBottomSheetDialogFragment.newInstance(tempSongItem)
+        val songInfoBottomSheetDialog = SongInfoFullBottomSheetDialogFragment.newInstance(mMediaPlayerDataViewModel.currentMediaItem.value)
         activity ?.supportFragmentManager?.let { songInfoBottomSheetDialog.show(it, SongInfoFullBottomSheetDialogFragment.TAG) }
         dismiss()
     }
     private fun initViews() {
-        mDataBiding?.textTitle?.isSelected = true
-        mDataBiding?.textDescription?.isSelected = true
+        mDataBinding.textTitle.isSelected = true
+        mDataBinding.textDescription.isSelected = true
     }
 
     fun updateData(playingNowFragmentViewModel : PlayingNowFragmentViewModel, mainFragmentViewModel : MainFragmentViewModel, screenShootPlayerView : View){
-        mPlayingNowFragmentViewModel = playingNowFragmentViewModel
-        mMainFragmentViewModel = mainFragmentViewModel
-        mScreenShotPlayerView = screenShootPlayerView
+//        mMediaPlayerDataViewModel = playingNowFragmentViewModel
+//        mMainFragmentViewModel = mainFragmentViewModel
+//        mScreenShotPlayerView = screenShootPlayerView
     }
     fun updateContentExploreDetails(
         albumItem: AlbumItem,

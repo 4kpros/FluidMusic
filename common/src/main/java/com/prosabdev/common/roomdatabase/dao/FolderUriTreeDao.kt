@@ -7,19 +7,19 @@ import com.prosabdev.common.models.FolderUriTree
 @Dao
 interface FolderUriTreeDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(folderUriTree: FolderUriTree?) : Long
+    fun insert(folderUriTree: FolderUriTree) : Long
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertMultiple(folderUriTrees: ArrayList<FolderUriTree>?) : List<Long>
+    fun insertMultiple(folderUriTrees: ArrayList<FolderUriTree>) : List<Long>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(folderUriTree: FolderUriTree?) : Int
+    fun update(folderUriTree: FolderUriTree) : Int
 
     @Delete
-    fun delete(folderUriTree: FolderUriTree?) : Int
+    fun delete(folderUriTree: FolderUriTree) : Int
 
     @Delete
-    fun deleteMultiple(folderUriTree: ArrayList<FolderUriTree>?) : Int
+    fun deleteMultiple(folderUriTree: ArrayList<FolderUriTree>) : Int
 
     @Query("DELETE FROM FolderUriTree")
     fun deleteAll() : Int
@@ -28,13 +28,13 @@ interface FolderUriTreeDao {
     fun deleteAtId(id: Long) : Int
 
     @Query("DELETE FROM FolderUriTree WHERE uriTree = :uriTree")
-    fun deleteAtUriTree(uriTree: String?)
+    fun deleteAtUriTree(uriTree: String)
 
     @Query("SELECT * FROM FolderUriTree WHERE id = :id LIMIT 1")
     fun getAtId(id: Long): FolderUriTree?
 
     @Query("SELECT * FROM FolderUriTree WHERE uriTree = :uriTree LIMIT 1")
-    fun getAtUriTree(uriTree: String?): FolderUriTree?
+    fun getAtUriTree(uriTree: String): FolderUriTree?
 
     @Query("SELECT * FROM FolderUriTree " +
             "ORDER BY " +
@@ -47,7 +47,7 @@ interface FolderUriTreeDao {
             "CASE :orderBy WHEN 'pathTree' THEN FolderUriTree.pathTree END ASC," +
             "CASE :orderBy WHEN 'id' THEN FolderUriTree.id END ASC"
     )
-    fun getAll(orderBy: String?): LiveData<List<FolderUriTree>>?
+    fun getAll(orderBy: String): LiveData<List<FolderUriTree>>?
 
     @Query("SELECT * FROM FolderUriTree")
     fun getAllDirectly(): List<FolderUriTree>?

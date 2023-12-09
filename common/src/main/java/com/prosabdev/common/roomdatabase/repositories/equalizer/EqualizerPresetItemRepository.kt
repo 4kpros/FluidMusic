@@ -12,31 +12,31 @@ class EqualizerPresetItemRepository(ctx : Context) {
 
     private var mDao: EqualizerPresetItemDao? = AppDatabase.getDatabase(ctx).equalizerPresetItemDao()
 
-    suspend fun insert(item: EqualizerPresetItem?): Long?{
+    suspend fun insert(item: EqualizerPresetItem): Long?{
         return withContext(Dispatchers.IO){
             mDao?.insert(item)
         }
     }
 
-    suspend fun insertMultiple(itemList: List<EqualizerPresetItem>?): List<Long>?{
+    suspend fun insertMultiple(itemList: List<EqualizerPresetItem>): List<Long>?{
         return withContext(Dispatchers.IO){
             mDao?.insertMultiple(itemList)
         }
     }
 
-    suspend fun update(item: EqualizerPresetItem?): Int?{
+    suspend fun update(item: EqualizerPresetItem): Int?{
         return withContext(Dispatchers.IO){
             mDao?.update(item)
         }
     }
 
-    suspend fun delete(item: EqualizerPresetItem?): Int?{
+    suspend fun delete(item: EqualizerPresetItem): Int?{
         return withContext(Dispatchers.IO){
             mDao?.delete(item)
         }
     }
 
-    suspend fun deleteMultiple(itemList: List<EqualizerPresetItem>?): Int?{
+    suspend fun deleteMultiple(itemList: List<EqualizerPresetItem>): Int?{
         return withContext(Dispatchers.IO){
             mDao?.deleteMultiple(itemList)
         }
@@ -54,7 +54,7 @@ class EqualizerPresetItemRepository(ctx : Context) {
         }
     }
 
-    suspend fun deleteAtPresetName(presetName: String?): Int?{
+    suspend fun deleteAtPresetName(presetName: String): Int?{
         return withContext(Dispatchers.IO){
             mDao?.deleteAtPresetName(presetName)
         }
@@ -66,7 +66,7 @@ class EqualizerPresetItemRepository(ctx : Context) {
         }
     }
 
-    suspend fun getAtPresetName(presetName: String?): EqualizerPresetItem?{
+    suspend fun getAtPresetName(presetName: String): EqualizerPresetItem?{
         return withContext(Dispatchers.IO){
             mDao?.getAtPresetName(presetName)
         }

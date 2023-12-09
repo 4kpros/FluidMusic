@@ -28,7 +28,7 @@ data class PlaylistItem (
             }
             return ""
         }
-        fun getStringIndexForFastScroller(ctx: Context, dataItem: Any): String {
+        fun getStringIndexForFastScroller(dataItem: Any): String {
             if(dataItem is PlaylistItem) {
                 return dataItem.name ?: ""
             }

@@ -10,23 +10,23 @@ class EqualizerPresetBandLevelItemViewModel(app: Application) : AndroidViewModel
     private var repository: EqualizerPresetBandLevelItemRepository? = EqualizerPresetBandLevelItemRepository(app)
 
     suspend fun insert(item: EqualizerPresetBandLevelItem?): Long?{
-        return repository?.insert(item)
+        return repository?.insert(item ?: return null)
     }
 
     suspend fun insertMultiple(itemList: List<EqualizerPresetBandLevelItem>?): List<Long>?{
-        return repository?.insertMultiple(itemList)
+        return repository?.insertMultiple(itemList ?: return null)
     }
 
     suspend fun update(item: EqualizerPresetBandLevelItem?): Int?{
-        return repository?.update(item)
+        return repository?.update(item ?: return null)
     }
 
     suspend fun delete(item: EqualizerPresetBandLevelItem?): Int?{
-        return repository?.delete(item)
+        return repository?.delete(item ?: return null)
     }
 
     suspend fun deleteMultiple(itemList: List<EqualizerPresetBandLevelItem>?): Int?{
-        return repository?.deleteMultiple(itemList)
+        return repository?.deleteMultiple(itemList ?: return null)
     }
 
     suspend fun deleteAtId(id: Long): Int?{
@@ -34,11 +34,11 @@ class EqualizerPresetBandLevelItemViewModel(app: Application) : AndroidViewModel
     }
 
     suspend fun deleteBandAtPresetName(bandId: Int, presetName: String?): Int?{
-        return repository?.deleteBandAtPresetName(bandId, presetName)
+        return repository?.deleteBandAtPresetName(bandId, presetName ?: return null)
     }
 
     suspend fun deleteAllBandsAtPresetName(presetName: String?): Int? {
-        return repository?.deleteAllBandsAtPresetName(presetName)
+        return repository?.deleteAllBandsAtPresetName(presetName ?: return null)
     }
 
     suspend fun deleteAll(): Int?{
@@ -50,10 +50,10 @@ class EqualizerPresetBandLevelItemViewModel(app: Application) : AndroidViewModel
     }
 
     suspend fun getBandAtPresetName(presetName: String?, bandId: Short): EqualizerPresetBandLevelItem?{
-        return repository?.getBandAtPresetName(presetName, bandId)
+        return repository?.getBandAtPresetName(presetName ?: return null, bandId)
     }
 
     suspend fun getAllAtPresetName(presetName: String?): List<EqualizerPresetBandLevelItem>?{
-        return repository?.getAllAtPresetName(presetName)
+        return repository?.getAllAtPresetName(presetName ?: return null)
     }
 }

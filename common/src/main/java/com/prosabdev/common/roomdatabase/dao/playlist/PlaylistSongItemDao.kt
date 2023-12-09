@@ -7,25 +7,25 @@ import com.prosabdev.common.models.playlist.PlaylistSongItem
 @Dao
 interface PlaylistSongItemDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(playlistSongItem: PlaylistSongItem?) : Long
+    fun insert(playlistSongItem: PlaylistSongItem) : Long
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertMultiple(playlistSongItems: List<PlaylistSongItem>?) : List<Long>
+    fun insertMultiple(playlistSongItems: List<PlaylistSongItem>) : List<Long>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(playlistSongItem: PlaylistSongItem?) : Int
+    fun update(playlistSongItem: PlaylistSongItem) : Int
 
     @Delete
-    fun delete(playlistSongItem: PlaylistSongItem?) : Int
+    fun delete(playlistSongItem: PlaylistSongItem) : Int
 
     @Delete
-    fun deleteMultiple(playlistSongItem: List<PlaylistSongItem>?) : Int
+    fun deleteMultiple(playlistSongItem: List<PlaylistSongItem>) : Int
 
     @Query("DELETE FROM PlaylistSongItem")
     fun deleteAll() : Int
 
     @Query("DELETE FROM PlaylistSongItem WHERE songUri = :songUri")
-    fun deleteAtSongUri(songUri: String?) : Int
+    fun deleteAtSongUri(songUri: String) : Int
 
     @Query("SELECT * FROM PlaylistSongItem WHERE id = :id LIMIT 1")
     fun getAtId(id: Long): PlaylistSongItem?
@@ -37,7 +37,7 @@ interface PlaylistSongItemDao {
             "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN PlaylistSongItem.lastAddedDateToLibrary END ASC," +
             "CASE :orderBy WHEN 'id' THEN PlaylistSongItem.id END ASC"
     )
-    fun getAll(orderBy: String?): LiveData<List<PlaylistSongItem>?>
+    fun getAll(orderBy: String): LiveData<List<PlaylistSongItem>?>
 
     @Query("SELECT * FROM PlaylistSongItem " +
             "ORDER BY " +
@@ -46,5 +46,5 @@ interface PlaylistSongItemDao {
             "CASE :orderBy WHEN 'lastAddedDateToLibrary' THEN PlaylistSongItem.lastAddedDateToLibrary END ASC," +
             "CASE :orderBy WHEN 'id' THEN PlaylistSongItem.id END ASC"
     )
-    fun getAllDirectly(orderBy: String?): List<PlaylistSongItem>?
+    fun getAllDirectly(orderBy: String): List<PlaylistSongItem>?
 }

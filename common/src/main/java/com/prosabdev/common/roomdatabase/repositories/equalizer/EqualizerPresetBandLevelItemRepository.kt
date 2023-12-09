@@ -11,31 +11,31 @@ class EqualizerPresetBandLevelItemRepository(ctx : Context) {
 
     private var mDao: EqualizerPresetBandLevelItemDao? = AppDatabase.getDatabase(ctx).equalizerPresetBandLevelItemDao()
 
-    suspend fun insert(item: EqualizerPresetBandLevelItem?): Long?{
+    suspend fun insert(item: EqualizerPresetBandLevelItem): Long?{
         return withContext(Dispatchers.IO){
             mDao?.insert(item)
         }
     }
 
-    suspend fun insertMultiple(itemList: List<EqualizerPresetBandLevelItem>?): List<Long>?{
+    suspend fun insertMultiple(itemList: List<EqualizerPresetBandLevelItem>): List<Long>?{
         return withContext(Dispatchers.IO){
             mDao?.insertMultiple(itemList)
         }
     }
 
-    suspend fun update(item: EqualizerPresetBandLevelItem?): Int?{
+    suspend fun update(item: EqualizerPresetBandLevelItem): Int?{
         return withContext(Dispatchers.IO){
             mDao?.update(item)
         }
     }
 
-    suspend fun delete(item: EqualizerPresetBandLevelItem?): Int?{
+    suspend fun delete(item: EqualizerPresetBandLevelItem): Int?{
         return withContext(Dispatchers.IO){
             mDao?.delete(item)
         }
     }
 
-    suspend fun deleteMultiple(itemList: List<EqualizerPresetBandLevelItem>?): Int?{
+    suspend fun deleteMultiple(itemList: List<EqualizerPresetBandLevelItem>): Int?{
         return withContext(Dispatchers.IO){
             mDao?.deleteMultiple(itemList)
         }
@@ -47,13 +47,13 @@ class EqualizerPresetBandLevelItemRepository(ctx : Context) {
         }
     }
 
-    suspend fun deleteBandAtPresetName(bandId: Int, presetName: String?): Int?{
+    suspend fun deleteBandAtPresetName(bandId: Int, presetName: String): Int?{
         return withContext(Dispatchers.IO){
             mDao?.deleteBandAtPresetName(bandId, presetName)
         }
     }
 
-    suspend fun deleteAllBandsAtPresetName(presetName: String?): Int?{
+    suspend fun deleteAllBandsAtPresetName(presetName: String): Int?{
         return withContext(Dispatchers.IO){
             mDao?.deleteAllBandsAtPresetName(presetName)
         }
@@ -71,13 +71,13 @@ class EqualizerPresetBandLevelItemRepository(ctx : Context) {
         }
     }
 
-    suspend fun getBandAtPresetName(presetName: String?, bandId: Short): EqualizerPresetBandLevelItem?{
+    suspend fun getBandAtPresetName(presetName: String, bandId: Short): EqualizerPresetBandLevelItem?{
         return withContext(Dispatchers.IO){
             mDao?.getBandAtPresetName(presetName, bandId)
         }
     }
 
-    suspend fun getAllAtPresetName(presetName: String?): List<EqualizerPresetBandLevelItem>?{
+    suspend fun getAllAtPresetName(presetName: String): List<EqualizerPresetBandLevelItem>?{
         return withContext(Dispatchers.IO){
             mDao?.getAllAtPresetName(presetName)
         }
