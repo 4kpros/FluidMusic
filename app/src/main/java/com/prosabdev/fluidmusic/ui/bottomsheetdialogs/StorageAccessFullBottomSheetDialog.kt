@@ -10,12 +10,15 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetStorageAccessBinding
+import com.prosabdev.fluidmusic.databinding.FragmentYearsBinding
 import com.prosabdev.fluidmusic.viewmodels.activities.StorageAccessActivityViewModel
 
 class StorageAccessFullBottomSheetDialog : BottomSheetDialogFragment() {
 
-    private lateinit var mDataBiding : BottomSheetStorageAccessBinding
+    //Data binding
+    private lateinit var mDataBinding: BottomSheetStorageAccessBinding
 
+    //View models
     private lateinit var mStorageAccessActivityViewModel: StorageAccessActivityViewModel
 
     override fun onCreateView(
@@ -24,9 +27,9 @@ class StorageAccessFullBottomSheetDialog : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        //Set content with data biding util
-        mDataBiding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_storage_access, container, false)
-        val view = mDataBiding.root
+        //Inflate binding layout and return binding object
+        mDataBinding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_storage_access, container, false)
+        val view = mDataBinding.root
 
         //Load your UI content
         initViews()
@@ -36,7 +39,7 @@ class StorageAccessFullBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun checkInteractions() {
-        mDataBiding.buttonRemoveAll.setOnClickListener(){
+        mDataBinding.buttonRemoveAll.setOnClickListener(){
             showRemoveAllDialog()
         }
     }

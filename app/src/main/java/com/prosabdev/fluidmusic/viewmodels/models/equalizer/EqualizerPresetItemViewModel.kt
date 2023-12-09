@@ -11,23 +11,23 @@ class EqualizerPresetItemViewModel(app: Application) : AndroidViewModel(app) {
     private var mRepository: EqualizerPresetItemRepository? = EqualizerPresetItemRepository(app)
 
     suspend fun insert(item: EqualizerPresetItem?): Long?{
-        return mRepository?.insert(item)
+        return mRepository?.insert(item ?: return null)
     }
 
     suspend fun insertMultiple(itemList: List<EqualizerPresetItem>?): List<Long>?{
-        return mRepository?.insertMultiple(itemList)
+        return mRepository?.insertMultiple(itemList ?: return null)
     }
 
     suspend fun update(item: EqualizerPresetItem?): Int?{
-        return mRepository?.update(item)
+        return mRepository?.update(item ?: return null)
     }
 
     suspend fun delete(item: EqualizerPresetItem?): Int?{
-        return mRepository?.delete(item)
+        return mRepository?.delete(item ?: return null)
     }
 
     suspend fun deleteMultiple(itemList: List<EqualizerPresetItem>?): Int?{
-        return mRepository?.deleteMultiple(itemList)
+        return mRepository?.deleteMultiple(itemList ?: return null)
     }
 
     suspend fun deleteAll(): Int?{
@@ -39,7 +39,7 @@ class EqualizerPresetItemViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     suspend fun deleteAtPresetName(presetName: String?): Int?{
-        return mRepository?.deleteAtPresetName(presetName)
+        return mRepository?.deleteAtPresetName(presetName ?: return null)
     }
 
     suspend fun getAtId(id: Long): EqualizerPresetItem?{
@@ -47,7 +47,7 @@ class EqualizerPresetItemViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     suspend fun getAtPresetName(presetName: String?): EqualizerPresetItem?{
-        return mRepository?.getAtPresetName(presetName)
+        return mRepository?.getAtPresetName(presetName ?: return null)
     }
     suspend fun getAll(): LiveData<List<EqualizerPresetItem>?>?{
         return mRepository?.getAll()

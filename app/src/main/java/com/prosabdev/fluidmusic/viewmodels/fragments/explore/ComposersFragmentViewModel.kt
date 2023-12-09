@@ -7,6 +7,6 @@ import com.prosabdev.fluidmusic.viewmodels.models.explore.ComposerItemViewModel
 
 class ComposersFragmentViewModel (app: Application) : GenericListenDataViewModel(app) {
     suspend fun requestDataDirectlyFromDatabase(viewModel: ComposerItemViewModel){
-        dataList.value = viewModel.getAllDirectly(sortBy.value?.ifEmpty { ComposerItem.DEFAULT_INDEX } ?: ComposerItem.DEFAULT_INDEX)
+        itemsList.value = viewModel.getAllDirectly(sortBy.value?.ifEmpty { ComposerItem.DEFAULT_INDEX } ?: ComposerItem.DEFAULT_INDEX)
     }
 }

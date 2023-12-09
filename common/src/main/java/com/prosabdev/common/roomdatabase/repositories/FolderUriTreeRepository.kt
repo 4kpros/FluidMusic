@@ -12,17 +12,17 @@ class FolderUriTreeRepository(ctx : Context) {
 
     private var mDao: FolderUriTreeDao? = AppDatabase.getDatabase(ctx).folderUriTreeDao()
 
-    suspend fun insert(folderUriTree: FolderUriTree?) : Long? {
+    suspend fun insert(folderUriTree: FolderUriTree) : Long? {
         return withContext(Dispatchers.IO){
             mDao?.insert(folderUriTree)
         }
     }
-    suspend fun update(folderUriTree: FolderUriTree?) {
+    suspend fun update(folderUriTree: FolderUriTree) {
         return withContext(Dispatchers.IO){
             mDao?.update(folderUriTree)
         }
     }
-    suspend fun delete(folderUriTree: FolderUriTree?) {
+    suspend fun delete(folderUriTree: FolderUriTree) {
         return withContext(Dispatchers.IO){
             mDao?.delete(folderUriTree)
         }
@@ -32,12 +32,12 @@ class FolderUriTreeRepository(ctx : Context) {
             mDao?.deleteAtId(id)
         }
     }
-    suspend fun deleteAtUriTree(uri: String?) {
+    suspend fun deleteAtUriTree(uri: String) {
         withContext(Dispatchers.IO){
             mDao?.deleteAtUriTree(uri)
         }
     }
-    suspend fun deleteMultiple(songList: ArrayList<FolderUriTree>?) {
+    suspend fun deleteMultiple(songList: ArrayList<FolderUriTree>) {
         withContext(Dispatchers.IO){
             mDao?.deleteMultiple(songList)
         }
@@ -52,7 +52,7 @@ class FolderUriTreeRepository(ctx : Context) {
             mDao?.getAtId(id)
         }
     }
-    suspend fun getAll(orderBy: String?) : LiveData<List<FolderUriTree>>? {
+    suspend fun getAll(orderBy: String) : LiveData<List<FolderUriTree>>? {
         return withContext(Dispatchers.IO){
             mDao?.getAll(orderBy)
         }

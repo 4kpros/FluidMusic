@@ -8,7 +8,7 @@ import com.prosabdev.common.models.view.ComposerItem
 @Dao
 interface ComposerItemDao {
     @Query("SELECT * FROM ComposerItem WHERE name = :name LIMIT 1")
-    fun getAtName(name : String?): ComposerItem?
+    fun getAtName(name : String): ComposerItem?
 
     @Query(
         "SELECT * FROM ComposerItem " +
@@ -25,7 +25,7 @@ interface ComposerItemDao {
                 "COALESCE(NULLIF(ComposerItem.name,''), 'Unknown field')," +
                 "ComposerItem.lastAddedDateToLibrary DESC"
     )
-    fun getAll(orderBy: String?): LiveData<List<ComposerItem>>?
+    fun getAll(orderBy: String): LiveData<List<ComposerItem>>?
 
     @Query(
         "SELECT * FROM ComposerItem " +
@@ -42,5 +42,5 @@ interface ComposerItemDao {
                 "COALESCE(NULLIF(ComposerItem.name,''), 'Unknown field')," +
                 "ComposerItem.lastAddedDateToLibrary DESC"
     )
-    fun getAllDirectly(orderBy: String?): List<ComposerItem>?
+    fun getAllDirectly(orderBy: String): List<ComposerItem>?
 }

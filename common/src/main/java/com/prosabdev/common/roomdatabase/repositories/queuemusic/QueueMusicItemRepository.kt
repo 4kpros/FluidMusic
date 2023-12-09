@@ -12,17 +12,17 @@ class QueueMusicItemRepository(ctx : Context) {
 
     private var mDao: QueueMusicItemDao? = AppDatabase.getDatabase(ctx).queueMusicItemDao()
 
-    suspend fun insert(queueMusicItem: QueueMusicItem?) : Long? {
+    suspend fun insert(queueMusicItem: QueueMusicItem) : Long? {
         return withContext(Dispatchers.IO){
             mDao?.insert(queueMusicItem)
         }
     }
-    suspend fun update(queueMusicItem: QueueMusicItem?): Int? {
+    suspend fun update(queueMusicItem: QueueMusicItem): Int? {
         return withContext(Dispatchers.IO){
             mDao?.update(queueMusicItem)
         }
     }
-    suspend fun delete(queueMusicItem: QueueMusicItem?): Int? {
+    suspend fun delete(queueMusicItem: QueueMusicItem): Int? {
         return withContext(Dispatchers.IO){
             mDao?.delete(queueMusicItem)
         }
@@ -32,7 +32,7 @@ class QueueMusicItemRepository(ctx : Context) {
             mDao?.deleteAtId(id)
         }
     }
-    suspend fun deleteMultiple(queueMusicItem: List<QueueMusicItem>?): Int? {
+    suspend fun deleteMultiple(queueMusicItem: List<QueueMusicItem>): Int? {
         return withContext(Dispatchers.IO){
             mDao?.deleteMultiple(queueMusicItem)
         }

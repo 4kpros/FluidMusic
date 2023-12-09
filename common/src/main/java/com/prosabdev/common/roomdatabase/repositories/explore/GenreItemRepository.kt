@@ -12,17 +12,17 @@ class GenreItemRepository(ctx : Context) {
 
     private var mDao: GenreItemDao? = AppDatabase.getDatabase(ctx).genreItemDao()
 
-    suspend fun getAtName(name : String?) : GenreItem? {
+    suspend fun getAtName(name : String) : GenreItem? {
         return withContext(Dispatchers.IO){
             mDao?.getAtName(name)
         }
     }
-    suspend fun getAll(orderBy: String?) : LiveData<List<GenreItem>>? {
+    suspend fun getAll(orderBy: String) : LiveData<List<GenreItem>>? {
         return withContext(Dispatchers.IO){
             mDao?.getAll(orderBy)
         }
     }
-    suspend fun getAllDirectly(orderBy: String?) : List<GenreItem>? {
+    suspend fun getAllDirectly(orderBy: String) : List<GenreItem>? {
         return withContext(Dispatchers.IO){
             mDao?.getAllDirectly(orderBy)
         }

@@ -7,19 +7,19 @@ import com.prosabdev.common.models.equalizer.EqualizerPresetItem
 @Dao
 interface EqualizerPresetItemDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(item: EqualizerPresetItem?): Long
+    fun insert(item: EqualizerPresetItem): Long
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertMultiple(itemList: List<EqualizerPresetItem>?): List<Long>
+    fun insertMultiple(itemList: List<EqualizerPresetItem>): List<Long>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(item: EqualizerPresetItem?): Int
+    fun update(item: EqualizerPresetItem): Int
 
     @Delete
-    fun delete(item: EqualizerPresetItem?): Int
+    fun delete(item: EqualizerPresetItem): Int
 
     @Delete
-    fun deleteMultiple(itemList: List<EqualizerPresetItem>?): Int
+    fun deleteMultiple(itemList: List<EqualizerPresetItem>): Int
 
     @Query("DELETE FROM EqualizerPresetItem")
     fun deleteAll(): Int
@@ -28,13 +28,13 @@ interface EqualizerPresetItemDao {
     fun deleteAtId(id: Long): Int
 
     @Query("DELETE FROM EqualizerPresetItem WHERE presetName = :presetName")
-    fun deleteAtPresetName(presetName: String?): Int
+    fun deleteAtPresetName(presetName: String): Int
 
     @Query("SELECT * FROM EqualizerPresetItem WHERE id = :id LIMIT 1")
     fun getAtId(id: Long): EqualizerPresetItem?
 
     @Query("SELECT * FROM EqualizerPresetItem WHERE presetName = :presetName LIMIT 1")
-    fun getAtPresetName(presetName: String?): EqualizerPresetItem?
+    fun getAtPresetName(presetName: String): EqualizerPresetItem?
 
     @Query("SELECT * FROM EqualizerPresetItem ORDER BY id")
     fun getAll(): LiveData<List<EqualizerPresetItem>?>?

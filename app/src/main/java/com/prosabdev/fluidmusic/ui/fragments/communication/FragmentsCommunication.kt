@@ -1,6 +1,7 @@
 package com.prosabdev.fluidmusic.ui.fragments.communication
 
 import com.prosabdev.common.constants.WorkManagerConst
+import com.prosabdev.common.models.songitem.SongItem
 import com.prosabdev.fluidmusic.adapters.generic.GenericListGridItemAdapter
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentForFragment
 import com.prosabdev.fluidmusic.ui.fragments.PlaylistsFragment
@@ -87,14 +88,14 @@ abstract class FragmentsCommunication {
 
         fun playSongAtPositionFromQueueMusic(
             playingNowFragmentViewModel: PlayingNowFragmentViewModel?,
-            songItem: com.prosabdev.common.models.songitem.SongItem?
+            songItem: SongItem?
         ): Boolean {
             if (playingNowFragmentViewModel == null) return false
             if (songItem?.uri == null || songItem.uri?.isEmpty() ?: return false) return false
 
-            playingNowFragmentViewModel.setCurrentPlayingSong(songItem)
-            playingNowFragmentViewModel.setIsPlaying(true)
-            playingNowFragmentViewModel.setPlayingProgressValue(0)
+//            playingNowFragmentViewModel.setCurrentPlayingSong(songItem)
+//            playingNowFragmentViewModel.setIsPlaying(true)
+//            playingNowFragmentViewModel.setPlayingProgressValue(0)
             return true
         }
 
@@ -112,39 +113,39 @@ abstract class FragmentsCommunication {
             if (playingNowFragmentViewModel == null) return false
             if (genericListenDataViewModel == null) return false
             if (genericListGridItemAdapter == null || genericListGridItemAdapter.currentList.size <= 0) return false
-            if (
-                playingNowFragmentViewModel.getSortBy().value != genericListenDataViewModel.getSortBy().value ||
-                playingNowFragmentViewModel.getIsInverted().value != genericListenDataViewModel.getIsInverted().value ||
-                playingNowFragmentViewModel.getQueueListSource().value != loadFromSource ||
-                playingNowFragmentViewModel.getQueueListSourceColumnIndex().value != loadFromSourceColumnIndex ||
-                playingNowFragmentViewModel.getQueueListSourceColumnValue().value != loadFromSourceColumnValue
-            ) {
-                playingNowFragmentViewModel.setSortBy(
-                    genericListenDataViewModel.getSortBy().value ?: ""
-                )
-                playingNowFragmentViewModel.setIsInverted(
-                    genericListenDataViewModel.getIsInverted().value ?: false
-                )
-                playingNowFragmentViewModel.setQueueListSource(loadFromSource)
-                playingNowFragmentViewModel.setQueueListSourceColumnIndex(loadFromSourceColumnIndex)
-                playingNowFragmentViewModel.setQueueListSourceColumnValue(loadFromSourceColumnValue)
-
-                playingNowFragmentViewModel.setUpdatePlaylistCounter()
-            }
-            playingNowFragmentViewModel.setIsPlaying(true)
-            playingNowFragmentViewModel.setPlayingProgressValue(0)
-            playingNowFragmentViewModel.setRepeat(
-                repeat ?: playingNowFragmentViewModel.getRepeat().value
-            )
-            playingNowFragmentViewModel.setShuffle(
-                shuffle ?: playingNowFragmentViewModel.getShuffle().value
-            )
-            playingNowFragmentViewModel.setCurrentPlayingSong(
-                getCurrentPlayingSongFromPosition(
-                    genericListGridItemAdapter,
-                    position
-                )
-            )
+//            if (
+//                playingNowFragmentViewModel.getSortBy().value != genericListenDataViewModel.getSortBy().value ||
+//                playingNowFragmentViewModel.getIsInverted().value != genericListenDataViewModel.getIsInverted().value ||
+//                playingNowFragmentViewModel.getQueueListSource().value != loadFromSource ||
+//                playingNowFragmentViewModel.getQueueListSourceColumnIndex().value != loadFromSourceColumnIndex ||
+//                playingNowFragmentViewModel.getQueueListSourceColumnValue().value != loadFromSourceColumnValue
+//            ) {
+//                playingNowFragmentViewModel.setSortBy(
+//                    genericListenDataViewModel.getSortBy().value ?: ""
+//                )
+//                playingNowFragmentViewModel.setIsInverted(
+//                    genericListenDataViewModel.getIsInverted().value ?: false
+//                )
+//                playingNowFragmentViewModel.setQueueListSource(loadFromSource)
+//                playingNowFragmentViewModel.setQueueListSourceColumnIndex(loadFromSourceColumnIndex)
+//                playingNowFragmentViewModel.setQueueListSourceColumnValue(loadFromSourceColumnValue)
+//
+//                playingNowFragmentViewModel.setUpdatePlaylistCounter()
+//            }
+//            playingNowFragmentViewModel.setIsPlaying(true)
+//            playingNowFragmentViewModel.setPlayingProgressValue(0)
+//            playingNowFragmentViewModel.setRepeat(
+//                repeat ?: playingNowFragmentViewModel.getRepeat().value
+//            )
+//            playingNowFragmentViewModel.setShuffle(
+//                shuffle ?: playingNowFragmentViewModel.getShuffle().value
+//            )
+//            playingNowFragmentViewModel.setCurrentPlayingSong(
+//                getCurrentPlayingSongFromPosition(
+//                    genericListGridItemAdapter,
+//                    position
+//                )
+//            )
             return true
         }
 

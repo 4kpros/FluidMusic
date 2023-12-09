@@ -13,7 +13,7 @@ class ExploreContentsForFragmentViewModel(
         whereColumnIndex: String,
         columnValue: String?
     ){
-        dataList.value = viewModel.getAllDirectlyWhereEqual(
+        itemsList.value = viewModel.getAllDirectlyWhereEqual(
             whereColumnIndex,
             columnValue,
             sortBy.value?.ifEmpty { SongItem.DEFAULT_INDEX } ?: SongItem.DEFAULT_INDEX

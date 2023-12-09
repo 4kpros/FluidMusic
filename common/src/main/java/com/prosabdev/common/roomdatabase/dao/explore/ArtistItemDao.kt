@@ -8,7 +8,7 @@ import com.prosabdev.common.models.view.ArtistItem
 @Dao
 interface ArtistItemDao {
     @Query("SELECT * FROM ArtistItem WHERE name = :name LIMIT 1")
-    fun getAtName(name : String?): ArtistItem?
+    fun getAtName(name : String): ArtistItem?
 
     @Query(
         "SELECT * FROM ArtistItem " +
@@ -25,7 +25,7 @@ interface ArtistItemDao {
                 "COALESCE(NULLIF(ArtistItem.name,''), 'Unknown field')," +
                 "ArtistItem.lastAddedDateToLibrary DESC"
     )
-    fun getAll(orderBy: String?): LiveData<List<ArtistItem>>?
+    fun getAll(orderBy: String): LiveData<List<ArtistItem>>?
 
     @Query(
         "SELECT * FROM ArtistItem " +
@@ -42,5 +42,5 @@ interface ArtistItemDao {
                 "COALESCE(NULLIF(ArtistItem.name,''), 'Unknown field')," +
                 "ArtistItem.lastAddedDateToLibrary DESC"
     )
-    fun getAllDirectly(orderBy: String?): List<ArtistItem>?
+    fun getAllDirectly(orderBy: String): List<ArtistItem>?
 }

@@ -11,17 +11,17 @@ class SongItemRepository(ctx : Context) {
 
     private var mDao: SongItemDao? = AppDatabase.getDatabase(ctx).songItemDao()
 
-    suspend fun insert(songItem: SongItem?) : Long? {
+    suspend fun insert(songItem: SongItem) : Long? {
         return withContext(Dispatchers.IO){
             mDao?.insert(songItem)
         }
     }
-    suspend fun update(songItem: SongItem?): Int? {
+    suspend fun update(songItem: SongItem): Int? {
         return withContext(Dispatchers.IO){
             mDao?.update(songItem)
         }
     }
-    suspend fun delete(songItem: SongItem?): Int? {
+    suspend fun delete(songItem: SongItem): Int? {
         return withContext(Dispatchers.IO){
             mDao?.delete(songItem)
         }
@@ -42,27 +42,27 @@ class SongItemRepository(ctx : Context) {
             mDao?.getAtId(id)
         }
     }
-    suspend fun getAtUri(uri: String?) : SongItem? {
+    suspend fun getAtUri(uri: String) : SongItem? {
         return withContext(Dispatchers.IO){
             mDao?.getAtUri(uri)
         }
     }
-    suspend fun getAllDirectlyLimit(orderBy: String?, limit: Int) : List<SongItem>? {
+    suspend fun getAllDirectlyLimit(orderBy: String, limit: Int) : List<SongItem>? {
         return withContext(Dispatchers.IO){
             mDao?.getAllDirectlyLimit(orderBy, limit)
         }
     }
-    suspend fun getAllDirectly(orderBy: String?) : List<SongItem>? {
+    suspend fun getAllDirectly(orderBy: String) : List<SongItem>? {
         return withContext(Dispatchers.IO){
             mDao?.getAllDirectly(orderBy)
         }
     }
-    suspend fun getAllDirectlyWhereEqual(whereColumn: String?, columnValue: String?, orderBy: String?) : List<SongItem>? {
+    suspend fun getAllDirectlyWhereEqual(whereColumn: String, columnValue: String, orderBy: String) : List<SongItem>? {
         return withContext(Dispatchers.IO){
             mDao?.getAllDirectlyWhereEqual(whereColumn, columnValue, orderBy)
         }
     }
-    suspend fun getAllDirectlyWhereLike(whereColumn: String?, columnValue: String?, orderBy: String?) : List<SongItem>? {
+    suspend fun getAllDirectlyWhereLike(whereColumn: String, columnValue: String, orderBy: String) : List<SongItem>? {
         return withContext(Dispatchers.IO){
             mDao?.getAllDirectlyWhereLike(whereColumn, columnValue, orderBy)
         }

@@ -7,19 +7,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.MediaItem
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.prosabdev.common.models.songitem.SongItem
+import com.prosabdev.common.utils.FormattersAndParsers
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetDialogSongInfoBinding
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 
 class SongInfoFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFragment() {
 
-    private lateinit var mDataBiding: BottomSheetDialogSongInfoBinding
+    //Data binding
+    private lateinit var mDataBinding: BottomSheetDialogSongInfoBinding
 
-    private var mSongItem : SongItem? = null
+    //Variables
+    private var mMediaItem : MediaItem? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,13 +30,13 @@ class SongInfoFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFragme
         savedInstanceState: Bundle?
     ): View {
 
-        //Set content with data biding util
-        mDataBiding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_dialog_song_info, container, false)
-        val view = mDataBiding.root
+        //Inflate binding layout and return binding object
+        mDataBinding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_dialog_song_info, container, false)
+        val view = mDataBinding.root
 
         //Load your UI content
         initViews()
-        showSongDetailsUI(mSongItem)
+        showSongDetailsUI(mMediaItem)
 
         return view
     }
@@ -46,46 +49,46 @@ class SongInfoFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFragme
         }
     }
 
-    private fun showSongDetailsUI(songItem: com.prosabdev.common.models.songitem.SongItem?) {
-        if(songItem == null) return
-        MainScope().launch {
+    private fun showSongDetailsUI(mediaItem: MediaItem?) {
+        if(mediaItem == null) return
+        lifecycleScope.launch {
             val ctx : Context = this@SongInfoFullBottomSheetDialogFragment.context ?: return@launch
 
-            mDataBiding.textSongFilePath.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(songItem.uriPath)
+            mDataBinding.textSongFilePath.text = FormattersAndParsers.getUnderLinedWord(mediaItem.mediaMetadata.extras?.getString("uriPath"))
 
             //MP3, 44100Hz, 320kbps
-            mDataBiding.textSongDetails.text = ctx.getString(
+            mDataBinding.textSongDetails.text = ctx.getString(
                 R.string._song_details_tags,
-                songItem.fileExtension ?: "",
-                (songItem.sampleRate/1000.0f),
-                (songItem.bitrate/1000.0f)
+                mediaItem.mediaMetadata.extras?.getString("fileExtension") ?: "",
+                (mediaItem.mediaMetadata.extras?.getLong("sampleRate") ?: 0) / 1000f,
+                (mediaItem.mediaMetadata.extras?.getLong("bitrate") ?: 0) / 1000f
             )
             //3:27min = 207sec
-            mDataBiding.textSongDuration.text = ctx.getString(
+            mDataBinding.textSongDuration.text = ctx.getString(
                 R.string._song_duration_tags,
-                com.prosabdev.common.utils.FormattersAndParsers.formatSongDurationToString(songItem.duration),
-                songItem.duration/1000
+                FormattersAndParsers.formatSongDurationToString(mediaItem.mediaMetadata.extras?.getLong("duration") ?: 0),
+                (mediaItem.mediaMetadata.extras?.getLong("duration") ?: 0) / 1000f
             )
             //3.5mb = 3730kb
-            val fileSizeInKB: Long = songItem.size / 1024
-            val fileSizeInMB = fileSizeInKB / 1024.0f
-            mDataBiding.textSongSize.text = ctx.getString(
+            val fileSizeInKB: Long = (mediaItem.mediaMetadata.extras?.getLong("size") ?: 0) / 1024
+            val fileSizeInMB = fileSizeInKB / 1024f
+            mDataBinding.textSongSize.text = ctx.getString(
                 R.string._song_size_tags,
                 fileSizeInMB,
                 fileSizeInKB
             )
 
-            mDataBiding.textSongTrack.text = songItem.cdTrackNumber
-            mDataBiding.textSongDisc.text = songItem.diskNumber
-            mDataBiding.textSongYear.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(songItem.year)
+            mDataBinding.textSongTrack.text = mediaItem.mediaMetadata.extras?.getInt("cdTrackNumber").toString()
+            mDataBinding.textSongDisc.text = mediaItem.mediaMetadata.extras?.getInt("diskNumber").toString()
+            mDataBinding.textSongYear.text = FormattersAndParsers.getUnderLinedWord(mediaItem.mediaMetadata.recordingYear.toString())
 
-            mDataBiding.textSongFileName.text = songItem.fileName
-            mDataBiding.textSongTitle.text = songItem.title
-            mDataBiding.textSongArtist.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(songItem.artist)
-            mDataBiding.textSongAlbum.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(songItem.album)
-            mDataBiding.textSongAlbumArtist.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(songItem.albumArtist)
-            mDataBiding.textSongGenre.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(songItem.genre)
-            mDataBiding.textSongComposer.text = com.prosabdev.common.utils.FormattersAndParsers.getUnderLinedWord(songItem.composer)
+            mDataBinding.textSongFileName.text = mediaItem.mediaMetadata.extras?.getString("fileName")
+            mDataBinding.textSongTitle.text = mediaItem.mediaMetadata.title
+            mDataBinding.textSongArtist.text = FormattersAndParsers.getUnderLinedWord(mediaItem.mediaMetadata.artist)
+            mDataBinding.textSongAlbum.text = FormattersAndParsers.getUnderLinedWord(mediaItem.mediaMetadata.albumTitle)
+            mDataBinding.textSongAlbumArtist.text = FormattersAndParsers.getUnderLinedWord(mediaItem.mediaMetadata.albumArtist)
+            mDataBinding.textSongGenre.text = FormattersAndParsers.getUnderLinedWord(mediaItem.mediaMetadata.genre)
+            mDataBinding.textSongComposer.text = FormattersAndParsers.getUnderLinedWord(mediaItem.mediaMetadata.composer)
         }
     }
 
@@ -96,9 +99,9 @@ class SongInfoFullBottomSheetDialogFragment : GenericFullBottomSheetDialogFragme
         const val TAG = "SongInfoFullBottomSheetDialogFragment"
 
         @JvmStatic
-        fun newInstance(songItem: com.prosabdev.common.models.songitem.SongItem?) =
+        fun newInstance(mediaItem: MediaItem?) =
             SongInfoFullBottomSheetDialogFragment().apply {
-                mSongItem = songItem
+                mMediaItem = mediaItem
             }
     }
 }

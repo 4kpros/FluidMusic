@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetSortSongsBinding
+import com.prosabdev.fluidmusic.databinding.FragmentYearsBinding
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentForFragment
 import com.prosabdev.fluidmusic.ui.fragments.PlaylistsFragment
 import com.prosabdev.fluidmusic.ui.fragments.StreamsFragment
@@ -23,8 +24,10 @@ import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 
 class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
-    private lateinit var mDataBiding: BottomSheetSortSongsBinding
+    //Data binding
+    private lateinit var mDataBinding: BottomSheetSortSongsBinding
 
+    //View models
     private var mGenericListenDataViewModel: GenericListenDataViewModel? = null
 
     private var mFromSource: String? = null
@@ -36,9 +39,9 @@ class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        //Set content with data biding util
-        mDataBiding = DataBindingUtil.inflate(inflater, R.layout._bottom_sheet_sort_songs, container, false)
-        val view = mDataBiding.root
+        //Inflate binding layout and return binding object
+        mDataBinding = DataBindingUtil.inflate(inflater, R.layout._bottom_sheet_sort_songs, container, false)
+        val view = mDataBinding.root
 
         //Load your UI content
         initViews()
@@ -48,7 +51,7 @@ class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun checkInteractions() {
-        mDataBiding.let {
+        mDataBinding.let {
             it.radioGroupSort.setOnCheckedChangeListener { _, checkedId ->
                 onRadioGroupStateChanged(
                     checkedId
@@ -154,7 +157,7 @@ class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private fun updateTitleUI() {
         when (mFromSource) {
             AllSongsFragment.TAG -> {
-                mDataBiding.textSortDetails.text = context?.resources?.getString(
+                mDataBinding.textSortDetails.text = context?.resources?.getString(
                     R.string._sort_for,
                     context?.resources?.getString(R.string.all_songs) ?: ""
                 ) ?: ""
@@ -162,61 +165,61 @@ class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
             ExploreContentForFragment.TAG -> {
                 when (mFromSourceValue) {
                     AlbumsFragment.TAG -> {
-                        mDataBiding.textSortDetails.text = context?.resources?.getString(
+                        mDataBinding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_album) ?: ""
                         ) ?: ""
                     }
                     AlbumArtistsFragment.TAG -> {
-                        mDataBiding.textSortDetails.text = context?.resources?.getString(
+                        mDataBinding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_album_artist) ?: ""
                         ) ?: ""
                     }
                     ArtistsFragment.TAG -> {
-                        mDataBiding.textSortDetails.text = context?.resources?.getString(
+                        mDataBinding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_artist) ?: ""
                         ) ?: ""
                     }
                     ComposersFragment.TAG -> {
-                        mDataBiding.textSortDetails.text = context?.resources?.getString(
+                        mDataBinding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_composer) ?: ""
                         ) ?: ""
                     }
                     FoldersFragment.TAG -> {
-                        mDataBiding.textSortDetails.text = context?.resources?.getString(
+                        mDataBinding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_folder) ?: ""
                         ) ?: ""
                     }
                     GenresFragment.TAG -> {
-                        mDataBiding.textSortDetails.text = context?.resources?.getString(
+                        mDataBinding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_genre) ?: ""
                         ) ?: ""
                     }
                     YearsFragment.TAG -> {
-                        mDataBiding.textSortDetails.text = context?.resources?.getString(
+                        mDataBinding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_year) ?: ""
                         ) ?: ""
                     }
                     PlaylistsFragment.TAG -> {
-                        mDataBiding.textSortDetails.text = context?.resources?.getString(
+                        mDataBinding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_playlist) ?: ""
                         ) ?: ""
                     }
 //                    FavoritesFragment.TAG -> {
-//                        mDataBiding.textSortDetails.text = context?.resources?.getString(
+//                        mDataBinding.textSortDetails.text = context?.resources?.getString(
 //                            R.string._sort_for,
 //                            context?.resources?.getString(R.string.songs_for_favorites) ?: ""
 //                        ) ?: ""
 //                    }
                     StreamsFragment.TAG -> {
-                        mDataBiding.textSortDetails.text = context?.resources?.getString(
+                        mDataBinding.textSortDetails.text = context?.resources?.getString(
                             R.string._sort_for,
                             context?.resources?.getString(R.string.songs_for_stream) ?: ""
                         ) ?: ""
@@ -227,13 +230,13 @@ class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun updateDefaultCheckboxInvertButtonUI() {
-        mDataBiding.checkboxInvertItems.isChecked =
+        mDataBinding.checkboxInvertItems.isChecked =
             mGenericListenDataViewModel?.isInverted?.value ?: false
     }
 
     private fun updateDefaultCheckedRadioButtonUI() {
         if (mGenericListenDataViewModel == null) return
-        mDataBiding.let {
+        mDataBinding.let {
             val tempFilter = mGenericListenDataViewModel?.sortBy?.value ?: return
             when (tempFilter) {
                 "title" -> {

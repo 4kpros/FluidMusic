@@ -17,7 +17,7 @@ import com.prosabdev.common.utils.FormattersAndParsers
     foreignKeys = [
         ForeignKey(entity = FolderUriTree::class, parentColumns = ["id"], childColumns = ["uriTreeId"], onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE)
     ],
-    indices = [Index(value = ["uri"], unique = true)]
+    indices = [Index(value = ["uri"], unique = true), Index(value = ["uriTreeId"])]
 )
 data class SongItem (
     @PrimaryKey(autoGenerate = true)

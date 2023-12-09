@@ -39,7 +39,12 @@ class AddSongsToPlaylistWorker(
                         whereColumn
                     )
                 //Insert to database
-                val indexList = AppDatabase.getDatabase(applicationContext).playlistSongItemDao().insertMultiple(playlistItemList)
+                var indexList = listOf<Long>()
+                try {
+                    indexList = AppDatabase.getDatabase(applicationContext).playlistSongItemDao().insertMultiple(playlistItemList!!)
+                }catch (error: Throwable) {
+                    error.printStackTrace()
+                }
 
                 Log.i(TAG, "Worker $TAG ended")
 

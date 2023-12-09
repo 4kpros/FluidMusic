@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
+import androidx.media3.common.MediaItem
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.l4digital.fastscroll.FastScroller
@@ -13,16 +15,25 @@ import com.prosabdev.fluidmusic.adapters.GridSpacingItemDecoration
 import com.prosabdev.fluidmusic.adapters.QueueMusicItemListAdapter
 import com.prosabdev.fluidmusic.databinding.BottomSheetQueueMusicBinding
 import com.prosabdev.fluidmusic.ui.fragments.communication.FragmentsCommunication
+import com.prosabdev.fluidmusic.utils.InjectorUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayingNowFragmentViewModel
+import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaControllerViewModel
+import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaPlayerDataViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
 
-    private lateinit var mDataBiding: BottomSheetQueueMusicBinding
+    //Data binding
+    private lateinit var mDataBinding: BottomSheetQueueMusicBinding
 
-    private var mPlayingNowFragmentViewModel: PlayingNowFragmentViewModel? = null
+    //View models
+    private val mMediaPlayerDataViewModel: MediaPlayerDataViewModel by activityViewModels()
+    private val mMediaControllerViewModel by activityViewModels<MediaControllerViewModel> {
+        InjectorUtils.provideMediaControllerViewModel(mMediaPlayerDataViewModel.mediaEventsListener)
+    }
 
+    //Variables
     private var mQueueMusicItemAdapter :QueueMusicItemListAdapter? = null
     private var mLayoutManager: GridLayoutManager? = null
     private var mItemDecoration: GridSpacingItemDecoration? = null
@@ -35,53 +46,44 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        //Set content with data biding util
-        mDataBiding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_queue_music, container, false)
-        val view = mDataBiding.root
+        //Inflate binding layout and return binding object
+        mDataBinding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_queue_music, container, false)
+        val view = mDataBinding.root
 
         //Load your UI content
         initViews()
         setupRecyclerView()
+        checkInteractions()
+        observeLiveData()
 
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        checkInteractions()
-        observeLiveData()
-    }
-
     private fun observeLiveData() {
-        mPlayingNowFragmentViewModel?.let { playerFragmentViewModel ->
-            playerFragmentViewModel.getCurrentPlayingSong().observe(viewLifecycleOwner) {
-                updatePlayingSongUI(it)
-            }
-            playerFragmentViewModel.getIsPlaying().observe(viewLifecycleOwner) {
-                updatePlaybackStateUI(it)
-            }
+        //Listen to player changes
+        mMediaPlayerDataViewModel.currentMediaItemIndex.observe(viewLifecycleOwner) {
+            updateUICurrentMediaItemIndex(it)
+        }
+        mMediaPlayerDataViewModel.isPlaying.observe(viewLifecycleOwner) {
+            updateUIIsPlaying(it)
         }
     }
-    private fun updatePlayingSongUI(songItem: com.prosabdev.common.models.songitem.SongItem?) {
-        val songPosition: Int = songItem?.position ?: -1
-        if((mQueueMusicItemAdapter?.getPlayingPosition() ?: -1) != songPosition)
-            mQueueMusicItemAdapter?.setPlayingPosition(songPosition)
+    private fun updateUICurrentMediaItemIndex(position: Int) {
+        if((mQueueMusicItemAdapter?.getPlayingPosition() ?: -1) != position)
+            mQueueMusicItemAdapter?.setPlayingPosition(position)
     }
 
-    private fun updatePlaybackStateUI(isPlaying: Boolean) {
+    private fun updateUIIsPlaying(isPlaying: Boolean) {
         if(mQueueMusicItemAdapter?.getIsPlaying() != isPlaying)
             mQueueMusicItemAdapter?.setIsPlaying(isPlaying)
     }
 
     private fun checkInteractions() {
-        mDataBiding?.let { bottomSheetQueueMusicBinding ->
-            bottomSheetQueueMusicBinding.buttonClearQueueMusic.setOnClickListener{
-                clearQueueMusicList()
-            }
-            bottomSheetQueueMusicBinding.buttonAddToPlaylist.setOnClickListener{
-                addAllQueueMusicToPlaylist()
-            }
+        mDataBinding.buttonClearQueueMusic.setOnClickListener{
+            clearQueueMusicList()
+        }
+        mDataBinding.buttonAddToPlaylist.setOnClickListener{
+            addAllQueueMusicToPlaylist()
         }
     }
 
@@ -97,56 +99,49 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
 
     private fun setupRecyclerView() {
         context?.let { ctx ->
-            mDataBiding?.let { bottomSheetQueueMusicBinding ->
-                mQueueMusicItemAdapter = QueueMusicItemListAdapter(
-                    ctx,
-                    object : QueueMusicItemListAdapter.OnItemClickListener {
-                        override fun onSongItemClicked(position: Int) {
-                            onPlaySongAtPosition(position)
-                        }
-                    },
-                    object : QueueMusicItemListAdapter.OnTouchListener {
-                        override fun onItemMovedTo(position: Int) {
-                            //
-                        }
-                        override fun requestDrag(viewHolder: RecyclerView.ViewHolder?) {
-                            //
-                        }
+            mQueueMusicItemAdapter = QueueMusicItemListAdapter(
+                ctx,
+                object : QueueMusicItemListAdapter.OnItemClickListener {
+                    override fun onSongItemClicked(position: Int) {
+                        onPlaySongAtPosition(position)
                     }
-                )
-                //Add Layout manager
-                mLayoutManager = GridLayoutManager(ctx, 1, GridLayoutManager.VERTICAL, false)
-                bottomSheetQueueMusicBinding.recyclerView.adapter = mQueueMusicItemAdapter
-                bottomSheetQueueMusicBinding.recyclerView.layoutManager = mLayoutManager
-                mQueueMusicItemAdapter?.submitList(mSongList)
-                //
-                mQueueMusicItemAdapter?.setIsPlaying(mPlayingNowFragmentViewModel?.getIsPlaying()?.value ?: false)
-                mQueueMusicItemAdapter?.setPlayingPosition(mPlayingNowFragmentViewModel?.getCurrentPlayingSong()?.value?.position ?: -1)
-                mPlayingNowFragmentViewModel?.let { playerFragmentViewModel ->
-                    val tempCurrentSong: com.prosabdev.common.models.songitem.SongItem =
-                        playerFragmentViewModel.getCurrentPlayingSong().value
-                            ?: return
-                    mLayoutManager?.scrollToPosition(tempCurrentSong.position)
-                }
-                val spanCount = 1
-                mItemDecoration = GridSpacingItemDecoration(spanCount)
-                MainScope().launch {
-                    mItemDecoration?.let {
-                        bottomSheetQueueMusicBinding.recyclerView.addItemDecoration(it)
+                },
+                object : QueueMusicItemListAdapter.OnTouchListener {
+                    override fun onItemMovedTo(position: Int) {
+                        //
                     }
-                    bottomSheetQueueMusicBinding.fastScroller.attachRecyclerView(bottomSheetQueueMusicBinding.recyclerView)
-                    bottomSheetQueueMusicBinding.fastScroller.setFastScrollListener(object :
-                        FastScroller.FastScrollListener {
-                        override fun onFastScrollStart(fastScroller: FastScroller) {
-                            println("FAST SCROLLING STARTED")
-                        }
-
-                        override fun onFastScrollStop(fastScroller: FastScroller) {
-                            println("FAST SCROLLING STOPPED")
-                        }
-
-                    })
+                    override fun requestDrag(viewHolder: RecyclerView.ViewHolder?) {
+                        //
+                    }
                 }
+            )
+            //Add Layout manager
+            mLayoutManager = GridLayoutManager(ctx, 1, GridLayoutManager.VERTICAL, false)
+            mDataBinding.recyclerView.adapter = mQueueMusicItemAdapter
+            mDataBinding.recyclerView.layoutManager = mLayoutManager
+            mQueueMusicItemAdapter?.submitList(mSongList)
+            //
+            mQueueMusicItemAdapter?.setIsPlaying(mMediaPlayerDataViewModel.isPlaying.value ?: false)
+            mQueueMusicItemAdapter?.setPlayingPosition(mMediaPlayerDataViewModel.currentMediaItemIndex.value ?: -1)
+            mLayoutManager?.scrollToPosition(mMediaPlayerDataViewModel.currentMediaItemIndex.value ?: -1)
+            val spanCount = 1
+            mItemDecoration = GridSpacingItemDecoration(spanCount)
+            MainScope().launch {
+                mItemDecoration?.let {
+                    mDataBinding.recyclerView.addItemDecoration(it)
+                }
+                mDataBinding.fastScroller.attachRecyclerView(mDataBinding.recyclerView)
+                mDataBinding.fastScroller.setFastScrollListener(object :
+                    FastScroller.FastScrollListener {
+                    override fun onFastScrollStart(fastScroller: FastScroller) {
+                        println("FAST SCROLLING STARTED")
+                    }
+
+                    override fun onFastScrollStop(fastScroller: FastScroller) {
+                        println("FAST SCROLLING STOPPED")
+                    }
+
+                })
             }
         }
     }
@@ -154,10 +149,10 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
     private fun onPlaySongAtPosition(position: Int) {
         val tempSongItem: com.prosabdev.common.models.songitem.SongItem = mQueueMusicItemAdapter?.currentList?.get(position) as com.prosabdev.common.models.songitem.SongItem? ?: return
         tempSongItem.position = position
-        FragmentsCommunication.playSongAtPositionFromQueueMusic(
-            mPlayingNowFragmentViewModel,
-            tempSongItem
-        )
+//        FragmentsCommunication.playSongAtPositionFromQueueMusic(
+//            mMediaPlayerDataViewModel,
+//            tempSongItem
+//        )
     }
 
     private fun initViews() {
@@ -167,9 +162,9 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
     fun updatePlayerFragmentViewModel(
         playingNowFragmentViewModel: PlayingNowFragmentViewModel
     ){
-        if(mPlayingNowFragmentViewModel == null){
-            mPlayingNowFragmentViewModel = playingNowFragmentViewModel
-        }
+//        if(mMediaPlayerDataViewModel == null){
+//            mMediaPlayerDataViewModel = playingNowFragmentViewModel
+//        }
     }
     fun updateQueueMusicList(
         songList: List<com.prosabdev.common.models.songitem.SongItem>?

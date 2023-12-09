@@ -7,6 +7,6 @@ import com.prosabdev.fluidmusic.viewmodels.models.explore.FolderItemViewModel
 
 class FoldersFragmentViewModel(app: Application) : GenericListenDataViewModel(app) {
     suspend fun requestDataDirectlyFromDatabase(viewModel: FolderItemViewModel){
-        dataList.value = viewModel.getAllDirectly(sortBy.value?.ifEmpty { FolderItem.DEFAULT_INDEX } ?: FolderItem.DEFAULT_INDEX)
+        itemsList.value = viewModel.getAllDirectly(sortBy.value?.ifEmpty { FolderItem.DEFAULT_INDEX } ?: FolderItem.DEFAULT_INDEX)
     }
 }

@@ -8,7 +8,7 @@ import com.prosabdev.common.models.view.YearItem
 @Dao
 interface YearItemDao {
     @Query("SELECT * FROM YearItem WHERE name = :name LIMIT 1")
-    fun getAtName(name : String?): YearItem?
+    fun getAtName(name : String): YearItem?
 
     @Query(
         "SELECT * FROM YearItem " +
@@ -25,7 +25,7 @@ interface YearItemDao {
                 "COALESCE(NULLIF(YearItem.name,''), 'Unknown field')," +
                 "YearItem.lastAddedDateToLibrary DESC"
     )
-    fun getAll(orderBy: String?): LiveData<List<YearItem>>?
+    fun getAll(orderBy: String): LiveData<List<YearItem>>?
 
     @Query(
         "SELECT * FROM YearItem " +
@@ -42,5 +42,5 @@ interface YearItemDao {
                 "COALESCE(NULLIF(YearItem.name,''), 'Unknown field')," +
                 "YearItem.lastAddedDateToLibrary DESC"
     )
-    fun getAllDirectly(orderBy: String?): List<YearItem>?
+    fun getAllDirectly(orderBy: String): List<YearItem>?
 }

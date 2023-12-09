@@ -12,10 +12,10 @@ data class FolderUriTree (
     var id: Long = 0,
     var uriTree: String = "",
     var path: String = "",
-    var pathTree: String? = "",
-    var lastPathSegment: String? = "",
-    var normalizeScheme: String? = "",
-    var deviceName: String? = "",
+    var pathTree: String = "",
+    var lastPathSegment: String = "",
+    var normalizeScheme: String = "",
+    var deviceName: String = "",
 
     var lastModified: Long = 0
 ){

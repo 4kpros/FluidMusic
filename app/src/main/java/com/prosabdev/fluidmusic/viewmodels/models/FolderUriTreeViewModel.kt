@@ -11,13 +11,13 @@ class FolderUriTreeViewModel(app: Application) : AndroidViewModel(app) {
     private var mRepository: FolderUriTreeRepository? = FolderUriTreeRepository(app)
 
     suspend fun insert(folderUriTree: FolderUriTree?) : Long? {
-        return mRepository?.insert(folderUriTree)
+        return mRepository?.insert(folderUriTree ?: return null)
     }
     suspend fun update(folderUriTree: FolderUriTree?) {
-        mRepository?.update(folderUriTree)
+        mRepository?.update(folderUriTree ?: return)
     }
     suspend fun delete(folderUriTree: FolderUriTree?) {
-        mRepository?.delete(folderUriTree)
+        mRepository?.delete(folderUriTree ?: return)
     }
     suspend fun deleteAll() {
         mRepository?.deleteAll()

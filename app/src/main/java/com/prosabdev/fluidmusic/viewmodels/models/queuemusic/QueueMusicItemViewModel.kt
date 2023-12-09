@@ -11,13 +11,13 @@ class QueueMusicItemViewModel(app: Application) : AndroidViewModel(app) {
     private var mRepository: QueueMusicItemRepository? = QueueMusicItemRepository(app)
 
     suspend fun insert(queueMusicItem: QueueMusicItem?) : Long? {
-        return mRepository?.insert(queueMusicItem)
+        return mRepository?.insert(queueMusicItem ?: return null)
     }
     suspend fun update(queueMusicItem: QueueMusicItem?) {
-        mRepository?.update(queueMusicItem)
+        mRepository?.update(queueMusicItem ?: return)
     }
     suspend fun delete(queueMusicItem: QueueMusicItem?) {
-        mRepository?.delete(queueMusicItem)
+        mRepository?.delete(queueMusicItem ?: return)
     }
     suspend fun deleteAll() {
         mRepository?.deleteAll()

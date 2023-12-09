@@ -12,17 +12,17 @@ class ComposerItemRepository(ctx : Context) {
 
     private var mDao: ComposerItemDao? = AppDatabase.getDatabase(ctx).composerItemDao()
 
-    suspend fun getAtName(name : String?) : ComposerItem? {
+    suspend fun getAtName(name : String) : ComposerItem? {
         return withContext(Dispatchers.IO){
             mDao?.getAtName(name)
         }
     }
-    suspend fun getAll(orderBy: String?) : LiveData<List<ComposerItem>>? {
+    suspend fun getAll(orderBy: String) : LiveData<List<ComposerItem>>? {
         return withContext(Dispatchers.IO){
             mDao?.getAll(orderBy)
         }
     }
-    suspend fun getAllDirectly(orderBy: String?) : List<ComposerItem>? {
+    suspend fun getAllDirectly(orderBy: String) : List<ComposerItem>? {
         return withContext(Dispatchers.IO){
             mDao?.getAllDirectly(orderBy)
         }
