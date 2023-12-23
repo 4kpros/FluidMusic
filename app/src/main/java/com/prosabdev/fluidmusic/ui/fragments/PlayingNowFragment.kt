@@ -1,7 +1,6 @@
 package com.prosabdev.fluidmusic.ui.fragments
 
 import android.content.Intent
-import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -23,7 +22,11 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.slider.Slider
 import com.google.android.material.slider.Slider.OnSliderTouchListener
 import com.prosabdev.common.models.songitem.SongItem
-import com.prosabdev.common.utils.*
+import com.prosabdev.common.utils.Animators
+import com.prosabdev.common.utils.FormattersAndParsers
+import com.prosabdev.common.utils.ImageLoaders
+import com.prosabdev.common.utils.InsetModifiers
+import com.prosabdev.common.utils.MathComputations
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.PlayingNowPageAdapter
 import com.prosabdev.fluidmusic.databinding.FragmentPlayingNowBinding
@@ -31,14 +34,11 @@ import com.prosabdev.fluidmusic.ui.activities.EqualizerActivity
 import com.prosabdev.fluidmusic.ui.activities.settings.MediaScannerSettingsActivity
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.PlayerMoreFullBottomSheetDialog
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.QueueMusicBottomSheetDialog
-import com.prosabdev.fluidmusic.ui.fragments.explore.*
 import com.prosabdev.fluidmusic.utils.InjectorUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayingNowFragmentViewModel
-import com.prosabdev.fluidmusic.viewmodels.fragments.explore.*
 import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaControllerViewModel
 import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaPlayerDataViewModel
-import com.prosabdev.fluidmusic.viewmodels.models.explore.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 

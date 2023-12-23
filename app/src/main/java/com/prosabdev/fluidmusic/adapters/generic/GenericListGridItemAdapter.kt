@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.textview.MaterialTextView
 import com.l4digital.fastscroll.FastScroller
-import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.components.Constants
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ItemGenericListGridBinding
 import com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
@@ -29,7 +29,7 @@ class GenericListGridItemAdapter (
     private val mOnItemClickListener: OnItemClickListener,
     private val mOnSelectSelectableItemListener: OnSelectSelectableItemListener,
     diffCallback: DiffUtil.ItemCallback<Any>,
-    private var mOrganizeListGrid: Int = MainConst.ORGANIZE_GRID_MEDIUM,
+    private var mOrganizeListGrid: Int = Constants.ORGANIZE_GRID_MEDIUM,
     private var mIsSelectable: Boolean = true,
     private var mHavePlaybackState: Boolean = false,
     private var mIsImageFullCircle: Boolean = false,
@@ -149,19 +149,19 @@ class GenericListGridItemAdapter (
             for (payload in payloads) {
                 when (payload) {
                     PAYLOAD_IS_ORGANIZE_LIST_GRID -> {
-                        Log.i(MainConst.TAG, "PAYLOAD_IS_ORGANIZE_LIST_GRID")
+                        Log.i(Constants.TAG, "PAYLOAD_IS_ORGANIZE_LIST_GRID")
                         holder.updateOrganizeListGridMotion(mContext, mOrganizeListGrid, mIsImageFullCircle)
                     }
                     PAYLOAD_IS_COVERT_ART_TEXT -> {
-                        Log.i(MainConst.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
+                        Log.i(Constants.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
                         holder.updateTextAndImageViewUI(mContext, getItem(position), mOrganizeListGrid, mIsImageFullCircle)
                     }
                     PAYLOAD_IS_SELECTED -> {
-                        Log.i(MainConst.TAG, "PAYLOAD_IS_SELECTED")
+                        Log.i(Constants.TAG, "PAYLOAD_IS_SELECTED")
                         holder.updateWithAnimationSelectedStateUI(selectableIsSelected(position), mIsSelectable)
                     }
                     PAYLOAD_PLAYBACK_STATE -> {
-                        Log.i(MainConst.TAG, "PAYLOAD_PLAYBACK_STATE")
+                        Log.i(Constants.TAG, "PAYLOAD_PLAYBACK_STATE")
                         holder.updateIsPlayingStateUI(getPlayingPosition(), mHavePlaybackState, mOrganizeListGrid, true)
                     }
                     else -> {
@@ -223,22 +223,22 @@ class GenericListGridItemAdapter (
             val layoutParamsLinearTextContainer : LayoutParams = mDataBinding.linearTextContainer.layoutParams as LayoutParams
             val layoutParamsLinearCardViewClickable : LayoutParams = mDataBinding.cardViewClickable.layoutParams as LayoutParams
             if(
-                organizeListGrid == MainConst.ORGANIZE_LIST_SMALL_NO_IMAGE ||
-                organizeListGrid == MainConst.ORGANIZE_LIST_MEDIUM_NO_IMAGE ||
-                organizeListGrid == MainConst.ORGANIZE_LIST_LARGE_NO_IMAGE ||
-                organizeListGrid == MainConst.ORGANIZE_GRID_SMALL_NO_IMAGE ||
-                organizeListGrid == MainConst.ORGANIZE_GRID_MEDIUM_NO_IMAGE ||
+                organizeListGrid == Constants.ORGANIZE_LIST_SMALL_NO_IMAGE ||
+                organizeListGrid == Constants.ORGANIZE_LIST_MEDIUM_NO_IMAGE ||
+                organizeListGrid == Constants.ORGANIZE_LIST_LARGE_NO_IMAGE ||
+                organizeListGrid == Constants.ORGANIZE_GRID_SMALL_NO_IMAGE ||
+                organizeListGrid == Constants.ORGANIZE_GRID_MEDIUM_NO_IMAGE ||
 
-                organizeListGrid == MainConst.ORGANIZE_LIST_EXTRA_SMALL ||
-                organizeListGrid == MainConst.ORGANIZE_LIST_SMALL ||
-                organizeListGrid == MainConst.ORGANIZE_LIST_MEDIUM ||
-                organizeListGrid == MainConst.ORGANIZE_LIST_LARGE
+                organizeListGrid == Constants.ORGANIZE_LIST_EXTRA_SMALL ||
+                organizeListGrid == Constants.ORGANIZE_LIST_SMALL ||
+                organizeListGrid == Constants.ORGANIZE_LIST_MEDIUM ||
+                organizeListGrid == Constants.ORGANIZE_LIST_LARGE
             ){
                 if(
-                    organizeListGrid == MainConst.ORGANIZE_LIST_EXTRA_SMALL ||
-                    organizeListGrid == MainConst.ORGANIZE_LIST_SMALL ||
-                    organizeListGrid == MainConst.ORGANIZE_LIST_MEDIUM ||
-                    organizeListGrid == MainConst.ORGANIZE_LIST_LARGE
+                    organizeListGrid == Constants.ORGANIZE_LIST_EXTRA_SMALL ||
+                    organizeListGrid == Constants.ORGANIZE_LIST_SMALL ||
+                    organizeListGrid == Constants.ORGANIZE_LIST_MEDIUM ||
+                    organizeListGrid == Constants.ORGANIZE_LIST_LARGE
                 ){
                     //Add left margin
                     layoutParamsLinearImageviewContainer.setMargins(marginLarge, 0, 0, 0)
@@ -298,7 +298,7 @@ class GenericListGridItemAdapter (
             mDataBinding.cardViewClickable.layoutParams = layoutParamsLinearCardViewClickable
 
             when (organizeListGrid) {
-                MainConst.ORGANIZE_LIST_SMALL_NO_IMAGE -> {
+                Constants.ORGANIZE_LIST_SMALL_NO_IMAGE -> {
                     //Update text size and font
                     mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_title_size))
                     mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_subtitle_details_size))
@@ -308,7 +308,7 @@ class GenericListGridItemAdapter (
                     mDataBinding.textSubtitle.visibility = View.GONE
                     mDataBinding.textDetails.visibility = View.GONE
                 }
-                MainConst.ORGANIZE_LIST_MEDIUM_NO_IMAGE -> {
+                Constants.ORGANIZE_LIST_MEDIUM_NO_IMAGE -> {
                     //Update text size and font
                     mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_title_size))
                     mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_subtitle_details_size))
@@ -318,7 +318,7 @@ class GenericListGridItemAdapter (
                     mDataBinding.textSubtitle.visibility = View.VISIBLE
                     mDataBinding.textDetails.visibility = View.GONE
                 }
-                MainConst.ORGANIZE_LIST_LARGE_NO_IMAGE -> {
+                Constants.ORGANIZE_LIST_LARGE_NO_IMAGE -> {
                     //Update text size and font
                     mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_title_size))
                     mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_subtitle_details_size))
@@ -328,7 +328,7 @@ class GenericListGridItemAdapter (
                     mDataBinding.textSubtitle.visibility = View.VISIBLE
                     mDataBinding.textDetails.visibility = View.VISIBLE
                 }
-                MainConst.ORGANIZE_GRID_SMALL_NO_IMAGE -> {
+                Constants.ORGANIZE_GRID_SMALL_NO_IMAGE -> {
                     //Update text size and font
                     mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_title_size))
                     mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_subtitle_details_size))
@@ -338,7 +338,7 @@ class GenericListGridItemAdapter (
                     mDataBinding.textSubtitle.visibility = View.VISIBLE
                     mDataBinding.textDetails.visibility = View.GONE
                 }
-                MainConst.ORGANIZE_GRID_MEDIUM_NO_IMAGE -> {
+                Constants.ORGANIZE_GRID_MEDIUM_NO_IMAGE -> {
                     //Update text size and font
                     mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_title_size))
                     mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_subtitle_details_size))
@@ -349,7 +349,7 @@ class GenericListGridItemAdapter (
                     mDataBinding.textDetails.visibility = View.VISIBLE
                 }
                 //
-                MainConst.ORGANIZE_LIST_EXTRA_SMALL -> {
+                Constants.ORGANIZE_LIST_EXTRA_SMALL -> {
                     //Update text size and font
                     mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_small_text_title_size))
                     mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_small_text_subtitle_details_size))
@@ -359,7 +359,7 @@ class GenericListGridItemAdapter (
                     mDataBinding.textSubtitle.visibility = View.VISIBLE
                     mDataBinding.textDetails.visibility = View.GONE
                 }
-                MainConst.ORGANIZE_LIST_SMALL -> {
+                Constants.ORGANIZE_LIST_SMALL -> {
                     //Update text size and font
                     mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_title_size))
                     mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_subtitle_details_size))
@@ -369,7 +369,7 @@ class GenericListGridItemAdapter (
                     mDataBinding.textSubtitle.visibility = View.VISIBLE
                     mDataBinding.textDetails.visibility = View.VISIBLE
                 }
-                MainConst.ORGANIZE_LIST_MEDIUM -> {
+                Constants.ORGANIZE_LIST_MEDIUM -> {
                     //Update text size and font
                     mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_title_size))
                     mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_subtitle_details_size))
@@ -379,7 +379,7 @@ class GenericListGridItemAdapter (
                     mDataBinding.textSubtitle.visibility = View.VISIBLE
                     mDataBinding.textDetails.visibility = View.VISIBLE
                 }
-                MainConst.ORGANIZE_LIST_LARGE -> {
+                Constants.ORGANIZE_LIST_LARGE -> {
                     //Update text size and font
                     mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_title_size))
                     mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_subtitle_details_size))
@@ -390,7 +390,7 @@ class GenericListGridItemAdapter (
                     mDataBinding.textDetails.visibility = View.VISIBLE
                 }
                 //
-                MainConst.ORGANIZE_GRID_EXTRA_SMALL -> {
+                Constants.ORGANIZE_GRID_EXTRA_SMALL -> {
                     //Update text size and font
                     mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_small_text_title_size))
                     mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_small_text_subtitle_details_size))
@@ -400,7 +400,7 @@ class GenericListGridItemAdapter (
                     mDataBinding.textSubtitle.visibility = View.GONE
                     mDataBinding.textDetails.visibility = View.GONE
                 }
-                MainConst.ORGANIZE_GRID_SMALL -> {
+                Constants.ORGANIZE_GRID_SMALL -> {
                     //Update text size and font
                     mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_title_size))
                     mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.small_text_subtitle_details_size))
@@ -410,7 +410,7 @@ class GenericListGridItemAdapter (
                     mDataBinding.textSubtitle.visibility = View.GONE
                     mDataBinding.textDetails.visibility = View.GONE
                 }
-                MainConst.ORGANIZE_GRID_MEDIUM -> {
+                Constants.ORGANIZE_GRID_MEDIUM -> {
                     //Update text size and font
                     mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_title_size))
                     mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.medium_text_subtitle_details_size))
@@ -420,7 +420,7 @@ class GenericListGridItemAdapter (
                     mDataBinding.textSubtitle.visibility = View.GONE
                     mDataBinding.textDetails.visibility = View.GONE
                 }
-                MainConst.ORGANIZE_GRID_LARGE -> {
+                Constants.ORGANIZE_GRID_LARGE -> {
                     //Update text size and font
                     mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_title_size))
                     mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.large_text_subtitle_details_size))
@@ -430,7 +430,7 @@ class GenericListGridItemAdapter (
                     mDataBinding.textSubtitle.visibility = View.VISIBLE
                     mDataBinding.textDetails.visibility = View.GONE
                 }
-                MainConst.ORGANIZE_GRID_EXTRA_LARGE -> {
+                Constants.ORGANIZE_GRID_EXTRA_LARGE -> {
                     //Update text size and font
                     mDataBinding.textTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_large_text_title_size))
                     mDataBinding.textSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, ctx.resources.getDimension(R.dimen.extra_large_text_subtitle_details_size))
@@ -491,11 +491,11 @@ class GenericListGridItemAdapter (
             isImageFullCircle: Boolean
         ) {
             if(
-                organizeListGrid == MainConst.ORGANIZE_LIST_SMALL_NO_IMAGE ||
-                organizeListGrid == MainConst.ORGANIZE_LIST_MEDIUM_NO_IMAGE ||
-                organizeListGrid == MainConst.ORGANIZE_LIST_LARGE_NO_IMAGE ||
-                organizeListGrid == MainConst.ORGANIZE_GRID_SMALL_NO_IMAGE ||
-                organizeListGrid == MainConst.ORGANIZE_GRID_MEDIUM_NO_IMAGE
+                organizeListGrid == Constants.ORGANIZE_LIST_SMALL_NO_IMAGE ||
+                organizeListGrid == Constants.ORGANIZE_LIST_MEDIUM_NO_IMAGE ||
+                organizeListGrid == Constants.ORGANIZE_LIST_LARGE_NO_IMAGE ||
+                organizeListGrid == Constants.ORGANIZE_GRID_SMALL_NO_IMAGE ||
+                organizeListGrid == Constants.ORGANIZE_GRID_MEDIUM_NO_IMAGE
             ){
                 com.prosabdev.common.utils.ImageLoaders.clearImageView(ctx, mDataBinding.imageviewCoverArt)
                 com.prosabdev.common.utils.ImageLoaders.clearImageView(ctx, mDataBinding.imageviewCoverArtCircle)
@@ -533,11 +533,11 @@ class GenericListGridItemAdapter (
             }
 
             if(
-                organizeListGrid == MainConst.ORGANIZE_LIST_SMALL_NO_IMAGE ||
-                organizeListGrid == MainConst.ORGANIZE_LIST_MEDIUM_NO_IMAGE ||
-                organizeListGrid == MainConst.ORGANIZE_LIST_LARGE_NO_IMAGE ||
-                organizeListGrid == MainConst.ORGANIZE_GRID_SMALL_NO_IMAGE ||
-                organizeListGrid == MainConst.ORGANIZE_GRID_MEDIUM_NO_IMAGE
+                organizeListGrid == Constants.ORGANIZE_LIST_SMALL_NO_IMAGE ||
+                organizeListGrid == Constants.ORGANIZE_LIST_MEDIUM_NO_IMAGE ||
+                organizeListGrid == Constants.ORGANIZE_LIST_LARGE_NO_IMAGE ||
+                organizeListGrid == Constants.ORGANIZE_GRID_SMALL_NO_IMAGE ||
+                organizeListGrid == Constants.ORGANIZE_GRID_MEDIUM_NO_IMAGE
             ){
                 mDataBinding.imageviewBackgroundIsPlaying.visibility = View.GONE
                 mDataBinding.linearIsPlayingAnimContainer.visibility = View.GONE

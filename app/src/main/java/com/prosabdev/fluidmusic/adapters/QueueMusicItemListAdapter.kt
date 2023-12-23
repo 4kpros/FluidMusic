@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.color.MaterialColors
-import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.components.Constants
 import com.prosabdev.common.models.songitem.SongItem
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.callbacks.QueueMusicItemCallback
@@ -69,11 +69,11 @@ class QueueMusicItemListAdapter(
             for (payload in payloads) {
                 when (payload) {
                     PAYLOAD_PLAYBACK_STATE -> {
-                        Log.i(MainConst.TAG, "PAYLOAD_PLAYBACK_STATE")
+                        Log.i(Constants.TAG, "PAYLOAD_PLAYBACK_STATE")
                         holder.updateIsPlayingStateUI(getPlayingPosition(), true)
                     }
                     PAYLOAD_IS_COVERT_ART_TEXT -> {
-                        Log.i(MainConst.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
+                        Log.i(Constants.TAG, "PAYLOAD_IS_COVERT_ART_TEXT")
                         holder.updateCovertArtAndTitleUI(mContext, getItem(position) as SongItem)
                     }
                     else -> {

@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.work.*
-import com.prosabdev.common.constants.WorkManagerConst
+import com.prosabdev.common.components.WMConstants
 import com.prosabdev.common.workers.delete.DeleteSongsWorker
 
 class SongActionsWorkerViewModel(app: Application) : AndroidViewModel(app) {
@@ -24,10 +24,10 @@ class SongActionsWorkerViewModel(app: Application) : AndroidViewModel(app) {
         val deleteSongsWorkRequest: OneTimeWorkRequest = OneTimeWorkRequestBuilder<DeleteSongsWorker>()
             .setInputData(
                 workDataOf(
-                    WorkManagerConst.ITEM_LIST_MODEL_TYPE to modelType,
-                    WorkManagerConst.ITEM_LIST to itemsList.toTypedArray(),
-                    WorkManagerConst.ITEM_LIST_WHERE to whereClause,
-                    WorkManagerConst.WHERE_COLUMN_INDEX to whereColumn
+                    WMConstants.ITEM_LIST_MODEL_TYPE to modelType,
+                    WMConstants.ITEM_LIST to itemsList.toTypedArray(),
+                    WMConstants.ITEM_LIST_WHERE to whereClause,
+                    WMConstants.WHERE_COLUMN_INDEX to whereColumn
                 )
             )
             .addTag(DeleteSongsWorker.TAG)

@@ -18,12 +18,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
 import com.l4digital.fastscroll.FastScroller
-import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.components.Constants
 import com.prosabdev.common.models.view.FolderItem
 import com.prosabdev.common.persistence.PersistentStorage
 import com.prosabdev.common.persistence.models.SortOrganizeItemSP
 import com.prosabdev.common.utils.InsetModifiers
-import com.prosabdev.common.utils.MathComputations
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.adapters.EmptyBottomAdapter
 import com.prosabdev.fluidmusic.adapters.GridSpacingItemDecoration
@@ -66,10 +65,8 @@ class FoldersFragment : Fragment() {
     private val mFolderItemViewModel: FolderItemViewModel by activityViewModels()
 
     //Dialogs
-    private var mOrganizeDialog: OrganizeItemBottomSheetDialogFragment =
-        OrganizeItemBottomSheetDialogFragment.newInstance()
-    private val mSortFoldersDialog: SortContentExplorerBottomSheetDialogFragment =
-        SortContentExplorerBottomSheetDialogFragment.newInstance()
+    private var mOrganizeItemsDialog: OrganizeItemBottomSheetDialogFragment? = null
+    private var mSortItemsDialog: SortContentExplorerBottomSheetDialogFragment? = null
 
     //Adapters
     private var mConcatAdapter: ConcatAdapter? = null
@@ -609,28 +606,21 @@ class FoldersFragment : Fragment() {
     }
 
     private fun showSortDialog() {
-        if (mSortFoldersDialog.isVisible) return
-
-        mSortFoldersDialog.updateBottomSheetData(
+        mSortItemsDialog = SortContentExplorerBottomSheetDialogFragment.newInstance(
             mFoldersFragmentViewModel,
             TAG,
             null
         )
-        mSortFoldersDialog.show(
-            childFragmentManager,
-            SortContentExplorerBottomSheetDialogFragment.TAG
-        )
+        mSortItemsDialog?.show(childFragmentManager, SortContentExplorerBottomSheetDialogFragment.TAG)
     }
 
     private fun showOrganizeDialog() {
-        if (mOrganizeDialog.isVisible) return
-
-        mOrganizeDialog.updateBottomSheetData(
+        mOrganizeItemsDialog = OrganizeItemBottomSheetDialogFragment.newInstance(
             mFoldersFragmentViewModel,
             TAG,
             null
         )
-        mOrganizeDialog.show(childFragmentManager, OrganizeItemBottomSheetDialogFragment.TAG)
+        mOrganizeItemsDialog?.show(childFragmentManager, OrganizeItemBottomSheetDialogFragment.TAG)
     }
 
     private fun playFirstSong() {
@@ -665,7 +655,7 @@ class FoldersFragment : Fragment() {
 
     companion object {
         const val TAG = "FoldersFragment"
-        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = MainConst.ORGANIZE_GRID_MEDIUM
+        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = Constants.ORGANIZE_GRID_MEDIUM
         private const val SORT_LIST_GRID_DEFAULT_VALUE: String = FolderItem.DEFAULT_INDEX
         private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 

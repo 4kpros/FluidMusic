@@ -11,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
-import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
@@ -21,7 +20,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.components.Constants
 import com.prosabdev.common.models.FolderUriTree
 import com.prosabdev.common.utils.FormattersAndParsers
 import com.prosabdev.common.utils.InsetModifiers
@@ -122,7 +121,7 @@ class StorageAccessSettingsActivity : AppCompatActivity() {
 
     private fun updateFolderUriTreesUI(folderUriTrees: List<FolderUriTree>) {
         MainScope().launch {
-            Log.i(MainConst.TAG, "Add URI : ${folderUriTrees.size}")
+            Log.i(Constants.TAG, "Add URI : ${folderUriTrees.size}")
             mFolderUriTreeAdapter?.submitList(folderUriTrees)
             mDataBiding.foldersCounter = folderUriTrees.size
         }

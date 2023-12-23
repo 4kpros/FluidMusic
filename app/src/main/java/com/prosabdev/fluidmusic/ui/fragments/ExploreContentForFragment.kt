@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
 import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.l4digital.fastscroll.FastScroller
-import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.components.Constants
 import com.prosabdev.common.models.songitem.SongItem
 import com.prosabdev.common.persistence.PersistentStorage
 import com.prosabdev.common.persistence.models.SortOrganizeItemSP
@@ -38,7 +38,13 @@ import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortSongsBottomShee
 import com.prosabdev.fluidmusic.ui.custom.CenterSmoothScroller
 import com.prosabdev.fluidmusic.ui.custom.CustomShapeableImageViewImageViewRatio11
 import com.prosabdev.fluidmusic.ui.fragments.communication.FragmentsCommunication
-import com.prosabdev.fluidmusic.ui.fragments.explore.*
+import com.prosabdev.fluidmusic.ui.fragments.explore.AlbumArtistsFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.AlbumsFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.ArtistsFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.ComposersFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.FoldersFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.GenresFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.YearsFragment
 import com.prosabdev.fluidmusic.utils.InjectorUtils
 import com.prosabdev.fluidmusic.viewmodels.fragments.ExploreContentsForFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
@@ -66,10 +72,8 @@ class ExploreContentForFragment : Fragment() {
     private val mSongItemViewModel: SongItemViewModel by activityViewModels()
 
     //Dialogs
-    private var mOrganizeDialog: OrganizeItemBottomSheetDialogFragment =
-        OrganizeItemBottomSheetDialogFragment.newInstance()
-    private val mSortSongDialog: SortSongsBottomSheetDialogFragment =
-        SortSongsBottomSheetDialogFragment.newInstance()
+    private var mOrganizeItemsDialog: OrganizeItemBottomSheetDialogFragment? = null
+    private var mSortItemsDialog: SortSongsBottomSheetDialogFragment? = null
 
     //Adapters
     private var mConcatAdapter: ConcatAdapter? = null
@@ -648,25 +652,21 @@ class ExploreContentForFragment : Fragment() {
     }
 
     private fun showSortDialog() {
-        if (mSortSongDialog.isVisible) return
-
-        mSortSongDialog.updateBottomSheetData(
+        mSortItemsDialog = SortSongsBottomSheetDialogFragment.newInstance(
             mExploreContentsForFragmentViewModel,
             TAG,
-            mLoadSongFromSource
+            null
         )
-        mSortSongDialog.show(childFragmentManager, SortSongsBottomSheetDialogFragment.TAG)
+        mSortItemsDialog?.show(childFragmentManager, SortSongsBottomSheetDialogFragment.TAG)
     }
 
     private fun showOrganizeDialog() {
-        if (mOrganizeDialog.isVisible) return
-
-        mOrganizeDialog.updateBottomSheetData(
+        mOrganizeItemsDialog = OrganizeItemBottomSheetDialogFragment.newInstance(
             mExploreContentsForFragmentViewModel,
             TAG,
-            mLoadSongFromSource
+            null
         )
-        mOrganizeDialog.show(childFragmentManager, OrganizeItemBottomSheetDialogFragment.TAG)
+        mOrganizeItemsDialog?.show(childFragmentManager, OrganizeItemBottomSheetDialogFragment.TAG)
     }
 
     private fun playSongOnShuffle() {
@@ -811,7 +811,7 @@ class ExploreContentForFragment : Fragment() {
     companion object {
         const val TAG = "ExploreContentFor"
 
-        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = MainConst.ORGANIZE_LIST_SMALL
+        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = Constants.ORGANIZE_LIST_SMALL
         private const val SORT_LIST_GRID_DEFAULT_VALUE: String = SongItem.DEFAULT_INDEX
         private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 

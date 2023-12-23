@@ -1,11 +1,18 @@
 package com.prosabdev.fluidmusic.ui.fragments.communication
 
-import com.prosabdev.common.constants.WorkManagerConst
+import com.prosabdev.common.components.WMConstants
 import com.prosabdev.common.models.songitem.SongItem
 import com.prosabdev.fluidmusic.adapters.generic.GenericListGridItemAdapter
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentForFragment
 import com.prosabdev.fluidmusic.ui.fragments.PlaylistsFragment
-import com.prosabdev.fluidmusic.ui.fragments.explore.*
+import com.prosabdev.fluidmusic.ui.fragments.explore.AlbumArtistsFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.AlbumsFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.AllSongsFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.ArtistsFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.ComposersFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.FoldersFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.GenresFragment
+import com.prosabdev.fluidmusic.ui.fragments.explore.YearsFragment
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.MainFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayingNowFragmentViewModel
@@ -31,49 +38,49 @@ abstract class FragmentsCommunication {
 
                 AlbumsFragment.TAG -> {
                     modelTypeInfo.add(com.prosabdev.common.models.view.AlbumItem.TAG)
-                    modelTypeInfo.add(WorkManagerConst.ITEM_LIST_WHERE_EQUAL)
+                    modelTypeInfo.add(WMConstants.ITEM_LIST_WHERE_EQUAL)
                     modelTypeInfo.add(com.prosabdev.common.models.view.AlbumItem.INDEX_COLUM_TO_SONG_ITEM)
                 }
 
                 ArtistsFragment.TAG -> {
                     modelTypeInfo.add(com.prosabdev.common.models.view.ArtistItem.TAG)
-                    modelTypeInfo.add(WorkManagerConst.ITEM_LIST_WHERE_EQUAL)
+                    modelTypeInfo.add(WMConstants.ITEM_LIST_WHERE_EQUAL)
                     modelTypeInfo.add(com.prosabdev.common.models.view.ArtistItem.INDEX_COLUM_TO_SONG_ITEM)
                 }
 
                 FoldersFragment.TAG -> {
                     modelTypeInfo.add(com.prosabdev.common.models.view.FolderItem.TAG)
-                    modelTypeInfo.add(WorkManagerConst.ITEM_LIST_WHERE_EQUAL)
+                    modelTypeInfo.add(WMConstants.ITEM_LIST_WHERE_EQUAL)
                     modelTypeInfo.add(com.prosabdev.common.models.view.FolderItem.INDEX_COLUM_TO_SONG_ITEM)
                 }
 
                 GenresFragment.TAG -> {
                     modelTypeInfo.add(com.prosabdev.common.models.view.GenreItem.TAG)
-                    modelTypeInfo.add(WorkManagerConst.ITEM_LIST_WHERE_EQUAL)
+                    modelTypeInfo.add(WMConstants.ITEM_LIST_WHERE_EQUAL)
                     modelTypeInfo.add(com.prosabdev.common.models.view.GenreItem.INDEX_COLUM_TO_SONG_ITEM)
                 }
 
                 AlbumArtistsFragment.TAG -> {
                     modelTypeInfo.add(com.prosabdev.common.models.view.AlbumArtistItem.TAG)
-                    modelTypeInfo.add(WorkManagerConst.ITEM_LIST_WHERE_EQUAL)
+                    modelTypeInfo.add(WMConstants.ITEM_LIST_WHERE_EQUAL)
                     modelTypeInfo.add(com.prosabdev.common.models.view.AlbumArtistItem.INDEX_COLUM_TO_SONG_ITEM)
                 }
 
                 ComposersFragment.TAG -> {
                     modelTypeInfo.add(com.prosabdev.common.models.view.ComposerItem.TAG)
-                    modelTypeInfo.add(WorkManagerConst.ITEM_LIST_WHERE_EQUAL)
+                    modelTypeInfo.add(WMConstants.ITEM_LIST_WHERE_EQUAL)
                     modelTypeInfo.add(com.prosabdev.common.models.view.ComposerItem.INDEX_COLUM_TO_SONG_ITEM)
                 }
 
                 YearsFragment.TAG -> {
                     modelTypeInfo.add(com.prosabdev.common.models.view.YearItem.TAG)
-                    modelTypeInfo.add(WorkManagerConst.ITEM_LIST_WHERE_EQUAL)
+                    modelTypeInfo.add(WMConstants.ITEM_LIST_WHERE_EQUAL)
                     modelTypeInfo.add(com.prosabdev.common.models.view.YearItem.INDEX_COLUM_TO_SONG_ITEM)
                 }
 
                 PlaylistsFragment.TAG -> {
                     modelTypeInfo.add(com.prosabdev.common.models.playlist.PlaylistItem.TAG)
-                    modelTypeInfo.add(WorkManagerConst.ITEM_LIST_WHERE_EQUAL)
+                    modelTypeInfo.add(WMConstants.ITEM_LIST_WHERE_EQUAL)
                     modelTypeInfo.add(com.prosabdev.common.models.playlist.PlaylistItem.INDEX_COLUM_TO_SONG_ITEM)
                 }
 

@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
 import com.l4digital.fastscroll.FastScroller
 import com.l4digital.fastscroll.FastScroller.FastScrollListener
-import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.components.Constants
 import com.prosabdev.common.models.songitem.SongItem
 import com.prosabdev.common.persistence.PersistentStorage
 import com.prosabdev.common.persistence.models.SortOrganizeItemSP
@@ -28,7 +28,6 @@ import com.prosabdev.fluidmusic.adapters.GridSpacingItemDecoration
 import com.prosabdev.fluidmusic.adapters.HeadlinePlayShuffleAdapter
 import com.prosabdev.fluidmusic.adapters.generic.GenericListGridItemAdapter
 import com.prosabdev.fluidmusic.adapters.generic.SelectableItemListAdapter
-import com.prosabdev.fluidmusic.databinding.FragmentAlbumArtistsBinding
 import com.prosabdev.fluidmusic.databinding.FragmentAllSongsBinding
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.OrganizeItemBottomSheetDialogFragment
 import com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter.SortSongsBottomSheetDialogFragment
@@ -68,10 +67,8 @@ class AllSongsFragment : Fragment() {
     private val mSongItemViewModel: SongItemViewModel by activityViewModels()
 
     //Dialogs
-    private var mOrganizeDialog: OrganizeItemBottomSheetDialogFragment =
-        OrganizeItemBottomSheetDialogFragment.newInstance()
-    private val mSortSongDialog: SortSongsBottomSheetDialogFragment =
-        SortSongsBottomSheetDialogFragment.newInstance()
+    private var mOrganizeItemsDialog: OrganizeItemBottomSheetDialogFragment? = null
+    private var mSortItemsDialog: SortSongsBottomSheetDialogFragment? = null
 
     //Adapters
     private var mConcatAdapter: ConcatAdapter? = null
@@ -600,25 +597,21 @@ class AllSongsFragment : Fragment() {
     }
 
     private fun showSortDialog() {
-        if (mSortSongDialog.isVisible) return
-
-        mSortSongDialog.updateBottomSheetData(
+        mSortItemsDialog = SortSongsBottomSheetDialogFragment.newInstance(
             mAllSongsFragmentViewModel,
             TAG,
             null
         )
-        mSortSongDialog.show(childFragmentManager, SortSongsBottomSheetDialogFragment.TAG)
+        mSortItemsDialog?.show(childFragmentManager, SortSongsBottomSheetDialogFragment.TAG)
     }
 
     private fun showOrganizeDialog() {
-        if (mOrganizeDialog.isVisible) return
-
-        mOrganizeDialog.updateBottomSheetData(
+        mOrganizeItemsDialog = OrganizeItemBottomSheetDialogFragment.newInstance(
             mAllSongsFragmentViewModel,
             TAG,
             null
         )
-        mOrganizeDialog.show(childFragmentManager, OrganizeItemBottomSheetDialogFragment.TAG)
+        mOrganizeItemsDialog?.show(childFragmentManager, OrganizeItemBottomSheetDialogFragment.TAG)
     }
 
     private fun playSongOnShuffle() {
@@ -672,7 +665,7 @@ class AllSongsFragment : Fragment() {
 
     companion object {
         const val TAG = "AllSongsFragment"
-        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = MainConst.ORGANIZE_LIST_MEDIUM
+        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = Constants.ORGANIZE_LIST_MEDIUM
         private const val SORT_LIST_GRID_DEFAULT_VALUE: String = SongItem.DEFAULT_INDEX
         private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 

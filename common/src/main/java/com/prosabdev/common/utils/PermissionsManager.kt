@@ -10,7 +10,7 @@ import android.os.Build
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.components.Constants
 
 object PermissionsManager {
     fun haveWriteSystemSettingsPermission(ctx: Context): Boolean {
@@ -42,7 +42,7 @@ object PermissionsManager {
             activity, arrayOf(
                 BLUETOOTH
             ),
-            MainConst.BLUETOOTH_PERMISSION_CODE
+            Constants.BLUETOOTH_PERMISSION_CODE
         )
     }
 }

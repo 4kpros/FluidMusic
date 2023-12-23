@@ -5,12 +5,8 @@ import android.content.SharedPreferences
 import androidx.media3.common.Player
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.prosabdev.common.constants.MainConst
-import com.prosabdev.common.models.equalizer.EqualizerPresetBandLevelItem
-import com.prosabdev.common.persistence.models.SleepTimerSP
+import com.prosabdev.common.components.Constants
 import com.prosabdev.common.persistence.models.SortOrganizeItemSP
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class PersistentStorage private constructor(private val ctx: Context) {
 
@@ -20,7 +16,7 @@ class PersistentStorage private constructor(private val ctx: Context) {
     )
 
     companion object {
-        private const val SHARED_PREF_KEY = "${MainConst.PACKAGE_NAME}.SHARED_PREF_KEY"
+        private const val SHARED_PREF_KEY = "${Constants.PACKAGE_NAME}.SHARED_PREF_KEY"
 
         @Volatile
         private var INSTANCE: PersistentStorage? = null

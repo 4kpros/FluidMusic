@@ -13,7 +13,6 @@ import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.BuildCompat
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -21,7 +20,7 @@ import androidx.work.WorkInfo
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
-import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.components.Constants
 import com.prosabdev.common.utils.InsetModifiers
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.ActivityMediaScannerSettingsBinding
@@ -204,11 +203,11 @@ class MediaScannerSettingsActivity : AppCompatActivity() {
             val workInfo = it[0]
 
             if(workInfo.state.isFinished){
-                Log.i(MainConst.TAG, "Device scan finished.")
+                Log.i(Constants.TAG, "Device scan finished.")
                 mMediaScannerActivityViewModel.updateWorkInfoData(workInfo)
                 mMediaScannerActivityViewModel.isLoadingInBackground.value = false
             }else{
-                Log.i(MainConst.TAG, "Working on background ...")
+                Log.i(Constants.TAG, "Working on background ...")
             }
         }
     }
@@ -254,17 +253,17 @@ class MediaScannerSettingsActivity : AppCompatActivity() {
 
     private fun updatePlaylistCounterUI(it: Int?) {
         mDataBiding.playlistCounter = it
-        Log.i(MainConst.TAG, "Device scan playlists : $it")
+        Log.i(Constants.TAG, "Device scan playlists : $it")
     }
 
     private fun updateSongsCounterUI(it: Int?) {
         mDataBiding.songsCounter = it
-        Log.i(MainConst.TAG, "Device scan songs : $it")
+        Log.i(Constants.TAG, "Device scan songs : $it")
     }
 
     private fun updateFoldersCounterUI(it: Int) {
         mDataBiding.folderCounter = it
-        Log.i(MainConst.TAG, "Device scan folders : $it")
+        Log.i(Constants.TAG, "Device scan folders : $it")
     }
 
     private fun updateLoadingUI(it: Boolean?) {

@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.prosabdev.common.constants.WorkManagerConst
+import com.prosabdev.common.components.WMConstants
 import com.prosabdev.common.models.songitem.SongItem
 import com.prosabdev.common.models.songitem.SongItemUri
 import com.prosabdev.common.roomdatabase.AppDatabase
@@ -25,10 +25,10 @@ class RemoveSongsFromQueueMusicWorker(
                 Log.d(TAG, "Worker $TAG started")
 
                 //Extract worker params
-                val modelType = inputData.getString(WorkManagerConst.ITEM_LIST_MODEL_TYPE)
-                val itemsList = inputData.getStringArray(WorkManagerConst.ITEM_LIST)
-                val whereClause = inputData.getString(WorkManagerConst.ITEM_LIST_WHERE)
-                val whereColumn = inputData.getString(WorkManagerConst.WHERE_COLUMN_INDEX)
+                val modelType = inputData.getString(WMConstants.ITEM_LIST_MODEL_TYPE)
+                val itemsList = inputData.getStringArray(WMConstants.ITEM_LIST)
+                val whereClause = inputData.getString(WMConstants.ITEM_LIST_WHERE)
+                val whereColumn = inputData.getString(WMConstants.WHERE_COLUMN_INDEX)
                 //Delete songs from queue music
                 val count = tryToDeleteSongsFromSource(
                     modelType,
@@ -42,7 +42,7 @@ class RemoveSongsFromQueueMusicWorker(
 
                 Result.success(
                     workDataOf(
-                        WorkManagerConst.WORKER_OUTPUT_DATA to count,
+                        WMConstants.WORKER_OUTPUT_DATA to count,
                     )
                 )
             } catch (error: Throwable) {
@@ -108,13 +108,13 @@ class RemoveSongsFromQueueMusicWorker(
                 val tempSongUriList =
                     when (whereClause) {
                         //If it is standard content explorer, then get all songs uri directly
-                        WorkManagerConst.ITEM_LIST_WHERE_EQUAL ->
+                        WMConstants.ITEM_LIST_WHERE_EQUAL ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereEqual(
                                 whereColumn,
                                 tempFieldValue
                             )
                         //If it is from search view, get songs uri directly with "where like" clause
-                        WorkManagerConst.ITEM_LIST_WHERE_LIKE ->
+                        WMConstants.ITEM_LIST_WHERE_LIKE ->
                             AppDatabase.getDatabase(applicationContext).songItemDao().getAllOnlyUriDirectlyWhereLike(
                                 whereColumn,
                                 tempFieldValue

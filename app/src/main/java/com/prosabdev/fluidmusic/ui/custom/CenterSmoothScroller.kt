@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.DisplayMetrics
 import android.util.Log
 import androidx.recyclerview.widget.LinearSmoothScroller
-import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.components.Constants
 
 class CenterSmoothScroller(
     ctx : Context
@@ -21,7 +21,7 @@ class CenterSmoothScroller(
     }
 
     override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics?): Float {
-        Log.i(MainConst.TAG, "TIME TO SCROLL MILLISECONDS_PER_INCH : ${MILLISECONDS_PER_INCH / (displayMetrics?.densityDpi ?: 0)}")
+        Log.i(Constants.TAG, "TIME TO SCROLL MILLISECONDS_PER_INCH : ${MILLISECONDS_PER_INCH / (displayMetrics?.densityDpi ?: 0)}")
         return MILLISECONDS_PER_INCH / (displayMetrics?.densityDpi ?: 0)
     }
 

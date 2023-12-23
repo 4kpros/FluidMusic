@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.components.Constants
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetOrganizeItemsBinding
 import com.prosabdev.fluidmusic.databinding.FragmentYearsBinding
@@ -63,46 +63,46 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
         mDataBinding.radioGroupOrganize.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.radio_list_extra_small -> mGenericListenDataViewModel?.organizeListGrid?.value =
-                    MainConst.ORGANIZE_LIST_EXTRA_SMALL
+                    Constants.ORGANIZE_LIST_EXTRA_SMALL
 
                 R.id.radio_list_small -> mGenericListenDataViewModel?.organizeListGrid?.value =
-                    MainConst.ORGANIZE_LIST_SMALL
+                    Constants.ORGANIZE_LIST_SMALL
 
                 R.id.radio_list_medium -> mGenericListenDataViewModel?.organizeListGrid?.value =
-                    MainConst.ORGANIZE_LIST_MEDIUM
+                    Constants.ORGANIZE_LIST_MEDIUM
 
                 R.id.radio_list_large -> mGenericListenDataViewModel?.organizeListGrid?.value =
-                    MainConst.ORGANIZE_LIST_LARGE
+                    Constants.ORGANIZE_LIST_LARGE
 
                 R.id.radio_list_small_no_image -> mGenericListenDataViewModel?.organizeListGrid?.value =
-                    MainConst.ORGANIZE_LIST_SMALL_NO_IMAGE
+                    Constants.ORGANIZE_LIST_SMALL_NO_IMAGE
 
                 R.id.radio_list_medium_no_image -> mGenericListenDataViewModel?.organizeListGrid?.value =
-                    MainConst.ORGANIZE_LIST_MEDIUM_NO_IMAGE
+                    Constants.ORGANIZE_LIST_MEDIUM_NO_IMAGE
 
                 R.id.radio_list_large_no_image -> mGenericListenDataViewModel?.organizeListGrid?.value =
-                    MainConst.ORGANIZE_LIST_LARGE_NO_IMAGE
+                    Constants.ORGANIZE_LIST_LARGE_NO_IMAGE
 
                 R.id.radio_grid_extra_small -> mGenericListenDataViewModel?.organizeListGrid?.value =
-                    MainConst.ORGANIZE_GRID_EXTRA_SMALL
+                    Constants.ORGANIZE_GRID_EXTRA_SMALL
 
                 R.id.radio_grid_small -> mGenericListenDataViewModel?.organizeListGrid?.value =
-                    MainConst.ORGANIZE_GRID_SMALL
+                    Constants.ORGANIZE_GRID_SMALL
 
                 R.id.radio_grid_medium -> mGenericListenDataViewModel?.organizeListGrid?.value =
-                    MainConst.ORGANIZE_GRID_MEDIUM
+                    Constants.ORGANIZE_GRID_MEDIUM
 
                 R.id.radio_grid_large -> mGenericListenDataViewModel?.organizeListGrid?.value =
-                    MainConst.ORGANIZE_GRID_LARGE
+                    Constants.ORGANIZE_GRID_LARGE
 
                 R.id.radio_grid_extra_large -> mGenericListenDataViewModel?.organizeListGrid?.value =
-                    MainConst.ORGANIZE_GRID_EXTRA_LARGE
+                    Constants.ORGANIZE_GRID_EXTRA_LARGE
 
                 R.id.radio_grid_small_no_image -> mGenericListenDataViewModel?.organizeListGrid?.value =
-                    MainConst.ORGANIZE_GRID_SMALL_NO_IMAGE
+                    Constants.ORGANIZE_GRID_SMALL_NO_IMAGE
 
                 R.id.radio_grid_medium_no_image -> mGenericListenDataViewModel?.organizeListGrid?.value =
-                    MainConst.ORGANIZE_GRID_MEDIUM_NO_IMAGE
+                    Constants.ORGANIZE_GRID_MEDIUM_NO_IMAGE
             }
         }
     }
@@ -268,51 +268,52 @@ class OrganizeItemBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSho
         val tempOrganize: Int = mGenericListenDataViewModel?.organizeListGrid?.value ?: return
         mDataBinding.run {
             when (tempOrganize) {
-                MainConst.ORGANIZE_LIST_EXTRA_SMALL -> mDataBinding.radioGroupOrganize.check(radioListExtraSmall.id)
-                MainConst.ORGANIZE_LIST_SMALL -> mDataBinding.radioGroupOrganize.check(radioListSmall.id)
-                MainConst.ORGANIZE_LIST_MEDIUM -> mDataBinding.radioGroupOrganize.check(radioListMedium.id)
-                MainConst.ORGANIZE_LIST_LARGE -> mDataBinding.radioGroupOrganize.check(radioListLarge.id)
-                MainConst.ORGANIZE_LIST_SMALL_NO_IMAGE -> mDataBinding.radioGroupOrganize.check(radioListSmallNoImage.id)
-                MainConst.ORGANIZE_LIST_MEDIUM_NO_IMAGE -> mDataBinding.radioGroupOrganize.check(radioListMediumNoImage.id)
-                MainConst.ORGANIZE_LIST_LARGE_NO_IMAGE -> mDataBinding.radioGroupOrganize.check(radioListLargeNoImage.id)
-                MainConst.ORGANIZE_GRID_EXTRA_SMALL -> mDataBinding.radioGroupOrganize.check(radioGridExtraSmall.id)
-                MainConst.ORGANIZE_GRID_SMALL -> mDataBinding.radioGroupOrganize.check(radioGridSmall.id)
-                MainConst.ORGANIZE_GRID_MEDIUM -> mDataBinding.radioGroupOrganize.check(radioGridMedium.id)
-                MainConst.ORGANIZE_GRID_LARGE -> mDataBinding.radioGroupOrganize.check(radioGridLarge.id)
-                MainConst.ORGANIZE_GRID_EXTRA_LARGE -> mDataBinding.radioGroupOrganize.check(radioGridExtraLarge.id)
-                MainConst.ORGANIZE_GRID_SMALL_NO_IMAGE -> mDataBinding.radioGroupOrganize.check(radioGridSmallNoImage.id)
-                MainConst.ORGANIZE_GRID_MEDIUM_NO_IMAGE -> mDataBinding.radioGroupOrganize.check(radioGridMediumNoImage.id)
+                Constants.ORGANIZE_LIST_EXTRA_SMALL -> mDataBinding.radioGroupOrganize.check(radioListExtraSmall.id)
+                Constants.ORGANIZE_LIST_SMALL -> mDataBinding.radioGroupOrganize.check(radioListSmall.id)
+                Constants.ORGANIZE_LIST_MEDIUM -> mDataBinding.radioGroupOrganize.check(radioListMedium.id)
+                Constants.ORGANIZE_LIST_LARGE -> mDataBinding.radioGroupOrganize.check(radioListLarge.id)
+                Constants.ORGANIZE_LIST_SMALL_NO_IMAGE -> mDataBinding.radioGroupOrganize.check(radioListSmallNoImage.id)
+                Constants.ORGANIZE_LIST_MEDIUM_NO_IMAGE -> mDataBinding.radioGroupOrganize.check(radioListMediumNoImage.id)
+                Constants.ORGANIZE_LIST_LARGE_NO_IMAGE -> mDataBinding.radioGroupOrganize.check(radioListLargeNoImage.id)
+                Constants.ORGANIZE_GRID_EXTRA_SMALL -> mDataBinding.radioGroupOrganize.check(radioGridExtraSmall.id)
+                Constants.ORGANIZE_GRID_SMALL -> mDataBinding.radioGroupOrganize.check(radioGridSmall.id)
+                Constants.ORGANIZE_GRID_MEDIUM -> mDataBinding.radioGroupOrganize.check(radioGridMedium.id)
+                Constants.ORGANIZE_GRID_LARGE -> mDataBinding.radioGroupOrganize.check(radioGridLarge.id)
+                Constants.ORGANIZE_GRID_EXTRA_LARGE -> mDataBinding.radioGroupOrganize.check(radioGridExtraLarge.id)
+                Constants.ORGANIZE_GRID_SMALL_NO_IMAGE -> mDataBinding.radioGroupOrganize.check(radioGridSmallNoImage.id)
+                Constants.ORGANIZE_GRID_MEDIUM_NO_IMAGE -> mDataBinding.radioGroupOrganize.check(radioGridMediumNoImage.id)
                 else -> mDataBinding.radioGroupOrganize.check(radioListSmall.id)
             }
         }
-    }
-
-    fun updateBottomSheetData(
-        genericListenDataViewModel: GenericListenDataViewModel?,
-        fromSource: String?,
-        fromSourceValue: String?
-    ) {
-        mGenericListenDataViewModel = genericListenDataViewModel
-        mFromSource = fromSource
-        mFromSourceValue = fromSourceValue
-        initViews()
     }
 
     companion object {
         const val TAG = "OrganizeItemBottomSheetDialogFragment"
 
         fun getSpanCount(ctx: Context, organizeValue: Int?): Int {
-            return when (organizeValue ?: MainConst.ORGANIZE_LIST_MEDIUM) {
-                MainConst.ORGANIZE_GRID_SMALL_NO_IMAGE -> ctx.resources.getInteger(R.integer.organize_grid_no_image_span_count)
-                MainConst.ORGANIZE_GRID_MEDIUM_NO_IMAGE -> ctx.resources.getInteger(R.integer.organize_grid_no_image_span_count)
-                MainConst.ORGANIZE_GRID_EXTRA_SMALL -> ctx.resources.getInteger(R.integer.organize_grid_extra_small_span_count)
-                MainConst.ORGANIZE_GRID_SMALL -> ctx.resources.getInteger(R.integer.organize_grid_small_span_count)
-                MainConst.ORGANIZE_GRID_MEDIUM -> ctx.resources.getInteger(R.integer.organize_grid_medium_span_count)
-                MainConst.ORGANIZE_GRID_LARGE -> ctx.resources.getInteger(R.integer.organize_grid_large_span_count)
-                MainConst.ORGANIZE_GRID_EXTRA_LARGE -> ctx.resources.getInteger(R.integer.organize_grid_extra_large_span_count)
+            return when (organizeValue ?: Constants.ORGANIZE_LIST_MEDIUM) {
+                Constants.ORGANIZE_GRID_SMALL_NO_IMAGE -> ctx.resources.getInteger(R.integer.organize_grid_no_image_span_count)
+                Constants.ORGANIZE_GRID_MEDIUM_NO_IMAGE -> ctx.resources.getInteger(R.integer.organize_grid_no_image_span_count)
+                Constants.ORGANIZE_GRID_EXTRA_SMALL -> ctx.resources.getInteger(R.integer.organize_grid_extra_small_span_count)
+                Constants.ORGANIZE_GRID_SMALL -> ctx.resources.getInteger(R.integer.organize_grid_small_span_count)
+                Constants.ORGANIZE_GRID_MEDIUM -> ctx.resources.getInteger(R.integer.organize_grid_medium_span_count)
+                Constants.ORGANIZE_GRID_LARGE -> ctx.resources.getInteger(R.integer.organize_grid_large_span_count)
+                Constants.ORGANIZE_GRID_EXTRA_LARGE -> ctx.resources.getInteger(R.integer.organize_grid_extra_large_span_count)
                 else -> 1
             }
         }
+
+        @JvmStatic
+        fun newInstance(
+            genericListenDataViewModel: GenericListenDataViewModel?,
+            fromSource: String?,
+            fromSourceValue: String? = null
+        ) =
+            OrganizeItemBottomSheetDialogFragment().apply {
+                mGenericListenDataViewModel = genericListenDataViewModel
+                mFromSource = fromSource
+                mFromSourceValue = fromSourceValue
+            }
 
         @JvmStatic
         fun newInstance() =

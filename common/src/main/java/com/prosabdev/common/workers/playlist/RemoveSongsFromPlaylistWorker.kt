@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.prosabdev.common.constants.WorkManagerConst
+import com.prosabdev.common.components.WMConstants
 import com.prosabdev.common.roomdatabase.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -37,7 +37,7 @@ class RemoveSongsFromPlaylistWorker (
 
                 Result.success(
                     workDataOf(
-                        WorkManagerConst.WORKER_OUTPUT_DATA to count,
+                        WMConstants.WORKER_OUTPUT_DATA to count,
                     )
                 )
             } catch (error: Throwable) {

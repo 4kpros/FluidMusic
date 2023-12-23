@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
-import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.components.Constants
 import com.prosabdev.common.utils.Animators
 import com.prosabdev.common.utils.ImageLoaders
 import com.prosabdev.common.utils.InsetModifiers
@@ -409,7 +409,7 @@ class MainFragment : Fragment() {
             dataBidingView.slidingUpPanel.addPanelSlideListener(object :
                 com.sothree.slidinguppanel.PanelSlideListener {
                 override fun onPanelSlide(panel: View, slideOffset: Float) {
-                    Log.i(MainConst.TAG, "On panel slide offset : $slideOffset")
+                    Log.i(Constants.TAG, "On panel slide offset : $slideOffset")
                     if (slideOffset <= 0.21f) {
                         dataBidingView.slidingUpPanel.setDragView(dataBidingView.constraintMiniPlayerContainer)
                     } else {

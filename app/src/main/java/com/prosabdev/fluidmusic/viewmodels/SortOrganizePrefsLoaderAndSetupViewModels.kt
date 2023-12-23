@@ -2,7 +2,7 @@ package com.prosabdev.fluidmusic.viewmodels
 
 import com.prosabdev.common.persistence.PersistentStorage
 import com.prosabdev.common.persistence.models.SortOrganizeItemSP
-import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.components.Constants
 import com.prosabdev.fluidmusic.viewmodels.fragments.GenericListenDataViewModel
 
 abstract class SortOrganizePrefsLoaderAndSetupViewModels {
@@ -29,10 +29,10 @@ abstract class SortOrganizePrefsLoaderAndSetupViewModels {
                 sharedPrefsKey == PersistentStorage.SortAndOrganize.SORT_ORGANIZE_EXPLORE_MUSIC_CONTENT_FOR_YEAR
             ){
                 defaultOrderBy = "title"
-                defaultOrganizeListGrid = MainConst.ORGANIZE_LIST_SMALL
+                defaultOrganizeListGrid = Constants.ORGANIZE_LIST_SMALL
             }else {
                 defaultOrderBy = "name"
-                defaultOrganizeListGrid = MainConst.ORGANIZE_GRID_MEDIUM
+                defaultOrganizeListGrid = Constants.ORGANIZE_GRID_MEDIUM
             }
             setupViewModelSortOrganizeFor(
                 genericListenDataViewModel,

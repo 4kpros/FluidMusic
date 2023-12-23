@@ -6,7 +6,7 @@ import android.text.SpannableString
 import android.text.style.UnderlineSpan
 import androidx.documentfile.provider.DocumentFile
 import com.prosabdev.common.R
-import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.components.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.floor
@@ -45,16 +45,16 @@ object FormattersAndParsers {
 
     fun getSpecificWidthSizeForListType(ctx: Context, organizeListGrid: Int): Int {
         return when (organizeListGrid) {
-            MainConst.ORGANIZE_LIST_EXTRA_SMALL -> {
+            Constants.ORGANIZE_LIST_EXTRA_SMALL -> {
                 ctx.resources.getDimensionPixelSize(R.dimen.organize_list_extra_small_image_size)
             }
-            MainConst.ORGANIZE_LIST_SMALL -> {
+            Constants.ORGANIZE_LIST_SMALL -> {
                 ctx.resources.getDimensionPixelSize(R.dimen.organize_list_small_image_size)
             }
-            MainConst.ORGANIZE_LIST_MEDIUM -> {
+            Constants.ORGANIZE_LIST_MEDIUM -> {
                 ctx.resources.getDimensionPixelSize(R.dimen.organize_list_medium_image_size)
             }
-            MainConst.ORGANIZE_LIST_LARGE -> {
+            Constants.ORGANIZE_LIST_LARGE -> {
                 ctx.resources.getDimensionPixelSize(R.dimen.organize_list_large_image_size)
             }
             else -> {

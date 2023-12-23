@@ -15,7 +15,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.prosabdev.common.R
-import com.prosabdev.common.constants.MainConst
+import com.prosabdev.common.components.Constants
 import jp.wasabeef.blurry.Blurry
 import kotlinx.coroutines.*
 import java.util.concurrent.ArrayBlockingQueue
@@ -162,19 +162,19 @@ object ImageLoaders {
             mCachedHashmapBlurImage[imageRequest.hashedCovertArtSignature] = bitmap
             if(mCachedHashmapBlurImage.size >= 10)
                 mCachedHashmapBlurImage.pollFirstEntry()
-            Log.i(MainConst.TAG, "HASHED BINARY AND SAVED ON BLUR -----> ${mCachedHashmapBlurImage.size}")
+            Log.i(Constants.TAG, "HASHED BINARY AND SAVED ON BLUR -----> ${mCachedHashmapBlurImage.size}")
         }else{
 
             if(imageRequest.widthHeight >= 500){
                 mCachedHashmapLargeImage[imageRequest.hashedCovertArtSignature] = bitmap
                 if(mCachedHashmapLargeImage.size >= 5)
                     mCachedHashmapLargeImage.pollFirstEntry()
-                Log.i(MainConst.TAG, "HASHED BINARY AND SAVED ON LARGE ORIGINAL -----> ${mCachedHashmapLargeImage.size}")
+                Log.i(Constants.TAG, "HASHED BINARY AND SAVED ON LARGE ORIGINAL -----> ${mCachedHashmapLargeImage.size}")
             }else{
                 mCachedHashmapImage[imageRequest.hashedCovertArtSignature] = bitmap
                 if(mCachedHashmapImage.size >= 100)
                     mCachedHashmapImage.pollFirstEntry()
-                Log.i(MainConst.TAG, "HASHED BINARY AND SAVED ON ORIGINAL -----> ${mCachedHashmapImage.size}")
+                Log.i(Constants.TAG, "HASHED BINARY AND SAVED ON ORIGINAL -----> ${mCachedHashmapImage.size}")
             }
         }
     }

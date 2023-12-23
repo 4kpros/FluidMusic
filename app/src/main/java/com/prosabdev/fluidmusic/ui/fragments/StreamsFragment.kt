@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.prosabdev.fluidmusic.R
-import com.prosabdev.fluidmusic.databinding.ActivityMainBinding
 import com.prosabdev.fluidmusic.databinding.FragmentStreamsBinding
 
 class StreamsFragment : Fragment() {
