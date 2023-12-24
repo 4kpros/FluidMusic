@@ -22,12 +22,10 @@ class MediaPlayerDataViewModel: ViewModel() {
     val currentMediaItem = MutableLiveData<MediaItem?>(null)
     val mediaItems = MutableLiveData<List<MediaItem?>?>(listOf())
     val currentMediaItemIndex = MutableLiveData<Int>(-1)
-    val playlistMediaMetadata = MutableLiveData<MediaMetadata?>(null)
     val repeatMode = MutableLiveData<Int>(Player.REPEAT_MODE_OFF)
     val shuffleModeEnabled = MutableLiveData<Boolean>(false)
     val playbackSpeed = MutableLiveData<Float>(0f)
     val playbackPitch = MutableLiveData<Float>(0f)
-    val tracks = MutableLiveData<Tracks?>(null)
     val volume = MutableLiveData<Float>(0F)
     val deviceVolume = MutableLiveData<Int>(0)
     val audioAttributes = MutableLiveData<AudioAttributes?>(null)
@@ -65,8 +63,12 @@ class MediaPlayerDataViewModel: ViewModel() {
             this@MediaPlayerDataViewModel.currentMediaItemIndex.value = currentMediaItemIndex
         }
 
-        override fun onPositionDiscontinuity(currentPosition: Long) {
-            this@MediaPlayerDataViewModel.positionMs.value = currentPosition
+        override fun onMediaMetaDataChanged(mediaMetadata: MediaMetadata) {
+            //
+        }
+
+        override fun onPositionChanged(position: Long) {
+            this@MediaPlayerDataViewModel.positionMs.value = position
         }
 
         override fun onRepeatModeChanged(repeatMode: Int) {
@@ -82,10 +84,6 @@ class MediaPlayerDataViewModel: ViewModel() {
             this@MediaPlayerDataViewModel.playbackPitch.value = playbackParameters.pitch
         }
 
-        override fun onTracksChanged(tracks: Tracks) {
-            this@MediaPlayerDataViewModel.tracks.value = tracks
-        }
-
         override fun onSeekForwardIncrementChanged(seekForwardIncrement: Long) {
             this@MediaPlayerDataViewModel.seekForwardIncrement.value = seekForwardIncrement
         }
@@ -96,10 +94,6 @@ class MediaPlayerDataViewModel: ViewModel() {
 
         override fun onAudioAttributesChanged(audioAttributes: AudioAttributes) {
             this@MediaPlayerDataViewModel.audioAttributes.value = audioAttributes
-        }
-
-        override fun onPlaylistMetadataChanged(mediaMetadata: MediaMetadata) {
-            this@MediaPlayerDataViewModel.playlistMediaMetadata.value = mediaMetadata
         }
 
         override fun onVolumeChanged(volume: Float) {
@@ -113,6 +107,11 @@ class MediaPlayerDataViewModel: ViewModel() {
         override fun onTimelineChanged(currentTimeline: Timeline) {
             this@MediaPlayerDataViewModel.currentTimeline.value = currentTimeline
         }
+
+        override fun onMediaItemsChanged(mediaItems: List<MediaItem>) {
+            this@MediaPlayerDataViewModel.mediaItems.value = mediaItems
+        }
+
     }
 
     companion object {

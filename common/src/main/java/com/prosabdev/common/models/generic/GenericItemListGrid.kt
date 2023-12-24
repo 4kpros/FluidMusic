@@ -7,8 +7,8 @@ data class GenericItemListGrid (
     var title: String? = "",
     var subtitle: String? = "",
     var details: String? = "",
-    var imageUri: Uri = Uri.EMPTY,
-    var imageHashedSignature: Int = -1
+    var mediaUri: Uri = Uri.EMPTY,
+    var hashedCovertArtSignature: Int = -1
 ){
     companion object {
         const val TAG = "GenericItemListGrid"

@@ -269,13 +269,6 @@ class SortContentExplorerBottomSheetDialogFragment : BottomSheetDialogFragment()
         }
     }
 
-    fun updateBottomSheetData(genericListenDataViewModel: GenericListenDataViewModel?, fromSource: String?, fromSourceValue: String? = null){
-        mGenericListenDataViewModel = genericListenDataViewModel
-        mFromSource = fromSource
-        mFromSourceValue = fromSourceValue
-        initViews()
-    }
-
     companion object {
         const val TAG = "SortContentExplorerBottomSheetDialogFragment"
 

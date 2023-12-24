@@ -38,7 +38,7 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
     private var mLayoutManager: GridLayoutManager? = null
     private var mItemDecoration: GridSpacingItemDecoration? = null
 
-    private var mSongList: List<com.prosabdev.common.models.songitem.SongItem>? = null
+    private var mMediaItems: List<MediaItem>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -119,7 +119,7 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
             mLayoutManager = GridLayoutManager(ctx, 1, GridLayoutManager.VERTICAL, false)
             mDataBinding.recyclerView.adapter = mQueueMusicItemAdapter
             mDataBinding.recyclerView.layoutManager = mLayoutManager
-            mQueueMusicItemAdapter?.submitList(mSongList)
+            mQueueMusicItemAdapter?.submitList(mMediaItems)
             //
             mQueueMusicItemAdapter?.setIsPlaying(mMediaPlayerDataViewModel.isPlaying.value ?: false)
             mQueueMusicItemAdapter?.setPlayingPosition(mMediaPlayerDataViewModel.currentMediaItemIndex.value ?: -1)
@@ -167,10 +167,10 @@ class QueueMusicBottomSheetDialog : GenericFullBottomSheetDialogFragment() {
 //        }
     }
     fun updateQueueMusicList(
-        songList: List<com.prosabdev.common.models.songitem.SongItem>?
+        mediaItems: List<MediaItem>?
     ){
-        mSongList = songList
-        mQueueMusicItemAdapter?.submitList(songList)
+        mMediaItems = mediaItems
+        mQueueMusicItemAdapter?.submitList(mMediaItems)
     }
 
     companion object {

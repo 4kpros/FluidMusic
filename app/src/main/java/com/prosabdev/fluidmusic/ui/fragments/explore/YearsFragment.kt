@@ -119,11 +119,11 @@ class YearsFragment : Fragment() {
     private fun saveAllDataToPref() {
         val tempSortOrganize = SortOrganizeItemSP()
         tempSortOrganize.sortOrderBy =
-            mYearsFragmentViewModel.sortBy.value ?: SORT_LIST_GRID_DEFAULT_VALUE
+            mYearsFragmentViewModel.sortBy.value ?: YearsFragmentViewModel.SORT_DEFAULT_VALUE
         tempSortOrganize.organizeListGrid =
-            mYearsFragmentViewModel.organizeListGrid.value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
+            mYearsFragmentViewModel.organizeListGrid.value ?: YearsFragmentViewModel.ORGANIZE_DEFAULT_VALUE
         tempSortOrganize.isInvertSort =
-            mYearsFragmentViewModel.isInverted.value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
+            mYearsFragmentViewModel.isInverted.value ?: YearsFragmentViewModel.IS_INVERTED_DEFAULT_VALUE
         PersistentStorage
             .SortAndOrganize
             .save(
@@ -145,9 +145,9 @@ class YearsFragment : Fragment() {
             mYearsFragmentViewModel.isInverted.value = it.isInvertSort
         }
         if (tempSortOrganize == null) {
-            mYearsFragmentViewModel.sortBy.value = SORT_LIST_GRID_DEFAULT_VALUE
-            mYearsFragmentViewModel.organizeListGrid.value = ORGANIZE_LIST_GRID_DEFAULT_VALUE
-            mYearsFragmentViewModel.isInverted.value = IS_INVERTED_LIST_GRID_DEFAULT_VALUE
+            mYearsFragmentViewModel.sortBy.value = YearsFragmentViewModel.SORT_DEFAULT_VALUE
+            mYearsFragmentViewModel.organizeListGrid.value = YearsFragmentViewModel.ORGANIZE_DEFAULT_VALUE
+            mYearsFragmentViewModel.isInverted.value = YearsFragmentViewModel.IS_INVERTED_DEFAULT_VALUE
         }
     }
 
@@ -193,7 +193,7 @@ class YearsFragment : Fragment() {
             val tempSpanCount: Int =
                 OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, organizeValue)
             mGenericListGridItemAdapter?.setOrganizeListGrid(
-                mYearsFragmentViewModel.organizeListGrid.value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
+                mYearsFragmentViewModel.organizeListGrid.value ?: YearsFragmentViewModel.ORGANIZE_DEFAULT_VALUE
             )
             mLayoutManager?.spanCount = tempSpanCount
         }
@@ -485,7 +485,7 @@ class YearsFragment : Fragment() {
                     }
                 },
                 YearItem.diffCallback as DiffUtil.ItemCallback<Any>,
-                mYearsFragmentViewModel.organizeListGrid.value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE,
+                mYearsFragmentViewModel.organizeListGrid.value ?: YearsFragmentViewModel.ORGANIZE_DEFAULT_VALUE,
                 mIsSelectable = true,
                 mHavePlaybackState = false,
                 mIsImageFullCircle = false,
@@ -580,8 +580,8 @@ class YearsFragment : Fragment() {
 
         context?.let { ctx ->
             val tempGeneric = YearItem.castDataItemToGeneric(ctx, tempItem, true) ?: return
-            val tempStringUri =
-                if (tempGeneric.imageUri == Uri.EMPTY) "" else tempGeneric.imageUri.toString()
+            val tempStringUri = if (tempGeneric.mediaUri == Uri.EMPTY)
+                "" else tempGeneric.mediaUri.toString()
             tempFragmentManager.commit {
                 setReorderingAllowed(false)
                 add(
@@ -594,7 +594,7 @@ class YearsFragment : Fragment() {
                         YearItem.INDEX_COLUM_TO_SONG_ITEM,
                         tempGeneric.name,
                         tempStringUri,
-                        tempGeneric.imageHashedSignature,
+                        tempGeneric.hashedCovertArtSignature,
                         tempGeneric.title,
                         tempGeneric.subtitle,
                         tempGeneric.details,
@@ -655,9 +655,6 @@ class YearsFragment : Fragment() {
 
     companion object {
         const val TAG = "YearsFragment"
-        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = Constants.ORGANIZE_GRID_MEDIUM
-        private const val SORT_LIST_GRID_DEFAULT_VALUE: String = YearItem.DEFAULT_INDEX
-        private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 
         @JvmStatic
         fun newInstance() =

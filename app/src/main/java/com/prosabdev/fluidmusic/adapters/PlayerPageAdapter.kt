@@ -2,10 +2,13 @@ package com.prosabdev.fluidmusic.adapters
 
 import android.content.Context
 import android.net.Uri
+import android.provider.MediaStore.Audio.Media
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.media3.common.MediaItem
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.prosabdev.common.models.songitem.SongItem
@@ -22,8 +25,7 @@ import kotlinx.coroutines.launch
 class PlayingNowPageAdapter(
     private val mContext: Context,
     private val mListener: OnItemClickListener
-) : ListAdapter<SongItem, PlayingNowPageAdapter.PlayingNowPageHolder>(
-    SongItem.diffCallbackViewPager) {
+) : ListAdapter<MediaItem, PlayingNowPageAdapter.PlayingNowPageHolder>(SongItem.diffCallbackMediaItem) {
 
     interface OnItemClickListener {
         fun onButtonLyricsClicked(position: Int)
@@ -83,12 +85,12 @@ class PlayingNowPageAdapter(
             Animators.crossFadeDown(mItemPlayerCardViewBinding.buttonFullscreen as View, true)
         }
 
-        fun loadCovertArt(ctx: Context, songItem: SongItem) {
-            val tempUri : Uri? = Uri.parse(songItem.uri ?: "")
+        fun loadCovertArt(ctx: Context, mediaItem: MediaItem) {
+            val tempUri : Uri? = Uri.parse(mediaItem.mediaMetadata.extras?.getString(SongItem.EXTRAS_MEDIA_URI) ?: "")
             val imageRequest: ImageLoaders.ImageRequestItem = ImageLoaders.ImageRequestItem.newOriginalLargeCardInstance()
             imageRequest.uri = tempUri
             imageRequest.imageView = mItemPlayerCardViewBinding.playerViewpagerImageview
-            imageRequest.hashedCovertArtSignature = songItem.hashedCovertArtSignature
+            imageRequest.hashedCovertArtSignature = mediaItem.mediaMetadata.extras?.getInt(SongItem.EXTRAS_IMAGE_SIGNATURE) ?: -1
             ImageLoaders.startExploreContentImageLoaderJob(ctx, imageRequest)
         }
     }

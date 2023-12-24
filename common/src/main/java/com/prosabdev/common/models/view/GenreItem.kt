@@ -85,9 +85,9 @@ data class GenreItem (
                 tempResult.subtitle = tempSubtitle
                 tempResult.details = tempDetails
                 if(dataItem.uriImage?.isNotEmpty() == true){
-                    tempResult.imageUri = Uri.parse(dataItem.uriImage)
+                    tempResult.mediaUri = Uri.parse(dataItem.uriImage)
                 }
-                tempResult.imageHashedSignature = dataItem.hashedCovertArtSignature
+                tempResult.hashedCovertArtSignature = dataItem.hashedCovertArtSignature
             }
             return tempResult
         }

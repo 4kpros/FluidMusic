@@ -41,7 +41,7 @@ import com.prosabdev.common.components.Constants
         GenreItem::class,
         YearItem::class,
            ],
-    version = 92)
+    version = 93)
 
 abstract class AppDatabase : RoomDatabase() {
 

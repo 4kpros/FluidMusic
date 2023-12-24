@@ -64,6 +64,7 @@ class ExploreContentForFragment : Fragment() {
     private val mExploreContentsForFragmentViewModel: ExploreContentsForFragmentViewModel by activityViewModels()
     private val mMainFragmentViewModel: MainFragmentViewModel by activityViewModels()
     private val mPlayingNowFragmentViewModel: PlayingNowFragmentViewModel by activityViewModels()
+
     private val mMediaPlayerDataViewModel: MediaPlayerDataViewModel by activityViewModels()
     private val mMediaControllerViewModel by activityViewModels<MediaControllerViewModel> {
         InjectorUtils.provideMediaControllerViewModel(mMediaPlayerDataViewModel.mediaEventsListener)
@@ -88,8 +89,8 @@ class ExploreContentForFragment : Fragment() {
     private var mLoadSongFromSource: String? = null
     private var mWhereColumnIndex: String? = null
     private var mWhereColumnValue: String? = null
-
     private var mPreferencesKey: String? = null
+
     private var mImageUri: String? = null
     private var mHashedCoverArtSignature: Int = -1
     private var mTextTitle: String? = null
@@ -119,7 +120,7 @@ class ExploreContentForFragment : Fragment() {
 
         //Load your UI content
         if (savedInstanceState == null){
-            loadPreferences()
+            mExploreContentsForFragmentViewModel.loadPreferencesManually(mPreferencesKey)
             initViews()
             setupRecyclerViewAdapter()
             checkInteractions()
@@ -131,81 +132,110 @@ class ExploreContentForFragment : Fragment() {
 
     private fun observeLiveData() {
         mExploreContentsForFragmentViewModel.itemsList.observe(viewLifecycleOwner) {
-            updateItemsList(it)
+            updateItemsListUI(it)
         }
         mExploreContentsForFragmentViewModel.sortBy.observe(viewLifecycleOwner) {
-            updateItemsListSortBy(it)
+            updateSortListUI(it)
         }
         mExploreContentsForFragmentViewModel.isInverted.observe(viewLifecycleOwner) {
-            updateItemsListIsInverted(it)
+            updateIsInvertedListUI(it)
         }
         mExploreContentsForFragmentViewModel.organizeListGrid.observe(viewLifecycleOwner) {
-            updateUIOrganizeListGrid(it)
+            updateOrganizeListGridUI(it)
         }
 
         //Listen to player changes
         mMediaPlayerDataViewModel.currentMediaItem.observe(viewLifecycleOwner) {
-            updateUICurrentMediaItem(it)
+            updateCurrentMediaItemUI(it)
         }
         mMediaPlayerDataViewModel.isPlaying.observe(viewLifecycleOwner) {
-            updateUIIsPlaying(it)
+            updateIsPlayingUI(it)
         }
 
         //Listen for main fragment changes
         mMainFragmentViewModel.selectMode.observe(viewLifecycleOwner) {
-            updateSelectionModeChanged(it)
+            updateSelectionModeUI(it)
         }
         mMainFragmentViewModel.requestToggleSelectAll.observe(viewLifecycleOwner) {
-            updateSelectAllItems(it)
+            updateSelectAllItemsUI(it)
         }
         mMainFragmentViewModel.requestToggleSelectRange.observe(viewLifecycleOwner) {
-            updateSelectRangeItems(it)
+            updateSelectRangeItemsUI(it)
         }
         mMainFragmentViewModel.scrollingState.observe(viewLifecycleOwner) {
-            updateUIScrollingState(it)
+            updateScrollingStateUI(it)
         }
         mMainFragmentViewModel.isFastScrolling.observe(viewLifecycleOwner) {
-            updateUIIsFastScrolling(it)
+            updateIsFastScrollingUI(it)
         }
     }
 
-    private fun updateUIIsFastScrolling(b: Boolean) {
+    private fun updateIsFastScrollingUI(isFastScrolling: Boolean) {
         //
     }
 
-    private fun updateUIScrollingState(i: Int) {
+    private fun updateScrollingStateUI(scrollingState: Int) {
         //
     }
 
-    private fun updateSelectRangeItems(i: Int) {
+    private fun updateSelectRangeItemsUI(counter: Int) {
         //
     }
 
-    private fun updateSelectAllItems(i: Int) {
+    private fun updateSelectAllItemsUI(counter: Int) {
         //
     }
 
-    private fun updateUIIsPlaying(b: Boolean) {
+    private fun updateIsPlayingUI(isPlaying: Boolean) {
         //
     }
 
-    private fun updateUICurrentMediaItem(mediaItem: MediaItem?) {
+    private fun updateCurrentMediaItemUI(mediaItem: MediaItem?) {
         //
     }
 
-    private fun updateUIOrganizeListGrid(i: Int) {
+    private fun updateOrganizeListGridUI(organizeValue: Int) {
+        context?.let { ctx ->
+            val tempSpanCount: Int =
+                OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, organizeValue)
+            mGenericListGridItemAdapter?.setOrganizeListGrid(
+                mExploreContentsForFragmentViewModel.organizeListGrid.value
+                    ?: ExploreContentsForFragmentViewModel.ORGANIZE_LIST_GRID_DEFAULT_VALUE
+            )
+            mLayoutManager?.spanCount = tempSpanCount
+        }
+    }
+
+    private fun updateIsInvertedListUI(isInverted: Boolean) {
+        if (isInverted) {
+            mGenericListGridItemAdapter?.submitList(mExploreContentsForFragmentViewModel.itemsList.value?.reversed())
+        } else {
+            mGenericListGridItemAdapter?.submitList(mExploreContentsForFragmentViewModel.itemsList.value)
+        }
+        if (
+            mMediaPlayerDataViewModel.queueListSource.value == TAG &&
+            mMediaPlayerDataViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
+            mMediaPlayerDataViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
+            mMediaPlayerDataViewModel.queueListSortBy.value == mExploreContentsForFragmentViewModel.sortBy.value &&
+            mMediaPlayerDataViewModel.queueListIsInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
+        ) {
+            mGenericListGridItemAdapter?.setPlayingPosition(
+                mMediaPlayerDataViewModel.currentMediaItemIndex.value ?: 0
+            )
+            mGenericListGridItemAdapter?.setIsPlaying(
+                mMediaPlayerDataViewModel.isPlaying.value ?: false
+            )
+        } else {
+            mGenericListGridItemAdapter?.setPlayingPosition(-1)
+            mGenericListGridItemAdapter?.setIsPlaying(false)
+        }
+    }
+
+    private fun updateSortListUI(it: String?) {
         //
     }
 
-    private fun updateItemsListIsInverted(b: Boolean) {
-        //
-    }
-
-    private fun updateItemsListSortBy(it: String?) {
-        //
-    }
-
-    private fun updateItemsList(items: List<Any>?) {
+    private fun updateItemsListUI(items: List<Any>?) {
         //
     }
 
@@ -213,44 +243,6 @@ class ExploreContentForFragment : Fragment() {
         if (isFastScrolling) {
             mDataBinding.appBarLayout.setExpanded(false)
         }
-    }
-
-    private fun updateOrganizeListGrid(organizeValue: Int?) {
-        context?.let { ctx ->
-            val tempSpanCount: Int =
-                OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, organizeValue)
-            mGenericListGridItemAdapter?.setOrganizeListGrid(
-                mExploreContentsForFragmentViewModel.organizeListGrid.value
-                    ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
-            )
-            mLayoutManager?.spanCount = tempSpanCount
-        }
-    }
-
-    private fun invertSongListAndUpdateAdapter(isInverted: Boolean?) {
-//        val tempNewIsInverted: Boolean = isInverted ?: false
-//        if (tempNewIsInverted) {
-//            mGenericListGridItemAdapter?.submitList(mExploreContentsForFragmentViewModel.itemsList.value?.reversed())
-//        } else {
-//            mGenericListGridItemAdapter?.submitList(mExploreContentsForFragmentViewModel.itemsList.value)
-//        }
-//        if (
-//            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
-//            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
-//            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
-//            mPlayingNowFragmentViewModel.sort.value == mExploreContentsForFragmentViewModel.sortBy.value &&
-//            mPlayingNowFragmentViewModel.isInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
-//        ) {
-//            mGenericListGridItemAdapter?.setPlayingPosition(
-//                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
-//            )
-//            mGenericListGridItemAdapter?.setIsPlaying(
-//                mPlayingNowFragmentViewModel.getIsPlaying().value ?: false
-//            )
-//        } else {
-//            mGenericListGridItemAdapter?.setPlayingPosition(-1)
-//            mGenericListGridItemAdapter?.setIsPlaying(false)
-//        }
     }
 
     private suspend fun requestNewDataFromDatabase() {
@@ -264,31 +256,31 @@ class ExploreContentForFragment : Fragment() {
     }
 
     private fun addDataToGenericAdapter(dataList: List<Any>?) {
-//        if (mExploreContentsForFragmentViewModel.isInverted.value == true) {
-//            mGenericListGridItemAdapter?.submitList(dataList?.reversed())
-//        } else {
-//            mGenericListGridItemAdapter?.submitList(dataList)
-//        }
-//        if (mMainFragmentViewModel.currentSelectablePage.value == TAG) {
-//            mMainFragmentViewModel.totalCount.value = dataList?.size ?: 0
-//        }
-//        if (
-//            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
-//            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
-//            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
-//            mPlayingNowFragmentViewModel.sortBy.value == mExploreContentsForFragmentViewModel.sortBy.value &&
-//            mPlayingNowFragmentViewModel.isInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
-//        ) {
-//            mGenericListGridItemAdapter?.setPlayingPosition(
-//                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
-//            )
-//            mGenericListGridItemAdapter?.setIsPlaying(
-//                mPlayingNowFragmentViewModel.getIsPlaying().value ?: false
-//            )
-//        } else {
-//            mGenericListGridItemAdapter?.setPlayingPosition(-1)
-//            mGenericListGridItemAdapter?.setIsPlaying(false)
-//        }
+        if (mExploreContentsForFragmentViewModel.isInverted.value == true) {
+            mGenericListGridItemAdapter?.submitList(dataList?.reversed())
+        } else {
+            mGenericListGridItemAdapter?.submitList(dataList)
+        }
+        if (mMainFragmentViewModel.currentSelectablePage.value == TAG) {
+            mMainFragmentViewModel.totalCount.value = dataList?.size ?: 0
+        }
+        if (
+            mMediaPlayerDataViewModel.queueListSource.value == TAG &&
+            mMediaPlayerDataViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
+            mMediaPlayerDataViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
+            mMediaPlayerDataViewModel.queueListSortBy.value == mExploreContentsForFragmentViewModel.sortBy.value &&
+            mMediaPlayerDataViewModel.queueListIsInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
+        ) {
+            mGenericListGridItemAdapter?.setPlayingPosition(
+                mMediaPlayerDataViewModel.currentMediaItemIndex.value ?: 0
+            )
+            mGenericListGridItemAdapter?.setIsPlaying(
+                mMediaPlayerDataViewModel.isPlaying.value ?: false
+            )
+        } else {
+            mGenericListGridItemAdapter?.setPlayingPosition(-1)
+            mGenericListGridItemAdapter?.setIsPlaying(false)
+        }
     }
 
     private fun updateOnScrollingStateUI(i: Int) {
@@ -319,7 +311,7 @@ class ExploreContentForFragment : Fragment() {
         }
     }
 
-    private fun updateSelectionModeChanged(it: Boolean?) {
+    private fun updateSelectionModeUI(it: Boolean?) {
         if (mMainFragmentViewModel.currentSelectablePage.value == TAG) {
             mMainFragmentViewModel.totalCount.value = mGenericListGridItemAdapter?.itemCount ?: 0
             mLayoutManager?.let { it1 ->
@@ -330,24 +322,24 @@ class ExploreContentForFragment : Fragment() {
     }
 
     private fun updatePlayingSongUI(songItem: SongItem?) {
-//        val songPosition: Int = songItem?.position ?: -1
-//
-//        if (
-//            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
-//            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
-//            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
-//            mPlayingNowFragmentViewModel.sortBy.value == mExploreContentsForFragmentViewModel.sortBy.value &&
-//            mPlayingNowFragmentViewModel.isInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
-//        ) {
-//            mGenericListGridItemAdapter?.setPlayingPosition(songPosition)
-//            mGenericListGridItemAdapter?.setIsPlaying(
-//                mPlayingNowFragmentViewModel.getIsPlaying().value ?: false
-//            )
-//            tryToScrollOnCurrentItem(songPosition)
-//        } else {
-//            if ((mGenericListGridItemAdapter?.getPlayingPosition() ?: -1) >= 0)
-//                mGenericListGridItemAdapter?.setPlayingPosition(-1)
-//        }
+        val songPosition: Int = songItem?.position ?: -1
+
+        if (
+            mMediaPlayerDataViewModel.queueListSource.value == TAG &&
+            mMediaPlayerDataViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
+            mMediaPlayerDataViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
+            mMediaPlayerDataViewModel.queueListSortBy.value == mExploreContentsForFragmentViewModel.sortBy.value &&
+            mMediaPlayerDataViewModel.queueListIsInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
+        ) {
+            mGenericListGridItemAdapter?.setPlayingPosition(songPosition)
+            mGenericListGridItemAdapter?.setIsPlaying(
+                mMediaPlayerDataViewModel.isPlaying.value ?: false
+            )
+            tryToScrollOnCurrentItem(songPosition)
+        } else {
+            if ((mGenericListGridItemAdapter?.getPlayingPosition() ?: -1) >= 0)
+                mGenericListGridItemAdapter?.setPlayingPosition(-1)
+        }
     }
 
     private fun tryToScrollOnCurrentItem(position: Int) {
@@ -378,26 +370,26 @@ class ExploreContentForFragment : Fragment() {
     }
 
     private fun updatePlaybackStateUI(isPlaying: Boolean) {
-//        if (
-//            mPlayingNowFragmentViewModel.queueListSource.value == TAG &&
-//            mPlayingNowFragmentViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
-//            mPlayingNowFragmentViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
-//            mPlayingNowFragmentViewModel.sortBy.value == mExploreContentsForFragmentViewModel.sortBy.value &&
-//            mPlayingNowFragmentViewModel.isInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
-//        ) {
-//            mGenericListGridItemAdapter?.setPlayingPosition(
-//                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
-//            )
-//            mGenericListGridItemAdapter?.setIsPlaying(isPlaying)
-//            tryToScrollOnCurrentItem(
-//                mPlayingNowFragmentViewModel.getCurrentPlayingSong().value?.position ?: 0
-//            )
-//        } else {
-//            if (mGenericListGridItemAdapter?.getIsPlaying() == true) {
-//                mGenericListGridItemAdapter?.setIsPlaying(false)
-//                mGenericListGridItemAdapter?.setPlayingPosition(-1)
-//            }
-//        }
+        if (
+            mMediaPlayerDataViewModel.queueListSource.value == TAG &&
+            mMediaPlayerDataViewModel.queueListSourceColumnIndex.value == mWhereColumnIndex &&
+            mMediaPlayerDataViewModel.queueListSourceColumnValue.value == mWhereColumnValue &&
+            mMediaPlayerDataViewModel.queueListSortBy.value == mExploreContentsForFragmentViewModel.sortBy.value &&
+            mMediaPlayerDataViewModel.queueListIsInverted.value == mExploreContentsForFragmentViewModel.isInverted.value
+        ) {
+            mGenericListGridItemAdapter?.setPlayingPosition(
+                mMediaPlayerDataViewModel.currentMediaItemIndex.value ?: 0
+            )
+            mGenericListGridItemAdapter?.setIsPlaying(isPlaying)
+            tryToScrollOnCurrentItem(
+                mMediaPlayerDataViewModel.currentMediaItemIndex.value ?: 0
+            )
+        } else {
+            if (mGenericListGridItemAdapter?.getIsPlaying() == true) {
+                mGenericListGridItemAdapter?.setIsPlaying(false)
+                mGenericListGridItemAdapter?.setPlayingPosition(-1)
+            }
+        }
     }
 
     private fun checkInteractions() {
@@ -406,7 +398,7 @@ class ExploreContentForFragment : Fragment() {
         }
         mDataBinding.topAppBar.setOnMenuItemClickListener {
             if (it?.itemId == R.id.search) {
-                //onSearchButtonClicked()
+                goToSearchScreen()
             }
             true
         }
@@ -461,6 +453,10 @@ class ExploreContentForFragment : Fragment() {
         })
     }
 
+    private fun goToSearchScreen() {
+        TODO("Not yet implemented")
+    }
+
     private fun setupRecyclerViewAdapter() {
         if (mGenericListGridItemAdapter != null) return
         val ctx: Context = context ?: return
@@ -472,15 +468,7 @@ class ExploreContentForFragment : Fragment() {
             listHeadlines,
             object : HeadlinePlayShuffleAdapter.OnItemClickListener {
                 override fun onPlayButtonClicked() {
-                    FragmentsCommunication.playSongAtPositionFromGenericAdapterView(
-                        mPlayingNowFragmentViewModel,
-                        mExploreContentsForFragmentViewModel,
-                        mGenericListGridItemAdapter,
-                        TAG,
-                        mWhereColumnIndex,
-                        mWhereColumnValue,
-                        0
-                    )
+                    playSong()
                 }
 
                 override fun onShuffleButtonClicked() {
@@ -528,15 +516,7 @@ class ExploreContentForFragment : Fragment() {
                             mLayoutManager
                         )
                     } else {
-                        FragmentsCommunication.playSongAtPositionFromGenericAdapterView(
-                            mPlayingNowFragmentViewModel,
-                            mExploreContentsForFragmentViewModel,
-                            mGenericListGridItemAdapter,
-                            TAG,
-                            mWhereColumnIndex,
-                            mWhereColumnValue,
-                            position
-                        )
+                        playSongAtPosition(position)
                     }
                 }
 
@@ -567,7 +547,7 @@ class ExploreContentForFragment : Fragment() {
             },
             SongItem.diffCallback as DiffUtil.ItemCallback<Any>,
             mExploreContentsForFragmentViewModel.organizeListGrid.value
-                ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE,
+                ?: ExploreContentsForFragmentViewModel.ORGANIZE_LIST_GRID_DEFAULT_VALUE,
             mIsSelectable = true,
             mHavePlaybackState = true,
             mIsImageFullCircle = false
@@ -669,28 +649,25 @@ class ExploreContentForFragment : Fragment() {
         mOrganizeItemsDialog?.show(childFragmentManager, OrganizeItemBottomSheetDialogFragment.TAG)
     }
 
+    private fun playSongAtPosition(position: Int) {
+        if ((mGenericListGridItemAdapter?.currentList?.size ?: 0) <= 0) return
+
+        updateRecyclerViewScrollingSate()
+        TODO("Start playing song at position")
+    }
+
+    private fun playSong() {
+        if ((mGenericListGridItemAdapter?.currentList?.size ?: 0) <= 0) return
+
+        updateRecyclerViewScrollingSate()
+        TODO("Start playing song at position 0 without shuffle")
+    }
+
     private fun playSongOnShuffle() {
         if ((mGenericListGridItemAdapter?.currentList?.size ?: 0) <= 0) return
 
-        val randomExcludedNumber: Int =
-            com.prosabdev.common.utils.MathComputations.randomExcluded(
-                mGenericListGridItemAdapter?.getPlayingPosition() ?: -1,
-                (mGenericListGridItemAdapter?.currentList?.size ?: 0) - 1
-            )
-        mGenericListGridItemAdapter?.let { genericListGridItemAdapter ->
-            FragmentsCommunication.playSongAtPositionFromGenericAdapterView(
-                mPlayingNowFragmentViewModel,
-                mExploreContentsForFragmentViewModel,
-                genericListGridItemAdapter,
-                TAG,
-                mWhereColumnIndex,
-                mWhereColumnValue,
-                randomExcludedNumber,
-                Player.REPEAT_MODE_OFF,
-                false
-            )
-        }
         updateRecyclerViewScrollingSate()
+        TODO("Start playing song and enable shuffle")
     }
 
     private fun updateRecyclerViewScrollingSate() {
@@ -708,18 +685,18 @@ class ExploreContentForFragment : Fragment() {
                 it
             )
         }
-        updateUICoverArt()
-        updateUIBackButtonTitle()
-        updateUITexts()
+        updateCoverArtUI()
+        updateBackButtonTitleUI()
+        updateTextsUI()
     }
-    private fun updateUITexts() {
+    private fun updateTextsUI() {
         mDataBinding.let { mDataBinding ->
             mDataBinding.textTitle.text = mTextTitle
             mDataBinding.textSubtitle.text = mTextSubTitle
             mDataBinding.textDetails.text = mTextDetails
         }
     }
-    private fun updateUIBackButtonTitle() {
+    private fun updateBackButtonTitleUI() {
         mDataBinding.collapsingToolBarLayout.title = when (mLoadSongFromSource) {
 
             AlbumsFragment.TAG -> context?.resources?.getString(R.string.album)
@@ -733,7 +710,7 @@ class ExploreContentForFragment : Fragment() {
             else -> context?.resources?.getString(R.string.unknown_content)
         }
     }
-    private fun updateUICoverArt() {
+    private fun updateCoverArtUI() {
         context?.let { ctx ->
             val imageRequestLargeImage =
                 ImageLoaders.ImageRequestItem.newOriginalMediumCardInstance()
@@ -747,84 +724,20 @@ class ExploreContentForFragment : Fragment() {
         }
     }
 
-    fun updateInstanceData(
-        preferencesKey: String,
-        loadSongFromSource: String?,
-        whereColumnIndex: String?,
-        columnValue: String?,
-        imageUri: String?,
-        hashedCoverArtSignature: Int,
-        textTitle: String?,
-        textSubTitle: String?,
-        textDetails: String?,
-    ) {
-        mLoadSongFromSource = loadSongFromSource
-        mWhereColumnIndex = whereColumnIndex
-        mWhereColumnValue = columnValue
-
-        mPreferencesKey = preferencesKey
-        mImageUri = imageUri
-        mHashedCoverArtSignature = hashedCoverArtSignature
-        mTextTitle = textTitle
-        mTextSubTitle = textSubTitle
-        mTextDetails = textDetails
-
-        mMainFragmentViewModel.scrollingState.value = -2
-        loadPreferences()
-        updateUICoverArt()
-        updateUIBackButtonTitle()
-        updateUITexts()
-        setupRecyclerViewAdapter()
-    }
-
-    private fun savePreferences() {
-        val tempSortOrganize = SortOrganizeItemSP()
-        tempSortOrganize.sortOrderBy =
-            mExploreContentsForFragmentViewModel.sortBy.value ?: SORT_LIST_GRID_DEFAULT_VALUE
-        tempSortOrganize.organizeListGrid =
-            mExploreContentsForFragmentViewModel.organizeListGrid.value
-                ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
-        tempSortOrganize.isInvertSort = mExploreContentsForFragmentViewModel.isInverted.value
-            ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
-        PersistentStorage.SortAndOrganize.save(
-            mPreferencesKey ?: return,
-            tempSortOrganize
-        )
-    }
-    private fun loadPreferences() {
-        val tempSortOrganize: SortOrganizeItemSP? = PersistentStorage.SortAndOrganize.load(
-            mPreferencesKey ?: return
-        )
-        mExploreContentsForFragmentViewModel.sortBy.value =
-            tempSortOrganize?.sortOrderBy ?: SORT_LIST_GRID_DEFAULT_VALUE
-        mExploreContentsForFragmentViewModel.organizeListGrid.value =
-            tempSortOrganize?.organizeListGrid ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
-        mExploreContentsForFragmentViewModel.isInverted.value =
-            tempSortOrganize?.isInvertSort ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        savePreferences()
-    }
-
     companion object {
         const val TAG = "ExploreContentFor"
-
-        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = Constants.ORGANIZE_LIST_SMALL
-        private const val SORT_LIST_GRID_DEFAULT_VALUE: String = SongItem.DEFAULT_INDEX
-        private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 
         const val SCROLLING_TOP: Int = -1
         const val SCROLLING_BOTTOM: Int = 1
         const val SCROLLED_TOP: Int = -2
         const val SCROLLED_BOTTOM: Int = 2
+
         @JvmStatic
         fun newInstance(
             preferencesKey: String,
             loadSongFromSource: String?,
             whereColumnIndex: String?,
-            columnValue: String?,
+            whereColumnValue: String?,
             imageUri: String?,
             hashedCoverArtSignature: Int,
             textTitle: String?,
@@ -834,9 +747,9 @@ class ExploreContentForFragment : Fragment() {
             ExploreContentForFragment().apply {
                 mLoadSongFromSource = loadSongFromSource
                 mWhereColumnIndex = whereColumnIndex
-                mWhereColumnValue = columnValue
-
+                mWhereColumnValue = whereColumnValue
                 mPreferencesKey = preferencesKey
+
                 mImageUri = imageUri
                 mHashedCoverArtSignature = hashedCoverArtSignature
                 mTextTitle = textTitle

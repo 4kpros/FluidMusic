@@ -3,6 +3,7 @@ package com.prosabdev.fluidmusic.ui.fragments
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -90,15 +91,21 @@ class PlayingNowFragment : Fragment() {
     private fun observeLiveData() {
         mMediaPlayerDataViewModel.mediaItems.observe(viewLifecycleOwner) {
             updateUIEmptyList(it?.size ?: 0)
+            mPlayingNowPageAdapter?.submitList(it)
         }
         mMediaPlayerDataViewModel.isPlaying.observe(viewLifecycleOwner) {
             updateUIIsPlaying(it)
         }
+        mMediaPlayerDataViewModel.currentMediaItemIndex.observe(viewLifecycleOwner) {
+            updateUINextPrev(mMediaPlayerDataViewModel.currentMediaItemIndex.value, mMediaPlayerDataViewModel.mediaItems.value?.size)
+            updateUIViewpager(mMediaPlayerDataViewModel.currentMediaItemIndex.value, mMediaPlayerDataViewModel.mediaItems.value?.size)
+        }
         mMediaPlayerDataViewModel.currentMediaItem.observe(viewLifecycleOwner) {
             updateUIMediaInfo(it)
+            updateUIDuration(mMediaPlayerDataViewModel.currentMediaItem.value?.mediaMetadata?.extras?.getLong(SongItem.EXTRAS_DURATION) ?: 0)
         }
         mMediaPlayerDataViewModel.positionMs.observe(viewLifecycleOwner) {
-            updateUIPositionMs(it, mMediaPlayerDataViewModel.currentMediaItem.value?.clippingConfiguration?.endPositionMs ?: 0)
+            updateUIPositionMs(it, mMediaPlayerDataViewModel.currentMediaItem.value?.mediaMetadata?.extras?.getLong(SongItem.EXTRAS_DURATION) ?: 0)
         }
         mMediaPlayerDataViewModel.repeatMode.observe(viewLifecycleOwner) {
             updateUIRepeat(it)
@@ -111,76 +118,64 @@ class PlayingNowFragment : Fragment() {
     private fun updateUIRepeat(repeat: Int?) {
         when (repeat) {
             Player.REPEAT_MODE_ALL -> {
-                lifecycleScope.launch {
-                    mDataBinding.buttonRepeat.alpha = 1.0f
-                    mDataBinding.buttonRepeat.icon =
-                        context?.let { ContextCompat.getDrawable(it, R.drawable.repeat) }
-                }
+                mDataBinding.buttonRepeat.alpha = 1.0f
+                mDataBinding.buttonRepeat.icon =
+                    context?.let { ContextCompat.getDrawable(it, R.drawable.repeat) }
             }
 
             Player.REPEAT_MODE_ONE -> {
-                lifecycleScope.launch {
-                    mDataBinding.buttonRepeat.alpha = 1.0f
-                    mDataBinding.buttonRepeat.icon =
-                        context?.let { ContextCompat.getDrawable(it, R.drawable.repeat_one) }
-                }
+                mDataBinding.buttonRepeat.alpha = 1.0f
+                mDataBinding.buttonRepeat.icon =
+                    context?.let { ContextCompat.getDrawable(it, R.drawable.repeat_one) }
             }
 
             else -> {
-                lifecycleScope.launch {
-                    mDataBinding.buttonRepeat.alpha = 0.4f
-                    mDataBinding.buttonRepeat.icon =
-                        context?.let { ContextCompat.getDrawable(it, R.drawable.repeat) }
-                }
+                mDataBinding.buttonRepeat.alpha = 0.4f
+                mDataBinding.buttonRepeat.icon =
+                    context?.let { ContextCompat.getDrawable(it, R.drawable.repeat) }
             }
         }
     }
 
     private fun updateUIShuffle(shuffle: Boolean?) {
+        mDataBinding.buttonShuffle.icon =
+            context?.let { ContextCompat.getDrawable(it, R.drawable.shuffle) }
         when (shuffle) {
             true -> {
-                lifecycleScope.launch {
-                    mDataBinding.buttonShuffle.alpha = 1.0f
-                    mDataBinding.buttonShuffle.icon =
-                        context?.let { ContextCompat.getDrawable(it, R.drawable.shuffle) }
-                }
+                mDataBinding.buttonShuffle.alpha = 1.0f
             }
             else -> {
-                lifecycleScope.launch {
-                    mDataBinding.buttonShuffle.alpha = 0.4f
-                    mDataBinding.buttonShuffle.icon =
-                        context?.let { ContextCompat.getDrawable(it, R.drawable.shuffle) }
-                }
+                mDataBinding.buttonShuffle.alpha = 0.4f
             }
         }
     }
 
-    private fun updateUIPositionMs(positionMs: Long, totalDuration: Long? = 0) {
-        lifecycleScope.launch {
-            mDataBinding.slider.value =
-                FormattersAndParsers.formatSongDurationToSliderProgress(
-                    positionMs,
-                    totalDuration ?: 0
-                )
-            mDataBinding.textPositionMin.text =
-                FormattersAndParsers.formatSongDurationToString(positionMs)
-        }
+    private fun updateUIPositionMs(positionMs: Long?, totalDuration: Long?) {
+        mDataBinding.slider.value =
+            FormattersAndParsers.formatSongDurationToSliderProgress(
+                positionMs ?: 0,
+                totalDuration ?: 0
+            )
+        mDataBinding.textPositionMin.text =
+            FormattersAndParsers.formatSongDurationToString(positionMs ?: 0)
+    }
+
+    private fun updateUIDuration(duration: Long?) {
+        mDataBinding.textDuration.text = FormattersAndParsers.formatSongDurationToString(duration ?: 0)
     }
 
     private fun updateUIMediaInfo(mediaItem: MediaItem?) {
-        lifecycleScope.launch {
-            mDataBinding.textTitle.text = mediaItem?.mediaMetadata?.title ?: context?.getString(R.string.unknown_title) ?: ""
-            mDataBinding.textArtist.text = mediaItem?.mediaMetadata?.artist ?: context?.getString(R.string.unknown_artist) ?: ""
-            mDataBinding.textDuration.text = FormattersAndParsers.formatSongDurationToString(mediaItem?.clippingConfiguration?.endPositionMs ?: 0)
-        }
-        updateUINextPrev(mMediaPlayerDataViewModel.currentMediaItemIndex.value, mMediaPlayerDataViewModel.mediaItems.value?.size)
-        updateUIViewpager(mMediaPlayerDataViewModel.currentMediaItemIndex.value, mMediaPlayerDataViewModel.mediaItems.value?.size)
-        updateUIBlurredBackground(mediaItem?.requestMetadata?.mediaUri, mediaItem?.mediaMetadata?.extras?.getInt(SongItem.IMAGE_SIGNATURE))
+        mDataBinding.textTitle.text = mediaItem?.mediaMetadata?.title?.ifEmpty { context?.getString(R.string.unknown_title) ?: "" } ?: ""
+        mDataBinding.textArtist.text = mediaItem?.mediaMetadata?.artist?.ifEmpty { context?.getString(R.string.unknown_artist) ?: "" }
+            ?:
+            context?.getString(R.string.unknown_artist) ?: ""
+        mDataBinding.textDetails.text = mediaItem?.mediaMetadata?.description ?: ""
+        updateUIBlurredBackground(mediaItem?.mediaMetadata?.extras?.getString(SongItem.EXTRAS_MEDIA_URI), mediaItem?.mediaMetadata?.extras?.getInt(SongItem.EXTRAS_IMAGE_SIGNATURE))
     }
-    private fun updateUIBlurredBackground(imageUri: Uri?, signature: Int? = -1) {
+    private fun updateUIBlurredBackground(mediaItemUri: String?, signature: Int? = -1) {
         val request: ImageLoaders.ImageRequestItem =
             ImageLoaders.ImageRequestItem.newBlurInstance()
-        request.uri = imageUri
+        request.uri = Uri.parse(mediaItemUri.toString())
         request.hashedCovertArtSignature = signature ?: -1
         request.imageView = mDataBinding.blurredImageview
         context?.let { ImageLoaders.startExploreContentImageLoaderJob(it, request) }
@@ -188,39 +183,28 @@ class PlayingNowFragment : Fragment() {
     private fun updateUIViewpager(mediaIndex: Int?, itemsCount: Int?) {
         if ((mediaIndex == null) || (mediaIndex < 0) || (itemsCount == null) || (mediaIndex > itemsCount)) return
 
-        val oldValue: Boolean =
-            mPlayingNowFragmentViewModel.canSmoothScrollViewpager.value ?: false
-        mPlayingNowFragmentViewModel.canSmoothScrollViewpager.value = false
-        mDataBinding.viewPagerPlayer.setCurrentItem(mediaIndex, oldValue)
+        mDataBinding.viewPagerPlayer.setCurrentItem(mediaIndex, true)
     }
     private fun updateUINextPrev(currentMediaIndex: Int? = 0, totalMediaItems: Int? = 0, ) {
-        lifecycleScope.launch {
-            mDataBinding.buttonSkipNext.isEnabled = (totalMediaItems ?: 0) > 0 && (currentMediaIndex ?: 0) < (totalMediaItems ?: 0) - 1
-            mDataBinding.buttonSkipPrev.isEnabled = (totalMediaItems ?: 0) > 0 && (currentMediaIndex ?: 0) > 0
-        }
+        mDataBinding.buttonSkipNext.isEnabled = (totalMediaItems ?: 0) > 0 && (currentMediaIndex ?: 0) < (totalMediaItems ?: 0) - 1
+        mDataBinding.buttonSkipPrev.isEnabled = (totalMediaItems ?: 0) > 0 && (currentMediaIndex ?: 0) > 0
     }
 
     private fun updateUIIsPlaying(isPlaying: Boolean?) {
         if (isPlaying == true) {
-            lifecycleScope.launch {
-                mDataBinding.buttonPlayPause.icon =
-                    context?.let { ContextCompat.getDrawable(it, R.drawable.pause_circle) }
-            }
+            mDataBinding.buttonPlayPause.icon =
+                context?.let { ContextCompat.getDrawable(it, R.drawable.pause_circle) }
         } else {
-            lifecycleScope.launch {
-                mDataBinding.buttonPlayPause.icon =
-                    context?.let { ContextCompat.getDrawable(it, R.drawable.play_circle) }
-            }
+            mDataBinding.buttonPlayPause.icon =
+                context?.let { ContextCompat.getDrawable(it, R.drawable.play_circle) }
         }
     }
 
     private fun updateUIEmptyList(size: Int) {
-        mDataBinding.let {
-            if (size > 0) {
-                it.linearRescanDeviceContainer.visibility = GONE
-            } else {
-                it.linearRescanDeviceContainer.visibility = VISIBLE
-            }
+        if (size > 0) {
+            mDataBinding.linearRescanDeviceContainer.visibility = GONE
+        } else {
+            mDataBinding.linearRescanDeviceContainer.visibility = VISIBLE
         }
     }
 
@@ -250,6 +234,7 @@ class PlayingNowFragment : Fragment() {
 
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
+                onViewpagerPageChanged(position)
                 if (viewpagerScrollState == ViewPager2.SCROLL_STATE_DRAGGING) {
                     viewpagerScrollState = ViewPager2.SCROLL_STATE_IDLE
                     onViewpagerPageChanged(position)
@@ -315,7 +300,12 @@ class PlayingNowFragment : Fragment() {
         if ((mDataBinding.viewPagerPlayer.adapter?.itemCount ?: 0) < 1) return
         if (position == mMediaPlayerDataViewModel.currentMediaItemIndex.value) return
 
-        mMediaControllerViewModel.mediaController?.seekTo(position, 0)
+        if(mPlayingNowFragmentViewModel.viewpagerChangedFromUser.value == true){
+            mPlayingNowFragmentViewModel.viewpagerChangedFromUser.value = false
+        }else{
+            mPlayingNowFragmentViewModel.viewpagerChangedFromUser.value = true
+            mMediaControllerViewModel.mediaController?.seekTo(position, 0)
+        }
     }
     private fun onViewpagerPageChangedTwice(position: Int) {
         if ((mDataBinding.viewPagerPlayer.adapter?.itemCount ?: 0) < 1) return
@@ -366,26 +356,22 @@ class PlayingNowFragment : Fragment() {
 
     private fun setupViewPagerAdapter() {
         context?.let { ctx ->
-            lifecycleScope.launch {
-                mPlayingNowPageAdapter = PlayingNowPageAdapter(
-                    ctx,
-                    object : PlayingNowPageAdapter.OnItemClickListener {
-                        override fun onButtonLyricsClicked(position: Int) {
-                        }
+            mPlayingNowPageAdapter = PlayingNowPageAdapter(
+                ctx,
+                object : PlayingNowPageAdapter.OnItemClickListener {
+                    override fun onButtonLyricsClicked(position: Int) {
+                    }
 
-                        override fun onButtonFullscreenClicked(position: Int) {
-                        }
-                    })
-            }
+                    override fun onButtonFullscreenClicked(position: Int) {
+                    }
+                })
         }
-        lifecycleScope.launch {
-            mDataBinding.viewPagerPlayer.adapter = mPlayingNowPageAdapter
-            mDataBinding.viewPagerPlayer.clipToPadding = false
-            mDataBinding.viewPagerPlayer.clipChildren = false
-            mDataBinding.viewPagerPlayer.offscreenPageLimit = 3
-            mDataBinding.viewPagerPlayer.getChildAt(0)?.overScrollMode =
-                View.OVER_SCROLL_NEVER
-        }
+        mDataBinding.viewPagerPlayer.adapter = mPlayingNowPageAdapter
+        mDataBinding.viewPagerPlayer.clipToPadding = false
+        mDataBinding.viewPagerPlayer.clipChildren = false
+        mDataBinding.viewPagerPlayer.offscreenPageLimit = 3
+        mDataBinding.viewPagerPlayer.getChildAt(0)?.overScrollMode =
+            View.OVER_SCROLL_NEVER
         Animators.applyPageTransformer(mDataBinding.viewPagerPlayer)
     }
 
@@ -398,8 +384,7 @@ class PlayingNowFragment : Fragment() {
         InsetModifiers.updateTopViewInsets(mDataBinding.linearRescanDeviceContainer)
         InsetModifiers.updateTopViewInsets(mDataBinding.linearViewpager)
 
-        InsetModifiers.updateBottomViewInsets(mDataBinding.dragHandleViewContainer)
-        InsetModifiers.updateBottomViewInsets(mDataBinding.constraintBottomButtonsContainer)
+        InsetModifiers.updateBottomViewInsets(mDataBinding.linearMoreButtons)
 
         //Update dialogs data in order to show more quickly
         mPlayerMoreBottomSheetDialog.updateData(

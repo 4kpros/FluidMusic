@@ -1,7 +1,6 @@
 package com.prosabdev.fluidmusic.ui.bottomsheetdialogs.filter
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +8,6 @@ import androidx.databinding.DataBindingUtil
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.prosabdev.fluidmusic.R
 import com.prosabdev.fluidmusic.databinding.BottomSheetSortSongsBinding
-import com.prosabdev.fluidmusic.databinding.FragmentYearsBinding
 import com.prosabdev.fluidmusic.ui.fragments.ExploreContentForFragment
 import com.prosabdev.fluidmusic.ui.fragments.PlaylistsFragment
 import com.prosabdev.fluidmusic.ui.fragments.StreamsFragment
@@ -29,10 +27,10 @@ class SortSongsBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private lateinit var mDataBinding: BottomSheetSortSongsBinding
 
     //View models
-    var mGenericListenDataViewModel: GenericListenDataViewModel? = null
+    private var mGenericListenDataViewModel: GenericListenDataViewModel? = null
 
-    var mFromSource: String? = null
-    var mFromSourceValue: String? = null
+    private var mFromSource: String? = null
+    private var mFromSourceValue: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,

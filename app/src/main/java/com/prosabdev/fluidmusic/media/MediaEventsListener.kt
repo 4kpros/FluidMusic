@@ -9,70 +9,34 @@ import androidx.media3.common.Tracks
 
 abstract class MediaEventsListener {
 
-    open fun onIsPlayingChanged(isPlaying: Boolean) {
+    abstract fun onIsPlayingChanged(isPlaying: Boolean)
 
-    }
+    abstract fun onIsLoadingChanged(isLoading: Boolean)
 
-    open fun onIsLoadingChanged(isLoading: Boolean) {
+    abstract fun onPlaybackStateChanged(playbackState: Int)
 
-    }
+    abstract fun onMediaItemTransition(currentMediaItem: MediaItem?, currentMediaItemIndex: Int)
 
-    open fun onPlaybackStateChanged(playbackState: Int) {
+    abstract fun onMediaMetaDataChanged(mediaMetadata: MediaMetadata)
 
-    }
+    abstract fun onPositionChanged(position: Long)
 
-    open fun onMediaItemTransition(currentMediaItem: MediaItem?, currentMediaItemIndex: Int) {
+    abstract fun onRepeatModeChanged(repeatMode: Int)
 
-    }
+    abstract fun onShuffleModeChanged(shuffleModeEnabled: Boolean)
 
-    open fun onMediaMetaDataChanged(mediaMetadata: MediaMetadata){
+    abstract fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters)
 
-    }
+    abstract fun onSeekForwardIncrementChanged(seekForwardIncrement: Long)
 
-    open fun onPositionDiscontinuity(currentPosition: Long) {
+    abstract fun onSeekBackIncrementChanged(seekBackIncrement: Long)
 
-    }
+    abstract fun onAudioAttributesChanged(audioAttributes: AudioAttributes)
 
-    open fun onRepeatModeChanged(repeatMode: Int) {
+    abstract fun onVolumeChanged(volume: Float)
+    abstract fun onDeviceVolumeChanged(deviceVolume: Int)
 
-    }
+    abstract fun onTimelineChanged(currentTimeline: Timeline)
 
-    open fun onShuffleModeChanged(shuffleModeEnabled: Boolean) {
-
-    }
-
-    open fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
-
-    }
-
-    open fun onSeekForwardIncrementChanged(seekForwardIncrement: Long) {
-
-    }
-
-    open fun onSeekBackIncrementChanged(seekBackIncrement: Long) {
-
-    }
-
-    open fun onAudioAttributesChanged(audioAttributes: AudioAttributes) {
-
-    }
-
-    open fun onPlaylistMetadataChanged(mediaMetadata: MediaMetadata) {
-
-    }
-
-    open fun onTracksChanged(tracks: Tracks) {
-
-    }
-
-    open fun onVolumeChanged(volume: Float) {
-
-    }
-    open fun onDeviceVolumeChanged(deviceVolume: Int) {
-
-    }
-
-    open fun onTimelineChanged(currentTimeline: Timeline) {
-
-    }
+    abstract fun onMediaItemsChanged(mediaItems: List<MediaItem>)
 }

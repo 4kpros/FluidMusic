@@ -119,11 +119,11 @@ class AlbumsFragment : Fragment() {
     private fun saveAllDataToPref() {
         val tempSortOrganize = SortOrganizeItemSP()
         tempSortOrganize.sortOrderBy =
-            mAlbumsFragmentViewModel.sortBy.value ?: SORT_LIST_GRID_DEFAULT_VALUE
+            mAlbumsFragmentViewModel.sortBy.value ?: AlbumsFragmentViewModel.SORT_DEFAULT_VALUE
         tempSortOrganize.organizeListGrid =
-            mAlbumsFragmentViewModel.organizeListGrid.value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
+            mAlbumsFragmentViewModel.organizeListGrid.value ?: AlbumsFragmentViewModel.ORGANIZE_DEFAULT_VALUE
         tempSortOrganize.isInvertSort =
-            mAlbumsFragmentViewModel.isInverted.value ?: IS_INVERTED_LIST_GRID_DEFAULT_VALUE
+            mAlbumsFragmentViewModel.isInverted.value ?: AlbumsFragmentViewModel.IS_INVERTED_DEFAULT_VALUE
         PersistentStorage
             .SortAndOrganize
             .save(
@@ -145,9 +145,9 @@ class AlbumsFragment : Fragment() {
             mAlbumsFragmentViewModel.isInverted.value = it.isInvertSort
         }
         if (tempSortOrganize == null) {
-            mAlbumsFragmentViewModel.sortBy.value = SORT_LIST_GRID_DEFAULT_VALUE
-            mAlbumsFragmentViewModel.organizeListGrid.value = ORGANIZE_LIST_GRID_DEFAULT_VALUE
-            mAlbumsFragmentViewModel.isInverted.value = IS_INVERTED_LIST_GRID_DEFAULT_VALUE
+            mAlbumsFragmentViewModel.sortBy.value = AlbumsFragmentViewModel.SORT_DEFAULT_VALUE
+            mAlbumsFragmentViewModel.organizeListGrid.value = AlbumsFragmentViewModel.ORGANIZE_DEFAULT_VALUE
+            mAlbumsFragmentViewModel.isInverted.value = AlbumsFragmentViewModel.IS_INVERTED_DEFAULT_VALUE
         }
     }
 
@@ -193,7 +193,7 @@ class AlbumsFragment : Fragment() {
             val tempSpanCount: Int =
                 OrganizeItemBottomSheetDialogFragment.getSpanCount(ctx, organizeValue)
             mGenericListGridItemAdapter?.setOrganizeListGrid(
-                mAlbumsFragmentViewModel.organizeListGrid.value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE
+                mAlbumsFragmentViewModel.organizeListGrid.value ?: AlbumsFragmentViewModel.ORGANIZE_DEFAULT_VALUE
             )
             mLayoutManager?.spanCount = tempSpanCount
         }
@@ -485,7 +485,7 @@ class AlbumsFragment : Fragment() {
                     }
                 },
                 AlbumItem.diffCallback as DiffUtil.ItemCallback<Any>,
-                mAlbumsFragmentViewModel.organizeListGrid.value ?: ORGANIZE_LIST_GRID_DEFAULT_VALUE,
+                mAlbumsFragmentViewModel.organizeListGrid.value ?: AlbumsFragmentViewModel.ORGANIZE_DEFAULT_VALUE,
                 mIsSelectable = true,
                 mHavePlaybackState = false,
                 mIsImageFullCircle = false,
@@ -580,8 +580,8 @@ class AlbumsFragment : Fragment() {
 
         context?.let { ctx ->
             val tempGeneric = AlbumItem.castDataItemToGeneric(ctx, tempItem, true) ?: return
-            val tempStringUri =
-                if (tempGeneric.imageUri == Uri.EMPTY) "" else tempGeneric.imageUri.toString()
+            val tempStringUri = if (tempGeneric.mediaUri == Uri.EMPTY)
+                "" else tempGeneric.mediaUri.toString()
             tempFragmentManager.commit {
                 setReorderingAllowed(false)
                 add(
@@ -594,7 +594,7 @@ class AlbumsFragment : Fragment() {
                         AlbumItem.INDEX_COLUM_TO_SONG_ITEM,
                         tempGeneric.name,
                         tempStringUri,
-                        tempGeneric.imageHashedSignature,
+                        tempGeneric.hashedCovertArtSignature,
                         tempGeneric.title,
                         tempGeneric.subtitle,
                         tempGeneric.details,
@@ -655,9 +655,6 @@ class AlbumsFragment : Fragment() {
 
     companion object {
         const val TAG = "AlbumsFragment"
-        private const val ORGANIZE_LIST_GRID_DEFAULT_VALUE: Int = Constants.ORGANIZE_GRID_MEDIUM
-        private const val SORT_LIST_GRID_DEFAULT_VALUE: String = AlbumItem.DEFAULT_INDEX
-        private const val IS_INVERTED_LIST_GRID_DEFAULT_VALUE: Boolean = false
 
         @JvmStatic
         fun newInstance() =

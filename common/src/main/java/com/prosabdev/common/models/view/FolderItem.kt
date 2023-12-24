@@ -85,9 +85,9 @@ data class FolderItem (
                 tempResult.subtitle = if(tempSubtitle == dataItem.deviceName) tempSubtitle else "/${tempSubtitle}"
                 tempResult.details = tempDetails
                 if(dataItem.uriImage?.isNotEmpty() == true){
-                    tempResult.imageUri = Uri.parse(dataItem.uriImage)
+                    tempResult.mediaUri = Uri.parse(dataItem.uriImage)
                 }
-                tempResult.imageHashedSignature = dataItem.hashedCovertArtSignature
+                tempResult.hashedCovertArtSignature = dataItem.hashedCovertArtSignature
             }
             return tempResult
         }

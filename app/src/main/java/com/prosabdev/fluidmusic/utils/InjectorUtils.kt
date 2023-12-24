@@ -5,6 +5,7 @@ import android.content.Context
 import com.prosabdev.fluidmusic.media.MediaEventsListener
 import com.prosabdev.fluidmusic.viewmodels.activities.EqualizerActivityViewModel
 import com.prosabdev.fluidmusic.viewmodels.activities.MainActivityViewModel
+import com.prosabdev.fluidmusic.viewmodels.fragments.ExploreContentsForFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.fragments.PlayingNowFragmentViewModel
 import com.prosabdev.fluidmusic.viewmodels.mediacontroller.MediaControllerViewModel
 

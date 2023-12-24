@@ -580,8 +580,8 @@ class ComposersFragment : Fragment() {
 
         context?.let { ctx ->
             val tempGeneric = ComposerItem.castDataItemToGeneric(ctx, tempItem, true) ?: return
-            val tempStringUri =
-                if (tempGeneric.imageUri == Uri.EMPTY) "" else tempGeneric.imageUri.toString()
+            val tempStringUri = if (tempGeneric.mediaUri == Uri.EMPTY)
+                "" else tempGeneric.mediaUri.toString()
             tempFragmentManager.commit {
                 setReorderingAllowed(false)
                 add(
@@ -594,7 +594,7 @@ class ComposersFragment : Fragment() {
                         ComposerItem.INDEX_COLUM_TO_SONG_ITEM,
                         tempGeneric.name,
                         tempStringUri,
-                        tempGeneric.imageHashedSignature,
+                        tempGeneric.hashedCovertArtSignature,
                         tempGeneric.title,
                         tempGeneric.subtitle,
                         tempGeneric.details,
