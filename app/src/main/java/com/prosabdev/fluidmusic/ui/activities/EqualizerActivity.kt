@@ -413,8 +413,8 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
         }
     }
 
-    private fun updateUIEnableEqualizer(isChecked: Boolean, animate: Boolean) {
-        if(isChecked){
+    private fun updateUIEnableEqualizer(isChecked: Boolean?, animate: Boolean) {
+        if(isChecked == true){
             Animators.crossFadeUpClickable(
                 mDataBiding.buttonChoosePreset,
                 animate,
@@ -477,9 +477,9 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
                 mDataBiding.linearVerticalSeekbars.findViewById<MaterialTextView>(R.id.text_view_bottom + INDEX_TEXT_VIEW_BOTTOM_ADD + i)
             val verticalSeekBar =
                 mDataBiding.linearVerticalSeekbars.findViewById<VerticalSeekBar>(R.id.vertical_seekbar + INDEX_VERTICAL_SEEKBAR_ADD +i)
-            verticalSeekBar.useThumbToSetProgress = isChecked
-            verticalSeekBar.clickToSetProgress = isChecked
-            if(isChecked){
+            verticalSeekBar.useThumbToSetProgress = isChecked ?: false
+            verticalSeekBar.clickToSetProgress = isChecked ?: false
+            if(isChecked == true){
                 Animators.crossFadeUpClickable(
                     textTop,
                     animate

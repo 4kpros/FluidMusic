@@ -10,6 +10,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.PlaybackParameters
+import androidx.media3.common.Timeline
 import androidx.media3.common.util.UnstableApi
 import com.prosabdev.common.models.equalizer.EqualizerPresetItem
 import com.prosabdev.fluidmusic.media.MediaEventsListener
@@ -17,6 +23,7 @@ import com.prosabdev.fluidmusic.ui.custom.visualizer.ExoVisualizer
 import com.prosabdev.fluidmusic.ui.custom.visualizer.FFTAudioProcessor
 import com.prosabdev.fluidmusic.viewmodels.models.equalizer.EqualizerPresetBandLevelItemViewModel
 import com.prosabdev.fluidmusic.viewmodels.models.equalizer.EqualizerPresetItemViewModel
+import kotlinx.coroutines.launch
 
 @SuppressLint("LongLogTag")
 class EqualizerActivityViewModel(app: Application) : AndroidViewModel(app)  {
@@ -34,6 +41,72 @@ class EqualizerActivityViewModel(app: Application) : AndroidViewModel(app)  {
 
     private var mEqualizer: Equalizer? = null
     var mediaEventsListener: MediaEventsListener = object : MediaEventsListener() {
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onIsLoadingChanged(isLoading: Boolean) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onMediaItemTransition(
+            currentMediaItem: MediaItem?,
+            currentMediaItemIndex: Int
+        ) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onMediaMetaDataChanged(mediaMetadata: MediaMetadata) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onPositionChanged(position: Long) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onRepeatModeChanged(repeatMode: Int) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onShuffleModeChanged(shuffleModeEnabled: Boolean) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onSeekForwardIncrementChanged(seekForwardIncrement: Long) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onSeekBackIncrementChanged(seekBackIncrement: Long) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onAudioAttributesChanged(audioAttributes: AudioAttributes) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onVolumeChanged(volume: Float) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onDeviceVolumeChanged(deviceVolume: Int) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onTimelineChanged(currentTimeline: Timeline) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onMediaItemsChanged(mediaItems: List<MediaItem>) {
+            TODO("Not yet implemented")
+        }
 
     }
 
@@ -60,7 +133,9 @@ class EqualizerActivityViewModel(app: Application) : AndroidViewModel(app)  {
     }
 
     suspend fun setCurrentPreset(preset: CharSequence?, viewModel: EqualizerPresetBandLevelItemViewModel?){
-        currentPreset.value = preset
+        viewModelScope.launch {
+            currentPreset.value = preset
+        }
         if(preset.isNullOrEmpty()) return
 
         if(viewModel == null) return
@@ -73,7 +148,9 @@ class EqualizerActivityViewModel(app: Application) : AndroidViewModel(app)  {
                 for(i in 0 until equ.numberOfBands){
                     tempPresetsLevels[i] = equ.getBandLevel(i.toShort())
                 }
-                presetBandsLevels.value = tempPresetsLevels
+                viewModelScope.launch {
+                    presetBandsLevels.value = tempPresetsLevels
+                }
             }
         }else{
             val tempCustomPresets = customPresets.value
@@ -85,7 +162,9 @@ class EqualizerActivityViewModel(app: Application) : AndroidViewModel(app)  {
                         for (i in tempCustomPresetBandsLevels.indices){
                             tempPresetsLevels[tempCustomPresetBandsLevels[i].bandId.toInt()] = tempCustomPresetBandsLevels[i].bandLevel
                         }
-                        presetBandsLevels.value = tempPresetsLevels
+                        viewModelScope.launch {
+                            presetBandsLevels.value = tempPresetsLevels
+                        }
                     }
                 }
             }
